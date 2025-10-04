@@ -81,6 +81,7 @@ Rails.application.configure do
     Flipper.enable :allow_self_reporting
     Flipper.enable :demo_tournaments
     Flipper.enable :custom_table_numbering
+    Flipper.enable :enable_profiles
   rescue StandardError => e
     Rails.logger.warn "Failed setting Flipper features: #{e.class}"
   end

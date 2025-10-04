@@ -70,6 +70,8 @@ Rails.application.routes.draw do
   end
   resources :identities, only: [:index]
 
+  resources :profiles, only: [:index]
+
   get '/error', to: 'errors#show'
 
   get '/help', to: 'home#help'
