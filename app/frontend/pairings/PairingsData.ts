@@ -40,10 +40,18 @@ export async function loadSharingData(
   return (await response.json()) as SharingData;
 }
 
-export interface PairingsData {
+export class PairingsData {
   policy: TournamentPolicies;
   is_player_meeting: boolean;
   stages: Stage[];
+  csrf_token: string;
+
+  constructor() {
+    this.policy = { update: false };
+    this.is_player_meeting = false;
+    this.stages = [];
+    this.csrf_token = "";
+  }
 }
 
 export class SharingData {

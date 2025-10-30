@@ -2,9 +2,19 @@
   import Round from "./Round.svelte";
   import type { Stage } from "./PairingsData";
 
-  export let stage: Stage;
-  export let tournamentId: number;
-  export let start_expanded: boolean;
+  interface Props {
+    stage: Stage;
+    tournamentId: number;
+    startExpanded: boolean;
+    showReportedPairings?: boolean;
+  }
+
+  let {
+    stage,
+    tournamentId,
+    startExpanded,
+    showReportedPairings = true,
+  }: Props = $props();
 </script>
 
 <div class="accordion mb-3" role="tablist">
@@ -18,7 +28,8 @@
       {tournamentId}
       {round}
       {stage}
-      start_expanded={start_expanded && index === stage.rounds.length - 1}
+      startExpanded={startExpanded && index === stage.rounds.length - 1}
+      {showReportedPairings}
     />
   {/each}
 </div>

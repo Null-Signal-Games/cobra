@@ -40,7 +40,7 @@
   {#each data.stages as stage, index (stage.format)}
     <Stage
       {stage}
-      start_expanded={index === data.stages.length - 1}
+      startExpanded={index === data.stages.length - 1}
       {tournamentId}
     />
   {/each}

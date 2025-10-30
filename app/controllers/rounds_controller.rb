@@ -19,6 +19,10 @@ class RoundsController < ApplicationController
     authorize @tournament, :show?
   end
 
+  def pairings_new
+    authorize @tournament, :show?
+  end
+
   def pairings_data
     authorize @tournament, :show?
 
@@ -27,7 +31,8 @@ class RoundsController < ApplicationController
         update: @tournament.user == current_user
       },
       is_player_meeting: @tournament.round_ids.empty?,
-      stages: pairings_data_stages
+      stages: pairings_data_stages,
+      csrf_token: form_authenticity_token
     }
   end
 
