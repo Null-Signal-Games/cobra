@@ -42,13 +42,13 @@ export async function loadSharingData(
 
 export class PairingsData {
   policy: TournamentPolicies;
-  is_player_meeting: boolean;
+  tournament: Tournament;
   stages: Stage[];
   csrf_token: string;
 
   constructor() {
     this.policy = { update: false };
-    this.is_player_meeting = false;
+    this.tournament = new Tournament();
     this.stages = [];
     this.csrf_token = "";
   }
@@ -66,6 +66,24 @@ export interface TournamentPolicies {
   update: boolean;
 }
 
+export class Tournament {
+  player_meeting: boolean;
+  registration_open: boolean;
+  registration_unlocked: boolean;
+  self_registration: boolean;
+  locked_players: number;
+  unlocked_players: number;
+
+  constructor() {
+    this.player_meeting = false;
+    this.registration_open = false;
+    this.registration_unlocked = false;
+    this.self_registration = false;
+    this.locked_players = 0;
+    this.unlocked_players = 0;
+  }
+}
+
 export interface Stage {
   name: string;
   format: string;
@@ -77,6 +95,7 @@ export interface Stage {
 export interface Round {
   id: number;
   number: number;
+  completed: boolean;
   pairings: Pairing[];
   pairings_reported: number;
 }

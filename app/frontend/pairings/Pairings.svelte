@@ -19,11 +19,11 @@
     data = await loadPairings(tournamentId);
   });
 
-  function addSwissStage(e: MouseEvent) {
+  function redirectRequest(e: MouseEvent, url: string, method: string) {
     e.preventDefault();
 
-    fetch(`/tournaments/${tournamentId}/stages`, {
-      method: "POST",
+    fetch(url, {
+      method: method,
       headers: { "X-CSRF-Token": data.csrf_token },
     }).then((response) => {
       if (response.redirected) {
@@ -31,10 +31,19 @@
       }
     });
   }
+
+  function pairNewRound(e: MouseEvent) {
+    if (data.tournament.registration_unlocked && !confirm("Registration is still open or some players are unlocked. Pair new round anyway?"))
+    {
+      return;
+    }
+
+    redirectRequest(e, `/tournaments/${tournamentId}/rounds`, "POST")
+  }
 </script>
 
 <!-- Upper controls -->
-<div class="mb-3">
+<div>
   {#if data.stages && data.stages.length > 0}
     {#if data.stages.some((s) => s.rounds && s.rounds.length > 0)}
       <div>
@@ -82,28 +91,61 @@
       </a>
     {/if}
   {:else if data.policy.update}
-    <button type="button" class="btn btn-success" onclick={addSwissStage}>
+    <button type="button" class="btn btn-success" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/stages`, "POST")}>
       <FontAwesomeIcon icon="plus" /> Add Swiss stage
     </button>
   {/if}
 </div>
 
 <!-- Tournament admin controls -->
-<!-- TODO: Close registration button -->
-<!-- TODO: Open registration button -->
-<!-- TODO: Unlock all players button -->
-<!-- TODO: Lock all players button -->
-<!-- TODO: Pair new round button -->
+{#if data.policy.update}
+  <div class="mt-3">
+    {#if data.tournament.registration_open}
+      <button class="btn btn-info" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/close_registration`, "PATCH")}>
+        <FontAwesomeIcon icon="lock" /> Close registration
+      </button>
+    {:else if data.tournament.self_registration && !data.stages.some((s) => s.rounds.length > 0)}
+      <button class="btn btn-secondary" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/open_registration`, "PATCH")}>
+        <FontAwesomeIcon icon="folder-open" /> Open registration
+      </button>
+      {#if data.tournament.locked_players > 0}
+        <button class="btn btn-secondary" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/unlock_player_registrations`, "PATCH")}>
+          <FontAwesomeIcon icon="unlock" /> Unlock all players
+        </button>
+      {/if}
+       {#if data.tournament.unlocked_players > 0}
+        <button class="btn btn-info" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/lock_player_registrations`, "PATCH")}>
+          <FontAwesomeIcon icon="lock" /> Lock all players
+        </button>
+      {/if}
+    {/if}
+    
+    {#if data.stages.every((s) => s.rounds.every((r) => r.completed))}
+      <button class="btn btn-success" onclick={pairNewRound}>
+        <FontAwesomeIcon icon="plus" /> Pair new round!
+      </button>
+    {:else}
+      <button class="btn btn-secondary disabled">
+        <FontAwesomeIcon icon="plus" /> Pair new round!
+      </button>
+      <span class="ml-2">All rounds must be flagged complete before you can add a new round.</span>
+    {/if}
+  </div>
+{/if}
 
 <!-- Stages -->
-{#each data.stages as stage, index (stage.format)}
-  <Stage
-    {stage}
-    {tournamentId}
-    startExpanded={index === data.stages.length - 1}
-    {showReportedPairings}
-  />
-{/each}
+<div class="mt-3">
+  {#each data.stages as stage, index (stage.format)}
+    <Stage
+      {stage}
+      {tournamentId}
+      startExpanded={index === data.stages.length - 1}
+      {showReportedPairings}
+    />
+  {/each}
+</div>
+
+<!-- TODO: Cut buttons -->
 
 <!-- FAQ dialog -->
 <ModalDialog id="faq" headerText="FAQ">

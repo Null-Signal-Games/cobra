@@ -26,7 +26,7 @@
 <p></p>
 
 {#if data}
-  {#if data.is_player_meeting}
+  {#if data.tournament.player_meeting}
     <p>
       <a
         href="/tournaments/{tournamentId}/players/meeting"

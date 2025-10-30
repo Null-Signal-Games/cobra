@@ -30,7 +30,14 @@ class RoundsController < ApplicationController
       policy: {
         update: @tournament.user == current_user
       },
-      is_player_meeting: @tournament.round_ids.empty?,
+      tournament: {
+        player_meeting: @tournament.round_ids.empty?,
+        registration_open: @tournament.registration_open?,
+        registration_unlocked: @tournament.registration_unlocked?,
+        self_registration: @tournament.self_registration?,
+        locked_players: @tournament.locked_players.count,
+        unlocked_players: @tournament.unlocked_players.count
+      },
       stages: pairings_data_stages,
       csrf_token: form_authenticity_token
     }
@@ -276,6 +283,7 @@ class RoundsController < ApplicationController
     {
       id: round.id,
       number: round.number,
+      completed: round.completed?,
       pairings:,
       pairings_reported:
     }
