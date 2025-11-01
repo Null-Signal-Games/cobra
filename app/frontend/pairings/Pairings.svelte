@@ -33,12 +33,16 @@
   }
 
   function pairNewRound(e: MouseEvent) {
-    if (data.tournament.registration_unlocked && !confirm("Registration is still open or some players are unlocked. Pair new round anyway?"))
-    {
+    if (
+      data.tournament.registration_unlocked &&
+      !confirm(
+        "Registration is still open or some players are unlocked. Pair new round anyway?",
+      )
+    ) {
       return;
     }
 
-    redirectRequest(e, `/tournaments/${tournamentId}/rounds`, "POST")
+    redirectRequest(e, `/tournaments/${tournamentId}/rounds`, "POST");
   }
 </script>
 
@@ -91,7 +95,12 @@
       </a>
     {/if}
   {:else if data.policy.update}
-    <button type="button" class="btn btn-success" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/stages`, "POST")}>
+    <button
+      type="button"
+      class="btn btn-success"
+      onclick={(e) =>
+        redirectRequest(e, `/tournaments/${tournamentId}/stages`, "POST")}
+    >
       <FontAwesomeIcon icon="plus" /> Add Swiss stage
     </button>
   {/if}
@@ -101,25 +110,57 @@
 {#if data.policy.update}
   <div class="mt-3">
     {#if data.tournament.registration_open}
-      <button class="btn btn-info" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/close_registration`, "PATCH")}>
+      <button
+        class="btn btn-info"
+        onclick={(e) =>
+          redirectRequest(
+            e,
+            `/tournaments/${tournamentId}/close_registration`,
+            "PATCH",
+          )}
+      >
         <FontAwesomeIcon icon="lock" /> Close registration
       </button>
     {:else if data.tournament.self_registration && !data.stages.some((s) => s.rounds.length > 0)}
-      <button class="btn btn-secondary" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/open_registration`, "PATCH")}>
+      <button
+        class="btn btn-secondary"
+        onclick={(e) =>
+          redirectRequest(
+            e,
+            `/tournaments/${tournamentId}/open_registration`,
+            "PATCH",
+          )}
+      >
         <FontAwesomeIcon icon="folder-open" /> Open registration
       </button>
       {#if data.tournament.locked_players > 0}
-        <button class="btn btn-secondary" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/unlock_player_registrations`, "PATCH")}>
+        <button
+          class="btn btn-secondary"
+          onclick={(e) =>
+            redirectRequest(
+              e,
+              `/tournaments/${tournamentId}/unlock_player_registrations`,
+              "PATCH",
+            )}
+        >
           <FontAwesomeIcon icon="unlock" /> Unlock all players
         </button>
       {/if}
-       {#if data.tournament.unlocked_players > 0}
-        <button class="btn btn-info" onclick={(e) => redirectRequest(e, `/tournaments/${tournamentId}/lock_player_registrations`, "PATCH")}>
+      {#if data.tournament.unlocked_players > 0}
+        <button
+          class="btn btn-info"
+          onclick={(e) =>
+            redirectRequest(
+              e,
+              `/tournaments/${tournamentId}/lock_player_registrations`,
+              "PATCH",
+            )}
+        >
           <FontAwesomeIcon icon="lock" /> Lock all players
         </button>
       {/if}
     {/if}
-    
+
     {#if data.stages.every((s) => s.rounds.every((r) => r.completed))}
       <button class="btn btn-success" onclick={pairNewRound}>
         <FontAwesomeIcon icon="plus" /> Pair new round!
@@ -128,7 +169,9 @@
       <button class="btn btn-secondary disabled">
         <FontAwesomeIcon icon="plus" /> Pair new round!
       </button>
-      <span class="ml-2">All rounds must be flagged complete before you can add a new round.</span>
+      <span class="ml-2">
+        All rounds must be flagged complete before you can add a new round.
+      </span>
     {/if}
   </div>
 {/if}
@@ -145,11 +188,55 @@
   {/each}
 </div>
 
-<!-- TODO: Cut buttons -->
+<!-- Elimination stage controls -->
+{#if data.policy.update && (data.stages.length == 0 || !data.stages[data.stages.length - 1].is_elimination)}
+  <h4>Cut to...</h4>
+  <table>
+    <tbody>
+      <tr>
+        <td>Single Elimination</td>
+        {#each [3, 4, 8, 16] as num}
+          <td class="pl-2">
+            <button
+              class="btn btn-success"
+              onclick={(e) =>
+                redirectRequest(
+                  e,
+                  `/tournaments/${tournamentId}/cut?elimination_type=single&number=${num}`,
+                  "POST",
+                )}
+            >
+              <FontAwesomeIcon icon="scissors" /> Top {num}
+            </button>
+          </td>
+        {/each}
+      </tr>
+      <tr>
+        <td>Double Elimination</td>
+        <td></td>
+        {#each [4, 8, 16] as num}
+          <td class="pt-2 pl-2">
+            <button
+              class="btn btn-success"
+              onclick={(e) =>
+                redirectRequest(
+                  e,
+                  `/tournaments/${tournamentId}/cut?number=${num}`,
+                  "POST",
+                )}
+            >
+              <FontAwesomeIcon icon="scissors" /> Top {num}
+            </button>
+          </td>
+        {/each}
+      </tr>
+    </tbody>
+  </table>
+{/if}
 
 <!-- FAQ dialog -->
 <ModalDialog id="faq" headerText="FAQ">
-  <p class="font-weight-bold">How does self reporting work?</p>
+  <h5>How does self reporting work?</h5>
   <ul>
     <li>
       For self reporting, a player needs to be logged in with the NRDB account
@@ -157,22 +244,22 @@
       their games.
     </li>
     <li>
-      Self reporting in Cobra works alongside the <span class="font-weight-bold"
-        >two-eye principle</span
-      >: both players have to report the same result for Cobra to accept the
-      answer and set the scores.
+      Self reporting in Cobra works alongside the
+      <span class="font-weight-bold">two-eye principle</span>: both players have
+      to report the same result for Cobra to accept the answer and set the
+      scores.
     </li>
   </ul>
-  <p class="font-weight-bold">Does self reporting replace normal reports?</p>
+  <h5>Does self reporting replace normal reports?</h5>
   <p>
     No, it just allows players to report their own scores instead of handing in
     manually. This should ease the overall reporting process.
   </p>
   <ul>
     <li>
-      The TO can monitor any reports by clicking on <span
-        class="font-weight-bold">'Reports'</span
-      > which shows the scores reported.
+      The TO can monitor any reports by clicking on
+      <span class="font-weight-bold">'Reports'</span>
+      which shows the scores reported.
     </li>
     <li>
       The TO can accept a single report by clicking on the provided option.

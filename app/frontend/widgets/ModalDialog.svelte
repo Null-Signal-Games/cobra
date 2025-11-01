@@ -15,7 +15,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5>{headerText}</h5>
+        <h4>{headerText}</h4>
         <button
           type="button"
           class="close"
