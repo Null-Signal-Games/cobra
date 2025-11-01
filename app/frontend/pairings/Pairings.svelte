@@ -5,6 +5,7 @@
   import { showIdentities } from "./ShowIdentities";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
+    import { ws } from "msw";
 
   interface Props {
     tournamentId: number;
@@ -46,8 +47,8 @@
   }
 </script>
 
-<!-- Upper controls -->
 {#if !data.stages || data.stages.length == 0}
+  <!-- Add Swiss stage button -->
   {#if data.policy.update}
     <button
       type="button"
@@ -59,52 +60,51 @@
     </button>
   {/if}
 {:else}
+  <!-- Upper controls -->
   <div>
-    {#if data.stages && data.stages.length > 0}
-      {#if data.stages.some((s) => s.rounds && s.rounds.length > 0)}
-        <div>
-          {#if data.policy.update}
-            <button
-              class="btn btn-primary"
-              onclick={(_) => (showReportedPairings = !showReportedPairings)}
-            >
-              <FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
-            </button>
-          {/if}
+    {#if !data.stages || data.stages.every((s) => !s.rounds || s.rounds.length == 0)}
+      <a
+        href="/tournaments/{tournamentId}/players/meeting"
+        class="btn btn-primary"
+      >
+        <FontAwesomeIcon icon="list-ul" /> Player meeting
+      </a>
+    {:else}
+      {#if data.stages.some((s) => s.rounds?.length > 0)}
+        {#if data.policy.update}
           <button
             class="btn btn-primary"
-            onclick={(_) => showIdentities.update((value) => !value)}
+            onclick={(_) => (showReportedPairings = !showReportedPairings)}
           >
-            <FontAwesomeIcon icon="eye-slash" /> Show/hide identities
+            <FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
           </button>
-          <a
-            href="/tournaments/{tournamentId}/rounds/view_pairings"
-            class="btn btn-primary"
-          >
-            <FontAwesomeIcon icon="users" /> See player pairings view
-          </a>
-          <button
-            type="button"
-            class="btn btn-info"
-            data-toggle="modal"
-            data-target="#faq"
-          >
-            <FontAwesomeIcon icon="question" /> FAQ
-          </button>
-        </div>
+        {/if}
+        <button
+          class="btn btn-primary"
+          onclick={(_) => showIdentities.update((value) => !value)}
+        >
+          <FontAwesomeIcon icon="eye-slash" /> Show/hide identities
+        </button>
+        <a
+          href="/tournaments/{tournamentId}/rounds/view_pairings"
+          class="btn btn-primary"
+        >
+          <FontAwesomeIcon icon="users" /> See player pairings view
+        </a>
+        <button
+          type="button"
+          class="btn btn-info"
+          data-toggle="modal"
+          data-target="#faq"
+        >
+          <FontAwesomeIcon icon="question" /> FAQ
+        </button>
         {#if !showReportedPairings}
           <div class="alert alert-info mt-3">
             Reported scores are currently hidden on this page. This will not
             affect other users viewing this page.
           </div>
         {/if}
-      {:else}
-        <a
-          href="/tournaments/{tournamentId}/players/meeting"
-          class="btn btn-primary"
-        >
-          <FontAwesomeIcon icon="list-ul" /> Player meeting
-        </a>
       {/if}
     {/if}
   </div>
@@ -124,7 +124,7 @@
         >
           <FontAwesomeIcon icon="lock" /> Close registration
         </button>
-      {:else if data.tournament.self_registration && data.stages.every((s) => s.rounds.length == 0)}
+      {:else if data.tournament.self_registration && data.stages.every((s) => !s.rounds || s.rounds.length == 0)}
         <button
           class="btn btn-secondary"
           onclick={(e) =>
