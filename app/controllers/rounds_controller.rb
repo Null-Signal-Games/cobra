@@ -28,7 +28,8 @@ class RoundsController < ApplicationController
 
     render json: {
       policy: {
-        update: @tournament.user == current_user
+        update: @tournament.user == current_user,
+        custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
       },
       tournament: {
         player_meeting: @tournament.round_ids.empty?,
@@ -167,6 +168,7 @@ class RoundsController < ApplicationController
     players = pairings_data_players
     @tournament.stages.includes(:rounds).map do |stage|
       {
+        id: stage.id,
         name: stage.format.titleize,
         format: stage.format,
         is_single_sided: stage.single_sided?,

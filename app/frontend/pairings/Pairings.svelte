@@ -5,7 +5,7 @@
   import { showIdentities } from "./ShowIdentities";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
-    import { ws } from "msw";
+  import { redirectRequest } from "../utils/requests";
 
   interface Props {
     tournamentId: number;
@@ -20,19 +20,6 @@
     data = await loadPairings(tournamentId);
   });
 
-  function redirectRequest(e: MouseEvent, url: string, method: string) {
-    e.preventDefault();
-
-    fetch(url, {
-      method: method,
-      headers: { "X-CSRF-Token": data.csrf_token },
-    }).then((response) => {
-      if (response.redirected) {
-        window.location.href = response.url;
-      }
-    });
-  }
-
   function pairNewRound(e: MouseEvent) {
     if (
       data.tournament.registration_unlocked &&
@@ -43,7 +30,12 @@
       return;
     }
 
-    redirectRequest(e, `/tournaments/${tournamentId}/rounds`, "POST");
+    redirectRequest(
+      e,
+      `/tournaments/${tournamentId}/rounds`,
+      "POST",
+      data.csrf_token,
+    );
   }
 </script>
 
@@ -54,7 +46,12 @@
       type="button"
       class="btn btn-success"
       onclick={(e) =>
-        redirectRequest(e, `/tournaments/${tournamentId}/stages`, "POST")}
+        redirectRequest(
+          e,
+          `/tournaments/${tournamentId}/stages`,
+          "POST",
+          data.csrf_token,
+        )}
     >
       <FontAwesomeIcon icon="plus" /> Add Swiss stage
     </button>
@@ -69,46 +66,44 @@
       >
         <FontAwesomeIcon icon="list-ul" /> Player meeting
       </a>
-    {:else}
-      {#if data.stages.some((s) => s.rounds?.length > 0)}
-        {#if data.policy.update}
-          <button
-            class="btn btn-primary"
-            onclick={(_) => (showReportedPairings = !showReportedPairings)}
-          >
-            <FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
-          </button>
-        {/if}
+    {:else if data.stages.some((s) => s.rounds?.length > 0)}
+      {#if data.policy.update}
         <button
           class="btn btn-primary"
-          onclick={(_) => showIdentities.update((value) => !value)}
+          onclick={(_) => (showReportedPairings = !showReportedPairings)}
         >
-          <FontAwesomeIcon icon="eye-slash" /> Show/hide identities
+          <FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
         </button>
-        <a
-          href="/tournaments/{tournamentId}/rounds/view_pairings"
-          class="btn btn-primary"
-        >
-          <FontAwesomeIcon icon="users" /> See player pairings view
-        </a>
-        <button
-          type="button"
-          class="btn btn-info"
-          data-toggle="modal"
-          data-target="#faq"
-        >
-          <FontAwesomeIcon icon="question" /> FAQ
-        </button>
-        {#if !showReportedPairings}
-          <div class="alert alert-info mt-3">
-            Reported scores are currently hidden on this page. This will not
-            affect other users viewing this page.
-          </div>
-        {/if}
+      {/if}
+      <button
+        class="btn btn-primary"
+        onclick={(_) => showIdentities.update((value) => !value)}
+      >
+        <FontAwesomeIcon icon="eye-slash" /> Show/hide identities
+      </button>
+      <a
+        href="/tournaments/{tournamentId}/rounds/view_pairings"
+        class="btn btn-primary"
+      >
+        <FontAwesomeIcon icon="users" /> See player pairings view
+      </a>
+      <button
+        type="button"
+        class="btn btn-info"
+        data-toggle="modal"
+        data-target="#faq"
+      >
+        <FontAwesomeIcon icon="question" /> FAQ
+      </button>
+      {#if !showReportedPairings}
+        <div class="alert alert-info mt-3">
+          Reported scores are currently hidden on this page. This will not
+          affect other users viewing this page.
+        </div>
       {/if}
     {/if}
   </div>
-  
+
   <!-- Tournament admin controls -->
   {#if data.policy.update}
     <div class="mt-3">
@@ -120,6 +115,7 @@
               e,
               `/tournaments/${tournamentId}/close_registration`,
               "PATCH",
+              data.csrf_token,
             )}
         >
           <FontAwesomeIcon icon="lock" /> Close registration
@@ -132,6 +128,7 @@
               e,
               `/tournaments/${tournamentId}/open_registration`,
               "PATCH",
+              data.csrf_token,
             )}
         >
           <FontAwesomeIcon icon="folder-open" /> Open registration
@@ -144,6 +141,7 @@
                 e,
                 `/tournaments/${tournamentId}/unlock_player_registrations`,
                 "PATCH",
+                data.csrf_token,
               )}
           >
             <FontAwesomeIcon icon="unlock" /> Unlock all players
@@ -157,13 +155,14 @@
                 e,
                 `/tournaments/${tournamentId}/lock_player_registrations`,
                 "PATCH",
+                data.csrf_token,
               )}
           >
             <FontAwesomeIcon icon="lock" /> Lock all players
           </button>
         {/if}
       {/if}
-  
+
       {#if data.stages.every((s) => s.rounds.every((r) => r.completed))}
         <button class="btn btn-success" onclick={pairNewRound}>
           <FontAwesomeIcon icon="plus" /> Pair new round!
@@ -178,7 +177,7 @@
       {/if}
     </div>
   {/if}
-  
+
   <!-- Stages -->
   <div class="mt-3">
     {#each data.stages as stage, index (stage.format)}
@@ -187,10 +186,12 @@
         {tournamentId}
         startExpanded={index === data.stages.length - 1}
         {showReportedPairings}
+        tournamentPolicies={data.policy}
+        csrfToken={data.csrf_token}
       />
     {/each}
   </div>
-  
+
   <!-- Elimination stage controls -->
   {#if data.policy.update && data.stages.length > 0 && !data.stages[data.stages.length - 1].is_elimination}
     <h4>Cut to...</h4>
@@ -207,6 +208,7 @@
                     e,
                     `/tournaments/${tournamentId}/cut?elimination_type=single&number=${num}`,
                     "POST",
+                    data.csrf_token,
                   )}
               >
                 <FontAwesomeIcon icon="scissors" /> Top {num}
@@ -226,6 +228,7 @@
                     e,
                     `/tournaments/${tournamentId}/cut?number=${num}`,
                     "POST",
+                    data.csrf_token,
                   )}
               >
                 <FontAwesomeIcon icon="scissors" /> Top {num}
@@ -236,27 +239,27 @@
       </tbody>
     </table>
   {/if}
-  
+
   <!-- FAQ dialog -->
   <ModalDialog id="faq" headerText="FAQ">
     <h5>How does self reporting work?</h5>
     <ul>
       <li>
         For self reporting, a player needs to be logged in with the NRDB account
-        they used to register for the tournament to ensure they are reporting only
-        their games.
+        they used to register for the tournament to ensure they are reporting
+        only their games.
       </li>
       <li>
         Self reporting in Cobra works alongside the
-        <span class="font-weight-bold">two-eye principle</span>: both players have
-        to report the same result for Cobra to accept the answer and set the
-        scores.
+        <span class="font-weight-bold">two-eye principle</span>: both players
+        have to report the same result for Cobra to accept the answer and set
+        the scores.
       </li>
     </ul>
     <h5>Does self reporting replace normal reports?</h5>
     <p>
-      No, it just allows players to report their own scores instead of handing in
-      manually. This should ease the overall reporting process.
+      No, it just allows players to report their own scores instead of handing
+      in manually. This should ease the overall reporting process.
     </p>
     <ul>
       <li>

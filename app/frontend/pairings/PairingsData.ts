@@ -47,7 +47,7 @@ export class PairingsData {
   csrf_token: string;
 
   constructor() {
-    this.policy = { update: false };
+    this.policy = { update: false, custom_table_numbering: false };
     this.tournament = new Tournament();
     this.stages = [];
     this.csrf_token = "";
@@ -64,6 +64,7 @@ export class SharingData {
 
 export interface TournamentPolicies {
   update: boolean;
+  custom_table_numbering: boolean;
 }
 
 export class Tournament {
@@ -85,6 +86,7 @@ export class Tournament {
 }
 
 export interface Stage {
+  id: number;
   name: string;
   format: string;
   is_single_sided: boolean;
