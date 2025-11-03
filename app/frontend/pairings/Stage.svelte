@@ -64,6 +64,7 @@
     {/if}
   </div>
 
+  <!-- Rounds -->
   {#if !tournamentPolicies?.update && stage.rounds.length > 0 && stage.rounds[stage.rounds.length - 1].pairings.length > 30}
     <div class="alert alert-info">
       Due to the number of players, only the most recent round will be displayed
@@ -75,6 +76,8 @@
       {stage}
       {startExpanded}
       {showReportedPairings}
+      {tournamentPolicies}
+      {csrfToken}
     />
   {:else}
     {#each stage.rounds.filter((r) => r.id) as round, index (round.id)}
@@ -84,6 +87,8 @@
         {stage}
         startExpanded={startExpanded && index === stage.rounds.length - 1}
         {showReportedPairings}
+        {tournamentPolicies}
+        {csrfToken}
       />
     {/each}
   {/if}
