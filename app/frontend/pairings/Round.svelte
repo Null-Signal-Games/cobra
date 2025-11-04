@@ -24,6 +24,8 @@
     csrfToken = "",
   }: Props = $props();
 
+  let roundTimerLength = $state(round.length_minutes);
+
   function completeRound(e: MouseEvent) {
     if (round.pairings.length != round.pairings_reported
       && !confirm(
@@ -36,6 +38,23 @@
     redirectRequest(
       e,
       `/tournaments/${tournamentId}/rounds/${round.id}/complete?completed=true`,
+      "PATCH",
+      csrfToken,
+    );
+  }
+
+  function resetTimer(e: MouseEvent) {
+    if (
+      !confirm(
+        "This will clear all elapsed time in the round. Are you sure?",
+      )
+    ) {
+      return;
+    }
+
+    redirectRequest(
+      e,
+      `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=reset`,
       "PATCH",
       csrfToken,
     );
@@ -79,6 +98,50 @@
         <FontAwesomeIcon icon="list-ul" />
         Pairings by name
       </a>
+
+      <!-- Timer -->
+      {#if tournamentPolicies?.update && !round.completed}
+        <div class="form-inline mt-2">
+          <div class="form-group">
+            <label for="round{round.id}Length">Round timer length (minutes)</label>
+            <input id="round{round.id}Length" size="3" class="form-control ml-2 mr-2" value={roundTimerLength} />
+            {#if round.timer.running}
+              <button class="btn btn-danger" onclick={(e) =>
+                  redirectRequest(
+                    e,
+                    `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=stop`,
+                    "PATCH",
+                    csrfToken,
+                  )}>
+                <FontAwesomeIcon icon="clock-o" /> Pause
+              </button>
+            {:else if round.timer.paused}
+              <button class="btn btn-success" onclick={(e) =>
+                  redirectRequest(
+                    e,
+                    `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=start`,
+                    "PATCH",
+                    csrfToken,
+                  )}>
+                <FontAwesomeIcon icon="clock-o" /> Resume
+              </button>
+            {:else if !round.timer.started}
+              <button class="btn btn-success" onclick={(e) =>
+                  redirectRequest(
+                    e,
+                    `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=start`,
+                    "PATCH",
+                    csrfToken,
+                  )}>
+                <FontAwesomeIcon icon="clock-o" /> Start
+              </button>
+            {/if}
+            <button class="btn btn-info ml-2" onclick={resetTimer}>
+              <FontAwesomeIcon icon="undo" /> Reset
+            </button>
+          </div>
+        </div>
+      {/if}
 
       <!-- Pairings -->
       {#each round.pairings as pairing (pairing.id)}

@@ -287,7 +287,13 @@ class RoundsController < ApplicationController
       number: round.number,
       completed: round.completed?,
       pairings:,
-      pairings_reported:
+      pairings_reported:,
+      length_minutes: round.length_minutes,
+      timer: {
+        running: round.timer.running?,
+        paused: round.timer.paused?,
+        started: round.timer.started?
+      }
     }
   end
 

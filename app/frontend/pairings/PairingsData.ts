@@ -100,6 +100,14 @@ export interface Round {
   completed: boolean;
   pairings: Pairing[];
   pairings_reported: number;
+  length_minutes: number;
+  timer: RoundTimer;
+}
+
+export interface RoundTimer {
+  running: boolean;
+  paused: boolean;
+  started: boolean;
 }
 
 export interface PlayerSource {
