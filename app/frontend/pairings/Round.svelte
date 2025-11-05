@@ -95,8 +95,7 @@
         </a>
       {/if}
       <a class="btn btn-primary" href="{round.id}/pairings">
-        <FontAwesomeIcon icon="list-ul" />
-        Pairings by name
+        <FontAwesomeIcon icon="list-ul" /> Pairings by name
       </a>
 
       <!-- Timer -->
@@ -145,8 +144,11 @@
 
       <!-- Pairings -->
       {#each round.pairings as pairing (pairing.id)}
-        {#if showReportedPairings || pairing.score_label === "-"}
-          <Pairing {tournamentId} {pairing} {round} {stage} />
+        {#if showReportedPairings || !pairing.reported}
+          <Pairing {tournamentId} {pairing} {round} {stage} {tournamentPolicies} {csrfToken} />
+          {#if tournamentPolicies?.update}
+            <hr />
+          {/if}
         {/if}
       {/each}
     </div>
