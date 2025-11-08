@@ -1,9 +1,12 @@
 <script lang="ts">
-  import { type Pairing, type Round, type Score, type Stage, type TournamentPolicies, scorePresets } from "./PairingsData";
+  import { onMount } from "svelte";
+  import { type Pairing, type Player, type Round, type Score, SelfReport, type Stage, type TournamentPolicies, readableReportScore, scorePresets } from "./PairingsData";
   import PlayerName from "./PlayerName.svelte";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import SelfReportOptions from "./SelfReportOptions.svelte";
+  import ModalDialog from "../widgets/ModalDialog.svelte";
   import { redirectRequest } from "../utils/requests";
+    import { report } from "process";
 
   interface Props {
     tournamentId: number;
@@ -16,12 +19,16 @@
 
   let { tournamentId, stage, round, pairing, tournamentPolicies, csrfToken }: Props = $props();
 
-  let left_player = $state(pairing.player1);
-  let right_player = $state(pairing.player2);
+  let leftPlayer = $state(pairing.player1);
+  let rightPlayer = $state(pairing.player2);
   if (pairing.player2.side == "corp" && stage.is_single_sided) {
-    left_player = pairing.player2;
-    right_player = pairing.player1;
+    leftPlayer = pairing.player2;
+    rightPlayer = pairing.player1;
   }
+  let leftPlayerReport: SelfReport | undefined = $state(new SelfReport());
+  let rightPlayerReport: SelfReport | undefined = $state(new SelfReport());
+  let playersReported = $state(false);
+  let selfReportsMatch = $state(false);
 
   let showScorePresets = $state(!pairing.reported);
   let customScore: Score = $state({
@@ -33,6 +40,18 @@
     score2_runner: 0,
     score1_runner: 0,
     score2_corp: 0
+  });
+
+  onMount(() => {
+    leftPlayerReport = pairing.self_reports?.find((r) => r.report_player_id === leftPlayer.user_id);
+    rightPlayerReport = pairing.self_reports?.find((r) => r.report_player_id === rightPlayer.user_id);
+    playersReported = leftPlayerReport !== undefined && rightPlayerReport !== undefined;
+    selfReportsMatch = leftPlayerReport?.score1 === rightPlayerReport?.score1
+      && leftPlayerReport?.score2 === rightPlayerReport?.score2
+      && leftPlayerReport?.score1_corp === rightPlayerReport?.score1_corp
+      && leftPlayerReport?.score2_corp === rightPlayerReport?.score2_corp
+      && leftPlayerReport?.score1_runner === rightPlayerReport?.score1_runner
+      && leftPlayerReport?.score2_runner === rightPlayerReport?.score2_runner;
   });
 
   function toggleShowScorePresets(e: MouseEvent) {
@@ -50,6 +69,32 @@
       e,
       `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/report?${params.join("&")}`,
       "POST",
+      csrfToken,
+    );
+  }
+
+  function deletePairing(e: MouseEvent) {
+    if (!confirm("Are you sure? This cannot be reversed.")) {
+      return;
+    }
+
+    redirectRequest(
+      e,
+      `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}`,
+      "DELETE",
+      csrfToken,
+    );
+  }
+
+  function resetReports(e: MouseEvent) {
+    if (!confirm("Are you sure? This cannot be reversed.")) {
+      return;
+    }
+
+    redirectRequest(
+      e,
+      `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/reset_self_report`,
+      "DELETE",
       csrfToken,
     );
   }
@@ -82,7 +127,7 @@
       </a>
     {/if}
   {/if}
-  <PlayerName player={left_player} left_or_right="left" />
+  <PlayerName player={leftPlayer} left_or_right="left" />
 
   <!-- Score -->
   {#if tournamentPolicies?.update && (!stage.is_single_sided || pairing.player1.side)}
@@ -98,7 +143,7 @@
       {:else}
         <div class="form-row justify-content-center">
           <div>
-            {#if left_player == pairing.player1}
+            {#if leftPlayer == pairing.player1}
               <input class="form-control" style="width: 2.5em;" bind:value={customScore.score1} />
             {:else}
               <input class="form-control" style="width: 2.5em;" bind:value={customScore.score2} />
@@ -108,7 +153,7 @@
           <button class="btn btn-primary mx-2" onclick={(e) => submitScore(e, customScore)}><FontAwesomeIcon icon="flag-checkered" /> Save</button>
 
           <div>
-            {#if right_player == pairing.player1}
+            {#if rightPlayer == pairing.player1}
               <input class="form-control" style="width: 2.5em;" bind:value={customScore.score1} />
             {:else}
               <input class="form-control" style="width: 2.5em;" bind:value={customScore.score2} />
@@ -145,7 +190,7 @@
   {/if}
 
   <!-- Player 2 -->
-  <PlayerName player={right_player} left_or_right="right" />
+  <PlayerName player={rightPlayer} left_or_right="right" />
   {#if pairing.policy.view_decks && !pairing.player1.side}
     <a href="../players/{pairing.player2.id}/view_decks?back_to=pairings">
       <FontAwesomeIcon icon="eye" /> View decks
@@ -154,11 +199,83 @@
 
   <!-- Self-reporting -->
   <div class="col-sm-2">
-    {#if pairing.policy.self_report}
-      <SelfReportOptions {tournamentId} {stage} {round} {pairing} />
-    {/if}
-    {#if pairing.self_report !== null}
-      Report: {pairing.self_report.label}
+    {#if tournamentPolicies?.update}
+      <button
+        type="button"
+        class="btn btn-primary mr-2"
+        data-toggle="modal"
+        data-target="#reports{pairing.id}"
+      >
+        Reports
+        {#if !pairing.reported && pairing.self_reports?.length == 2 && pairing.self_reports[0].matches(pairing.self_reports[1])}
+          <FontAwesomeIcon icon="exclamation-triangle" />
+        {/if}
+      </button>
+      <button class="btn btn-danger" onclick={deletePairing}>
+        <FontAwesomeIcon icon="trash" />
+      </button>
+    {:else}
+      {#if pairing.policy.self_report}
+        <SelfReportOptions {tournamentId} {stage} {round} {pairing} />
+      {/if}
+      {#if pairing.self_reports && pairing.self_reports.length !== 0}
+        Report: {pairing.self_reports[0].label}
+      {/if}
     {/if}
   </div>
+
+  {#snippet playerReport(player: Player, report: SelfReport | undefined)}
+    {player.name} reported:
+    {#if report}
+      {readableReportScore(report, pairing.player1.side, stage.is_single_sided)}
+      {#if playersReported && !selfReportsMatch}
+        <FontAwesomeIcon icon="times" />
+      {/if}
+    {:else}
+      <FontAwesomeIcon icon="hourglass" />
+    {/if}
+  {/snippet}
+
+  {#snippet acceptPlayerReportButton(player: Player, report: SelfReport)}
+    <button
+      type="button"
+      class="btn btn-primary"
+      onclick={(e) => submitScore(
+        e,
+        {
+          score1: report.score1,
+          score1_corp: 0,
+          score1_runner: 0,
+          score2: report.score2,
+          score2_corp: 0,
+          score2_runner: 0
+        })}
+      disabled={pairing.reported}
+    >
+      <FontAwesomeIcon icon="check" /> Accept {player.name}
+    </button>
+  {/snippet}
+
+  <ModalDialog id="reports{pairing.id}" headerText="Player Self Reports">
+    <p>
+      {@render playerReport(leftPlayer, leftPlayerReport)}
+    </p>
+    <p>
+      {@render playerReport(rightPlayer, rightPlayerReport)}
+    </p>
+
+    {#snippet footer()}
+      {#if leftPlayerReport}
+        {@render acceptPlayerReportButton(leftPlayer, leftPlayerReport)}
+      {/if}
+      {#if rightPlayerReport}
+        {@render acceptPlayerReportButton(rightPlayer, rightPlayerReport)}
+      {/if}
+      {#if playersReported && !selfReportsMatch}
+        <button class="btn btn-primary" onclick={resetReports} title="Reset self reports of pairing">
+          <FontAwesomeIcon icon="undo" /> Reset
+        </button>
+      {/if}
+    {/snippet}
+  </ModalDialog>
 </div>

@@ -67,7 +67,7 @@ export function scorePresets(stage: Stage, pairing: Pairing) {
         ] as Score[];
   }
 
-  if (stage.is_elimination && !pairing.player1.side)
+  if (!pairing.player1.side)
   {
     return pairing.player1.side == "corp"
       ? [
@@ -84,6 +84,35 @@ export function scorePresets(stage: Stage, pairing: Pairing) {
     { score1: 3, score2: 0, score1_corp: 0, score2_runner: 0, score1_runner: 0, score2_corp: 0, label: '3-0' },
     { score1: 0, score2: 3, score1_corp: 0, score2_runner: 0, score1_runner: 0, score2_corp: 0, label: '0-3' }
   ] as Score[];
+}
+
+export function readableReportScore(report: SelfReport, player1Side: string | null, isSingleSided: boolean): string {
+  if (report.score1 === 0 && report.score2 === 0) {
+    return "-";
+  }
+
+  let leftScore = report.score1;
+  let rightScore = report.score2;
+  if (isSingleSided && player1Side === "runner") {
+    leftScore = report.score2;
+    rightScore = report.score1;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  const str = `${leftScore} - ${rightScore}`;
+  const ws = winningSide(report);
+  return ws !== "" ? `${str} (${ws})` : str;
+}
+
+function winningSide(report: SelfReport) {
+  const corpScore = report.score1_corp + report.score2_corp;
+  const runnerScore = report.score1_runner + report.score2_runner;
+
+  if (corpScore === runnerScore) {
+    return "";
+  }
+
+  return corpScore > runnerScore ? "C" : "R";
 }
 
 export class PairingsData {
@@ -170,12 +199,16 @@ export interface Pairing {
   policy: PairingPolicies;
   player1: Player;
   player2: Player;
-  score1: number,
-  score2: number,
+  score1: number;
+  score1_corp: number;
+  score1_runner: number;
+  score2: number;
+  score2_corp: number;
+  score2_runner: number;
   score_label: string;
   intentional_draw: boolean;
   two_for_one: boolean;
-  self_report: SelfReport | null;
+  self_reports: SelfReport[] | null;
   reported: boolean;
   winner_game: number | null;
   loser_game: number | null;
@@ -187,12 +220,32 @@ export interface UiMetadata {
   row_highlighted: boolean;
 }
 
-export interface SelfReport {
+export class SelfReport {
   report_player_id: number;
   score1: number;
+  score1_corp: number;
+  score1_runner: number;
   score2: number;
+  score2_corp: number;
+  score2_runner: number;
   intentional_draw: boolean;
   label: string | null;
+
+  constructor() {
+    this.report_player_id = -1;
+    this.score1 = 0;
+    this.score1_corp = 0;
+    this.score1_runner = 0;
+    this.score2 = 0;
+    this.score2_corp = 0;
+    this.score2_runner = 0;
+    this.intentional_draw = false;
+    this.label = null;
+  }
+
+  matches(other: SelfReport): boolean {
+    return this.score1 === other.score1 && this.score2 === other.score2;
+  }
 }
 
 export interface PairingPolicies {
@@ -202,9 +255,10 @@ export interface PairingPolicies {
 
 export interface Player {
   id: number;
+  name: string;
   name_with_pronouns: string;
   side: string | null;
-  user_id: string | null;
+  user_id: number | null;
   side_label: string | null;
   corp_id: Identity | null;
   runner_id: Identity | null;

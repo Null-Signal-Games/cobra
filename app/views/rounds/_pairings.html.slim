@@ -135,7 +135,7 @@
                 p
                   = "#{right_player.name} reported: "
                   - if right_player_report
-                    =< "#{readable_self_report_score(pairing, right_player_report)}"
+                    =< "#{readable_self_report_score(pairing, right_player_report)}" 
                     - if (players_have_self_reported && !self_reports_match)
                       =< fa_icon 'times'
                   - else

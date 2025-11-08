@@ -13,5 +13,7 @@ export function redirectRequest(
     if (response.redirected) {
       window.location.href = response.url;
     }
+  }).catch((error: unknown) => {
+    console.log(error);
   });
 }

@@ -6,9 +6,10 @@
     id: string;
     headerText: string;
     children?: Snippet;
+    footer?: Snippet;
   }
 
-  let { id, headerText, children }: Props = $props();
+  let { id, headerText, children, footer }: Props = $props();
 </script>
 
 <div {id} class="modal fade" role="dialog" tabindex="-1" aria-hidden="true">
@@ -25,9 +26,16 @@
           <FontAwesomeIcon icon="times" />
         </button>
       </div>
+      
       <div class="modal-body">
         {@render children?.()}
       </div>
+
+      {#if footer}
+        <div class="modal-footer">
+          {@render footer?.()}
+        </div>
+      {/if}
     </div>
   </div>
 </div>

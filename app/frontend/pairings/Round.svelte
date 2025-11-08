@@ -145,10 +145,10 @@
       <!-- Pairings -->
       {#each round.pairings as pairing (pairing.id)}
         {#if showReportedPairings || !pairing.reported}
-          <Pairing {tournamentId} {pairing} {round} {stage} {tournamentPolicies} {csrfToken} />
           {#if tournamentPolicies?.update}
             <hr />
           {/if}
+          <Pairing {tournamentId} {pairing} {round} {stage} {tournamentPolicies} {csrfToken} />
         {/if}
       {/each}
     </div>
