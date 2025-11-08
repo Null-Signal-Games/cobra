@@ -1,15 +1,15 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { type Pairing, type Player, type Round, type Score, SelfReport, type Stage, type TournamentPolicies, readableReportScore, scorePresets } from "./PairingsData";
+  import { type Pairing, type Player, type Round, type Score, SelfReport, type Stage, Tournament, type TournamentPolicies, readableReportScore, scorePresets } from "./PairingsData";
   import PlayerName from "./PlayerName.svelte";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import SelfReportOptions from "./SelfReportOptions.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
   import { redirectRequest } from "../utils/requests";
-    import { report } from "process";
 
   interface Props {
     tournamentId: number;
+    tournament: Tournament;
     stage: Stage;
     round: Round;
     pairing: Pairing;
@@ -17,7 +17,7 @@
     csrfToken?: string;
   }
 
-  let { tournamentId, stage, round, pairing, tournamentPolicies, csrfToken }: Props = $props();
+  let { tournamentId, tournament, stage, round, pairing, tournamentPolicies, csrfToken }: Props = $props();
 
   let leftPlayer = $state(pairing.player1);
   let rightPlayer = $state(pairing.player2);
@@ -113,6 +113,23 @@
       : ''}"
   >
     {pairing.table_label}
+
+    {#if tournamentPolicies?.update && tournament.allow_streaming_opt_out}
+      {#if pairing.player1.include_in_stream && pairing.player2.include_in_stream}
+        <span title="May be included in video coverage.">
+          <FontAwesomeIcon icon="video-camera" cssClass="text-success" />
+        </span>
+      {:else if stage.is_elimination}
+        <span title="One or both players request not to be included in video coverage, but were informed this may not be possible in the cut.">
+          <FontAwesomeIcon icon="video-camera" cssClass="text-warning" />
+        </span>
+      {:else}
+        <span title="One or both players request not to not be included in video coverage.">
+          <FontAwesomeIcon icon="video-camera" cssClass="text-secondary" />
+          <FontAwesomeIcon icon="ban" cssClass="text-danger" />
+        </span>
+      {/if}
+    {/if}
   </div>
 
   <!-- Player 1 -->

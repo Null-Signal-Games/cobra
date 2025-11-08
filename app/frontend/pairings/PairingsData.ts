@@ -149,6 +149,7 @@ export class Tournament {
   self_registration: boolean;
   locked_players: number;
   unlocked_players: number;
+  allow_streaming_opt_out: boolean;
 
   constructor() {
     this.player_meeting = false;
@@ -157,6 +158,7 @@ export class Tournament {
     this.self_registration = false;
     this.locked_players = 0;
     this.unlocked_players = 0;
+    this.allow_streaming_opt_out = false;
   }
 }
 
@@ -262,6 +264,7 @@ export interface Player {
   side_label: string | null;
   corp_id: Identity | null;
   runner_id: Identity | null;
+  include_in_stream: boolean;
 }
 
 export interface Score {

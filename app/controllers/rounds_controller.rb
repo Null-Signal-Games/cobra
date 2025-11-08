@@ -37,7 +37,8 @@ class RoundsController < ApplicationController
         registration_unlocked: @tournament.registration_unlocked?,
         self_registration: @tournament.self_registration?,
         locked_players: @tournament.locked_players.count,
-        unlocked_players: @tournament.unlocked_players.count
+        unlocked_players: @tournament.unlocked_players.count,
+        allow_streaming_opt_out: @tournament.allow_streaming_opt_out
       },
       stages: pairings_data_stages,
       csrf_token: form_authenticity_token
@@ -189,7 +190,8 @@ class RoundsController < ApplicationController
         p.corp_identity,
         ci.faction as corp_faction,
         p.runner_identity,
-        ri.faction AS runner_faction
+        ri.faction AS runner_faction,
+        p.include_in_stream
       FROM
         players p
         LEFT JOIN identities AS ci ON p.corp_identity_ref_id = ci.id
@@ -323,7 +325,8 @@ class RoundsController < ApplicationController
       user_id: (player['user_id'] if player),
       side_label: side_label(side),
       corp_id: id(player, 'corp'),
-      runner_id: id(player, 'runner')
+      runner_id: id(player, 'runner'),
+      include_in_stream: player['include_in_stream']
     }
   end
 

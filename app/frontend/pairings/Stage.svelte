@@ -1,12 +1,13 @@
 <script lang="ts">
   import Round from "./Round.svelte";
-  import type { Stage, TournamentPolicies } from "./PairingsData";
+  import type { Stage, Tournament, TournamentPolicies } from "./PairingsData";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { redirectRequest } from "../utils/requests";
 
   interface Props {
     stage: Stage;
     tournamentId: number;
+    tournament: Tournament;
     startExpanded: boolean;
     showReportedPairings?: boolean;
     tournamentPolicies?: TournamentPolicies;
@@ -16,6 +17,7 @@
   let {
     stage,
     tournamentId,
+    tournament,
     startExpanded,
     showReportedPairings = true,
     tournamentPolicies,
@@ -72,6 +74,7 @@
     </div>
     <Round
       {tournamentId}
+      {tournament}
       round={stage.rounds[stage.rounds.length - 1]}
       {stage}
       {startExpanded}
@@ -83,6 +86,7 @@
     {#each stage.rounds.filter((r) => r.id) as round, index (round.id)}
       <Round
         {tournamentId}
+        {tournament}
         {round}
         {stage}
         startExpanded={startExpanded && index === stage.rounds.length - 1}

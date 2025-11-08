@@ -184,6 +184,7 @@
       <Stage
         {stage}
         {tournamentId}
+        tournament={data.tournament}
         startExpanded={index === data.stages.length - 1}
         {showReportedPairings}
         tournamentPolicies={data.policy}

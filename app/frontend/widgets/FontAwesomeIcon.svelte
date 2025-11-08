@@ -1,5 +1,10 @@
 <script lang="ts">
-  export let icon: string;
+  interface Props{
+    icon: string;
+    cssClass?: string;
+  }
+
+  let { icon, cssClass }: Props = $props();
 </script>
 
-<i class="fa fa-{icon}"></i>
+<i class="fa fa-{icon} {cssClass}"></i>

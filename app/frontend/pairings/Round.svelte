@@ -1,11 +1,12 @@
 <script lang="ts">
-  import type { Stage, Round, TournamentPolicies } from "./PairingsData";
+  import type { Stage, Round, TournamentPolicies, Tournament } from "./PairingsData";
   import Pairing from "./Pairing.svelte";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { redirectRequest } from "../utils/requests";
 
   interface Props {
     tournamentId: number;
+    tournament: Tournament;
     stage: Stage;
     round: Round;
     startExpanded: boolean;
@@ -16,6 +17,7 @@
 
   let {
     tournamentId,
+    tournament,
     stage,
     round,
     startExpanded,
@@ -148,7 +150,7 @@
           {#if tournamentPolicies?.update}
             <hr />
           {/if}
-          <Pairing {tournamentId} {pairing} {round} {stage} {tournamentPolicies} {csrfToken} />
+          <Pairing {tournamentId} {tournament} {pairing} {round} {stage} {tournamentPolicies} {csrfToken} />
         {/if}
       {/each}
     </div>
