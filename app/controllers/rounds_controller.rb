@@ -319,14 +319,14 @@ class RoundsController < ApplicationController
   def pairings_data_player(player, side)
     {
       id: (player['id'] if player),
-      name: player['name'],
+      name: (player['name'] if player),
       name_with_pronouns: name_with_pronouns(player),
       side:,
       user_id: (player['user_id'] if player),
       side_label: side_label(side),
       corp_id: id(player, 'corp'),
       runner_id: id(player, 'runner'),
-      include_in_stream: player['include_in_stream']
+      include_in_stream: (player['include_in_stream'] if player)
     }
   end
 
