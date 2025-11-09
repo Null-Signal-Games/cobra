@@ -134,14 +134,22 @@
 
   <!-- Player 1 -->
   {#if pairing.policy.view_decks}
-    {#if pairing.player1.side}
-      <a href="{round.id}/pairings/{pairing.id}/view_decks?back_to=pairings">
-        <FontAwesomeIcon icon="eye" /> View decks
-      </a>
+    {#if tournamentPolicies?.update}
+      {#if stage.is_single_sided}
+        <a href="{round.id}/pairings/{pairing.id}/view_decks?back_to=pairings">
+          <FontAwesomeIcon icon="eye" /> View decks
+        </a>
+      {/if}
     {:else}
-      <a href="../players/{pairing.player1.id}/view_decks?back_to=pairings">
-        <FontAwesomeIcon icon="eye" /> View decks
-      </a>
+      {#if pairing.player1.side}
+        <a href="{round.id}/pairings/{pairing.id}/view_decks?back_to=pairings">
+          <FontAwesomeIcon icon="eye" /> View decks
+        </a>
+      {:else}
+        <a href="../players/{pairing.player1.id}/view_decks?back_to=pairings">
+          <FontAwesomeIcon icon="eye" /> View decks
+        </a>
+      {/if}
     {/if}
   {/if}
   <PlayerName player={leftPlayer} left_or_right="left" />
@@ -208,15 +216,15 @@
 
   <!-- Player 2 -->
   <PlayerName player={rightPlayer} left_or_right="right" />
-  {#if pairing.policy.view_decks && !pairing.player1.side}
+  {#if !tournamentPolicies?.update && pairing.policy.view_decks && !pairing.player1.side}
     <a href="../players/{pairing.player2.id}/view_decks?back_to=pairings">
       <FontAwesomeIcon icon="eye" /> View decks
     </a>
   {/if}
 
   <!-- Self-reporting -->
-  <div class="col-sm-2">
-    {#if tournamentPolicies?.update}
+  {#if tournamentPolicies?.update}
+    <div class="row-sm1 mr-3">
       <button
         type="button"
         class="btn btn-primary mr-2"
@@ -231,15 +239,17 @@
       <button class="btn btn-danger" onclick={deletePairing}>
         <FontAwesomeIcon icon="trash" />
       </button>
-    {:else}
+    </div>
+  {:else}
+    <div class="col-sm-2">
       {#if pairing.policy.self_report}
         <SelfReportOptions {tournamentId} {stage} {round} {pairing} />
       {/if}
       {#if pairing.self_reports && pairing.self_reports.length !== 0}
         Report: {pairing.self_reports[0].label}
       {/if}
-    {/if}
-  </div>
+    </div>
+  {/if}
 
   {#snippet playerReport(player: Player, report: SelfReport | undefined)}
     {player.name} reported:

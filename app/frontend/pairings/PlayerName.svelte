@@ -3,8 +3,13 @@
   import Identity from "../identities/Identity.svelte";
   import { showIdentities } from "./ShowIdentities";
 
-  export let player: Player;
-  export let left_or_right: string;
+  let {
+    player,
+    left_or_right
+  }: {
+    player: Player,
+    left_or_right: string
+  } = $props();
 </script>
 
 <div class="col-sm {left_or_right}_player_name">
@@ -16,10 +21,18 @@
     {#if player.side_label}
       <Identity
         identity={player.side == "corp" ? player.corp_id : player.runner_id}
+        name_if_missing="Unspecified"
+        icon_if_missing="interrupt"
       />
     {:else}
-      <Identity identity={player.corp_id} />
-      <Identity identity={player.runner_id} />
+      <Identity
+        identity={player.corp_id}
+        name_if_missing="Unspecified"
+        icon_if_missing="interrupt" />
+      <Identity
+        identity={player.runner_id}
+        name_if_missing="Unspecified"
+        icon_if_missing="interrupt" />
     {/if}
   </div>
 </div>
