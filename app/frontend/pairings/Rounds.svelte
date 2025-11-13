@@ -40,8 +40,10 @@
   {#each data.stages as stage, index (stage.format)}
     <Stage
       {stage}
-      startExpanded={index === data.stages.length - 1}
       {tournamentId}
+      tournament={data.tournament}
+      startExpanded={index === data.stages.length - 1}
+      csrfToken={data.csrf_token}
     />
   {/each}
 {:else}
