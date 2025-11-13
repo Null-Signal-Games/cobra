@@ -2,7 +2,7 @@
   import type { Stage, Round, TournamentPolicies, Tournament } from "./PairingsData";
   import Pairing from "./Pairing.svelte";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
-  import { redirectRequest } from "../utils/requests";
+  import { redirectRequest } from "../utils/network";
 
   interface Props {
     tournamentId: number;
@@ -12,7 +12,7 @@
     startExpanded: boolean;
     showReportedPairings: boolean;
     tournamentPolicies?: TournamentPolicies;
-    csrfToken?: string;
+    csrfToken: string;
   }
 
   let {
@@ -23,12 +23,14 @@
     startExpanded,
     showReportedPairings = true,
     tournamentPolicies,
-    csrfToken = "",
+    csrfToken,
   }: Props = $props();
 
   let roundTimerLength = $state(round.length_minutes);
 
   function completeRound(e: MouseEvent) {
+    e.preventDefault();
+
     if (round.pairings.length != round.pairings_reported
       && !confirm(
         "Are you sure you want to complete this round? Are all pairings reported?",
@@ -38,25 +40,23 @@
     }
 
     redirectRequest(
-      e,
       `/tournaments/${tournamentId}/rounds/${round.id}/complete?completed=true`,
       "PATCH",
-      csrfToken,
+      csrfToken
     );
   }
 
-  function resetTimer(e: MouseEvent) {
-    if (
-      !confirm(
-        "This will clear all elapsed time in the round. Are you sure?",
-      )
+  function updateTimer(e: MouseEvent, operation: string) {
+    e.preventDefault();
+
+    if (operation === "reset"
+      && !confirm("This will clear all elapsed time in the round. Are you sure?")
     ) {
       return;
     }
 
     redirectRequest(
-      e,
-      `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=reset`,
+      `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=${operation}`,
       "PATCH",
       csrfToken,
     );
@@ -107,37 +107,19 @@
             <label for="round{round.id}Length">Round timer length (minutes)</label>
             <input id="round{round.id}Length" size="3" class="form-control ml-2 mr-2" value={roundTimerLength} />
             {#if round.timer.running}
-              <button class="btn btn-danger" onclick={(e) =>
-                  redirectRequest(
-                    e,
-                    `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=stop`,
-                    "PATCH",
-                    csrfToken,
-                  )}>
+              <button class="btn btn-danger" onclick={(e) => updateTimer(e, "stop")}>
                 <FontAwesomeIcon icon="clock-o" /> Pause
               </button>
             {:else if round.timer.paused}
-              <button class="btn btn-success" onclick={(e) =>
-                  redirectRequest(
-                    e,
-                    `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=start`,
-                    "PATCH",
-                    csrfToken,
-                  )}>
+              <button class="btn btn-success" onclick={(e) => updateTimer(e, "start")}>
                 <FontAwesomeIcon icon="clock-o" /> Resume
               </button>
             {:else if !round.timer.started}
-              <button class="btn btn-success" onclick={(e) =>
-                  redirectRequest(
-                    e,
-                    `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=start`,
-                    "PATCH",
-                    csrfToken,
-                  )}>
+              <button class="btn btn-success" onclick={(e) => updateTimer(e, "start")}>
                 <FontAwesomeIcon icon="clock-o" /> Start
               </button>
             {/if}
-            <button class="btn btn-info ml-2" onclick={resetTimer}>
+            <button class="btn btn-info ml-2" onclick={(e) => updateTimer(e, "reset")}>
               <FontAwesomeIcon icon="undo" /> Reset
             </button>
           </div>

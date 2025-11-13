@@ -5,7 +5,7 @@
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import SelfReportOptions from "./SelfReportOptions.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
-  import { redirectRequest } from "../utils/requests";
+  import { redirectRequest } from "../utils/network";
 
   interface Props {
     tournamentId: number;
@@ -14,7 +14,7 @@
     round: Round;
     pairing: Pairing;
     tournamentPolicies?: TournamentPolicies;
-    csrfToken?: string;
+    csrfToken: string;
   }
 
   let { tournamentId, tournament, stage, round, pairing, tournamentPolicies, csrfToken }: Props = $props();
@@ -61,12 +61,13 @@
   }
 
   function submitScore(e: MouseEvent, score: Score) {
+    e.preventDefault();
+
     let params: String[] = [];
     Object.entries(score).forEach(
       ([key, value]) => params.push(`pairing[${key}]=${value}`));
 
     redirectRequest(
-      e,
       `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/report?${params.join("&")}`,
       "POST",
       csrfToken,
@@ -74,12 +75,13 @@
   }
 
   function deletePairing(e: MouseEvent) {
+    e.preventDefault();
+
     if (!confirm("Are you sure? This cannot be reversed.")) {
       return;
     }
 
     redirectRequest(
-      e,
       `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}`,
       "DELETE",
       csrfToken,
@@ -87,12 +89,13 @@
   }
 
   function resetReports(e: MouseEvent) {
+    e.preventDefault();
+
     if (!confirm("Are you sure? This cannot be reversed.")) {
       return;
     }
 
     redirectRequest(
-      e,
       `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/reset_self_report`,
       "DELETE",
       csrfToken,

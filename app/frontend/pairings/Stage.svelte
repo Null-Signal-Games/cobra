@@ -2,7 +2,7 @@
   import Round from "./Round.svelte";
   import type { Stage, Tournament, TournamentPolicies } from "./PairingsData";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
-  import { redirectRequest } from "../utils/requests";
+  import { redirectRequest } from "../utils/network";
 
   interface Props {
     stage: Stage;
@@ -11,7 +11,7 @@
     startExpanded: boolean;
     showReportedPairings?: boolean;
     tournamentPolicies?: TournamentPolicies;
-    csrfToken?: string;
+    csrfToken: string;
   }
 
   let {
@@ -21,10 +21,12 @@
     startExpanded,
     showReportedPairings = true,
     tournamentPolicies,
-    csrfToken = "",
+    csrfToken,
   }: Props = $props();
 
   function deleteStage(e: MouseEvent) {
+    e.preventDefault();
+    
     if (
       !confirm(
         "Are you sure? This cannot be reversed and all rounds will be deleted!",
@@ -33,12 +35,7 @@
       return;
     }
 
-    redirectRequest(
-      e,
-      `/tournaments/${tournamentId}/stages/${stage.id}`,
-      "DELETE",
-      csrfToken,
-    );
+    redirectRequest(`/tournaments/${tournamentId}/stages/${stage.id}`, "DELETE", csrfToken);
   }
 </script>
 

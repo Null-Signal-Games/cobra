@@ -88,7 +88,7 @@ class PairingsController < ApplicationController
 
     save_report
 
-    redirect_back(fallback_location: tournament_rounds_path(tournament))
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def reset_self_report
@@ -96,7 +96,7 @@ class PairingsController < ApplicationController
 
     SelfReport.where(pairing_id: pairing.id).destroy_all
 
-    redirect_back(fallback_location: tournament_rounds_path(tournament))
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def self_report
@@ -133,7 +133,7 @@ class PairingsController < ApplicationController
 
     pairing.destroy
 
-    redirect_to tournament_round_path(tournament, round)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def match_slips

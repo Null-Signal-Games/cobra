@@ -19,10 +19,6 @@ class RoundsController < ApplicationController
     authorize @tournament, :show?
   end
 
-  def pairings_new
-    authorize @tournament, :show?
-  end
-
   def pairings_data
     authorize @tournament, :show?
 
@@ -97,7 +93,7 @@ class RoundsController < ApplicationController
 
     @tournament.pair_new_round!
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def edit
@@ -134,7 +130,7 @@ class RoundsController < ApplicationController
     @round.update!(completed: params[:completed])
     @round.timer.stop!
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def update_timer
@@ -152,7 +148,7 @@ class RoundsController < ApplicationController
       @round.timer.reset!
     end
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   private

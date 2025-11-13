@@ -14,7 +14,7 @@ class StagesController < ApplicationController
     stage = @tournament.stages.create(format: (@tournament.single_sided? ? :single_sided_swiss : :swiss))
     @tournament.players.each { |p| stage.players << p }
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def update
@@ -41,7 +41,7 @@ class StagesController < ApplicationController
       return render json: { error: error }, status: :unprocessable_entity
     end
 
-    render json: { url: tournament_stage_path(@tournament, @stage) }, stats: :ok
+    render json: { url: tournament_stage_path(@tournament, @stage) }, status: :ok
   end
 
   def destroy
@@ -49,7 +49,7 @@ class StagesController < ApplicationController
 
     @stage.destroy!
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def settings

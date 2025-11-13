@@ -5,7 +5,7 @@
   import { showIdentities } from "./ShowIdentities";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
-  import { redirectRequest } from "../utils/requests";
+  import { redirectRequest } from "../utils/network";
 
   interface Props {
     tournamentId: number;
@@ -20,7 +20,15 @@
     data = await loadPairings(tournamentId);
   });
 
+  function addSwissStage(e: MouseEvent) {
+    e.preventDefault();
+
+    redirectRequest(`/tournaments/${tournamentId}/stages`, "POST", data.csrf_token);
+  }
+
   function pairNewRound(e: MouseEvent) {
+    e.preventDefault();
+
     if (
       data.tournament.registration_unlocked &&
       !confirm(
@@ -30,11 +38,40 @@
       return;
     }
 
+    redirectRequest(`/tournaments/${tournamentId}/rounds`, "POST", data.csrf_token);
+  }
+
+  function closeRegistration(e: MouseEvent) {
+    e.preventDefault();
+
+    redirectRequest(`/tournaments/${tournamentId}/close_registration`, "PATCH", data.csrf_token);
+  }
+
+  function openRegistration(e: MouseEvent) {
+    e.preventDefault();
+
+    redirectRequest(`/tournaments/${tournamentId}/open_registration`, "PATCH", data.csrf_token);
+  }
+
+  function lockPlayerRegistration(e: MouseEvent) {
+    e.preventDefault();
+
+    redirectRequest(`/tournaments/${tournamentId}/lock_player_registration`, "PATCH", data.csrf_token);
+  }
+
+  function unlockPlayerRegistration(e: MouseEvent) {
+    e.preventDefault();
+
+    redirectRequest(`/tournaments/${tournamentId}/unlock_player_registration`, "PATCH", data.csrf_token);
+  }
+
+  function addCutStage(e: MouseEvent, single_elim: boolean, num: number) {
+    e.preventDefault();
+
     redirectRequest(
-      e,
-      `/tournaments/${tournamentId}/rounds`,
+      `/tournaments/${tournamentId}/cut?${single_elim && "elimination_type=single"}&number=${num}`,
       "POST",
-      data.csrf_token,
+      data.csrf_token
     );
   }
 </script>
@@ -42,17 +79,7 @@
 {#if !data.stages || data.stages.length == 0}
   <!-- Add Swiss stage button -->
   {#if data.policy.update}
-    <button
-      type="button"
-      class="btn btn-success"
-      onclick={(e) =>
-        redirectRequest(
-          e,
-          `/tournaments/${tournamentId}/stages`,
-          "POST",
-          data.csrf_token,
-        )}
-    >
+    <button type="button" class="btn btn-success" onclick={addSwissStage}>
       <FontAwesomeIcon icon="plus" /> Add Swiss stage
     </button>
   {/if}
@@ -108,56 +135,21 @@
   {#if data.policy.update}
     <div class="mt-3">
       {#if data.tournament.registration_open}
-        <button
-          class="btn btn-info"
-          onclick={(e) =>
-            redirectRequest(
-              e,
-              `/tournaments/${tournamentId}/close_registration`,
-              "PATCH",
-              data.csrf_token,
-            )}
-        >
+        <button class="btn btn-info" onclick={closeRegistration}>
           <FontAwesomeIcon icon="lock" /> Close registration
         </button>
       {:else if data.tournament.self_registration && data.stages.every((s) => !s.rounds || s.rounds.length == 0)}
-        <button
-          class="btn btn-secondary"
-          onclick={(e) =>
-            redirectRequest(
-              e,
-              `/tournaments/${tournamentId}/open_registration`,
-              "PATCH",
-              data.csrf_token,
-            )}
+        <button class="btn btn-secondary" onclick={openRegistration}
         >
           <FontAwesomeIcon icon="folder-open" /> Open registration
         </button>
         {#if data.tournament.locked_players > 0}
-          <button
-            class="btn btn-secondary"
-            onclick={(e) =>
-              redirectRequest(
-                e,
-                `/tournaments/${tournamentId}/unlock_player_registrations`,
-                "PATCH",
-                data.csrf_token,
-              )}
-          >
+          <button class="btn btn-secondary" onclick={unlockPlayerRegistration}>
             <FontAwesomeIcon icon="unlock" /> Unlock all players
           </button>
         {/if}
         {#if data.tournament.unlocked_players > 0}
-          <button
-            class="btn btn-info"
-            onclick={(e) =>
-              redirectRequest(
-                e,
-                `/tournaments/${tournamentId}/lock_player_registrations`,
-                "PATCH",
-                data.csrf_token,
-              )}
-          >
+          <button class="btn btn-info" onclick={lockPlayerRegistration}>
             <FontAwesomeIcon icon="lock" /> Lock all players
           </button>
         {/if}
@@ -202,16 +194,7 @@
           <td>Single Elimination</td>
           {#each [3, 4, 8, 16] as num}
             <td class="pl-2">
-              <button
-                class="btn btn-success"
-                onclick={(e) =>
-                  redirectRequest(
-                    e,
-                    `/tournaments/${tournamentId}/cut?elimination_type=single&number=${num}`,
-                    "POST",
-                    data.csrf_token,
-                  )}
-              >
+              <button class="btn btn-success" onclick={(e) => addCutStage(e, true, num)}>
                 <FontAwesomeIcon icon="scissors" /> Top {num}
               </button>
             </td>
@@ -222,16 +205,7 @@
           <td></td>
           {#each [4, 8, 16] as num}
             <td class="pt-2 pl-2">
-              <button
-                class="btn btn-success"
-                onclick={(e) =>
-                  redirectRequest(
-                    e,
-                    `/tournaments/${tournamentId}/cut?number=${num}`,
-                    "POST",
-                    data.csrf_token,
-                  )}
-              >
+              <button class="btn btn-success" onclick={(e) => addCutStage(e, false, num)}>
                 <FontAwesomeIcon icon="scissors" /> Top {num}
               </button>
             </td>
