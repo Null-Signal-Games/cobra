@@ -35,7 +35,6 @@ Rails.application.routes.draw do
         get :sharing, on: :collection
         get :markdown, on: :collection
       end
-      get :pairings_new, on: :collection
       patch :repair, on: :member
       patch :complete, on: :member
       patch :update_timer, on: :member
