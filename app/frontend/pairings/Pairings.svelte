@@ -7,11 +7,7 @@
   import ModalDialog from "../widgets/ModalDialog.svelte";
   import { redirectRequest } from "../utils/network";
 
-  interface Props {
-    tournamentId: number;
-  }
-
-  let { tournamentId }: Props = $props();
+  let { tournamentId }: { tournamentId: number } = $props();
 
   let data = $state(new PairingsData());
   let showReportedPairings = $state(true);

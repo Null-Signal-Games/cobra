@@ -4,16 +4,6 @@
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { redirectRequest } from "../utils/network";
 
-  interface Props {
-    stage: Stage;
-    tournamentId: number;
-    tournament: Tournament;
-    startExpanded: boolean;
-    showReportedPairings?: boolean;
-    tournamentPolicies?: TournamentPolicies;
-    csrfToken: string;
-  }
-
   let {
     stage,
     tournamentId,
@@ -22,11 +12,19 @@
     showReportedPairings = true,
     tournamentPolicies,
     csrfToken,
-  }: Props = $props();
+  }: {
+    stage: Stage;
+    tournamentId: number;
+    tournament: Tournament;
+    startExpanded: boolean;
+    showReportedPairings?: boolean;
+    tournamentPolicies?: TournamentPolicies;
+    csrfToken: string;
+  } = $props();
 
   function deleteStage(e: MouseEvent) {
     e.preventDefault();
-    
+
     if (
       !confirm(
         "Are you sure? This cannot be reversed and all rounds will be deleted!",

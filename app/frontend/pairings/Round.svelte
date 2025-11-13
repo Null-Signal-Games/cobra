@@ -4,17 +4,6 @@
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { redirectRequest } from "../utils/network";
 
-  interface Props {
-    tournamentId: number;
-    tournament: Tournament;
-    stage: Stage;
-    round: Round;
-    startExpanded: boolean;
-    showReportedPairings: boolean;
-    tournamentPolicies?: TournamentPolicies;
-    csrfToken: string;
-  }
-
   let {
     tournamentId,
     tournament,
@@ -24,7 +13,16 @@
     showReportedPairings = true,
     tournamentPolicies,
     csrfToken,
-  }: Props = $props();
+  }: {
+    tournamentId: number;
+    tournament: Tournament;
+    stage: Stage;
+    round: Round;
+    startExpanded: boolean;
+    showReportedPairings: boolean;
+    tournamentPolicies?: TournamentPolicies;
+    csrfToken: string;
+  } = $props();
 
   let roundTimerLength = $state(round.length_minutes);
 

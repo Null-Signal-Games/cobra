@@ -116,50 +116,29 @@ function winningSide(report: SelfReport) {
 }
 
 export class PairingsData {
-  policy: TournamentPolicies;
-  tournament: Tournament;
-  stages: Stage[];
-  csrf_token: string;
-
-  constructor() {
-    this.policy = { update: false, custom_table_numbering: false };
-    this.tournament = new Tournament();
-    this.stages = [];
-    this.csrf_token = "";
-  }
+  policy = new TournamentPolicies();
+  tournament = new Tournament();
+  stages: Stage[] = [];
+  csrf_token = "";
 }
 
 export class SharingData {
-  pages: string[];
-
-  constructor() {
-    this.pages = [];
-  }
+  pages: string[] = [];
 }
 
-export interface TournamentPolicies {
-  update: boolean;
-  custom_table_numbering: boolean;
+export class TournamentPolicies {
+  update = false;
+  custom_table_numbering = false;
 }
 
 export class Tournament {
-  player_meeting: boolean;
-  registration_open: boolean;
-  registration_unlocked: boolean;
-  self_registration: boolean;
-  locked_players: number;
-  unlocked_players: number;
-  allow_streaming_opt_out: boolean;
-
-  constructor() {
-    this.player_meeting = false;
-    this.registration_open = false;
-    this.registration_unlocked = false;
-    this.self_registration = false;
-    this.locked_players = 0;
-    this.unlocked_players = 0;
-    this.allow_streaming_opt_out = false;
-  }
+  player_meeting = false;
+  registration_open = false;
+  registration_unlocked = false;
+  self_registration = false;
+  locked_players = 0;
+  unlocked_players = 0;
+  allow_streaming_opt_out = false;
 }
 
 export interface Stage {
@@ -223,27 +202,15 @@ export interface UiMetadata {
 }
 
 export class SelfReport {
-  report_player_id: number;
-  score1: number;
-  score1_corp: number;
-  score1_runner: number;
-  score2: number;
-  score2_corp: number;
-  score2_runner: number;
-  intentional_draw: boolean;
-  label: string | null;
-
-  constructor() {
-    this.report_player_id = -1;
-    this.score1 = 0;
-    this.score1_corp = 0;
-    this.score1_runner = 0;
-    this.score2 = 0;
-    this.score2_corp = 0;
-    this.score2_runner = 0;
-    this.intentional_draw = false;
-    this.label = null;
-  }
+  report_player_id= -1;
+  score1 = 0;
+  score1_corp = 0;
+  score1_runner = 0;
+  score2 = 0;
+  score2_corp = 0;
+  score2_runner = 0;
+  intentional_draw = false;
+  label: string | null = null;
 
   matches(other: SelfReport): boolean {
     return this.score1 === other.score1 && this.score2 === other.score2;
@@ -255,16 +222,16 @@ export interface PairingPolicies {
   self_report: boolean;
 }
 
-export interface Player {
-  id: number;
-  name: string;
-  name_with_pronouns: string;
-  side: string | null;
-  user_id: number | null;
-  side_label: string | null;
-  corp_id: Identity | null;
-  runner_id: Identity | null;
-  include_in_stream: boolean;
+export class Player {
+  id = 0;
+  name = "";
+  name_with_pronouns = "";
+  side: string | null = null;
+  user_id: number | null = null;
+  side_label: string | null = null;
+  corp_id: Identity | null = null;
+  runner_id: Identity | null = null;
+  include_in_stream = false;
 }
 
 export interface Score {

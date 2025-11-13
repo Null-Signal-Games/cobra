@@ -1,13 +1,14 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Stage from "./Stage.svelte";
-  import type { PairingsData } from "./PairingsData";
+  import { PairingsData } from "./PairingsData";
   import { loadPairings } from "./PairingsData";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { showIdentities } from "./ShowIdentities";
 
-  export let tournamentId: number;
-  let data: PairingsData;
+  let { tournamentId }: { tournamentId: number } = $props();
+
+  let data = $state(new PairingsData());
 
   onMount(async () => {
     data = await loadPairings(tournamentId);
@@ -18,7 +19,7 @@
   }
 </script>
 
-<button class="btn btn-primary" on:click={toggleIdentities}>
+<button class="btn btn-primary" onclick={toggleIdentities}>
   <FontAwesomeIcon icon="eye-slash" />
   Show/hide identities
 </button>

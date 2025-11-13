@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
     type Pairing,
-    type Player,
+    Player,
     type Round,
     type Stage,
   } from "./PairingsData";
@@ -13,21 +13,28 @@
   } from "./SelfReport";
   import ModalDialog from "../widgets/ModalDialog.svelte";
 
-  export let tournamentId: number;
-  export let stage: Stage;
-  export let round: Round;
-  export let pairing: Pairing;
-  let presets: SelfReportPresets[];
+  let {
+    tournamentId,
+    stage,
+    round,
+    pairing
+  }: {
+    tournamentId: number;
+    stage: Stage;
+    round: Round;
+    pairing: Pairing;
+  } = $props();
+  
+  let presets: SelfReportPresets[] = $state([]);
   let csrfToken: string;
+  let customReporting = $state(false);
 
-  let customReporting = false;
+  let score1 = $state(0);
+  let score2 = $state(0);
 
-  let score1: number;
-  let score2: number;
-
-  let left_player_number = 1;
-  let left_player: Player;
-  let right_player: Player;
+  let left_player_number = $state(1);
+  let left_player = $state(new Player());
+  let right_player = $state(new Player());
 
   left_player = pairing.player1;
   right_player = pairing.player2;
@@ -114,7 +121,7 @@
           class="btn btn-primary"
           data-dismiss="modal"
           id="option-{index}"
-          on:click={async () => {
+          onclick={async () => {
             return onSelfReportPresetClicked(preset);
           }}
         >
@@ -159,7 +166,7 @@
         class="btn btn-primary"
         data-dismiss="modal"
         id="option-custom"
-        on:click={async () => {
+        onclick={async () => {
           return onCustomSelfReportSubmit(score1, score2);
         }}
       >
@@ -169,9 +176,7 @@
     <button
       class="btn btn-primary"
       id="option-custom"
-      on:click={() => {
-        onCustomReportClicked();
-      }}
+      onclick={onCustomReportClicked}
     >
       {customReporting ? "Presets" : "Custom"}
     </button>

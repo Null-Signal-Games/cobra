@@ -6,12 +6,12 @@ declare const Routes: {
   tournament_stage_path: (tournamentId: number, stageId: number) => string;
 };
 
-export interface Stage {
-  id: number;
-  tournament_id: number;
-  number: number;
-  format: string | null;
-  table_ranges: TableRange[];
+export class Stage {
+  id = -1;
+  tournament_id = -1;
+  number = -1;
+  format: string | null = null;
+  table_ranges: TableRange[] = [];
 }
 
 export interface TableRange {
@@ -22,20 +22,9 @@ export interface TableRange {
 }
 
 export class StageData {
-  stage: Stage;
+  stage = new Stage();
   warning?: string;
-  csrf_token: string;
-
-  constructor() {
-    this.stage = {
-      id: -1,
-      tournament_id: -1,
-      number: -1,
-      format: null,
-      table_ranges: [],
-    };
-    this.csrf_token = "";
-  }
+  csrf_token = "";
 }
 
 export interface SaveStageResponse {

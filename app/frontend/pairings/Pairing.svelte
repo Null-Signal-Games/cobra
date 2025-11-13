@@ -7,7 +7,15 @@
   import ModalDialog from "../widgets/ModalDialog.svelte";
   import { redirectRequest } from "../utils/network";
 
-  interface Props {
+  let {
+    tournamentId,
+    tournament,
+    stage,
+    round,
+    pairing,
+    tournamentPolicies,
+    csrfToken
+  }: {
     tournamentId: number;
     tournament: Tournament;
     stage: Stage;
@@ -15,9 +23,7 @@
     pairing: Pairing;
     tournamentPolicies?: TournamentPolicies;
     csrfToken: string;
-  }
-
-  let { tournamentId, tournament, stage, round, pairing, tournamentPolicies, csrfToken }: Props = $props();
+  } = $props();
 
   let leftPlayer = $state(pairing.player1);
   let rightPlayer = $state(pairing.player2);
