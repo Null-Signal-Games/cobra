@@ -202,7 +202,7 @@ export interface UiMetadata {
 }
 
 export class SelfReport {
-  report_player_id= -1;
+  report_player_id = -1;
   score1 = 0;
   score1_corp = 0;
   score1_runner = 0;
@@ -235,6 +235,7 @@ export class Player {
 }
 
 export interface Score {
+  side?: string;
   score1?: number;
   score2?: number;
   score1_corp: number;

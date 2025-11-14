@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { type Pairing, type Player, type Round, type Score, SelfReport, type Stage, Tournament, type TournamentPolicies, readableReportScore, scorePresets } from "./PairingsData";
-  import PlayerName from "./PlayerName.svelte";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import SelfReportOptions from "./SelfReportOptions.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
+  import Identity from "../identities/Identity.svelte";
+  import { showIdentities } from "./ShowIdentities";
   import { redirectRequest } from "../utils/network";
 
   let {
@@ -66,6 +67,27 @@
     showScorePresets = !showScorePresets;
   }
 
+  function changePlayerSide(e: MouseEvent, side: string, player: Player) {
+    if (!confirm(`Are you sure you want to switch ${player.name} to ${side}?`)) {
+      return;
+    }
+
+    let sideValue = side;
+    if (player !== pairing.player1) {
+      sideValue = side === "corp" ? "runner" : "corp";
+    }
+
+    submitScore(
+      e,
+      {
+        score1_corp: 0,
+        score2_runner: 0,
+        score1_runner: 0,
+        score2_corp: 0,
+        side: `player1_is_${sideValue}`
+      });
+  }
+
   function submitScore(e: MouseEvent, score: Score) {
     e.preventDefault();
 
@@ -108,6 +130,56 @@
     );
   }
 </script>
+
+{#snippet playerDisplay(player: Player, left_or_right: string)}
+  <div class="col-sm {left_or_right}_player_name">
+    <!-- Name -->
+    {player.name_with_pronouns}
+
+    <!-- Side -->
+    {#if stage.is_single_sided}
+      <br />
+      {#if tournamentPolicies?.update}
+        {#snippet setSideButton(side: string, player: Player)}
+          <button
+            class="btn btn-sm mr-1 {player.side === side ? "btn-dark" : "btn-outline-dark"}"
+            onclick={(e) => changePlayerSide(e, side, player)}
+          >
+            {#if player.side === side}
+              <FontAwesomeIcon icon="check" />
+            {/if}
+            {side}
+          </button>
+        {/snippet}
+
+        {@render setSideButton("corp", player)}
+        {@render setSideButton("runner", player)}
+      {:else if player.side_label}
+        {player.side_label}
+      {/if}
+    {/if}
+    
+    <!-- IDs -->
+    <div class="ids" style={$showIdentities ? "display: block;" : ""}>
+      {#if player.side_label}
+        <Identity
+          identity={player.side == "corp" ? player.corp_id : player.runner_id}
+          name_if_missing="Unspecified"
+          icon_if_missing="interrupt"
+        />
+      {:else}
+        <Identity
+          identity={player.corp_id}
+          name_if_missing="Unspecified"
+          icon_if_missing="interrupt" />
+        <Identity
+          identity={player.runner_id}
+          name_if_missing="Unspecified"
+          icon_if_missing="interrupt" />
+      {/if}
+    </div>
+  </div>
+{/snippet}
 
 <div
   class="row m-1 round_pairing align-items-center table_{pairing.table_number} {pairing
@@ -161,7 +233,7 @@
       {/if}
     {/if}
   {/if}
-  <PlayerName player={leftPlayer} left_or_right="left" />
+  {@render playerDisplay(leftPlayer, "left")}
 
   <!-- Score -->
   {#if tournamentPolicies?.update && (!stage.is_single_sided || pairing.player1.side)}
@@ -224,7 +296,7 @@
   {/if}
 
   <!-- Player 2 -->
-  <PlayerName player={rightPlayer} left_or_right="right" />
+  {@render playerDisplay(rightPlayer, "right")}
   {#if !tournamentPolicies?.update && pairing.policy.view_decks && !pairing.player1.side}
     <a href="../players/{pairing.player2.id}/view_decks?back_to=pairings">
       <FontAwesomeIcon icon="eye" /> View decks
