@@ -65,9 +65,10 @@
     e.preventDefault();
 
     redirectRequest(
-      `/tournaments/${tournamentId}/cut?${single_elim && "elimination_type=single"}&number=${num}`,
+      `/tournaments/${tournamentId}/cut`,
       "POST",
-      data.csrf_token
+      data.csrf_token,
+      { number: num, ...single_elim && { elimination_type: "single" } }
     );
   }
 </script>

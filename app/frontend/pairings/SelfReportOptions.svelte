@@ -7,9 +7,9 @@
   } from "./PairingsData";
   import { onMount } from "svelte";
   import {
-    loadPresets,
-    type SelfReportPresets,
-    selfReport,
+    type ScoreReport,
+    scorePresets,
+    selfReport
   } from "./SelfReport";
   import ModalDialog from "../widgets/ModalDialog.svelte";
 
@@ -17,16 +17,17 @@
     tournamentId,
     stage,
     round,
-    pairing
+    pairing,
+    csrfToken
   }: {
     tournamentId: number;
     stage: Stage;
     round: Round;
     pairing: Pairing;
+    csrfToken: string;
   } = $props();
   
-  let presets: SelfReportPresets[] = $state([]);
-  let csrfToken: string;
+  let presets: ScoreReport[] = $state([]);
   let customReporting = $state(false);
 
   let score1 = $state(0);
@@ -47,23 +48,19 @@
   }
 
   onMount(async () => {
-    const response = await loadPresets(tournamentId, round.id, pairing.id);
-    presets = response.presets;
-    csrfToken = response.csrf_token;
+    presets = scorePresets(stage, pairing);
   });
 
   function onCustomReportClicked() {
     customReporting = !customReporting;
   }
 
-  async function onSelfReportPresetClicked(data: SelfReportPresets) {
-    const response = await selfReport(
-      tournamentId,
-      round.id,
-      pairing.id,
-      csrfToken,
-      { score1: null, score2: null, ...data },
-    );
+  async function onSelfReportPresetClicked(data: ScoreReport) {
+    let report = { ...data };
+    report.score1 = null;
+    report.score2 = null;
+
+    const response = await selfReport(tournamentId, round.id, pairing.id, csrfToken, report);
     if (!response.success) {
       alert(response.error);
       return;

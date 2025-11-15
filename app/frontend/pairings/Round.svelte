@@ -38,9 +38,10 @@
     }
 
     redirectRequest(
-      `/tournaments/${tournamentId}/rounds/${round.id}/complete?completed=true`,
+      `/tournaments/${tournamentId}/rounds/${round.id}/complete`,
       "PATCH",
-      csrfToken
+      csrfToken,
+      { completed: true }
     );
   }
 
@@ -54,9 +55,10 @@
     }
 
     redirectRequest(
-      `/tournaments/${tournamentId}/rounds/${round.id}/update_timer?length_minutes=${roundTimerLength}&operation=${operation}`,
+      `/tournaments/${tournamentId}/rounds/${round.id}/update_timer`,
       "PATCH",
       csrfToken,
+      { length_minutes: roundTimerLength, operation: operation }
     );
   }
 </script>

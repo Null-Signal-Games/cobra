@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module PairingsHelper
+  # TODO: Remove?
   def pairing_player_select(form, label, round)
     form.input label,
                collection: round.unpaired_players,
@@ -10,6 +11,7 @@ module PairingsHelper
                input_html: { class: 'form-control mx-2' }
   end
 
+  # TODO: Remove?
   def pairing_player1_side_select(form, label)
     form.input label,
                collection: { 'Corp' => 'player1_is_corp', 'Runner' => 'player1_is_runner' },
@@ -19,6 +21,7 @@ module PairingsHelper
                input_html: { class: 'form-control mx-2' }
   end
 
+  # TODO: Remove?
   def preset_score_button(pairing, data)
     link_to data[:label],
             report_tournament_round_pairing_path(
@@ -31,6 +34,7 @@ module PairingsHelper
             class: 'btn btn-primary mb-1'
   end
 
+  # TODO: Remove?
   def side_value(player, side, pairing)
     return unless player_is_in_pairing(player, pairing)
 
@@ -39,6 +43,7 @@ module PairingsHelper
     end.first
   end
 
+  # TODO: Remove?
   def set_side_button(player, side, pairing)
     return unless player_is_in_pairing(player, pairing)
 
@@ -57,6 +62,7 @@ module PairingsHelper
             class: "btn btn-sm mr-1 #{active ? 'btn-dark' : 'btn-outline-dark'}"
   end
 
+  # TODO: Remove?
   def presets(pairing)
     # Double-sided round
     if pairing.stage.swiss?
@@ -124,16 +130,19 @@ module PairingsHelper
     Pairing.sides.collect { |v, _k| [v, v] }
   end
 
+  # TODO: Remove?
   def side_label_for(pairing, player)
     return nil unless pairing.side && player_is_in_pairing(player, pairing)
 
     "(#{pairing.side_for(player).to_s.titleize})"
   end
 
+  # TODO: Remove?
   def player_is_in_pairing(player, pairing)
     pairing.player1_id == player.id || pairing.player2_id == player.id
   end
 
+  # TODO: Remove?
   def readable_score(pairing)
     return '-' if pairing.score1&.zero? && pairing.score2&.zero?
 
@@ -157,6 +166,7 @@ module PairingsHelper
     end
   end
 
+  # TODO: Remove?
   # TODO: (TrueSvenpai): refactor to reduce code duplication.
   def readable_self_report_score(pairing, self_report)
     return '-' if self_report.score1&.zero? && self_report.score2&.zero?
@@ -181,6 +191,7 @@ module PairingsHelper
     end
   end
 
+  # TODO: Remove?
   def winning_side(pairing)
     corp_score = (pairing.score1_corp || 0) + (pairing.score2_corp || 0)
     runner_score = (pairing.score1_runner || 0) + (pairing.score2_runner || 0)

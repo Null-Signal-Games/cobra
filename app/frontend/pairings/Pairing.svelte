@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { type Pairing, type Player, type Round, type Score, SelfReport, type Stage, Tournament, type TournamentPolicies, readableReportScore, scorePresets } from "./PairingsData";
+  import { type Pairing, type Player, type Round, type Stage, Tournament, type TournamentPolicies } from "./PairingsData";
+  import { type ScoreReport, readableReportScore, reportsMatch, scorePresets } from "./SelfReport";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import SelfReportOptions from "./SelfReportOptions.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
@@ -32,13 +33,13 @@
     leftPlayer = pairing.player2;
     rightPlayer = pairing.player1;
   }
-  let leftPlayerReport: SelfReport | undefined = $state(new SelfReport());
-  let rightPlayerReport: SelfReport | undefined = $state(new SelfReport());
+  let leftPlayerReport: ScoreReport | undefined = $state();
+  let rightPlayerReport: ScoreReport | undefined = $state();
   let playersReported = $state(false);
   let selfReportsMatch = $state(false);
 
   let showScorePresets = $state(!pairing.reported);
-  let customScore: Score = $state({
+  let customScore: ScoreReport = $state({
     score1: pairing.score1,
     score2: pairing.score2,
     intentional_draw: pairing.intentional_draw,
@@ -77,28 +78,22 @@
       sideValue = side === "corp" ? "runner" : "corp";
     }
 
-    submitScore(
-      e,
-      {
-        score1_corp: 0,
-        score2_runner: 0,
-        score1_runner: 0,
-        score2_corp: 0,
-        side: `player1_is_${sideValue}`
-      });
-  }
-
-  function submitScore(e: MouseEvent, score: Score) {
-    e.preventDefault();
-
-    let params: String[] = [];
-    Object.entries(score).forEach(
-      ([key, value]) => params.push(`pairing[${key}]=${value}`));
-
     redirectRequest(
-      `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/report?${params.join("&")}`,
+      `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/report`,
       "POST",
       csrfToken,
+      { side: `player1_is_${sideValue}` }
+    );
+  }
+
+  function submitScore(e: MouseEvent, score: ScoreReport) {
+    e.preventDefault();
+
+    redirectRequest(
+      `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/report`,
+      "POST",
+      csrfToken,
+      score
     );
   }
 
@@ -313,7 +308,7 @@
         data-target="#reports{pairing.id}"
       >
         Reports
-        {#if !pairing.reported && pairing.self_reports?.length == 2 && pairing.self_reports[0].matches(pairing.self_reports[1])}
+        {#if !pairing.reported && pairing.self_reports?.length == 2 && reportsMatch(pairing.self_reports[0], pairing.self_reports[1])}
           <FontAwesomeIcon icon="exclamation-triangle" />
         {/if}
       </button>
@@ -324,7 +319,7 @@
   {:else}
     <div class="col-sm-2">
       {#if pairing.policy.self_report}
-        <SelfReportOptions {tournamentId} {stage} {round} {pairing} />
+        <SelfReportOptions {tournamentId} {stage} {round} {pairing} {csrfToken} />
       {/if}
       {#if pairing.self_reports && pairing.self_reports.length !== 0}
         Report: {pairing.self_reports[0].label}
@@ -332,7 +327,7 @@
     </div>
   {/if}
 
-  {#snippet playerReport(player: Player, report: SelfReport | undefined)}
+  {#snippet playerReport(player: Player, report: ScoreReport | undefined)}
     {player.name} reported:
     {#if report}
       {readableReportScore(report, pairing.player1.side, stage.is_single_sided)}
@@ -344,20 +339,11 @@
     {/if}
   {/snippet}
 
-  {#snippet acceptPlayerReportButton(player: Player, report: SelfReport)}
+  {#snippet acceptPlayerReportButton(player: Player, report: ScoreReport)}
     <button
       type="button"
       class="btn btn-primary"
-      onclick={(e) => submitScore(
-        e,
-        {
-          score1: report.score1,
-          score1_corp: 0,
-          score1_runner: 0,
-          score2: report.score2,
-          score2_corp: 0,
-          score2_runner: 0
-        })}
+      onclick={(e) => submitScore(e, report)}
       disabled={pairing.reported}
     >
       <FontAwesomeIcon icon="check" /> Accept {player.name}

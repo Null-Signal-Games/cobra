@@ -157,11 +157,6 @@ class PairingsController < ApplicationController
     end
   end
 
-  def pairing_presets
-    authorize @tournament, :show?
-    render json: { presets: helpers.presets(pairing), csrf_token: form_authenticity_token }
-  end
-
   private
 
   def save_report
