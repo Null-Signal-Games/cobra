@@ -133,7 +133,7 @@ class PairingsController < ApplicationController
 
     pairing.destroy
 
-    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
+    render json: { url: tournament_round_path(tournament, round) }, status: :ok
   end
 
   def match_slips
@@ -150,7 +150,9 @@ class PairingsController < ApplicationController
     authorize @tournament, :show?
     authorize pairing
     @back_to = params[:back_to]
-    if @back_to == 'pairings'
+    if @back_to == 'rounds'
+      @back_to_path = tournament_rounds_path(@tournament)
+    elsif @back_to == 'pairings'
       @back_to_path = view_pairings_tournament_rounds_path(@tournament)
     elsif @back_to == 'standings'
       @back_to_path = standings_tournament_players_path(@tournament)

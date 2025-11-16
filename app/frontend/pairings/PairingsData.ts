@@ -77,6 +77,7 @@ export interface Round {
   completed: boolean;
   pairings: Pairing[];
   pairings_reported: number;
+  unpaired_players?: Player[];
   length_minutes: number;
   timer: RoundTimer;
 }
@@ -137,4 +138,5 @@ export class Player {
   corp_id: Identity | null = null;
   runner_id: Identity | null = null;
   include_in_stream = false;
+  active: boolean | null = null;
 }

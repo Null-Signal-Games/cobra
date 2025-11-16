@@ -132,7 +132,7 @@
     {player.name_with_pronouns}
 
     <!-- Side -->
-    {#if stage.is_single_sided}
+    {#if stage.is_single_sided && pairing.player1.id && pairing.player2.id}
       <br />
       {#if tournamentPolicies?.update}
         {#snippet setSideButton(side: string, player: Player)}
@@ -156,7 +156,7 @@
     
     <!-- IDs -->
     <div class="ids" style={$showIdentities ? "display: block;" : ""}>
-      {#if player.side_label}
+      {#if stage.is_single_sided}
         <Identity
           identity={player.side == "corp" ? player.corp_id : player.runner_id}
           name_if_missing="Unspecified"
@@ -212,13 +212,13 @@
   {#if pairing.policy.view_decks}
     {#if tournamentPolicies?.update}
       {#if stage.is_single_sided}
-        <a href="{round.id}/pairings/{pairing.id}/view_decks?back_to=pairings">
+        <a href="/tournaments/{tournamentId}/rounds/{round.id}/pairings/{pairing.id}/view_decks?back_to=rounds">
           <FontAwesomeIcon icon="eye" /> View decks
         </a>
       {/if}
     {:else}
       {#if pairing.player1.side}
-        <a href="{round.id}/pairings/{pairing.id}/view_decks?back_to=pairings">
+        <a href="/tournaments/{tournamentId}/rounds/{round.id}/pairings/{pairing.id}/view_decks?back_to=pairings">
           <FontAwesomeIcon icon="eye" /> View decks
         </a>
       {:else}
@@ -292,7 +292,7 @@
 
   <!-- Player 2 -->
   {@render playerDisplay(rightPlayer, "right")}
-  {#if !tournamentPolicies?.update && pairing.policy.view_decks && !pairing.player1.side}
+  {#if !tournamentPolicies?.update && pairing.policy.view_decks && !pairing.player1.side && pairing.player2.id}
     <a href="../players/{pairing.player2.id}/view_decks?back_to=pairings">
       <FontAwesomeIcon icon="eye" /> View decks
     </a>

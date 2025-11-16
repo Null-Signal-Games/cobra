@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       get :view_pairings, on: :collection
       get :pairings_data, on: :collection
       get :brackets, on: :collection
+      get :round_data, on: :member
     end
     get :bracket, on: :member
     resources :stages, only: %i[show create update destroy] do

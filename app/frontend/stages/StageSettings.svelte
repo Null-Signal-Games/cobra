@@ -65,7 +65,7 @@
 
 <p>
   <a href="/tournaments/{tournamentId}/rounds" class="btn btn-primary">
-    <FontAwesomeIcon icon="arrow-left" /> Back to Pairings
+    <FontAwesomeIcon icon="arrow-left" /> Back to pairings
   </a>
 </p>
 

@@ -2,7 +2,7 @@
 
 class RoundsController < ApplicationController
   before_action :set_tournament
-  before_action :set_round, only: %i[edit update destroy repair complete update_timer]
+  before_action :set_round, only: %i[edit update destroy repair complete update_timer round_data]
 
   def index
     authorize @tournament, :update?
@@ -113,7 +113,7 @@ class RoundsController < ApplicationController
 
     @round.destroy!
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def repair
@@ -121,7 +121,7 @@ class RoundsController < ApplicationController
 
     @round.repair!
 
-    redirect_to tournament_round_path(@tournament, @round)
+    render json: { url: tournament_round_path(@tournament, @round) }, status: :ok
   end
 
   def complete
@@ -149,6 +149,41 @@ class RoundsController < ApplicationController
     end
 
     render json: { url: tournament_rounds_path(@tournament) }, status: :ok
+  end
+
+  def round_data
+    authorize @tournament, :update?
+
+    stage = @tournament.stages.find { |s| s.id == @round.stage_id }
+    round = Round.includes([{ pairings: %i[player1 player2] }]).find(params[:id])
+    round = edit_data_round(round, pairings_data_players)
+    round[:unpaired_players] = @round.unpaired_players
+
+    render json: {
+      policy: {
+        update: @tournament.user == current_user,
+        custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
+      },
+      tournament: {
+        player_meeting: @tournament.round_ids.empty?,
+        registration_open: @tournament.registration_open?,
+        registration_unlocked: @tournament.registration_unlocked?,
+        self_registration: @tournament.self_registration?,
+        locked_players: @tournament.locked_players.count,
+        unlocked_players: @tournament.unlocked_players.count,
+        allow_streaming_opt_out: @tournament.allow_streaming_opt_out
+      },
+      stage: {
+        id: stage.id,
+        name: stage.format.titleize,
+        format: stage.format,
+        is_single_sided: stage.single_sided?,
+        is_elimination: stage.elimination?,
+        player_count: stage.players.count
+      },
+      round:,
+      csrf_token: form_authenticity_token
+    }
   end
 
   private
@@ -187,7 +222,8 @@ class RoundsController < ApplicationController
         ci.faction as corp_faction,
         p.runner_identity,
         ri.faction AS runner_faction,
-        p.include_in_stream
+        p.include_in_stream,
+        p.active
       FROM
         players p
         LEFT JOIN identities AS ci ON p.corp_identity_ref_id = ci.id
@@ -199,6 +235,20 @@ class RoundsController < ApplicationController
       players[p['id']] = p
     end
     players
+  end
+
+  def edit_data_round(round, players)
+    view_decks = round.stage.decks_visible_to(current_user)
+
+    self_reports_by_pairing_id = SelfReport.joins(pairing: :round)
+                                           .where(rounds: { id: round.id })
+                                           .group_by(&:pairing_id)
+    # Convert the reports to hashes so they can be modified later
+    self_reports_by_pairing_id.each do |key, value|
+      self_reports_by_pairing_id[key] = value.map(&:attributes)
+    end
+
+    pairings_data_round(round.stage, players, view_decks, round, self_reports_by_pairing_id)
   end
 
   def pairings_data_rounds(stage, players)
