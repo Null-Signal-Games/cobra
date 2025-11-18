@@ -5,6 +5,7 @@
   import { loadPairings } from "./PairingsData";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { showIdentities } from "./ShowIdentities";
+  import GlobalMessages from "../utils/GlobalMessages.svelte";
 
   let { tournamentId }: { tournamentId: number } = $props();
 
@@ -18,6 +19,8 @@
     showIdentities.update((value) => !value);
   }
 </script>
+
+<GlobalMessages />
 
 <button class="btn btn-primary" onclick={toggleIdentities}>
   <FontAwesomeIcon icon="eye-slash" />

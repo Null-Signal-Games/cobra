@@ -6,6 +6,7 @@
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
   import { redirectRequest } from "../utils/network";
+  import GlobalMessages from "../utils/GlobalMessages.svelte";
 
   let { tournamentId }: { tournamentId: number } = $props();
 
@@ -72,6 +73,8 @@
     );
   }
 </script>
+
+<GlobalMessages />
 
 {#if !data.stages || data.stages.length == 0}
   <!-- Add Swiss stage button -->

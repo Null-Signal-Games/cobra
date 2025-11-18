@@ -1,3 +1,5 @@
+import { globalMessages } from "../utils/GlobalMessageState.svelte";
+
 declare const Routes: {
   settings_tournament_stage_path: (
     tournamentId: number,
@@ -50,13 +52,15 @@ export async function loadStage(
       method: "GET",
     },
   );
+
+  const data = (await response.json()) as StageData;
+  globalMessages.warnings = data.warning? [data.warning] : [];
+
   if (!response.ok) {
-    throw new Error(
-      `HTTP ${response.status.toString()}: ${response.statusText}`,
-    );
+    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
   }
 
-  return (await response.json()) as StageData;
+  return data;
 }
 
 export async function saveStage(

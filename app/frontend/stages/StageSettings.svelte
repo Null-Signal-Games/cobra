@@ -9,6 +9,7 @@
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import TableRangeEdit from "./TableRangeEdit.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
+  import GlobalMessages from "../utils/GlobalMessages.svelte";
 
   interface Props {
     tournamentId: number;
@@ -69,11 +70,9 @@
   </a>
 </p>
 
-{#if data}
-  {#if data.warning}
-    <div class="alert alert-warning">{data.warning}</div>
-  {/if}
+<GlobalMessages />
 
+{#if data}
   <div class="row">
     <div class="col-12">
       <h2>{data.stage.format}</h2>

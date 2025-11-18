@@ -1,6 +1,10 @@
+import { globalMessages } from "./GlobalMessageState.svelte";
+
 export interface StandardResponse {
   url?: string;
-  error?: string;
+  infos?: string[];
+  warnings?: string[];
+  errors?: string[];
 }
 
 export async function redirectRequest(
@@ -22,14 +26,16 @@ export async function redirectRequest(
     }
   );
 
-  const standardResponse = (await response.json()) as StandardResponse;
-  
+  const resp = (await response.json()) as StandardResponse;
+  globalMessages.infos = resp.infos ?? [];
+  globalMessages.warnings = resp.warnings ?? [];
+  globalMessages.errors = resp.errors ?? [];
+
   if (!response.ok) {
-    throw new Error(standardResponse.error
-      ?? `HTTP ${response.status.toString()}: ${response.statusText}`);
+    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
   }
 
-  if (standardResponse.url) {
-    window.location.href = standardResponse.url;
+  if (resp.url) {
+    window.location.href = resp.url;
   }
 }

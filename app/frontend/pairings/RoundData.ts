@@ -1,3 +1,4 @@
+import { globalMessages } from "../utils/GlobalMessageState.svelte";
 import { Tournament, TournamentPolicies, type Round, type Stage } from "./PairingsData";
 
 declare const Routes: {
@@ -15,7 +16,10 @@ export async function loadRound(
     },
   );
 
-  return (await response.json()) as RoundData;
+  const data = (await response.json()) as RoundData
+  globalMessages.warnings = data.warnings ?? [];
+
+  return data;
 }
 
 export interface RoundData {
@@ -24,4 +28,5 @@ export interface RoundData {
   round: Round;
   policy?: TournamentPolicies;
   csrf_token: string;
+  warnings?: string[];
 }

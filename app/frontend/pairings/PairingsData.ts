@@ -1,4 +1,5 @@
 import type { Identity } from "../identities/Identity";
+import { globalMessages } from "../utils/GlobalMessageState.svelte";
 import type { ScoreReport } from "./SelfReport";
 
 declare const Routes: {
@@ -19,7 +20,10 @@ export async function loadPairings(
     },
   );
 
-  return (await response.json()) as PairingsData;
+  const data = (await response.json()) as PairingsData;
+  globalMessages.warnings = data.warnings ?? [];
+
+  return data;
 }
 
 export async function loadSharingData(
@@ -41,6 +45,7 @@ export class PairingsData {
   tournament = new Tournament();
   stages: Stage[] = [];
   csrf_token = "";
+  warnings?: string[] = [];
 }
 
 export class SharingData {

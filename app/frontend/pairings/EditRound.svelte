@@ -4,6 +4,7 @@
   import Pairing from "./Pairing.svelte";
   import { type RoundData, loadRound } from "./RoundData";
   import { redirectRequest } from "../utils/network";
+    import GlobalMessages from "../utils/GlobalMessages.svelte";
 
   let {
     tournamentId,
@@ -62,6 +63,8 @@
     );
   }
 </script>
+
+<GlobalMessages />
 
 {#if data}
   <div class="col-12">

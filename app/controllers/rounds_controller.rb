@@ -12,7 +12,6 @@ class RoundsController < ApplicationController
     @players = @tournament.players
                           .includes(:corp_identity_ref, :runner_identity_ref)
                           .index_by(&:id).merge({ nil => NilPlayer.new })
-    @warning = @tournament.current_stage&.validate_table_count
   end
 
   def view_pairings
@@ -37,7 +36,8 @@ class RoundsController < ApplicationController
         allow_streaming_opt_out: @tournament.allow_streaming_opt_out
       },
       stages: pairings_data_stages,
-      csrf_token: form_authenticity_token
+      csrf_token: form_authenticity_token,
+      warnings: ([@tournament.current_stage&.validate_table_count] if policy(@tournament).update?)
     }
   end
 
@@ -182,7 +182,8 @@ class RoundsController < ApplicationController
         player_count: stage.players.count
       },
       round:,
-      csrf_token: form_authenticity_token
+      csrf_token: form_authenticity_token,
+      warnings: ([@tournament.current_stage&.validate_table_count] if policy(@tournament).update?)
     }
   end
 
