@@ -119,7 +119,6 @@ export function readableReportScore(report: ScoreReport, player1Side: string | n
     rightScore = report.score1;
   }
 
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   const str = `${leftScore} - ${rightScore}`;
   const ws = winningSide(report);
   return ws !== "" ? `${str} (${ws})` : str;

@@ -47,7 +47,7 @@
     }
   }
 
-  onMount(async () => {
+  onMount(() => {
     presets = scorePresets(stage, pairing);
   });
 

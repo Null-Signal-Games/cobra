@@ -37,7 +37,7 @@
       return;
     }
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${round.id}/complete`,
       "PATCH",
       csrfToken,
@@ -54,7 +54,7 @@
       return;
     }
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${round.id}/update_timer`,
       "PATCH",
       csrfToken,
@@ -107,19 +107,19 @@
             <label for="round{round.id}Length">Round timer length (minutes)</label>
             <input id="round{round.id}Length" size="3" class="form-control ml-2 mr-2" value={roundTimerLength} />
             {#if round.timer.running}
-              <button class="btn btn-danger" onclick={(e) => updateTimer(e, "stop")}>
+              <button class="btn btn-danger" onclick={(e) => { updateTimer(e, "stop"); }}>
                 <FontAwesomeIcon icon="clock-o" /> Pause
               </button>
             {:else if round.timer.paused}
-              <button class="btn btn-success" onclick={(e) => updateTimer(e, "start")}>
+              <button class="btn btn-success" onclick={(e) => { updateTimer(e, "start"); }}>
                 <FontAwesomeIcon icon="clock-o" /> Resume
               </button>
             {:else if !round.timer.started}
-              <button class="btn btn-success" onclick={(e) => updateTimer(e, "start")}>
+              <button class="btn btn-success" onclick={(e) => { updateTimer(e, "start"); }}>
                 <FontAwesomeIcon icon="clock-o" /> Start
               </button>
             {/if}
-            <button class="btn btn-info ml-2" onclick={(e) => updateTimer(e, "reset")}>
+            <button class="btn btn-info ml-2" onclick={(e) => { updateTimer(e, "reset"); }}>
               <FontAwesomeIcon icon="undo" /> Reset
             </button>
           </div>

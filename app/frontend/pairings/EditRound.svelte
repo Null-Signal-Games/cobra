@@ -27,10 +27,10 @@
       return;
     }
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${data.round.id}/repair`,
       "PATCH",
-      data?.csrf_token
+      data.csrf_token
     );
   }
 
@@ -41,10 +41,10 @@
       return;
     }
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${data.round.id}/complete`,
       "PATCH",
-      data?.csrf_token,
+      data.csrf_token,
       { completed: completed }
     );
   }
@@ -56,10 +56,10 @@
       return;
     }
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${data.round.id}`,
       "DELETE",
-      data?.csrf_token
+      data.csrf_token
     );
   }
 </script>
@@ -81,11 +81,11 @@
           <FontAwesomeIcon icon="refresh" /> Re-pair
         </button>
         {#if data.round.completed}
-          <button class="btn btn-warning" onclick={(e) => complete(e, false)}>
+          <button class="btn btn-warning" onclick={(e) => { complete(e, false); }}>
             <FontAwesomeIcon icon="backward" /> Uncomplete
           </button>
         {:else}
-          <button class="btn btn-warning" onclick={(e) => complete(e, true)}>
+          <button class="btn btn-warning" onclick={(e) => { complete(e, true); }}>
             <FontAwesomeIcon icon="check" /> Complete
           </button>
         {/if}
@@ -115,7 +115,7 @@
   <h3 class="mt-2 col-12">Unpaired players</h3>
   <div class="col-12">
     {#if data.round.unpaired_players && data.round.unpaired_players.length !== 0}
-      {#each data.round.unpaired_players as player}
+      {#each data.round.unpaired_players as player (player.id)}
         {player.name}
         {#if player.active === false} (Dropped){/if}
       {/each}
@@ -123,7 +123,7 @@
       {#snippet playerSelect(id: string)}
         <select id={`pairing_${id}`} name={`pairing[${id}]`} class="form-control mx-2">
           <option value="">(Bye)</option>
-          {#each data?.round.unpaired_players as player}
+          {#each data?.round.unpaired_players as player (player.id)}
             <option value={player.id}>{player.name}</option>
           {/each}
         </select>
@@ -139,6 +139,7 @@
           class="form-control"
           placeholder="Table number"
         />
+        <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
         {@render playerSelect("pairing_player1_id")}
         {#if data.stage.is_single_sided}
           <select id="side" name="pairing[side]" class="form-control mx-2">
@@ -148,6 +149,7 @@
           </select>
         {/if}
         vs
+        <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
         {@render playerSelect("pairing_player2_id")}
         <button type="submit" class="btn btn-success">
           <FontAwesomeIcon icon="plus" /> Create

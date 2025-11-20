@@ -15,6 +15,9 @@ export default ts.config(
       svelte.configs.recommended,
     ],
     ignores: ["**/venv/", "app/assets/**/*", "public/**/*", "tmp/", "vendor/"],
+    rules: {
+      "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }]
+    }
   },
   {
     languageOptions: {

@@ -20,7 +20,7 @@
   function addSwissStage(e: MouseEvent) {
     e.preventDefault();
 
-    redirectRequest(`/tournaments/${tournamentId}/stages`, "POST", data.csrf_token);
+    void redirectRequest(`/tournaments/${tournamentId}/stages`, "POST", data.csrf_token);
   }
 
   function pairNewRound(e: MouseEvent) {
@@ -35,37 +35,37 @@
       return;
     }
 
-    redirectRequest(`/tournaments/${tournamentId}/rounds`, "POST", data.csrf_token);
+    void redirectRequest(`/tournaments/${tournamentId}/rounds`, "POST", data.csrf_token);
   }
 
   function closeRegistration(e: MouseEvent) {
     e.preventDefault();
 
-    redirectRequest(`/tournaments/${tournamentId}/close_registration`, "PATCH", data.csrf_token);
+    void redirectRequest(`/tournaments/${tournamentId}/close_registration`, "PATCH", data.csrf_token);
   }
 
   function openRegistration(e: MouseEvent) {
     e.preventDefault();
 
-    redirectRequest(`/tournaments/${tournamentId}/open_registration`, "PATCH", data.csrf_token);
+    void redirectRequest(`/tournaments/${tournamentId}/open_registration`, "PATCH", data.csrf_token);
   }
 
   function lockPlayerRegistration(e: MouseEvent) {
     e.preventDefault();
 
-    redirectRequest(`/tournaments/${tournamentId}/lock_player_registration`, "PATCH", data.csrf_token);
+    void redirectRequest(`/tournaments/${tournamentId}/lock_player_registration`, "PATCH", data.csrf_token);
   }
 
   function unlockPlayerRegistration(e: MouseEvent) {
     e.preventDefault();
 
-    redirectRequest(`/tournaments/${tournamentId}/unlock_player_registration`, "PATCH", data.csrf_token);
+    void redirectRequest(`/tournaments/${tournamentId}/unlock_player_registration`, "PATCH", data.csrf_token);
   }
 
   function addCutStage(e: MouseEvent, single_elim: boolean, num: number) {
     e.preventDefault();
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/cut`,
       "POST",
       data.csrf_token,
@@ -76,7 +76,7 @@
 
 <GlobalMessages />
 
-{#if !data.stages || data.stages.length == 0}
+{#if data.stages.length == 0}
   <!-- Add Swiss stage button -->
   {#if data.policy.update}
     <button type="button" class="btn btn-success" onclick={addSwissStage}>
@@ -86,25 +86,25 @@
 {:else}
   <!-- Upper controls -->
   <div>
-    {#if !data.stages || data.stages.every((s) => !s.rounds || s.rounds.length == 0)}
+    {#if data.stages.every((s) => s.rounds.length == 0)}
       <a
         href="/tournaments/{tournamentId}/players/meeting"
         class="btn btn-primary"
       >
         <FontAwesomeIcon icon="list-ul" /> Player meeting
       </a>
-    {:else if data.stages.some((s) => s.rounds?.length > 0)}
+    {:else if data.stages.some((s) => s.rounds.length > 0)}
       {#if data.policy.update}
         <button
           class="btn btn-primary"
-          onclick={(_) => (showReportedPairings = !showReportedPairings)}
+          onclick={(e) => { e.preventDefault(); showReportedPairings = !showReportedPairings; }}
         >
           <FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
         </button>
       {/if}
       <button
         class="btn btn-primary"
-        onclick={(_) => showIdentities.update((value) => !value)}
+        onclick={(e) => { e.preventDefault(); showIdentities.update((value) => !value); }}
       >
         <FontAwesomeIcon icon="eye-slash" /> Show/hide identities
       </button>
@@ -138,7 +138,7 @@
         <button class="btn btn-info" onclick={closeRegistration}>
           <FontAwesomeIcon icon="lock" /> Close registration
         </button>
-      {:else if data.tournament.self_registration && data.stages.every((s) => !s.rounds || s.rounds.length == 0)}
+      {:else if data.tournament.self_registration && data.stages.every((s) => s.rounds.length == 0)}
         <button class="btn btn-secondary" onclick={openRegistration}
         >
           <FontAwesomeIcon icon="folder-open" /> Open registration
@@ -192,9 +192,9 @@
       <tbody>
         <tr>
           <td>Single Elimination</td>
-          {#each [3, 4, 8, 16] as num}
+          {#each [3, 4, 8, 16] as num (num)}
             <td class="pl-2">
-              <button class="btn btn-success" onclick={(e) => addCutStage(e, true, num)}>
+              <button class="btn btn-success" onclick={(e) => { addCutStage(e, true, num); }}>
                 <FontAwesomeIcon icon="scissors" /> Top {num}
               </button>
             </td>
@@ -203,9 +203,9 @@
         <tr>
           <td>Double Elimination</td>
           <td></td>
-          {#each [4, 8, 16] as num}
+          {#each [4, 8, 16] as num (num)}
             <td class="pt-2 pl-2">
-              <button class="btn btn-success" onclick={(e) => addCutStage(e, false, num)}>
+              <button class="btn btn-success" onclick={(e) => { addCutStage(e, false, num); }}>
                 <FontAwesomeIcon icon="scissors" /> Top {num}
               </button>
             </td>

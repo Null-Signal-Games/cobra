@@ -33,7 +33,7 @@
 
       {#if footer}
         <div class="modal-footer">
-          {@render footer?.()}
+          {@render footer()}
         </div>
       {/if}
     </div>

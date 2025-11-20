@@ -33,7 +33,7 @@
       return;
     }
 
-    redirectRequest(`/tournaments/${tournamentId}/stages/${stage.id}`, "DELETE", csrfToken);
+    void redirectRequest(`/tournaments/${tournamentId}/stages/${stage.id}`, "DELETE", csrfToken);
   }
 </script>
 
@@ -46,7 +46,7 @@
     <!-- Admin controls -->
     {#if tournamentPolicies?.update}
       <div class="col-sm-2">
-        {#if !stage.is_elimination && tournamentPolicies?.custom_table_numbering}
+        {#if !stage.is_elimination && tournamentPolicies.custom_table_numbering}
           <a
             href="/tournaments/{tournamentId}/stages/{stage.id}"
             class="btn btn-warning mx-1"

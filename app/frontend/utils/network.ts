@@ -32,7 +32,7 @@ export async function redirectRequest(
   globalMessages.errors = resp.errors ?? [];
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
+    globalMessages.errors.unshift(`HTTP ${response.status.toString()}: ${response.statusText}`);
   }
 
   if (resp.url) {

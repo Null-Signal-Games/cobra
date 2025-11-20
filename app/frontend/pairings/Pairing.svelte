@@ -78,7 +78,7 @@
       sideValue = side === "corp" ? "runner" : "corp";
     }
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/report`,
       "POST",
       csrfToken,
@@ -89,7 +89,7 @@
   function submitScore(e: MouseEvent, score: ScoreReport) {
     e.preventDefault();
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/report`,
       "POST",
       csrfToken,
@@ -104,7 +104,7 @@
       return;
     }
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}`,
       "DELETE",
       csrfToken,
@@ -118,7 +118,7 @@
       return;
     }
 
-    redirectRequest(
+    void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${round.id}/pairings/${pairing.id}/reset_self_report`,
       "DELETE",
       csrfToken,
@@ -138,7 +138,7 @@
         {#snippet setSideButton(side: string, player: Player)}
           <button
             class="btn btn-sm mr-1 {player.side === side ? "btn-dark" : "btn-outline-dark"}"
-            onclick={(e) => changePlayerSide(e, side, player)}
+            onclick={(e) => { changePlayerSide(e, side, player); }}
           >
             {#if player.side === side}
               <FontAwesomeIcon icon="check" />
@@ -147,7 +147,9 @@
           </button>
         {/snippet}
 
+        <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
         {@render setSideButton("corp", player)}
+        <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
         {@render setSideButton("runner", player)}
       {:else if player.side_label}
         {player.side_label}
@@ -228,6 +230,7 @@
       {/if}
     {/if}
   {/if}
+  <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
   {@render playerDisplay(leftPlayer, "left")}
 
   <!-- Score -->
@@ -236,8 +239,8 @@
     <div class="col-sm-5 centre_score">
       {#if showScorePresets}
         <div>
-          {#each scorePresets(stage, pairing) as score}
-            <button class="btn btn-primary mr-1" onclick={(e) => submitScore(e, score)}>{score.label}</button>
+          {#each scorePresets(stage, pairing) as score (score.label)}
+            <button class="btn btn-primary mr-1" onclick={(e) => { submitScore(e, score); }}>{score.label}</button>
           {/each}
           <button class="btn btn-primary" onclick={toggleShowScorePresets}>...</button>
         </div>
@@ -251,7 +254,7 @@
             {/if}
           </div>
 
-          <button class="btn btn-primary mx-2" onclick={(e) => submitScore(e, customScore)}><FontAwesomeIcon icon="flag-checkered" /> Save</button>
+          <button class="btn btn-primary mx-2" onclick={(e) => { submitScore(e, customScore); }}><FontAwesomeIcon icon="flag-checkered" /> Save</button>
 
           <div>
             {#if rightPlayer == pairing.player1}
@@ -291,6 +294,7 @@
   {/if}
 
   <!-- Player 2 -->
+  <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
   {@render playerDisplay(rightPlayer, "right")}
   {#if !tournamentPolicies?.update && pairing.policy.view_decks && !pairing.player1.side && pairing.player2.id}
     <a href="../players/{pairing.player2.id}/view_decks?back_to=pairings">
@@ -343,7 +347,7 @@
     <button
       type="button"
       class="btn btn-primary"
-      onclick={(e) => submitScore(e, report)}
+      onclick={(e) => { submitScore(e, report); }}
       disabled={pairing.reported}
     >
       <FontAwesomeIcon icon="check" /> Accept {player.name}
@@ -352,17 +356,21 @@
 
   <ModalDialog id="reports{pairing.id}" headerText="Player Self Reports">
     <p>
+      <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
       {@render playerReport(leftPlayer, leftPlayerReport)}
     </p>
     <p>
+      <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
       {@render playerReport(rightPlayer, rightPlayerReport)}
     </p>
 
     {#snippet footer()}
       {#if leftPlayerReport}
+        <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
         {@render acceptPlayerReportButton(leftPlayer, leftPlayerReport)}
       {/if}
       {#if rightPlayerReport}
+        <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
         {@render acceptPlayerReportButton(rightPlayer, rightPlayerReport)}
       {/if}
       {#if playersReported && !selfReportsMatch}
