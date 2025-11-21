@@ -34,7 +34,7 @@
         5432
     ],
     // Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "bundle install && bundle exec rake db:setup && npm install",
+    "postCreateCommand": "bundle install && bundle exec rake db:setup && npm install && npx --yes playwright install --with-deps",
     // Configure tool-specific properties.
     "customizations": {
         "vscode": {
