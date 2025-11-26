@@ -61,13 +61,17 @@ class TournamentResource < ApplicationResource
   belongs_to :user
 
   def create_timestamp(date, time_24h, timezone)
-    # Parse the date and time string
-    datetime_string = "#{date} #{time_24h}"
+    return nil if date.nil? || time_24h.nil? || timezone.nil?
 
-    # Create a Time object in the specified timezone
-    Time.zone = timezone
-    Time.zone.parse(datetime_string)
-  rescue ArgumentError => _e
-    nil
+    begin
+      # Parse the date and time string
+      datetime_string = "#{date} #{time_24h}"
+
+      # Create a Time object in the specified timezone
+      Time.zone = timezone
+      Time.zone.parse(datetime_string)
+    rescue ArgumentError => _e
+      nil
+    end
   end
 end
