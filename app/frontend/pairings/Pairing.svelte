@@ -143,7 +143,7 @@
             {#if player.side === side}
               <FontAwesomeIcon icon="check" />
             {/if}
-            {side}
+            {side == "corp" ? "Corp" : "Runner"}
           </button>
         {/snippet}
 
@@ -248,9 +248,9 @@
         <div class="form-row justify-content-center">
           <div>
             {#if leftPlayer == pairing.player1}
-              <input class="form-control" style="width: 2.5em;" bind:value={customScore.score1} />
+              <input id="pairing_score1" class="form-control" style="width: 2.5em;" bind:value={customScore.score1} />
             {:else}
-              <input class="form-control" style="width: 2.5em;" bind:value={customScore.score2} />
+              <input id="pairing_score2" class="form-control" style="width: 2.5em;" bind:value={customScore.score2} />
             {/if}
           </div>
 
@@ -258,9 +258,9 @@
 
           <div>
             {#if rightPlayer == pairing.player1}
-              <input class="form-control" style="width: 2.5em;" bind:value={customScore.score1} />
+              <input id="pairing_score1" class="form-control" style="width: 2.5em;" bind:value={customScore.score1} />
             {:else}
-              <input class="form-control" style="width: 2.5em;" bind:value={customScore.score2} />
+              <input id="pairing_score2" class="form-control" style="width: 2.5em;" bind:value={customScore.score2} />
             {/if}
           </div>
 

@@ -16,9 +16,8 @@ SimpleCov.start do
 end
 
 Capybara.register_driver :playwright do |app|
-  Capybara::Playwright::Driver.new(app, browser_type: :firefox, headless: false) # TODO: This need to be true
+  Capybara::Playwright::Driver.new(app, browser_type: :firefox, headless: true)
 end
-Capybara.default_max_wait_time = 60
 Capybara.default_driver = :playwright
 
 RSpec.configure do |config|

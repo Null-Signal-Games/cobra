@@ -2,13 +2,7 @@
 
 RSpec.describe 'Completing rounds' do
   let(:tournament) { create(:tournament) }
-  let(:stage) { create(:stage, tournament:) }
-  let(:round) { create(:round, tournament:, stage:, completed: false) }
-  let(:player1) { create(:player, tournament: round.tournament) }
-  let(:player2) { create(:player, tournament: round.tournament) }
-  let!(:pairing) do
-    create(:pairing, player1:, player2:, round:)
-  end
+  let(:round) { create(:round, tournament:, stage: tournament.current_stage, completed: false) }
 
   before do
     sign_in round.tournament.user
@@ -16,7 +10,7 @@ RSpec.describe 'Completing rounds' do
   end
 
   it 'completes the round' do
-    click_link 'Complete'
+    click_button 'Complete'
 
     expect(round.reload.completed?).to be(true)
   end

@@ -13,11 +13,20 @@ RSpec.describe RoundsController do
         sign_in nil
         get pairings_data_tournament_rounds_path(tournament)
 
-        expect(compare_body(response))
-          .to eq(
-            'is_player_meeting' => true,
-            'policy' => { 'update' => false },
-            'stages' => [swiss_stage_with_rounds([])]
+        expect(compare_body(response).delete_if { |k, _| k == 'csrf_token' })
+          .to eq(\
+            'policy' => { 'update' => false, 'custom_table_numbering' => false },
+            'stages' => [swiss_stage_with_rounds([])],
+            'tournament' => {
+              'allow_streaming_opt_out' => nil,
+              'locked_players' => 0,
+              'player_meeting' => true,
+              'registration_open' => false,
+              'registration_unlocked' => false,
+              'self_registration' => false,
+              'unlocked_players' => 3
+            },
+            'warnings' => nil
           )
       end
 
@@ -25,11 +34,20 @@ RSpec.describe RoundsController do
         sign_in alice
         get pairings_data_tournament_rounds_path(tournament)
 
-        expect(compare_body(response))
+        expect(compare_body(response).delete_if { |k, _| k == 'csrf_token' })
           .to eq(
-            'is_player_meeting' => true,
-            'policy' => { 'update' => false },
-            'stages' => [swiss_stage_with_rounds([])]
+            'policy' => { 'update' => false, 'custom_table_numbering' => false },
+            'stages' => [swiss_stage_with_rounds([])],
+            'tournament' => {
+              'allow_streaming_opt_out' => nil,
+              'locked_players' => 0,
+              'player_meeting' => true,
+              'registration_open' => false,
+              'registration_unlocked' => false,
+              'self_registration' => false,
+              'unlocked_players' => 3
+            },
+            'warnings' => nil
           )
       end
 
@@ -37,11 +55,20 @@ RSpec.describe RoundsController do
         sign_in organiser
         get pairings_data_tournament_rounds_path(tournament)
 
-        expect(compare_body(response))
+        expect(compare_body(response).delete_if { |k, _| k == 'csrf_token' })
           .to eq(
-            'is_player_meeting' => true,
-            'policy' => { 'update' => true },
-            'stages' => [swiss_stage_with_rounds([])]
+            'policy' => { 'update' => true, 'custom_table_numbering' => false },
+            'stages' => [swiss_stage_with_rounds([])],
+            'tournament' => {
+              'allow_streaming_opt_out' => nil,
+              'locked_players' => 0,
+              'player_meeting' => true,
+              'registration_open' => false,
+              'registration_unlocked' => false,
+              'self_registration' => false,
+              'unlocked_players' => 3
+            },
+            'warnings' => [nil]
           )
       end
     end
@@ -54,72 +81,110 @@ RSpec.describe RoundsController do
       it 'displays without logging in' do
         sign_in nil
         get pairings_data_tournament_rounds_path(tournament)
-        expect(compare_body(response))
+        expect(compare_body(response).delete_if { |k, _| k == 'csrf_token' })
           .to eq({
-                   'is_player_meeting' => false,
-                   'policy' => { 'update' => false },
+                   'policy' => { 'update' => false, 'custom_table_numbering' => false },
                    'stages' => [swiss_stage_with_rounds(
                      [
                        {
                          'number' => 1,
+                         'completed' => false,
+                         'length_minutes' => 65,
                          'pairings' => [
                            { 'intentional_draw' => false,
-                             'player1' => player_with_no_ids('Charlie (she/her)'),
-                             'player2' => player_with_no_ids('Bob (he/him)'),
+                             'player1' => player_with_no_ids(charlie),
+                             'player2' => player_with_no_ids(bob),
                              'policy' => { 'view_decks' => false, 'self_report' => false },
                              'ui_metadata' => { 'row_highlighted' => false },
+                             'reported' => false,
+                             'score1' => nil,
+                             'score2' => nil,
                              'score_label' => ' - ', 'two_for_one' => false,
-                             'table_label' => 'Table 1', 'table_number' => 1, 'self_report' => nil },
+                             'table_label' => 'Table 1', 'table_number' => 1, 'self_reports' => nil },
                            { 'intentional_draw' => false,
-                             'player1' => player_with_no_ids('Alice (she/her)'),
+                             'player1' => player_with_no_ids(alice),
                              'player2' => bye_player,
                              'policy' => { 'view_decks' => false, 'self_report' => false },
                              'ui_metadata' => { 'row_highlighted' => false },
+                             'reported' => true,
+                             'score1' => 6,
+                             'score2' => 0,
                              'score_label' => '6 - 0', 'two_for_one' => false,
-                             'table_label' => 'Table 2', 'table_number' => 2, 'self_report' => nil }
-                         ], 'pairings_reported' => 1
+                             'table_label' => 'Table 2', 'table_number' => 2, 'self_reports' => nil }
+                         ],
+                         'pairings_reported' => 1,
+                         'timer' => { 'paused' => false, 'running' => false, 'started' => false }
                        }
                      ]
-                   )]
+                   )],
+                   'tournament' => {
+                     'allow_streaming_opt_out' => nil,
+                     'locked_players' => 0,
+                     'player_meeting' => false,
+                     'registration_open' => false,
+                     'registration_unlocked' => false,
+                     'self_registration' => false,
+                     'unlocked_players' => 3
+                   },
+                   'warnings' => nil
                  })
       end
 
       it 'displays as organiser' do
         sign_in organiser
         get pairings_data_tournament_rounds_path(tournament)
-        expect(compare_body(response))
+        expect(compare_body(response).delete_if { |k, _| k == 'csrf_token' })
           .to eq({
-                   'is_player_meeting' => false,
-                   'policy' => { 'update' => true },
+                   'policy' => { 'update' => true, 'custom_table_numbering' => false },
                    'stages' => [swiss_stage_with_rounds(
                      [
                        {
                          'number' => 1,
+                         'completed' => false,
+                         'length_minutes' => 65,
                          'pairings' => [
                            { 'intentional_draw' => false,
-                             'player1' => player_with_no_ids('Charlie (she/her)'),
-                             'player2' => player_with_no_ids('Bob (he/him)'),
+                             'player1' => player_with_no_ids(charlie),
+                             'player2' => player_with_no_ids(bob),
                              'policy' => {
                                'view_decks' => false,
                                'self_report' => false
                              }, # sees player view as a player
                              'ui_metadata' => { 'row_highlighted' => false },
+                             'reported' => false,
+                             'score1' => nil,
+                             'score2' => nil,
                              'score_label' => ' - ', 'two_for_one' => false,
-                             'table_label' => 'Table 1', 'table_number' => 1, 'self_report' => nil },
+                             'table_label' => 'Table 1', 'table_number' => 1, 'self_reports' => nil },
                            { 'intentional_draw' => false,
-                             'player1' => player_with_no_ids('Alice (she/her)'),
+                             'player1' => player_with_no_ids(alice),
                              'player2' => bye_player,
                              'policy' => {
                                'view_decks' => false,
                                'self_report' => false
                              }, # sees player view as a player
                              'ui_metadata' => { 'row_highlighted' => false },
+                             'reported' => true,
+                             'score1' => 6,
+                             'score2' => 0,
                              'score_label' => '6 - 0', 'two_for_one' => false,
-                             'table_label' => 'Table 2', 'table_number' => 2, 'self_report' => nil }
-                         ], 'pairings_reported' => 1
+                             'table_label' => 'Table 2', 'table_number' => 2, 'self_reports' => nil }
+                         ],
+                         'pairings_reported' => 1,
+                         'timer' => { 'paused' => false, 'running' => false, 'started' => false }
                        }
                      ]
-                   )]
+                   )],
+                   'tournament' => {
+                     'allow_streaming_opt_out' => nil,
+                     'locked_players' => 0,
+                     'player_meeting' => false,
+                     'registration_open' => false,
+                     'registration_unlocked' => false,
+                     'self_registration' => false,
+                     'unlocked_players' => 3
+                   },
+                   'warnings' => [nil]
                  })
       end
     end
@@ -134,31 +199,40 @@ RSpec.describe RoundsController do
       it 'displays without logging in' do
         sign_in nil
         get pairings_data_tournament_rounds_path(tournament)
-        expect(compare_body(response))
+        expect(compare_body(response).delete_if { |k, _| k == 'csrf_token' })
           .to eq({
-                   'is_player_meeting' => false,
-                   'policy' => { 'update' => false },
+                   'policy' => { 'update' => false, 'custom_table_numbering' => false },
                    'stages' => [
                      swiss_stage_with_rounds(
                        [
                          {
                            'number' => 1,
+                           'completed' => false,
+                           'length_minutes' => 65,
                            'pairings' => [
                              { 'intentional_draw' => false,
-                               'player1' => player_with_no_ids('Charlie (she/her)'),
-                               'player2' => player_with_no_ids('Bob (he/him)'),
+                               'player1' => player_with_no_ids(charlie),
+                               'player2' => player_with_no_ids(bob),
                                'policy' => { 'view_decks' => false, 'self_report' => false },
                                'ui_metadata' => { 'row_highlighted' => false },
+                               'reported' => false,
+                               'score1' => nil,
+                               'score2' => nil,
                                'score_label' => ' - ', 'two_for_one' => false,
-                               'table_label' => 'Table 1', 'table_number' => 1, 'self_report' => nil },
+                               'table_label' => 'Table 1', 'table_number' => 1, 'self_reports' => nil },
                              { 'intentional_draw' => false,
-                               'player1' => player_with_no_ids('Alice (she/her)'),
+                               'player1' => player_with_no_ids(alice),
                                'player2' => bye_player,
                                'policy' => { 'view_decks' => false, 'self_report' => false },
                                'ui_metadata' => { 'row_highlighted' => false },
+                               'reported' => true,
+                               'score1' => 6,
+                               'score2' => 0,
                                'score_label' => '6 - 0', 'two_for_one' => false,
-                               'table_label' => 'Table 2', 'table_number' => 2, 'self_report' => nil }
-                           ], 'pairings_reported' => 1
+                               'table_label' => 'Table 2', 'table_number' => 2, 'self_reports' => nil }
+                           ],
+                           'pairings_reported' => 1,
+                           'timer' => { 'paused' => false, 'running' => false, 'started' => false }
                          }
                        ]
                      ),
@@ -166,20 +240,36 @@ RSpec.describe RoundsController do
                        [
                          {
                            'number' => 1,
+                           'completed' => false,
+                           'length_minutes' => 40,
                            'pairings' => [
                              { 'intentional_draw' => false,
-                               'player1' => player_with_no_ids('Bob (he/him)'),
-                               'player2' => player_with_no_ids('Charlie (she/her)'),
+                               'player1' => player_with_no_ids(bob),
+                               'player2' => player_with_no_ids(charlie),
                                'policy' => { 'view_decks' => false, 'self_report' => false },
                                'ui_metadata' => { 'row_highlighted' => false },
+                               'reported' => false,
+                               'score1' => nil,
+                               'score2' => nil,
                                'score_label' => ' - ', 'two_for_one' => false,
-                               'table_label' => 'Game 1', 'table_number' => 1, 'self_report' => nil }
+                               'table_label' => 'Game 1', 'table_number' => 1, 'self_reports' => nil }
                            ],
-                           'pairings_reported' => 0
+                           'pairings_reported' => 0,
+                           'timer' => { 'paused' => false, 'running' => false, 'started' => false }
                          }
                        ]
                      )
-                   ]
+                   ],
+                   'tournament' => {
+                     'allow_streaming_opt_out' => nil,
+                     'locked_players' => 0,
+                     'player_meeting' => false,
+                     'registration_open' => false,
+                     'registration_unlocked' => false,
+                     'self_registration' => false,
+                     'unlocked_players' => 3
+                   },
+                   'warnings' => nil
                  })
       end
 
@@ -193,22 +283,32 @@ RSpec.describe RoundsController do
                        [
                          {
                            'number' => 1,
+                           'completed' => false,
+                           'length_minutes' => 65,
                            'pairings' => [
                              { 'intentional_draw' => false,
-                               'player1' => player_with_no_ids('Charlie (she/her)'),
-                               'player2' => player_with_no_ids('Bob (he/him)'),
+                               'player1' => player_with_no_ids(charlie),
+                               'player2' => player_with_no_ids(bob),
                                'policy' => { 'view_decks' => false, 'self_report' => false },
                                'ui_metadata' => { 'row_highlighted' => false },
+                               'reported' => false,
+                               'score1' => nil,
+                               'score2' => nil,
                                'score_label' => ' - ', 'two_for_one' => false,
-                               'table_label' => 'Table 1', 'table_number' => 1, 'self_report' => nil },
+                               'table_label' => 'Table 1', 'table_number' => 1, 'self_reports' => nil },
                              { 'intentional_draw' => false,
-                               'player1' => player_with_no_ids('Alice (she/her)'),
+                               'player1' => player_with_no_ids(alice),
                                'player2' => bye_player,
                                'policy' => { 'view_decks' => false, 'self_report' => false },
                                'ui_metadata' => { 'row_highlighted' => false },
+                               'reported' => true,
+                               'score1' => 6,
+                               'score2' => 0,
                                'score_label' => '6 - 0', 'two_for_one' => false,
-                               'table_label' => 'Table 2', 'table_number' => 2, 'self_report' => nil }
-                           ], 'pairings_reported' => 1
+                               'table_label' => 'Table 2', 'table_number' => 2, 'self_reports' => nil }
+                           ],
+                           'pairings_reported' => 1,
+                           'timer' => { 'paused' => false, 'running' => false, 'started' => false }
                          }
                        ]
                      ),
@@ -216,17 +316,23 @@ RSpec.describe RoundsController do
                        [
                          {
                            'number' => 1,
+                           'completed' => false,
+                           'length_minutes' => 40,
                            'pairings' => [
                              { 'intentional_draw' => false,
-                               'player1' => player_with_no_ids('Bob (he/him)'),
-                               'player2' => player_with_no_ids('Charlie (she/her)'),
+                               'player1' => player_with_no_ids(bob),
+                               'player2' => player_with_no_ids(charlie),
                                'policy' => { 'view_decks' => false, 'self_report' => false },
                                'ui_metadata' => { 'row_highlighted' => false },
+                               'reported' => false,
+                               'score1' => nil,
+                               'score2' => nil,
                                'score_label' => ' - ', 'two_for_one' => false,
-                               'table_label' => 'Game 1', 'table_number' => 1, 'self_report' => nil,
+                               'table_label' => 'Game 1', 'table_number' => 1, 'self_reports' => nil,
                                'round' => 1, 'winner_game' => 2, 'loser_game' => nil, 'bracket_type' => 'upper' }
                            ],
-                           'pairings_reported' => 0
+                           'pairings_reported' => 0,
+                           'timer' => { 'paused' => false, 'running' => false, 'started' => false }
                          },
                          {
                            'number' => 2,
@@ -255,33 +361,52 @@ RSpec.describe RoundsController do
       it 'displays without logging in' do
         sign_in nil
         get pairings_data_tournament_rounds_path(tournament)
-        expect(compare_body(response))
+        expect(compare_body(response).delete_if { |k, _| k == 'csrf_token' })
           .to eq({
-                   'is_player_meeting' => false,
-                   'policy' => { 'update' => false },
+                   'policy' => { 'update' => false, 'custom_table_numbering' => false },
                    'stages' => [swiss_stage_with_rounds(
                      [
                        {
                          'number' => 1,
+                         'completed' => false,
+                         'length_minutes' => 65,
                          'pairings' => [
                            { 'intentional_draw' => false,
-                             'player1' => player_with_no_ids('Charlie (she/her)', side: 'corp', side_label: '(Corp)'),
-                             'player2' => player_with_no_ids('Bob (he/him)', side: 'runner', side_label: '(Runner)'),
+                             'player1' => player_with_no_ids(charlie, side: 'corp', side_label: '(Corp)'),
+                             'player2' => player_with_no_ids(bob, side: 'runner', side_label: '(Runner)'),
                              'policy' => { 'view_decks' => false, 'self_report' => false },
                              'ui_metadata' => { 'row_highlighted' => false },
+                             'reported' => true,
+                             'score1' => 3,
+                             'score2' => 0,
                              'score_label' => '3 - 0 (C)', 'two_for_one' => false,
-                             'table_label' => 'Table 1', 'table_number' => 1, 'self_report' => nil },
+                             'table_label' => 'Table 1', 'table_number' => 1, 'self_reports' => nil },
                            { 'intentional_draw' => false,
-                             'player1' => player_with_no_ids('Alice (she/her)'),
+                             'player1' => player_with_no_ids(alice),
                              'player2' => bye_player,
                              'policy' => { 'view_decks' => false, 'self_report' => false },
                              'ui_metadata' => { 'row_highlighted' => false },
+                             'reported' => true,
+                             'score1' => 6,
+                             'score2' => 0,
                              'score_label' => '6 - 0', 'two_for_one' => false,
-                             'table_label' => 'Table 2', 'table_number' => 2, 'self_report' => nil }
-                         ], 'pairings_reported' => 2
+                             'table_label' => 'Table 2', 'table_number' => 2, 'self_reports' => nil }
+                         ],
+                         'pairings_reported' => 2,
+                         'timer' => { 'paused' => false, 'running' => false, 'started' => false }
                        }
                      ]
-                   )]
+                   )],
+                   'tournament' => {
+                     'allow_streaming_opt_out' => nil,
+                     'locked_players' => 0,
+                     'player_meeting' => false,
+                     'registration_open' => false,
+                     'registration_unlocked' => false,
+                     'self_registration' => false,
+                     'unlocked_players' => 3
+                   },
+                   'warnings' => nil
                  })
       end
     end
@@ -299,35 +424,52 @@ RSpec.describe RoundsController do
       it 'displays player 1 score on the right (runner) side' do
         sign_in nil
         get pairings_data_tournament_rounds_path(tournament)
-        expect(compare_body(response))
+        expect(compare_body(response).delete_if { |k, _| k == 'csrf_token' })
           .to eq({
-                   'is_player_meeting' => false,
-                   'policy' => { 'update' => false },
+                   'policy' => { 'custom_table_numbering' => false, 'update' => false },
                    'stages' => [swiss_stage_with_rounds(
                      [
                        {
                          'number' => 1,
+                         'completed' => false,
+                         'length_minutes' => 65,
                          'pairings' => [
                            { 'intentional_draw' => false,
-                             'player1' => player_with_no_ids(
-                               'Charlie (she/her)', side: 'runner', side_label: '(Runner)'
-                             ),
-                             'player2' => player_with_no_ids('Bob (he/him)', side: 'corp', side_label: '(Corp)'),
+                             'player1' => player_with_no_ids(charlie, side: 'runner', side_label: '(Runner)'),
+                             'player2' => player_with_no_ids(bob, side: 'corp', side_label: '(Corp)'),
                              'policy' => { 'view_decks' => false, 'self_report' => false },
                              'ui_metadata' => { 'row_highlighted' => false },
+                             'reported' => true,
+                             'score1' => 3,
+                             'score2' => 0,
                              'score_label' => '0 - 3 (R)', 'two_for_one' => false,
-                             'table_label' => 'Table 1', 'table_number' => 1, 'self_report' => nil },
+                             'table_label' => 'Table 1', 'table_number' => 1, 'self_reports' => nil },
                            { 'intentional_draw' => false,
-                             'player1' => player_with_no_ids('Alice (she/her)'),
+                             'player1' => player_with_no_ids(alice),
                              'player2' => bye_player,
                              'policy' => { 'view_decks' => false, 'self_report' => false },
                              'ui_metadata' => { 'row_highlighted' => false },
+                             'reported' => true,
+                             'score1' => 6,
+                             'score2' => 0,
                              'score_label' => '6 - 0', 'two_for_one' => false,
-                             'table_label' => 'Table 2', 'table_number' => 2, 'self_report' => nil }
-                         ], 'pairings_reported' => 2
+                             'table_label' => 'Table 2', 'table_number' => 2, 'self_reports' => nil }
+                         ],
+                         'pairings_reported' => 2,
+                         'timer' => { 'paused' => false, 'running' => false, 'started' => false }
                        }
                      ]
-                   )]
+                   )],
+                   'tournament' => {
+                     'allow_streaming_opt_out' => nil,
+                     'locked_players' => 0,
+                     'player_meeting' => false,
+                     'registration_open' => false,
+                     'registration_unlocked' => false,
+                     'self_registration' => false,
+                     'unlocked_players' => 3
+                   },
+                   'warnings' => nil
                  })
       end
     end
@@ -349,9 +491,11 @@ RSpec.describe RoundsController do
     body
   end
 
-  def player_with_no_ids(name_with_pronouns, side: nil, side_label: nil)
+  def player_with_no_ids(player, side: nil, side_label: nil)
     {
-      'name_with_pronouns' => name_with_pronouns,
+      'name' => player.name,
+      'name_with_pronouns' => player.name_with_pronouns,
+      'include_in_stream' => player.include_in_stream,
       'user_id' => nil,
       'corp_id' => { 'faction' => nil, 'name' => nil },
       'runner_id' => { 'faction' => nil, 'name' => nil },
@@ -361,8 +505,16 @@ RSpec.describe RoundsController do
   end
 
   def bye_player
-    { 'corp_id' => nil, 'name_with_pronouns' => '(Bye)', 'runner_id' => nil, 'side' => nil, 'side_label' => nil,
-      'user_id' => nil }
+    {
+      'name' => nil,
+      'name_with_pronouns' => '(Bye)',
+      'include_in_stream' => nil,
+      'user_id' => nil,
+      'corp_id' => nil,
+      'runner_id' => nil,
+      'side' => nil,
+      'side_label' => nil
+    }
   end
 
   def swiss_stage_with_rounds(rounds)

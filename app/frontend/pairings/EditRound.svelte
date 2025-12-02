@@ -140,7 +140,7 @@
           placeholder="Table number"
         />
         <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-        {@render playerSelect("pairing_player1_id")}
+        {@render playerSelect("player1_id")}
         {#if data.stage.is_single_sided}
           <select id="side" name="pairing[side]" class="form-control mx-2">
             <option value="">Player 1 Side</option>
@@ -150,7 +150,7 @@
         {/if}
         vs
         <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-        {@render playerSelect("pairing_player2_id")}
+        {@render playerSelect("player2_id")}
         <button type="submit" class="btn btn-success">
           <FontAwesomeIcon icon="plus" /> Create
         </button>

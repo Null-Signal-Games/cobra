@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe 'destroying pairings' do
+  let(:round) { create(:round) }
   let(:player1) { create(:player, tournament: round.tournament) }
   let(:player2) { create(:player, tournament: round.tournament) }
-  let(:round) { create(:round) }
 
   before do
     round.pairings.create(player1:, player2:)
@@ -15,7 +15,10 @@ RSpec.describe 'destroying pairings' do
   it 'deletes pairing' do
     expect do
       within '.round_pairing' do
-        click_on class: 'btn-danger'
+        accept_confirm do
+          click_on class: 'btn-danger'
+        end
+        find class: 'btn-danger' # Wait for page to load
       end
     end.to change(Pairing, :count).by(-1)
 

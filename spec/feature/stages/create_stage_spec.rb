@@ -15,7 +15,7 @@ RSpec.describe 'creating a stage' do
 
     it 'creates new stage' do
       expect do
-        click_link 'Add Swiss stage'
+        click_button 'Add Swiss stage'
       end.to change(Stage, :count).by(1)
 
       stage = tournament.reload.current_stage

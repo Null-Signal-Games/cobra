@@ -154,7 +154,7 @@ class RoundsController < ApplicationController
   def round_data
     authorize @tournament, :update?
 
-    stage = @tournament.stages.find { |s| s.id == @round.stage_id }
+    stage = Stage.find @round.stage_id
     round = Round.includes([{ pairings: %i[player1 player2] }]).find(params[:id])
     round = edit_data_round(round, pairings_data_players)
     round[:unpaired_players] = @round.unpaired_players

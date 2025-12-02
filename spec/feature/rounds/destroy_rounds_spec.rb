@@ -11,7 +11,9 @@ RSpec.describe 'Destroying rounds' do
 
   it 'deletes the round' do
     expect do
-      click_link 'Delete round'
+      accept_confirm do
+        find(:button, text: 'Delete round').click
+      end
     end.to change(Round, :count).by(-1)
   end
 end

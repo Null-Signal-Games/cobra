@@ -96,13 +96,13 @@
           <FontAwesomeIcon icon="share" /> Export markdown
         </a>
       {/if}
-      <a class="btn btn-primary" href="{round.id}/pairings">
+      <a class="btn btn-primary" href="rounds/{round.id}/pairings">
         <FontAwesomeIcon icon="list-ul" /> Pairings by name
       </a>
 
       <!-- Timer -->
       {#if tournamentPolicies?.update && !round.completed}
-        <div class="form-inline mt-2">
+        <div class="form-inline mt-2 round-timer-form">
           <div class="form-group">
             <label for="round{round.id}Length">Round timer length (minutes)</label>
             <input id="round{round.id}Length" size="3" class="form-control ml-2 mr-2" value={roundTimerLength} />

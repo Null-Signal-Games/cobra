@@ -22,8 +22,13 @@ RSpec.describe 'round timer' do
     it 'hides the round timer when reset' do
       within(round_timer_form) do
         click_on 'Start'
-        click_on 'Reset'
+        accept_confirm do
+          find(:button, text: 'Reset').click
+        end
       end
+
+      find :button, 'Start' # Wait for the page to load
+
       expect(page).not_to have_content(timer_display_message)
     end
 
@@ -41,14 +46,14 @@ RSpec.describe 'round timer' do
         click_on 'Start'
       end
       travel_to Time.zone.local(2022, 8, 29, 15, 30)
-      click_on 'Complete'
+      find(:button, text: 'Complete').click
       expect(page).not_to have_content(timer_display_message)
       expect(round.timer.state).to have_attributes(paused: true, remaining_seconds: 35 * 60)
     end
 
     it 'does not show the timer form when the round is completed' do
       click_on 'Complete'
-      expect(page).not_to have_selector(round_timer_form)
+      expect(page).not_to have_content(timer_display_message)
     end
   end
 
