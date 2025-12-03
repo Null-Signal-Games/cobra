@@ -241,7 +241,7 @@
   </div>
 
   <!-- Player 1 -->
-  {#if pairing.policy.view_decks}
+  {#if stage.view_decks}
     {#if tournamentPolicies?.update}
       {#if stage.is_single_sided}
         <a
@@ -377,7 +377,7 @@
   <!-- Player 2 -->
   <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
   {@render playerDisplay(rightPlayer, "right")}
-  {#if !tournamentPolicies?.update && pairing.policy.view_decks && !pairing.player1.side && pairing.player2.id}
+  {#if !tournamentPolicies?.update && stage.view_decks && !pairing.player1.side && pairing.player2.id}
     <a href="../players/{pairing.player2.id}/view_decks?back_to=pairings">
       <FontAwesomeIcon icon="eye" /> View decks
     </a>

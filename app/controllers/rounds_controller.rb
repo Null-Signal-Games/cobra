@@ -179,6 +179,7 @@ class RoundsController < ApplicationController
         format: stage.format,
         is_single_sided: stage.single_sided?,
         is_elimination: stage.elimination?,
+        view_decks: stage.decks_visible_to(current_user),
         player_count: stage.players.count
       },
       round:,
@@ -206,6 +207,7 @@ class RoundsController < ApplicationController
         format: stage.format,
         is_single_sided: stage.single_sided?,
         is_elimination: stage.elimination?,
+        view_decks: stage.decks_visible_to(current_user),
         rounds: pairings_data_rounds(stage, players),
         player_count: stage.players.count
       }
@@ -239,8 +241,6 @@ class RoundsController < ApplicationController
   end
 
   def edit_data_round(round, players)
-    view_decks = round.stage.decks_visible_to(current_user)
-
     self_reports_by_pairing_id = SelfReport.joins(pairing: :round)
                                            .where(rounds: { id: round.id })
                                            .group_by(&:pairing_id)
@@ -249,12 +249,10 @@ class RoundsController < ApplicationController
       self_reports_by_pairing_id[key] = value.map(&:attributes)
     end
 
-    pairings_data_round(round.stage, players, view_decks, round, self_reports_by_pairing_id)
+    pairings_data_round(round.stage, players, round, self_reports_by_pairing_id)
   end
 
   def pairings_data_rounds(stage, players)
-    view_decks = stage.decks_visible_to(current_user)
-
     self_reports_by_pairing_id = SelfReport.joins(pairing: :round)
                                            .where(rounds: { stage_id: stage.id })
                                            .group_by(&:pairing_id)
@@ -265,11 +263,11 @@ class RoundsController < ApplicationController
 
     # Get data for all paired rounds
     stage.rounds.map do |round|
-      pairings_data_round(stage, players, view_decks, round, self_reports_by_pairing_id)
+      pairings_data_round(stage, players, round, self_reports_by_pairing_id)
     end
   end
 
-  def pairings_data_round(stage, players, view_decks, round, self_reports_by_pairing_id)
+  def pairings_data_round(stage, players, round, self_reports_by_pairing_id)
     pairings = []
     pairings_reported = 0
     pairings_fields = %i[id table_number player1_id player2_id side intentional_draw
@@ -318,7 +316,6 @@ class RoundsController < ApplicationController
         table_number:,
         table_label: stage.elimination? ? "Game #{table_number}" : "Table #{table_number}",
         policy: {
-          view_decks:,
           self_report: SelfReporting.self_report_allowed(current_user,
                                                          self_reports&.any? ? self_reports[0] : nil,
                                                          players[player1_id]&.dig('user_id'),
@@ -343,7 +340,7 @@ class RoundsController < ApplicationController
                                  score2, score2_corp, score2_runner),
         intentional_draw:,
         two_for_one:,
-        self_reports: self_reports,
+        self_reports:,
         reported: score1.present? || score2.present?
       }
     end

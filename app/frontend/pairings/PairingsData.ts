@@ -73,6 +73,7 @@ export interface Stage {
   format: string;
   is_single_sided: boolean;
   is_elimination: boolean;
+  view_decks: boolean;
   rounds: Round[];
 }
 
@@ -129,7 +130,6 @@ export interface UiMetadata {
 }
 
 export interface PairingPolicies {
-  view_decks: boolean;
   self_report: boolean;
 }
 
