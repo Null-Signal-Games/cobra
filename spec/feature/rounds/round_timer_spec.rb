@@ -44,9 +44,11 @@ RSpec.describe 'round timer' do
       within(round_timer_form) do
         travel_to Time.zone.local(2022, 8, 29, 15, 0)
         click_on 'Start'
+        sleep 1 # TODO: This is ugly and can hopefully be fixed once the entire FE is converted to Svelte
       end
+
       travel_to Time.zone.local(2022, 8, 29, 15, 30)
-      find(:button, text: 'Complete').click
+      click_on 'Complete'
       expect(page).not_to have_content(timer_display_message)
       expect(round.timer.state).to have_attributes(paused: true, remaining_seconds: 35 * 60)
     end
