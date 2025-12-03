@@ -20,7 +20,11 @@
   function addSwissStage(e: MouseEvent) {
     e.preventDefault();
 
-    void redirectRequest(`/tournaments/${tournamentId}/stages`, "POST", data.csrf_token);
+    void redirectRequest(
+      `/tournaments/${tournamentId}/stages`,
+      "POST",
+      data.csrf_token,
+    );
   }
 
   function pairNewRound(e: MouseEvent) {
@@ -35,31 +39,51 @@
       return;
     }
 
-    void redirectRequest(`/tournaments/${tournamentId}/rounds`, "POST", data.csrf_token);
+    void redirectRequest(
+      `/tournaments/${tournamentId}/rounds`,
+      "POST",
+      data.csrf_token,
+    );
   }
 
   function closeRegistration(e: MouseEvent) {
     e.preventDefault();
 
-    void redirectRequest(`/tournaments/${tournamentId}/close_registration`, "PATCH", data.csrf_token);
+    void redirectRequest(
+      `/tournaments/${tournamentId}/close_registration`,
+      "PATCH",
+      data.csrf_token,
+    );
   }
 
   function openRegistration(e: MouseEvent) {
     e.preventDefault();
 
-    void redirectRequest(`/tournaments/${tournamentId}/open_registration`, "PATCH", data.csrf_token);
+    void redirectRequest(
+      `/tournaments/${tournamentId}/open_registration`,
+      "PATCH",
+      data.csrf_token,
+    );
   }
 
   function lockPlayerRegistration(e: MouseEvent) {
     e.preventDefault();
 
-    void redirectRequest(`/tournaments/${tournamentId}/lock_player_registration`, "PATCH", data.csrf_token);
+    void redirectRequest(
+      `/tournaments/${tournamentId}/lock_player_registration`,
+      "PATCH",
+      data.csrf_token,
+    );
   }
 
   function unlockPlayerRegistration(e: MouseEvent) {
     e.preventDefault();
 
-    void redirectRequest(`/tournaments/${tournamentId}/unlock_player_registration`, "PATCH", data.csrf_token);
+    void redirectRequest(
+      `/tournaments/${tournamentId}/unlock_player_registration`,
+      "PATCH",
+      data.csrf_token,
+    );
   }
 
   function addCutStage(e: MouseEvent, single_elim: boolean, num: number) {
@@ -69,7 +93,7 @@
       `/tournaments/${tournamentId}/cut`,
       "POST",
       data.csrf_token,
-      { number: num, ...single_elim && { elimination_type: "single" } }
+      { number: num, ...(single_elim && { elimination_type: "single" }) },
     );
   }
 </script>
@@ -97,14 +121,20 @@
       {#if data.policy.update}
         <button
           class="btn btn-primary"
-          onclick={(e) => { e.preventDefault(); showReportedPairings = !showReportedPairings; }}
+          onclick={(e) => {
+            e.preventDefault();
+            showReportedPairings = !showReportedPairings;
+          }}
         >
           <FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
         </button>
       {/if}
       <button
         class="btn btn-primary"
-        onclick={(e) => { e.preventDefault(); showIdentities.update((value) => !value); }}
+        onclick={(e) => {
+          e.preventDefault();
+          showIdentities.update((value) => !value);
+        }}
       >
         <FontAwesomeIcon icon="eye-slash" /> Show/hide identities
       </button>
@@ -139,8 +169,7 @@
           <FontAwesomeIcon icon="lock" /> Close registration
         </button>
       {:else if data.tournament.self_registration && data.stages.every((s) => s.rounds.length == 0)}
-        <button class="btn btn-secondary" onclick={openRegistration}
-        >
+        <button class="btn btn-secondary" onclick={openRegistration}>
           <FontAwesomeIcon icon="folder-open" /> Open registration
         </button>
         {#if data.tournament.locked_players > 0}
@@ -194,7 +223,12 @@
           <td>Single Elimination</td>
           {#each [3, 4, 8, 16] as num (num)}
             <td class="pl-2">
-              <button class="btn btn-success" onclick={(e) => { addCutStage(e, true, num); }}>
+              <button
+                class="btn btn-success"
+                onclick={(e) => {
+                  addCutStage(e, true, num);
+                }}
+              >
                 <FontAwesomeIcon icon="scissors" /> Top {num}
               </button>
             </td>
@@ -205,7 +239,12 @@
           <td></td>
           {#each [4, 8, 16] as num (num)}
             <td class="pt-2 pl-2">
-              <button class="btn btn-success" onclick={(e) => { addCutStage(e, false, num); }}>
+              <button
+                class="btn btn-success"
+                onclick={(e) => {
+                  addCutStage(e, false, num);
+                }}
+              >
                 <FontAwesomeIcon icon="scissors" /> Top {num}
               </button>
             </td>

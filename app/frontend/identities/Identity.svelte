@@ -8,15 +8,15 @@
     points,
     include_icon = true,
     include_name = true,
-    gray_out = false
+    gray_out = false,
   }: {
-    identity: Identity | null,
-    name_if_missing?: string,
-    icon_if_missing?: string,
-    points?: number,
-    include_icon?: boolean,
-    include_name?: boolean,
-    gray_out?: boolean
+    identity: Identity | null;
+    name_if_missing?: string;
+    icon_if_missing?: string;
+    points?: number;
+    include_icon?: boolean;
+    include_name?: boolean;
+    gray_out?: boolean;
   } = $props();
 </script>
 
@@ -36,7 +36,7 @@
       {:else}
         {name_if_missing}
       {/if}
-      
+
       {#if points}
         ({points})
       {/if}

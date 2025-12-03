@@ -1,16 +1,7 @@
 <script lang="ts">
-  import {
-    type Pairing,
-    Player,
-    type Round,
-    type Stage,
-  } from "./PairingsData";
+  import { type Pairing, Player, type Round, type Stage } from "./PairingsData";
   import { onMount } from "svelte";
-  import {
-    type ScoreReport,
-    scorePresets,
-    selfReport
-  } from "./SelfReport";
+  import { type ScoreReport, scorePresets, selfReport } from "./SelfReport";
   import ModalDialog from "../widgets/ModalDialog.svelte";
 
   let {
@@ -18,7 +9,7 @@
     stage,
     round,
     pairing,
-    csrfToken
+    csrfToken,
   }: {
     tournamentId: number;
     stage: Stage;
@@ -26,7 +17,7 @@
     pairing: Pairing;
     csrfToken: string;
   } = $props();
-  
+
   let presets: ScoreReport[] = $state([]);
   let customReporting = $state(false);
 
@@ -60,7 +51,13 @@
     report.score1 = null;
     report.score2 = null;
 
-    const response = await selfReport(tournamentId, round.id, pairing.id, csrfToken, report);
+    const response = await selfReport(
+      tournamentId,
+      round.id,
+      pairing.id,
+      csrfToken,
+      report,
+    );
     if (!response.success) {
       alert(response.error);
       return;
@@ -108,10 +105,7 @@
   <p>
     {left_player.name_with_pronouns} vs. {right_player.name_with_pronouns}
   </p>
-  <div
-    style="gap: 20px;"
-    class="d-flex flex-row w-100 justify-content-center"
-  >
+  <div style="gap: 20px;" class="d-flex flex-row w-100 justify-content-center">
     {#if !customReporting}
       {#each presets as preset, index (preset.label)}
         <button

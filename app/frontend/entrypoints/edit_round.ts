@@ -7,8 +7,9 @@ document.addEventListener("turbolinks:load", function () {
     mount(EditRound, {
       target: anchor,
       props: {
-        tournamentId: Number(anchor.getAttribute("data-tournament") ?? "") || -1,
-        roundId: Number(anchor.getAttribute("data-round") ?? "") || -1
+        tournamentId:
+          Number(anchor.getAttribute("data-tournament") ?? "") || -1,
+        roundId: Number(anchor.getAttribute("data-round") ?? "") || -1,
       },
     });
   }

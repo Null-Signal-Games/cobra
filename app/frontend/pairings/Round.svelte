@@ -1,5 +1,10 @@
 <script lang="ts">
-  import type { Stage, Round, TournamentPolicies, Tournament } from "./PairingsData";
+  import type {
+    Stage,
+    Round,
+    TournamentPolicies,
+    Tournament,
+  } from "./PairingsData";
   import Pairing from "./Pairing.svelte";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { redirectRequest } from "../utils/network";
@@ -29,8 +34,9 @@
   function completeRound(e: MouseEvent) {
     e.preventDefault();
 
-    if (round.pairings.length != round.pairings_reported
-      && !confirm(
+    if (
+      round.pairings.length != round.pairings_reported &&
+      !confirm(
         "Are you sure you want to complete this round? Are all pairings reported?",
       )
     ) {
@@ -41,15 +47,16 @@
       `/tournaments/${tournamentId}/rounds/${round.id}/complete`,
       "PATCH",
       csrfToken,
-      { completed: true }
+      { completed: true },
     );
   }
 
   function updateTimer(e: MouseEvent, operation: string) {
     e.preventDefault();
 
-    if (operation === "reset"
-      && !confirm("This will clear all elapsed time in the round. Are you sure?")
+    if (
+      operation === "reset" &&
+      !confirm("This will clear all elapsed time in the round. Are you sure?")
     ) {
       return;
     }
@@ -58,7 +65,7 @@
       `/tournaments/${tournamentId}/rounds/${round.id}/update_timer`,
       "PATCH",
       csrfToken,
-      { length_minutes: roundTimerLength, operation: operation }
+      { length_minutes: roundTimerLength, operation: operation },
     );
   }
 </script>
@@ -81,7 +88,10 @@
     <div class="col-12 my-3">
       <!-- Admin controls -->
       {#if tournamentPolicies?.update}
-        <a class="btn btn-warning" href="/tournaments/{tournamentId}/rounds/{round.id}">
+        <a
+          class="btn btn-warning"
+          href="/tournaments/{tournamentId}/rounds/{round.id}"
+        >
           <FontAwesomeIcon icon="pencil" /> Edit
         </a>
         {#if !round.completed}
@@ -89,10 +99,16 @@
             <FontAwesomeIcon icon="check" /> Complete
           </button>
         {/if}
-        <a class="btn btn-primary" href="/tournaments/{tournamentId}/rounds/{round.id}/pairings/match_slips">
+        <a
+          class="btn btn-primary"
+          href="/tournaments/{tournamentId}/rounds/{round.id}/pairings/match_slips"
+        >
           <FontAwesomeIcon icon="flag-checkered" /> Match slips
         </a>
-        <a class="btn btn-primary" href="/tournaments/{tournamentId}/rounds/{round.id}/pairings/sharing">
+        <a
+          class="btn btn-primary"
+          href="/tournaments/{tournamentId}/rounds/{round.id}/pairings/sharing"
+        >
           <FontAwesomeIcon icon="share" /> Export markdown
         </a>
       {/if}
@@ -104,22 +120,49 @@
       {#if tournamentPolicies?.update && !round.completed}
         <div class="form-inline mt-2 round-timer-form">
           <div class="form-group">
-            <label for="round{round.id}Length">Round timer length (minutes)</label>
-            <input id="round{round.id}Length" size="3" class="form-control ml-2 mr-2" value={roundTimerLength} />
+            <label for="round{round.id}Length"
+              >Round timer length (minutes)</label
+            >
+            <input
+              id="round{round.id}Length"
+              size="3"
+              class="form-control ml-2 mr-2"
+              value={roundTimerLength}
+            />
             {#if round.timer.running}
-              <button class="btn btn-danger" onclick={(e) => { updateTimer(e, "stop"); }}>
+              <button
+                class="btn btn-danger"
+                onclick={(e) => {
+                  updateTimer(e, "stop");
+                }}
+              >
                 <FontAwesomeIcon icon="clock-o" /> Pause
               </button>
             {:else if round.timer.paused}
-              <button class="btn btn-success" onclick={(e) => { updateTimer(e, "start"); }}>
+              <button
+                class="btn btn-success"
+                onclick={(e) => {
+                  updateTimer(e, "start");
+                }}
+              >
                 <FontAwesomeIcon icon="clock-o" /> Resume
               </button>
             {:else if !round.timer.started}
-              <button class="btn btn-success" onclick={(e) => { updateTimer(e, "start"); }}>
+              <button
+                class="btn btn-success"
+                onclick={(e) => {
+                  updateTimer(e, "start");
+                }}
+              >
                 <FontAwesomeIcon icon="clock-o" /> Start
               </button>
             {/if}
-            <button class="btn btn-info ml-2" onclick={(e) => { updateTimer(e, "reset"); }}>
+            <button
+              class="btn btn-info ml-2"
+              onclick={(e) => {
+                updateTimer(e, "reset");
+              }}
+            >
               <FontAwesomeIcon icon="undo" /> Reset
             </button>
           </div>
@@ -132,7 +175,15 @@
           {#if tournamentPolicies?.update}
             <hr />
           {/if}
-          <Pairing {tournamentId} {tournament} {pairing} {round} {stage} {tournamentPolicies} {csrfToken} />
+          <Pairing
+            {tournamentId}
+            {tournament}
+            {pairing}
+            {round}
+            {stage}
+            {tournamentPolicies}
+            {csrfToken}
+          />
         {/if}
       {/each}
     </div>

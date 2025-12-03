@@ -26,7 +26,7 @@
           <FontAwesomeIcon icon="times" />
         </button>
       </div>
-      
+
       <div class="modal-body">
         {@render children?.()}
       </div>

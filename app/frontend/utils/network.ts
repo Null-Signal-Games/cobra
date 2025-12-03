@@ -11,20 +11,17 @@ export async function redirectRequest(
   url: string,
   method: string,
   csrfToken: string,
-  body?: object
+  body?: object,
 ) {
-  const response = await fetch(
-    url,
-    {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken
-      },
-      body: JSON.stringify(body)
-    }
-  );
+  const response = await fetch(url, {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+    body: JSON.stringify(body),
+  });
 
   const resp = (await response.json()) as StandardResponse;
   globalMessages.infos = resp.infos ?? [];
@@ -32,7 +29,9 @@ export async function redirectRequest(
   globalMessages.errors = resp.errors ?? [];
 
   if (!response.ok) {
-    globalMessages.errors.unshift(`HTTP ${response.status.toString()}: ${response.statusText}`);
+    globalMessages.errors.unshift(
+      `HTTP ${response.status.toString()}: ${response.statusText}`,
+    );
   }
 
   if (resp.url) {

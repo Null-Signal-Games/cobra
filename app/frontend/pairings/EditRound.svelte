@@ -4,11 +4,11 @@
   import Pairing from "./Pairing.svelte";
   import { type RoundData, loadRound } from "./RoundData";
   import { redirectRequest } from "../utils/network";
-    import GlobalMessages from "../utils/GlobalMessages.svelte";
+  import GlobalMessages from "../utils/GlobalMessages.svelte";
 
   let {
     tournamentId,
-    roundId
+    roundId,
   }: {
     tournamentId: number;
     roundId: number;
@@ -30,7 +30,7 @@
     void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${data.round.id}/repair`,
       "PATCH",
-      data.csrf_token
+      data.csrf_token,
     );
   }
 
@@ -45,7 +45,7 @@
       `/tournaments/${tournamentId}/rounds/${data.round.id}/complete`,
       "PATCH",
       data.csrf_token,
-      { completed: completed }
+      { completed: completed },
     );
   }
 
@@ -59,7 +59,7 @@
     void redirectRequest(
       `/tournaments/${tournamentId}/rounds/${data.round.id}`,
       "DELETE",
-      data.csrf_token
+      data.csrf_token,
     );
   }
 </script>
@@ -69,27 +69,40 @@
 {#if data}
   <div class="col-12">
     <h2>Round {data.round.number}</h2>
-  
+
     <p>
       <a href="/tournaments/{tournamentId}/rounds" class="btn btn-primary">
         <FontAwesomeIcon icon="arrow-left" /> Back to pairings
       </a>
-  
+
       <!-- Edit controls -->
       {#if data.policy?.update}
         <button class="btn btn-warning" onclick={rePair}>
           <FontAwesomeIcon icon="refresh" /> Re-pair
         </button>
         {#if data.round.completed}
-          <button class="btn btn-warning" onclick={(e) => { complete(e, false); }}>
+          <button
+            class="btn btn-warning"
+            onclick={(e) => {
+              complete(e, false);
+            }}
+          >
             <FontAwesomeIcon icon="backward" /> Uncomplete
           </button>
         {:else}
-          <button class="btn btn-warning" onclick={(e) => { complete(e, true); }}>
+          <button
+            class="btn btn-warning"
+            onclick={(e) => {
+              complete(e, true);
+            }}
+          >
             <FontAwesomeIcon icon="check" /> Complete
           </button>
         {/if}
-        <a href={`/tournaments/${tournamentId}/rounds/${roundId}/edit`} class="btn btn-warning">
+        <a
+          href={`/tournaments/${tournamentId}/rounds/${roundId}/edit`}
+          class="btn btn-warning"
+        >
           <FontAwesomeIcon icon="wrench" /> Advanced
         </a>
         <button class="btn btn-danger" onclick={deleteRound}>
@@ -97,31 +110,37 @@
         </button>
       {/if}
     </p>
-    
+
     <!-- Pairings -->
     {#each data.round.pairings as pairing (pairing.id)}
       <hr />
       <Pairing
-        tournamentId={tournamentId}
+        {tournamentId}
         tournament={data.tournament}
         {pairing}
         round={data.round}
         stage={data.stage}
         tournamentPolicies={data.policy}
-        csrfToken={data.csrf_token} />
+        csrfToken={data.csrf_token}
+      />
     {/each}
   </div>
-  
+
   <h3 class="mt-2 col-12">Unpaired players</h3>
   <div class="col-12">
     {#if data.round.unpaired_players && data.round.unpaired_players.length !== 0}
       {#each data.round.unpaired_players as player (player.id)}
         {player.name}
-        {#if player.active === false} (Dropped){/if}
+        {#if player.active === false}
+          (Dropped){/if}
       {/each}
 
       {#snippet playerSelect(id: string)}
-        <select id={`pairing_${id}`} name={`pairing[${id}]`} class="form-control mx-2">
+        <select
+          id={`pairing_${id}`}
+          name={`pairing[${id}]`}
+          class="form-control mx-2"
+        >
           <option value="">(Bye)</option>
           {#each data?.round.unpaired_players as player (player.id)}
             <option value={player.id}>{player.name}</option>
@@ -130,8 +149,17 @@
       {/snippet}
 
       <h3 class="mt-2">Create pairing</h3>
-      <form id="new_pairing" action="/tournaments/{tournamentId}/rounds/{roundId}/pairings" method="POST" class="form-inline col-12">
-        <input type="hidden" name="authenticity_token" value={data.csrf_token} />
+      <form
+        id="new_pairing"
+        action="/tournaments/{tournamentId}/rounds/{roundId}/pairings"
+        method="POST"
+        class="form-inline col-12"
+      >
+        <input
+          type="hidden"
+          name="authenticity_token"
+          value={data.csrf_token}
+        />
         <input
           id="pairing_table_number"
           name="pairing[table_number]"

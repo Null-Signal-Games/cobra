@@ -54,10 +54,12 @@ export async function loadStage(
   );
 
   const data = (await response.json()) as StageData;
-  globalMessages.warnings = data.warning? [data.warning] : [];
+  globalMessages.warnings = data.warning ? [data.warning] : [];
 
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
+    throw new Error(
+      `HTTP ${response.status.toString()}: ${response.statusText}`,
+    );
   }
 
   return data;

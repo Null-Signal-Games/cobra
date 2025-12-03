@@ -1,5 +1,5 @@
 <script lang="ts">
-  interface Props{
+  interface Props {
     icon: string;
     cssClass?: string;
   }

@@ -85,15 +85,16 @@ RSpec.describe 'registering a deck from NetrunnerDB' do
       expect(@new_player.corp_deck.deck_cards.map { |card| [card.title, card.quantity] })
         .to eq([['Advanced Assembly Lines', 2], ['Ravana 1.0', 1], ['Magnet', 2], ['Accelerated Beta Test', 3],
                 ['Archived Memories', 1], ['Biotic Labor', 3], ['Ichi 1.0', 3], ['Tollbooth', 1], ['Hedge Fund', 3],
-                ['Ash 2X3ZB9CY', 2], ['Project Vitruvius', 3], ['Eli 1.0', 3], ['Jackson Howard', 3], ['Restructure', 3],
-                ['Blue Level Clearance', 2], ['Targeted Marketing', 1], ['Crisium Grid', 1], ['Chronos Project', 2],
-                ['Architect', 3], ['Cyberdex Virus Suite', 2], ['Turing', 3], ['Global Food Initiative', 2]])
+                ['Ash 2X3ZB9CY', 2], ['Project Vitruvius', 3], ['Eli 1.0', 3], ['Jackson Howard', 3],
+                ['Restructure', 3], ['Blue Level Clearance', 2], ['Targeted Marketing', 1], ['Crisium Grid', 1],
+                ['Chronos Project', 2], ['Architect', 3], ['Cyberdex Virus Suite', 2], ['Turing', 3],
+                ['Global Food Initiative', 2]])
       expect(@new_player.runner_deck.deck_cards.map { |card| [card.title, card.quantity] })
         .to eq([['Tech Trader', 3], ['Spy Camera', 3], ['Political Operative', 1], ['Sports Hopper', 3],
                 ['Deuces Wild', 1], ['Paperclip', 1], ['Diversion of Funds', 3], ['Miss Bones', 2], ['Stargate', 1],
-                ['Blueberry!™ Diesel', 2], ['Flip Switch', 2], ['Masterwork (v37)', 3], ['Bravado', 3], ['Boomerang', 3],
-                ['Prognostic Q-Loop', 2], ['The Back', 1], ['Simulchip', 1], ['Fermenter', 2], ['Mutual Favor', 1],
-                ['Sure Gamble', 3], ['Clot', 1], ['Abagnale', 1], ['Revolver', 2]])
+                ['Blueberry!™ Diesel', 2], ['Flip Switch', 2], ['Masterwork (v37)', 3], ['Bravado', 3],
+                ['Boomerang', 3], ['Prognostic Q-Loop', 2], ['The Back', 1], ['Simulchip', 1], ['Fermenter', 2],
+                ['Mutual Favor', 1], ['Sure Gamble', 3], ['Clot', 1], ['Abagnale', 1], ['Revolver', 2]])
     end
 
     it 'records the user who saved the decks' do

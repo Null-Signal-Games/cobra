@@ -33,7 +33,11 @@
       return;
     }
 
-    void redirectRequest(`/tournaments/${tournamentId}/stages/${stage.id}`, "DELETE", csrfToken);
+    void redirectRequest(
+      `/tournaments/${tournamentId}/stages/${stage.id}`,
+      "DELETE",
+      csrfToken,
+    );
   }
 </script>
 

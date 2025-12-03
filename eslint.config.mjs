@@ -16,8 +16,11 @@ export default ts.config(
     ],
     ignores: ["**/venv/", "app/assets/**/*", "public/**/*", "tmp/", "vendor/"],
     rules: {
-      "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }]
-    }
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        { allowNumber: true },
+      ],
+    },
   },
   {
     languageOptions: {

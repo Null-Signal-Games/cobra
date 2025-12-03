@@ -149,12 +149,13 @@ class PairingsController < ApplicationController
   def view_decks
     authorize @tournament, :show?
     authorize pairing
-    @back_to = params[:back_to]
-    if @back_to == 'rounds'
+
+    case params[:back_to]
+    when 'rounds'
       @back_to_path = tournament_rounds_path(@tournament)
-    elsif @back_to == 'pairings'
+    when 'pairings'
       @back_to_path = view_pairings_tournament_rounds_path(@tournament)
-    elsif @back_to == 'standings'
+    when 'standings'
       @back_to_path = standings_tournament_players_path(@tournament)
     end
   end
