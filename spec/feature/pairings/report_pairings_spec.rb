@@ -96,6 +96,7 @@ RSpec.describe 'reporting scores for pairings' do
         describe 'player 1 wins' do
           it 'stores score' do
             click_button '3-0'
+            find :button, '3-0' # Wait for page to reload
 
             pairing.reload
 
@@ -113,6 +114,7 @@ RSpec.describe 'reporting scores for pairings' do
         describe 'player 2 wins' do
           it 'stores score' do
             click_button '0-3'
+            find :button, '0-3' # Wait for page to reload
 
             pairing.reload
 
@@ -137,6 +139,7 @@ RSpec.describe 'reporting scores for pairings' do
         describe 'corp player wins' do
           it 'stores score' do
             click_button '3-0'
+            find :button, '3-0' # Wait for page to reload
 
             pairing.reload
 
@@ -154,6 +157,7 @@ RSpec.describe 'reporting scores for pairings' do
         describe 'runner player wins' do
           it 'stores score' do
             click_button '0-3'
+            find :button, '0-3' # Wait for page to reload
 
             pairing.reload
 
@@ -202,6 +206,7 @@ RSpec.describe 'reporting scores for pairings' do
       fill_in :pairing_score1, with: '1'
       fill_in :pairing_score2, with: '1'
       click_button 'Save'
+      find :button, 'Save' # Wait for page to reload
 
       pairing.reload
 
@@ -267,6 +272,7 @@ RSpec.describe 'reporting scores for pairings' do
       fill_in :pairing_score1, with: '3'
       fill_in :pairing_score2, with: '0'
       click_button 'Save'
+      find :button, 'Save' # Wait for page to reload
 
       pairing.reload
 
@@ -333,6 +339,7 @@ RSpec.describe 'reporting scores for pairings' do
       fill_in :pairing_score1, with: '3'
       fill_in :pairing_score2, with: '0'
       click_button 'Save'
+      find :button, 'Save' # Wait for page to reload
 
       pairing.reload
 
