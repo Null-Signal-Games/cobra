@@ -112,7 +112,10 @@
           <FontAwesomeIcon icon="share" /> Export markdown
         </a>
       {/if}
-      <a class="btn btn-primary" href="/tournaments/{tournamentId}/rounds/{round.id}/pairings">
+      <a
+        class="btn btn-primary"
+        href="/tournaments/{tournamentId}/rounds/{round.id}/pairings"
+      >
         <FontAwesomeIcon icon="list-ul" /> Pairings by name
       </a>
 

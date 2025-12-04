@@ -16,9 +16,9 @@ RSpec.describe 'Re-pairing rounds' do
       accept_confirm do
         find(:button, text: 'Re-pair').click
       end
-    end.not_to change(Pairing, :count)
 
-    find :button, 'Re-pair' # Wait for the page to load
+      find :button, text: 'Re-pair' # Wait for the page to load
+    end.to change(Pairing, :count).by(1)
 
     expect(round.reload.unpaired_players).to eq([])
   end
