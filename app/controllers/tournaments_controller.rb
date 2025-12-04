@@ -122,7 +122,7 @@ class TournamentsController < ApplicationController
       }, status: :created
     else
       # Determine appropriate status code based on whether there are validation errors
-      status_code = @new_tournament.errors.any? ? :unprocessable_entity : :internal_server_error
+      status_code = @new_tournament.errors.any? ? :unprocessable_content : :internal_server_error
       render json: { errors: @new_tournament.errors }, status: status_code
     end
   end
@@ -158,7 +158,7 @@ class TournamentsController < ApplicationController
         url: tournament_rounds_path(tournament)
       }, status: :created
     else
-      render json: { errors: }, status: :unprocessable_entity
+      render json: { errors: }, status: :unprocessable_content
     end
   end
 
@@ -224,7 +224,7 @@ class TournamentsController < ApplicationController
         if errors.empty?
           head :no_content
         else
-          render json: { errors: errors }, status: :unprocessable_entity
+          render json: { errors: errors }, status: :unprocessable_content
         end
         return
       end

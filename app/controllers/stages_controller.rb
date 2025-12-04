@@ -26,7 +26,7 @@ class StagesController < ApplicationController
     error = validate_table_ranges(params[:table_ranges])
     if error
       flash.now[:alert] = error
-      return render json: { error: error }, status: :unprocessable_entity
+      return render json: { error: error }, status: :unprocessable_content
     end
 
     # Save table ranges
@@ -38,7 +38,7 @@ class StagesController < ApplicationController
     end
     if error
       flash.now[:alert] = error
-      return render json: { error: error }, status: :unprocessable_entity
+      return render json: { error: error }, status: :unprocessable_content
     end
 
     render json: { url: tournament_stage_path(@tournament, @stage) }, status: :ok

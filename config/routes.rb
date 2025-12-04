@@ -10,6 +10,16 @@ Rails.application.routes.draw do
     get :callback
   end
 
+  namespace :api, defaults: { format: :jsonapi } do
+    namespace :v1 do
+      namespace :public do
+        resources :tournaments, only: %i[index show]
+        resources :tournament_types, only: %i[index show]
+        resources :users, only: %i[show]
+      end
+    end
+  end
+
   resources :tournaments do
     resources :players, only: %i[index new create update destroy] do
       get :standings, on: :collection

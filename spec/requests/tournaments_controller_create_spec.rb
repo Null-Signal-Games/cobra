@@ -46,10 +46,10 @@ RSpec.describe TournamentsController, type: :request do
         end.not_to change(Tournament, :count)
       end
 
-      it 'returns unprocessable entity status with errors' do
+      it 'returns unprocessable content status with errors' do
         post tournaments_path, params: invalid_params, as: :json
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)).to eq(
           {
             'errors' => { 'name' => ["can't be blank"] }

@@ -59,7 +59,7 @@ RSpec.describe TournamentsController, type: :request do
       it 'returns unprocessable entity status with errors' do
         patch tournament_path(tournament), params: invalid_params, as: :json
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)).to eq(
           {
             'errors' => { 'name' => ["can't be blank"] }
@@ -141,7 +141,7 @@ RSpec.describe TournamentsController, type: :request do
         patch tournament_path(tournament), params: { tournament: { swiss_format: 'single_sided' } }, as: :json
         tournament.reload
         expect(tournament).to be_double_sided
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)).to eq(
           {
             'errors' => { 'base' => "Can't change Swiss format when rounds exist." }
