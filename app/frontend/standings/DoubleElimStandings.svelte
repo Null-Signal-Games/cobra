@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { CutStage } from "./StandingsData";
   import Identity from "../identities/Identity.svelte";
-  import FontAwesomeIcon from "@/widgets/FontAwesomeIcon.svelte";
+  import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
 
   export let stage: CutStage;
 </script>
