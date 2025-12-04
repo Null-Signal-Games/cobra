@@ -19,6 +19,7 @@ RSpec.describe 'reporting scores for pairings' do
     describe 'player 1 sweep' do
       it 'stores score' do
         click_button '6-0'
+        find :button, '6-0' # Wait for page to reload
 
         pairing.reload
 
@@ -36,6 +37,7 @@ RSpec.describe 'reporting scores for pairings' do
     describe 'player 2 sweep' do
       it 'stores score' do
         click_button '0-6'
+        find :button, '0-6' # Wait for page to reload
 
         pairing.reload
 
@@ -53,6 +55,7 @@ RSpec.describe 'reporting scores for pairings' do
     describe 'corp split' do
       it 'stores score' do
         click_button '3-3 (C)'
+        find :button, '3-3 (C)' # Wait for page to reload
 
         pairing.reload
 
@@ -70,6 +73,7 @@ RSpec.describe 'reporting scores for pairings' do
     describe 'runner split' do
       it 'stores score' do
         click_button '3-3 (R)'
+        find :button, '3-3 (R)' # Wait for page to reload
 
         pairing.reload
 
