@@ -1,32 +1,32 @@
 <script lang="ts">
-  import {
-    type Pairing,
-    type Player,
-    type Round,
-    type Stage,
-  } from "./PairingsData";
+  import { type Pairing, Player, type Round, type Stage } from "./PairingsData";
   import { onMount } from "svelte";
-  import {
-    loadPresets,
-    type SelfReportPresets,
-    selfReport,
-  } from "./SelfReport";
+  import { type ScoreReport, scorePresets, selfReport } from "./SelfReport";
+  import ModalDialog from "../widgets/ModalDialog.svelte";
 
-  export let tournamentId: number;
-  export let stage: Stage;
-  export let round: Round;
-  export let pairing: Pairing;
-  let presets: SelfReportPresets[];
-  let csrfToken: string;
+  let {
+    tournamentId,
+    stage,
+    round,
+    pairing,
+    csrfToken,
+  }: {
+    tournamentId: number;
+    stage: Stage;
+    round: Round;
+    pairing: Pairing;
+    csrfToken: string;
+  } = $props();
 
-  let customReporting = false;
+  let presets: ScoreReport[] = $state([]);
+  let customReporting = $state(false);
 
-  let score1: number;
-  let score2: number;
+  let score1 = $state(0);
+  let score2 = $state(0);
 
-  let left_player_number = 1;
-  let left_player: Player;
-  let right_player: Player;
+  let left_player_number = $state(1);
+  let left_player = $state(new Player());
+  let right_player = $state(new Player());
 
   left_player = pairing.player1;
   right_player = pairing.player2;
@@ -38,23 +38,25 @@
     }
   }
 
-  onMount(async () => {
-    const response = await loadPresets(tournamentId, round.id, pairing.id);
-    presets = response.presets;
-    csrfToken = response.csrf_token;
+  onMount(() => {
+    presets = scorePresets(stage, pairing);
   });
 
   function onCustomReportClicked() {
     customReporting = !customReporting;
   }
 
-  async function onSelfReportPresetClicked(data: SelfReportPresets) {
+  async function onSelfReportPresetClicked(data: ScoreReport) {
+    let report = { ...data };
+    report.score1 = null;
+    report.score2 = null;
+
     const response = await selfReport(
       tournamentId,
       round.id,
       pairing.id,
       csrfToken,
-      { score1: null, score2: null, ...data },
+      report,
     );
     if (!response.success) {
       alert(response.error);
@@ -98,105 +100,76 @@
   Report Pairing
 </button>
 
-<div
-  class="modal fade"
-  id="reportModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="reportModal"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="reportModal">Report Pairing</h4>
+<ModalDialog id="reportModal" headerText="Report Pairing">
+  <p>Please click the button for the result to report this pairing:</p>
+  <p>
+    {left_player.name_with_pronouns} vs. {right_player.name_with_pronouns}
+  </p>
+  <div style="gap: 20px;" class="d-flex flex-row w-100 justify-content-center">
+    {#if !customReporting}
+      {#each presets as preset, index (preset.label)}
         <button
-          type="button"
-          class="close"
+          class="btn btn-primary"
           data-dismiss="modal"
-          aria-label="Close"
+          id="option-{index}"
+          onclick={async () => {
+            return onSelfReportPresetClicked(preset);
+          }}
         >
-          <span aria-hidden="true">&times;</span>
+          {preset.extra_self_report_label ?? preset.label}
         </button>
-      </div>
-      <div class="modal-body">
-        <p>Please click the button for the result to report this pairing:</p>
-        <p>
-          {left_player.name_with_pronouns} vs. {right_player.name_with_pronouns}
-        </p>
-        <div
-          style="gap: 20px;"
-          class="d-flex flex-row w-100 justify-content-center"
-        >
-          {#if !customReporting}
-            {#each presets as preset, index (preset.label)}
-              <button
-                class="btn btn-primary"
-                data-dismiss="modal"
-                id="option-{index}"
-                on:click={async () => {
-                  return onSelfReportPresetClicked(preset);
-                }}
-              >
-                {preset.extra_self_report_label ?? preset.label}
-              </button>
-            {/each}
-          {:else}
-            {#if left_player_number === 1}
-              <input
-                type="text"
-                id="name"
-                style="width: 2.5em;"
-                class="form-control"
-                bind:value={score1}
-              />
-              <p>-</p>
-              <input
-                type="text"
-                id="name"
-                style="width: 2.5em;"
-                class="form-control"
-                bind:value={score2}
-              />
-            {:else}
-              <input
-                type="text"
-                id="name"
-                style="width: 2.5em;"
-                class="form-control"
-                bind:value={score2}
-              />
-              <p>-</p>
-              <input
-                type="text"
-                id="name"
-                style="width: 2.5em;"
-                class="form-control"
-                bind:value={score1}
-              />
-            {/if}
-            <button
-              class="btn btn-primary"
-              data-dismiss="modal"
-              id="option-custom"
-              on:click={async () => {
-                return onCustomSelfReportSubmit(score1, score2);
-              }}
-            >
-              Submit
-            </button>
-          {/if}
-          <button
-            class="btn btn-primary"
-            id="option-custom"
-            on:click={() => {
-              onCustomReportClicked();
-            }}
-          >
-            {customReporting ? "Presets" : "Custom"}
-          </button>
-        </div>
-      </div>
-    </div>
+      {/each}
+    {:else}
+      {#if left_player_number === 1}
+        <input
+          type="text"
+          id="name"
+          style="width: 2.5em;"
+          class="form-control"
+          bind:value={score1}
+        />
+        <p>-</p>
+        <input
+          type="text"
+          id="name"
+          style="width: 2.5em;"
+          class="form-control"
+          bind:value={score2}
+        />
+      {:else}
+        <input
+          type="text"
+          id="name"
+          style="width: 2.5em;"
+          class="form-control"
+          bind:value={score2}
+        />
+        <p>-</p>
+        <input
+          type="text"
+          id="name"
+          style="width: 2.5em;"
+          class="form-control"
+          bind:value={score1}
+        />
+      {/if}
+      <button
+        class="btn btn-primary"
+        data-dismiss="modal"
+        id="option-custom"
+        onclick={async () => {
+          return onCustomSelfReportSubmit(score1, score2);
+        }}
+      >
+        Submit
+      </button>
+    {/if}
+    <button
+      class="btn btn-primary"
+      id="option-custom"
+      onclick={onCustomReportClicked}
+    >
+      {customReporting ? "Presets" : "Custom"}
+    </button>
   </div>
-</div>
+</ModalDialog>

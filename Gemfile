@@ -57,6 +57,7 @@ end
 group :test do
   gem 'bundler-audit'
   gem 'capybara'
+  gem 'capybara-playwright-driver'
   gem 'database_cleaner'
   gem 'faker'
   gem 'launchy'

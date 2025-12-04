@@ -9,7 +9,7 @@ RSpec.describe 'creating a round' do
   end
 
   it 'redirects to rounds page' do
-    click_link 'Pair new round'
+    click_button 'Pair new round'
 
     expect(page).to have_current_path tournament_rounds_path(tournament), ignore_query: true
   end

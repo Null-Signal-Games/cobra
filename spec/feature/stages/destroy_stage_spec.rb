@@ -10,7 +10,9 @@ RSpec.describe 'destroying a stage' do
 
   it 'allows stages to be destroyed' do
     expect do
-      click_on class: 'btn-danger'
+      accept_confirm do
+        click_on class: 'btn-danger'
+      end
     end.to change(Stage, :count).by(-1)
   end
 end

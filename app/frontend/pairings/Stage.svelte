@@ -1,24 +1,98 @@
 <script lang="ts">
   import Round from "./Round.svelte";
-  import type { Stage } from "./PairingsData";
+  import type { Stage, Tournament, TournamentPolicies } from "./PairingsData";
+  import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
+  import { redirectRequest } from "../utils/network";
 
-  export let stage: Stage;
-  export let tournamentId: number;
-  export let start_expanded: boolean;
+  let {
+    stage,
+    tournamentId,
+    tournament,
+    startExpanded,
+    showReportedPairings = true,
+    tournamentPolicies,
+    csrfToken,
+  }: {
+    stage: Stage;
+    tournamentId: number;
+    tournament: Tournament;
+    startExpanded: boolean;
+    showReportedPairings?: boolean;
+    tournamentPolicies?: TournamentPolicies;
+    csrfToken: string;
+  } = $props();
+
+  function deleteStage(e: MouseEvent) {
+    e.preventDefault();
+
+    if (
+      !confirm(
+        "Are you sure? This cannot be reversed and all rounds will be deleted!",
+      )
+    ) {
+      return;
+    }
+
+    void redirectRequest(
+      `/tournaments/${tournamentId}/stages/${stage.id}`,
+      "DELETE",
+      csrfToken,
+    );
+  }
 </script>
 
 <div class="accordion mb-3" role="tablist">
   <div class="row mb-1">
-    <div class="col-sm-11 d-flex align-items-baseline gap-2">
+    <div class="col-sm-10 d-flex align-items-baseline gap-2">
       <h4>{stage.name}</h4>
     </div>
+
+    <!-- Admin controls -->
+    {#if tournamentPolicies?.update}
+      <div class="col-sm-2">
+        {#if !stage.is_elimination && tournamentPolicies.custom_table_numbering}
+          <a
+            href="/tournaments/{tournamentId}/stages/{stage.id}"
+            class="btn btn-warning mx-1"
+          >
+            <FontAwesomeIcon icon="pencil" />
+          </a>
+        {/if}
+        <button class="btn btn-danger mx-1" onclick={deleteStage}>
+          <FontAwesomeIcon icon="trash" />
+        </button>
+      </div>
+    {/if}
   </div>
-  {#each stage.rounds.filter((r) => r.id) as round, index (round.id)}
+
+  <!-- Rounds -->
+  {#if !tournamentPolicies?.update && stage.rounds.length > 0 && stage.rounds[stage.rounds.length - 1].pairings.length > 30}
+    <div class="alert alert-info">
+      Due to the number of players, only the most recent round will be displayed
+      on this page to help page load.
+    </div>
     <Round
       {tournamentId}
-      {round}
+      {tournament}
+      round={stage.rounds[stage.rounds.length - 1]}
       {stage}
-      start_expanded={start_expanded && index === stage.rounds.length - 1}
+      {startExpanded}
+      {showReportedPairings}
+      {tournamentPolicies}
+      {csrfToken}
     />
-  {/each}
+  {:else}
+    {#each stage.rounds.filter((r) => r.id) as round, index (round.id)}
+      <Round
+        {tournamentId}
+        {tournament}
+        {round}
+        {stage}
+        startExpanded={startExpanded && index === stage.rounds.length - 1}
+        {showReportedPairings}
+        {tournamentPolicies}
+        {csrfToken}
+      />
+    {/each}
+  {/if}
 </div>

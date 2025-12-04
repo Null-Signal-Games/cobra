@@ -2,7 +2,7 @@
 
 class RoundsController < ApplicationController
   before_action :set_tournament
-  before_action :set_round, only: %i[edit update destroy repair complete update_timer]
+  before_action :set_round, only: %i[edit update destroy repair complete update_timer round_data]
 
   def index
     authorize @tournament, :update?
@@ -12,7 +12,6 @@ class RoundsController < ApplicationController
     @players = @tournament.players
                           .includes(:corp_identity_ref, :runner_identity_ref)
                           .index_by(&:id).merge({ nil => NilPlayer.new })
-    @warning = @tournament.current_stage&.validate_table_count
   end
 
   def view_pairings
@@ -24,10 +23,21 @@ class RoundsController < ApplicationController
 
     render json: {
       policy: {
-        update: @tournament.user == current_user
+        update: @tournament.user == current_user,
+        custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
       },
-      is_player_meeting: @tournament.round_ids.empty?,
-      stages: pairings_data_stages
+      tournament: {
+        player_meeting: @tournament.round_ids.empty?,
+        registration_open: @tournament.registration_open?,
+        registration_unlocked: @tournament.registration_unlocked?,
+        self_registration: @tournament.self_registration?,
+        locked_players: @tournament.locked_players.count,
+        unlocked_players: @tournament.unlocked_players.count,
+        allow_streaming_opt_out: @tournament.allow_streaming_opt_out
+      },
+      stages: pairings_data_stages,
+      csrf_token: form_authenticity_token,
+      warnings: ([@tournament.current_stage&.validate_table_count] if policy(@tournament).update?)
     }
   end
 
@@ -83,7 +93,7 @@ class RoundsController < ApplicationController
 
     @tournament.pair_new_round!
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def edit
@@ -103,7 +113,7 @@ class RoundsController < ApplicationController
 
     @round.destroy!
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def repair
@@ -111,7 +121,7 @@ class RoundsController < ApplicationController
 
     @round.repair!
 
-    redirect_to tournament_round_path(@tournament, @round)
+    render json: { url: tournament_round_path(@tournament, @round) }, status: :ok
   end
 
   def complete
@@ -120,7 +130,7 @@ class RoundsController < ApplicationController
     @round.update!(completed: params[:completed])
     @round.timer.stop!
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def update_timer
@@ -138,7 +148,44 @@ class RoundsController < ApplicationController
       @round.timer.reset!
     end
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
+  end
+
+  def round_data
+    authorize @tournament, :update?
+
+    stage = Stage.find @round.stage_id
+    round = Round.includes([{ pairings: %i[player1 player2] }]).find(params[:id])
+    round = edit_data_round(round, pairings_data_players)
+    round[:unpaired_players] = @round.unpaired_players
+
+    render json: {
+      policy: {
+        update: @tournament.user == current_user,
+        custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
+      },
+      tournament: {
+        player_meeting: @tournament.round_ids.empty?,
+        registration_open: @tournament.registration_open?,
+        registration_unlocked: @tournament.registration_unlocked?,
+        self_registration: @tournament.self_registration?,
+        locked_players: @tournament.locked_players.count,
+        unlocked_players: @tournament.unlocked_players.count,
+        allow_streaming_opt_out: @tournament.allow_streaming_opt_out
+      },
+      stage: {
+        id: stage.id,
+        name: stage.format.titleize,
+        format: stage.format,
+        is_single_sided: stage.single_sided?,
+        is_elimination: stage.elimination?,
+        view_decks: stage.decks_visible_to(current_user),
+        player_count: stage.players.count
+      },
+      round:,
+      csrf_token: form_authenticity_token,
+      warnings: ([@tournament.current_stage&.validate_table_count] if policy(@tournament).update?)
+    }
   end
 
   private
@@ -155,10 +202,12 @@ class RoundsController < ApplicationController
     players = pairings_data_players
     @tournament.stages.includes(:rounds).map do |stage|
       {
+        id: stage.id,
         name: stage.format.titleize,
         format: stage.format,
         is_single_sided: stage.single_sided?,
         is_elimination: stage.elimination?,
+        view_decks: stage.decks_visible_to(current_user),
         rounds: pairings_data_rounds(stage, players),
         player_count: stage.players.count
       }
@@ -175,7 +224,9 @@ class RoundsController < ApplicationController
         p.corp_identity,
         ci.faction as corp_faction,
         p.runner_identity,
-        ri.faction AS runner_faction
+        ri.faction AS runner_faction,
+        p.include_in_stream,
+        p.active
       FROM
         players p
         LEFT JOIN identities AS ci ON p.corp_identity_ref_id = ci.id
@@ -189,24 +240,34 @@ class RoundsController < ApplicationController
     players
   end
 
-  def pairings_data_rounds(stage, players)
-    view_decks = stage.decks_visible_to(current_user) ? true : false
+  def edit_data_round(round, players)
+    self_reports_by_pairing_id = SelfReport.joins(pairing: :round)
+                                           .where(rounds: { id: round.id })
+                                           .group_by(&:pairing_id)
+    # Convert the reports to hashes so they can be modified later
+    self_reports_by_pairing_id.each do |key, value|
+      self_reports_by_pairing_id[key] = value.map(&:attributes)
+    end
 
-    self_reports_by_pairing_id = if current_user
-                                   SelfReport.joins(pairing: :round)
-                                             .where(rounds: { stage_id: stage.id }, report_player_id: current_user.id)
-                                             .index_by(&:pairing_id)
-                                 else
-                                   {}
-                                 end
+    pairings_data_round(round.stage, players, round, self_reports_by_pairing_id)
+  end
+
+  def pairings_data_rounds(stage, players)
+    self_reports_by_pairing_id = SelfReport.joins(pairing: :round)
+                                           .where(rounds: { stage_id: stage.id })
+                                           .group_by(&:pairing_id)
+    # Convert the reports to hashes so they can be modified later
+    self_reports_by_pairing_id.each do |key, value|
+      self_reports_by_pairing_id[key] = value.map(&:attributes)
+    end
 
     # Get data for all paired rounds
     stage.rounds.map do |round|
-      pairings_data_round(stage, players, view_decks, round, self_reports_by_pairing_id)
+      pairings_data_round(stage, players, round, self_reports_by_pairing_id)
     end
   end
 
-  def pairings_data_round(stage, players, view_decks, round, self_reports_by_pairing_id)
+  def pairings_data_round(stage, players, round, self_reports_by_pairing_id)
     pairings = []
     pairings_reported = 0
     pairings_fields = %i[id table_number player1_id player2_id side intentional_draw
@@ -215,24 +276,38 @@ class RoundsController < ApplicationController
     id, table_number, player1_id, player2_id, side, intentional_draw,
       two_for_one, score1, score1_corp, score1_runner, score2, score2_corp, score2_runner|
       pairings_reported += score1.nil? && score2.nil? ? 0 : 1
-      self_report = self_reports_by_pairing_id[id]
-      if self_report
-        self_report_result = { report_player_id: self_report.report_player_id }
+      self_reports = self_reports_by_pairing_id[id]
+
+      # Restrict non-TOs to only their own reports
+      if self_reports && current_user != @tournament.user
+        self_reports = self_reports.select { |r| r['report_player_id'] == current_user.id }
+      end
+
+      # TODO: Move label logic and score_label() to FE
+      if self_reports&.any? && @tournament.user != current_user
         if stage.single_sided? && side == 'player1_is_corp'
-          self_report_result[:label] = score_label(@tournament.swiss_format, player1_side(side),
-                                                   self_report.score1, self_report.score1_corp,
-                                                   self_report.score1_runner,
-                                                   self_report.score2,
-                                                   self_report.score2_corp,
-                                                   self_report.score2_runner)
+          self_reports.each do |r|
+            r[:label] = score_label(@tournament.swiss_format,
+                                    player1_side(side),
+                                    r['score1'],
+                                    r['score1_corp'],
+                                    r['score1_runner'],
+                                    r['score2'],
+                                    r['score2_corp'],
+                                    r['score2_runner'])
+          end
         else
           # Player 2 is the corp (left side) player
-          self_report_result[:label] = score_label(@tournament.swiss_format, player2_side(side),
-                                                   self_report.score2, self_report.score2_corp,
-                                                   self_report.score2_runner,
-                                                   self_report.score1,
-                                                   self_report.score1_corp,
-                                                   self_report.score1_runner)
+          self_reports.each do |r|
+            r[:label] = score_label(@tournament.swiss_format,
+                                    player2_side(side),
+                                    r['score2'],
+                                    r['score2_corp'],
+                                    r['score2_runner'],
+                                    r['score1'],
+                                    r['score1_corp'],
+                                    r['score1_runner'])
+          end
         end
       end
 
@@ -241,9 +316,8 @@ class RoundsController < ApplicationController
         table_number:,
         table_label: stage.elimination? ? "Game #{table_number}" : "Table #{table_number}",
         policy: {
-          view_decks:,
           self_report: SelfReporting.self_report_allowed(current_user,
-                                                         self_report,
+                                                         self_reports&.any? ? self_reports[0] : nil,
                                                          players[player1_id]&.dig('user_id'),
                                                          players[player2_id]&.dig('user_id')) &&
                        score1.nil? && score2.nil? && @tournament.allow_self_reporting
@@ -259,32 +333,44 @@ class RoundsController < ApplicationController
         },
         player1: pairings_data_player(players[player1_id], player1_side(side)),
         player2: pairings_data_player(players[player2_id], player2_side(side)),
+        score1:,
+        score2:,
         score_label: score_label(@tournament.swiss_format, player1_side(side),
                                  score1, score1_corp, score1_runner,
                                  score2, score2_corp, score2_runner),
         intentional_draw:,
         two_for_one:,
-        self_report: self_report_result
+        self_reports:,
+        reported: score1.present? || score2.present?
       }
     end
 
     {
       id: round.id,
       number: round.number,
+      completed: round.completed?,
       pairings:,
-      pairings_reported:
+      pairings_reported:,
+      length_minutes: round.length_minutes,
+      timer: {
+        running: round.timer.running?,
+        paused: round.timer.paused?,
+        started: round.timer.started?
+      }
     }
   end
 
   def pairings_data_player(player, side)
     {
       id: (player['id'] if player),
+      name: (player['name'] if player),
       name_with_pronouns: name_with_pronouns(player),
       side:,
       user_id: (player['user_id'] if player),
       side_label: side_label(side),
       corp_id: id(player, 'corp'),
-      runner_id: id(player, 'runner')
+      runner_id: id(player, 'runner'),
+      include_in_stream: (player['include_in_stream'] if player)
     }
   end
 

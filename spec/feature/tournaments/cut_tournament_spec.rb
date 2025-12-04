@@ -42,7 +42,9 @@ RSpec.describe 'cutting tournament' do
       it 'creates double elim stage' do
         expect(tournament.stages.size).to eq(1)
 
-        click_link 'Double-Elimination Top 8'
+        within find('td', text: 'Double Elimination').ancestor('tr').find('td:nth-child(4)') do
+          click_button 'Top 8'
+        end
 
         expect(tournament.stages.size).to eq(2)
         expect(tournament.stages.last.format).to eq('double_elim')
@@ -51,7 +53,9 @@ RSpec.describe 'cutting tournament' do
       it 'creates single elim stage' do
         expect(tournament.stages.size).to eq(1)
 
-        click_link 'Single-Elimination Top 4'
+        within find('td', text: 'Single Elimination').ancestor('tr').find('td:nth-child(3)') do
+          click_button 'Top 4'
+        end
 
         expect(tournament.stages.size).to eq(2)
         expect(tournament.stages.last.format).to eq('single_elim')

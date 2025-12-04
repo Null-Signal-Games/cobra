@@ -16,25 +16,33 @@ RSpec.describe 'destroying tournaments' do
 
   it 'destroys tournament' do
     expect do
-      click_link 'Delete'
+      accept_confirm do
+        click_link 'Delete'
+      end
     end.to change(Tournament, :count).by(-1)
   end
 
   it 'destroys associated players' do
     expect do
-      click_link 'Delete'
+      accept_confirm do
+        click_link 'Delete'
+      end
     end.to change(Player, :count).by(-2)
   end
 
   it 'destroys associated rounds' do
     expect do
-      click_link 'Delete'
+      accept_confirm do
+        click_link 'Delete'
+      end
     end.to change(Round, :count).by(-1)
   end
 
   it 'destroys associated pairings' do
     expect do
-      click_link 'Delete'
+      accept_confirm do
+        click_link 'Delete'
+      end
     end.to change(Pairing, :count).by(-1)
   end
 end

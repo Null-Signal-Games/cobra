@@ -3,8 +3,7 @@
 RSpec.describe 'list pairings for a round' do
   context 'with swiss tournament' do
     let(:tournament) { create(:tournament) }
-    let(:stage) { create(:stage, tournament:) }
-    let(:round) { create(:round, tournament:, stage:) }
+    let(:round) { create(:round, tournament:, stage: tournament.current_stage) }
     let!(:jack) { create(:player, name: 'Jack', tournament: round.tournament) }
     let!(:jill) { create(:player, name: 'Jill', tournament: round.tournament) }
     let!(:snap) { create(:player, name: 'Snap', tournament: round.tournament) }
@@ -23,21 +22,29 @@ RSpec.describe 'list pairings for a round' do
       visit tournament_rounds_path(round.tournament)
       click_link 'Pairings by name'
 
-      aggregate_failures do
-        expect(page).to have_content('3(Bye)Pop')
-        expect(page).to have_content('2CrackleSnap')
-        expect(page).to have_content('1JackJill')
-        expect(page).to have_content('1JillJack')
-        expect(page).to have_content('3Pop(Bye)')
-        expect(page).to have_content('2SnapCrackle')
-      end
+      expect(page.has_table?(rows: [
+                               %w[3 (Bye) Pop],
+                               %w[2 Crackle Snap],
+                               %w[1 Jack Jill],
+                               %w[1 Jill Jack],
+                               %w[3 Pop (Bye)],
+                               %w[2 Snap Crackle]
+                             ])).to be true
     end
 
     it 'displays preset score options' do
       sign_in round.tournament.user
       visit tournament_rounds_path(round.tournament)
 
-      expect(page).to have_content('6-0 3-3 (C) 3-3 (R) 0-6 ...')
+      aggregate_failures do
+        expect(page).to have_content('6-0')
+        expect(page).to have_content('3-3')
+        expect(page).to have_content('(C)')
+        expect(page).to have_content('3-3')
+        expect(page).to have_content('(R)')
+        expect(page).to have_content('0-6')
+        expect(page).to have_content('...')
+      end
     end
 
     it 'displays bye with streaming opt out enabled' do
@@ -65,7 +72,10 @@ RSpec.describe 'list pairings for a round' do
     end
 
     it 'displays side selection buttons' do
-      expect(page).to have_content('Corp Runner')
+      aggregate_failures do
+        expect(page).to have_content('Corp')
+        expect(page).to have_content('Runner')
+      end
     end
 
     it 'does not display preset score options before side selection' do
@@ -83,7 +93,10 @@ RSpec.describe 'list pairings for a round' do
       sign_in tournament.user
       visit tournament_rounds_path(tournament)
 
-      expect(page).to have_content('3-0 0-3')
+      aggregate_failures do
+        expect(page).to have_text('3-0')
+        expect(page).to have_text('0-3')
+      end
     end
   end
 end

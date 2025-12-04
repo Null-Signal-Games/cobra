@@ -14,7 +14,9 @@ RSpec.describe 'destroying players' do
 
   it 'deletes player' do
     expect do
-      click_link 'Delete'
+      accept_confirm do
+        click_link 'Delete'
+      end
     end.to change(tournament.players, :count).by(-1)
 
     expect do

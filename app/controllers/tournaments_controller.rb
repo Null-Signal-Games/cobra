@@ -269,7 +269,7 @@ class TournamentsController < ApplicationController
 
     @tournament.cut_to!(format, number)
 
-    redirect_to tournament_rounds_path(@tournament)
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def shortlink
@@ -333,28 +333,32 @@ class TournamentsController < ApplicationController
     authorize @tournament, :edit?
 
     @tournament.close_registration!
-    redirect_back(fallback_location: tournament_rounds_path(@tournament))
+
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def open_registration
     authorize @tournament, :edit?
 
     @tournament.open_registration!
-    redirect_back(fallback_location: tournament_rounds_path(@tournament))
+
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def lock_player_registrations
     authorize @tournament, :edit?
 
     @tournament.lock_player_registrations!
-    redirect_back(fallback_location: tournament_rounds_path(@tournament))
+
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def unlock_player_registrations
     authorize @tournament, :edit?
 
     @tournament.unlock_player_registrations!
-    redirect_back(fallback_location: tournament_rounds_path(@tournament))
+
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def cut_conversion_rates

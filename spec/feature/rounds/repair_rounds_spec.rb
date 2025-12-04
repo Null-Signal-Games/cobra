@@ -13,7 +13,11 @@ RSpec.describe 'Re-pairing rounds' do
 
   it 're-pairs the round' do
     expect do
-      click_link 'Re-pair'
+      accept_confirm do
+        find(:button, text: 'Re-pair').click
+      end
+
+      find :button, text: 'Re-pair' # Wait for the page to load
     end.to change(Pairing, :count).by(1)
 
     expect(round.reload.unpaired_players).to eq([])
