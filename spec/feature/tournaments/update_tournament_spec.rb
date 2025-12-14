@@ -10,7 +10,7 @@ RSpec.describe 'updating tournament' do
     visit edit_tournament_path(tournament)
 
     fill_in :tournament_name, with: 'New Tournament Name'
-    fill_in :tournament_date, with: '2017-01-01'
+    fill_in :tournament_date, with: '2017/01/01'
     fill_in :tournament_stream_url, with: 'https://twitch.tv'
     check :tournament_private
     check :tournament_manual_seed

@@ -36,7 +36,6 @@ RSpec.describe 'registering for a tournament' do
     visit tournament_path(tournament)
     fill_in :player_corp_identity, with: 'Haas-Bioroid: Engineering the Future'
     fill_in :player_runner_identity, with: 'Noise'
-    find('input[name="player[consent_data_sharing]"]').click
     click_button 'Register'
   end
 end

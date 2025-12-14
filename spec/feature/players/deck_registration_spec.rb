@@ -118,7 +118,6 @@ RSpec.describe 'registering a deck from NetrunnerDB' do
     sign_in organiser
     visit tournament_path(tournament)
     fill_in 'Name', with: 'Test Player'
-    find('input[name="player[consent_data_sharing]"]').click
     with_nrdb_decks do
       click_button 'Deck Registration'
     end

@@ -14,7 +14,6 @@ RSpec.describe 'updating players' do
       fill_in :player_runner_identity, with: 'Gabriel Santiago'
       check :player_first_round_bye
       fill_in :player_manual_seed, with: 3
-      find('a', text: 'Assign table number').click
       fill_in :player_fixed_table_number, with: 20
       click_button 'Save'
     end

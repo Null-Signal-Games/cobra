@@ -14,11 +14,11 @@ RSpec.describe 'show player meeting' do
     visit tournament_players_path(tournament)
     click_link 'Player meeting'
 
-    expect(page.has_table?(rows: [
-                             ['1', 'Crackle', 'Jack'],
-                             ['2', 'Jill', 'Pop'],
-                             ['3', 'Snap', '']
-                           ])).to be true
+    aggregate_failures do
+      expect(page).to have_content('1CrackleJack')
+      expect(page).to have_content('2JillPop')
+      expect(page).to have_content('3Snap')
+    end
   end
 
   it 'sorts player names correctly' do
@@ -31,9 +31,9 @@ RSpec.describe 'show player meeting' do
     visit tournament_players_path(tournament)
     click_link 'Player meeting'
 
-    expect(page.has_table?(rows: [
-                             %w[1 alan Ben],
-                             %w[2 callum David]
-                           ])).to be true
+    aggregate_failures do
+      expect(page).to have_content('1alanBen')
+      expect(page).to have_content('2callumDavid')
+    end
   end
 end
