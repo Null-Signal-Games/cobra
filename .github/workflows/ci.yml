@@ -55,9 +55,6 @@ jobs:
           ruby-version: 3.4.4
           bundler-cache: true
       
-      - name: Install Playwright browsers
-        run: npx --yes playwright install firefox --with-deps
-
       - name: Set up Rails
         run: |
           cp config/database.ci.yml config/database.yml
