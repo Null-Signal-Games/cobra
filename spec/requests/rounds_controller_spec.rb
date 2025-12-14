@@ -71,6 +71,38 @@ RSpec.describe RoundsController do
             'warnings' => [nil]
           )
       end
+
+      it 'allows the organiser to pair a round' do
+        sign_in organiser
+
+        expect do
+          post tournament_rounds_path(tournament)
+        end.to change(tournament.rounds, :count).by(1)
+      end
+
+      it 'does not allow a player to pair a round' do
+        sign_in alice
+
+        expect do
+          post tournament_rounds_path(tournament)
+        end.to change(tournament.rounds, :count).by(0)
+      end
+
+      it 'allows the organiser to re-pair a round' do
+        sign_in organiser
+        round = create(:round, tournament:, stage: tournament.current_stage)
+
+        patch repair_tournament_round_path(tournament, round)
+        expect(tournament.rounds.last.unpaired_players.count).to eq(0)
+      end
+
+      it 'does not allow a player to re-pair a round' do
+        sign_in alice
+        round = create(:round, tournament:, stage: tournament.current_stage)
+
+        patch repair_tournament_round_path(tournament, round)
+        expect(tournament.rounds.last.unpaired_players.count).to eq(3)
+      end
     end
 
     describe 'during first swiss round before any results' do
@@ -180,6 +212,50 @@ RSpec.describe RoundsController do
                    },
                    'warnings' => [nil]
                  })
+      end
+
+      it 'allows the organiser to complete the round' do
+        sign_in organiser
+
+        patch complete_tournament_round_path(tournament, tournament.rounds.last), params: { completed: true }
+        expect(tournament.rounds.last.completed?).to be(true)
+      end
+
+      it 'does not allow a player to complete the round' do
+        sign_in alice
+
+        patch complete_tournament_round_path(tournament, tournament.rounds.last), params: { completed: true }
+        expect(tournament.rounds.last.completed?).to be(false)
+      end
+
+      it 'allows the organiser to delete the round', bullet: :skip do
+        sign_in organiser
+
+        expect do
+          delete tournament_round_path(tournament, tournament.rounds.last)
+        end.to change(tournament.rounds, :count).by(-1)
+      end
+
+      it 'does not allow a player to delete the round', bullet: :skip do
+        sign_in alice
+
+        expect do
+          delete tournament_round_path(tournament, tournament.rounds.last)
+        end.to change(tournament.rounds, :count).by(0)
+      end
+
+      it 'allows the organiser to edit the round' do
+        sign_in organiser
+
+        patch tournament_round_path(tournament, tournament.rounds.last), params: { round: { weight: 0.8 } }
+        expect(tournament.rounds.last.weight).to eq(0.8)
+      end
+
+      it 'does not allow a player to edit the round' do
+        sign_in alice
+
+        patch tournament_round_path(tournament, tournament.rounds.last), params: { round: { weight: 0.8 } }
+        expect(tournament.rounds.last.weight).to eq(1.0)
       end
     end
 

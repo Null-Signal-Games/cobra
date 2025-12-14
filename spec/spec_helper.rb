@@ -15,11 +15,6 @@ SimpleCov.start do
   add_group 'Libraries', 'lib'
 end
 
-Capybara.register_driver :playwright do |app|
-  Capybara::Playwright::Driver.new(app, browser_type: :firefox, headless: true)
-end
-Capybara.default_driver = :playwright
-
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
@@ -27,6 +22,14 @@ RSpec.configure do |config|
 
   config.mock_with :rspec do |mocks|
     mocks.verify_partial_doubles = true
+  end
+
+  config.before(:each, bullet: :skip) do
+    Bullet.enable = false
+  end
+
+  config.after(:each, bullet: :skip) do
+    Bullet.enable = true
   end
 
   config.shared_context_metadata_behavior = :apply_to_host_groups

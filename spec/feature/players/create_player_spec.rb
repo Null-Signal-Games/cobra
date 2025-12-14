@@ -64,7 +64,7 @@ RSpec.describe 'creating a player' do
 
   context 'new player form filled in for tournament with no stages' do
     before do
-      delete_tournament_stage
+      tournament.current_stage.destroy!
       fill_in_new_player_form
     end
 
@@ -81,10 +81,5 @@ RSpec.describe 'creating a player' do
     fill_in :player_corp_identity, with: 'Haas-Bioroid: Engineering the Future'
     fill_in :player_runner_identity, with: 'Noise'
     check :player_first_round_bye
-  end
-
-  def delete_tournament_stage
-    visit tournament_rounds_path(Tournament.last)
-    click_on class: ['btn-danger']
   end
 end

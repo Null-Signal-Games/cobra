@@ -27,7 +27,7 @@ RSpec.describe 'Listing players' do
 
       it 'sorts players' do
         expect(all('input[name="player[name]"]').map(&:value)).to eq(
-          ['', 'adam', 'Ben', 'Jack Player']
+          [nil, 'adam', 'Ben', 'Jack Player']
         )
       end
     end
