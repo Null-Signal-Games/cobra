@@ -85,7 +85,7 @@ RSpec.describe RoundsController do
 
         expect do
           post tournament_rounds_path(tournament)
-        end.to change(tournament.rounds, :count).by(0)
+        end.not_to change(tournament.rounds, :count)
       end
 
       it 'allows the organiser to re-pair a round' do
@@ -241,7 +241,7 @@ RSpec.describe RoundsController do
 
         expect do
           delete tournament_round_path(tournament, tournament.rounds.last)
-        end.to change(tournament.rounds, :count).by(0)
+        end.not_to change(tournament.rounds, :count)
       end
 
       it 'allows the organiser to edit the round' do
