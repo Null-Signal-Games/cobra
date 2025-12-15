@@ -1,3 +1,5 @@
+import { globalMessages } from "../utils/GlobalMessageState.svelte";
+
 declare const Routes: {
   settings_tournament_stage_path: (
     tournamentId: number,
@@ -6,12 +8,12 @@ declare const Routes: {
   tournament_stage_path: (tournamentId: number, stageId: number) => string;
 };
 
-export interface Stage {
-  id: number;
-  tournament_id: number;
-  number: number;
-  format: string | null;
-  table_ranges: TableRange[];
+export class Stage {
+  id = -1;
+  tournament_id = -1;
+  number = -1;
+  format: string | null = null;
+  table_ranges: TableRange[] = [];
 }
 
 export interface TableRange {
@@ -22,20 +24,9 @@ export interface TableRange {
 }
 
 export class StageData {
-  stage: Stage;
+  stage = new Stage();
   warning?: string;
-  csrf_token: string;
-
-  constructor() {
-    this.stage = {
-      id: -1,
-      tournament_id: -1,
-      number: -1,
-      format: null,
-      table_ranges: [],
-    };
-    this.csrf_token = "";
-  }
+  csrf_token = "";
 }
 
 export interface SaveStageResponse {
@@ -61,13 +52,17 @@ export async function loadStage(
       method: "GET",
     },
   );
+
+  const data = (await response.json()) as StageData;
+  globalMessages.warnings = data.warning ? [data.warning] : [];
+
   if (!response.ok) {
     throw new Error(
       `HTTP ${response.status.toString()}: ${response.statusText}`,
     );
   }
 
-  return (await response.json()) as StageData;
+  return data;
 }
 
 export async function saveStage(

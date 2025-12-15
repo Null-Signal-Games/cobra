@@ -1,44 +1,4 @@
-.col-12
-  h2= "Round #{@round.number}"
-  p
-    => link_to tournament_rounds_path(@round.tournament), class: 'btn btn-primary' do
-      => fa_icon 'arrow-left'
-      | Back to pairings
-    - if policy(@round.tournament).update?
-      => link_to repair_tournament_round_path(@round.tournament, @round), method: :patch, class: 'btn btn-warning', data: { confirm: 'Are you sure? This cannot be reversed.' } do
-        => fa_icon 'refresh'
-        | Re-pair
-      - if @round.completed?
-        => link_to complete_tournament_round_path(@round.tournament, @round, completed: false), method: :patch, class: 'btn btn-warning' do
-          => fa_icon 'backward'
-          | Uncomplete
-      - else
-        => link_to complete_tournament_round_path(@round.tournament, @round, completed: true), method: :patch, class: 'btn btn-warning' do
-          => fa_icon 'check'
-          | Complete
-      => link_to edit_tournament_round_path(@round.tournament, @round), class: 'btn btn-warning' do
-        => fa_icon 'wrench'
-        | Advanced
-      = link_to tournament_round_path(@round.tournament, @round), method: :delete, class: 'btn btn-danger', data: { confirm: 'Are you sure? This cannot be reversed.' } do
-        => fa_icon 'trash'
-        | Delete round
-  = render 'pairings', round: @round
+#edit_round_anchor.col-12 data-tournament="#{@tournament.id}" data-round="#{@round.id}"
 
-h3.mt-2.col-12 Unpaired players
-- if @round.unpaired_players.any?
-  - @round.unpaired_players.each do |player|
-    = render player
-  h3.mt-2.col-12 Create pairing
-  = simple_form_for @round.pairings.build, url: tournament_round_pairings_path(@round.tournament, @round), html: { class: 'form-inline col-12' } do |f|
-    = f.text_field :table_number, placeholder: 'Table number', class: 'form-control'
-    = pairing_player_select(f, :player1_id, @round)
-    - if @round.stage.single_sided? || !@round.tournament.swiss?
-      = pairing_player1_side_select(f, :side)
-    | vs
-    = pairing_player_select(f, :player2_id, @round)
-
-    = button_tag type: :submit, class: 'btn btn-success' do
-      => fa_icon 'plus'
-      | Create
-- else
-  ' None
+= content_for :head do
+  = vite_typescript_tag 'edit_round', 'data-turbolinks-track': 'reload'

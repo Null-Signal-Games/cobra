@@ -1,15 +1,12 @@
 import type { Identity } from "../identities/Identity";
+import { globalMessages } from "../utils/GlobalMessageState.svelte";
+import type { ScoreReport } from "./SelfReport";
 
 declare const Routes: {
   pairings_data_tournament_rounds_path: (tournamentId: number) => string;
   markdown_tournament_round_pairings_path: (
     tournamentId: number,
     roundId: number,
-  ) => string;
-  pairing_presets_tournament_round_pairing_path: (
-    tournamentId: number,
-    roundId: number,
-    id: number,
   ) => string;
 };
 
@@ -23,7 +20,10 @@ export async function loadPairings(
     },
   );
 
-  return (await response.json()) as PairingsData;
+  const data = (await response.json()) as PairingsData;
+  globalMessages.warnings = data.warnings ?? [];
+
+  return data;
 }
 
 export async function loadSharingData(
@@ -40,37 +40,58 @@ export async function loadSharingData(
   return (await response.json()) as SharingData;
 }
 
-export interface PairingsData {
-  policy: TournamentPolicies;
-  is_player_meeting: boolean;
-  stages: Stage[];
+export class PairingsData {
+  policy = new TournamentPolicies();
+  tournament = new Tournament();
+  stages: Stage[] = [];
+  csrf_token = "";
+  warnings?: string[] = [];
 }
 
 export class SharingData {
-  pages: string[];
-
-  constructor() {
-    this.pages = [];
-  }
+  pages: string[] = [];
 }
 
-export interface TournamentPolicies {
-  update: boolean;
+export class TournamentPolicies {
+  update = false;
+  custom_table_numbering = false;
+}
+
+export class Tournament {
+  player_meeting = false;
+  registration_open = false;
+  registration_unlocked = false;
+  self_registration = false;
+  locked_players = 0;
+  unlocked_players = 0;
+  allow_streaming_opt_out = false;
 }
 
 export interface Stage {
+  id: number;
   name: string;
   format: string;
   is_single_sided: boolean;
   is_elimination: boolean;
+  view_decks: boolean;
   rounds: Round[];
 }
 
 export interface Round {
   id: number;
   number: number;
+  completed: boolean;
   pairings: Pairing[];
   pairings_reported: number;
+  unpaired_players?: Player[];
+  length_minutes: number;
+  timer: RoundTimer;
+}
+
+export interface RoundTimer {
+  running: boolean;
+  paused: boolean;
+  started: boolean;
 }
 
 export interface PlayerSource {
@@ -87,10 +108,17 @@ export interface Pairing {
   policy: PairingPolicies;
   player1: Player;
   player2: Player;
+  score1: number;
+  score1_corp: number;
+  score1_runner: number;
+  score2: number;
+  score2_corp: number;
+  score2_runner: number;
   score_label: string;
   intentional_draw: boolean;
   two_for_one: boolean;
-  self_report: SelfReport | null;
+  self_reports: ScoreReport[] | null;
+  reported: boolean;
   winner_game: number | null;
   loser_game: number | null;
   bracket_type: string | null;
@@ -101,25 +129,19 @@ export interface UiMetadata {
   row_highlighted: boolean;
 }
 
-export interface SelfReport {
-  report_player_id: number;
-  score1: number;
-  score2: number;
-  intentional_draw: boolean;
-  label: string | null;
-}
-
 export interface PairingPolicies {
-  view_decks: boolean;
   self_report: boolean;
 }
 
-export interface Player {
-  id: number;
-  name_with_pronouns: string;
-  side: string | null;
-  user_id: string | null;
-  side_label: string | null;
-  corp_id: Identity | null;
-  runner_id: Identity | null;
+export class Player {
+  id = 0;
+  name = "";
+  name_with_pronouns = "";
+  side: string | null = null;
+  user_id: number | null = null;
+  side_label: string | null = null;
+  corp_id: Identity | null = null;
+  runner_id: Identity | null = null;
+  include_in_stream = false;
+  active: boolean | null = null;
 }

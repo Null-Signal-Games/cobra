@@ -88,7 +88,7 @@ class PairingsController < ApplicationController
 
     save_report
 
-    redirect_back(fallback_location: tournament_rounds_path(tournament))
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def reset_self_report
@@ -96,7 +96,7 @@ class PairingsController < ApplicationController
 
     SelfReport.where(pairing_id: pairing.id).destroy_all
 
-    redirect_back(fallback_location: tournament_rounds_path(tournament))
+    render json: { url: tournament_rounds_path(@tournament) }, status: :ok
   end
 
   def self_report
@@ -133,7 +133,7 @@ class PairingsController < ApplicationController
 
     pairing.destroy
 
-    redirect_to tournament_round_path(tournament, round)
+    render json: { url: tournament_round_path(tournament, round) }, status: :ok
   end
 
   def match_slips
@@ -149,17 +149,15 @@ class PairingsController < ApplicationController
   def view_decks
     authorize @tournament, :show?
     authorize pairing
-    @back_to = params[:back_to]
-    if @back_to == 'pairings'
+
+    case params[:back_to]
+    when 'rounds'
+      @back_to_path = tournament_rounds_path(@tournament)
+    when 'pairings'
       @back_to_path = view_pairings_tournament_rounds_path(@tournament)
-    elsif @back_to == 'standings'
+    when 'standings'
       @back_to_path = standings_tournament_players_path(@tournament)
     end
-  end
-
-  def pairing_presets
-    authorize @tournament, :show?
-    render json: { presets: helpers.presets(pairing), csrf_token: form_authenticity_token }
   end
 
   private

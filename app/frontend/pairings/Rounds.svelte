@@ -1,13 +1,15 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Stage from "./Stage.svelte";
-  import type { PairingsData } from "./PairingsData";
+  import { PairingsData } from "./PairingsData";
   import { loadPairings } from "./PairingsData";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { showIdentities } from "./ShowIdentities";
+  import GlobalMessages from "../utils/GlobalMessages.svelte";
 
-  export let tournamentId: number;
-  let data: PairingsData;
+  let { tournamentId }: { tournamentId: number } = $props();
+
+  let data = $state(new PairingsData());
 
   onMount(async () => {
     data = await loadPairings(tournamentId);
@@ -18,7 +20,9 @@
   }
 </script>
 
-<button class="btn btn-primary" on:click={toggleIdentities}>
+<GlobalMessages />
+
+<button class="btn btn-primary" onclick={toggleIdentities}>
   <FontAwesomeIcon icon="eye-slash" />
   Show/hide identities
 </button>
@@ -26,7 +30,7 @@
 <p></p>
 
 {#if data}
-  {#if data.is_player_meeting}
+  {#if data.tournament.player_meeting}
     <p>
       <a
         href="/tournaments/{tournamentId}/players/meeting"
@@ -40,8 +44,10 @@
   {#each data.stages as stage, index (stage.format)}
     <Stage
       {stage}
-      start_expanded={index === data.stages.length - 1}
       {tournamentId}
+      tournament={data.tournament}
+      startExpanded={index === data.stages.length - 1}
+      csrfToken={data.csrf_token}
     />
   {/each}
 {:else}

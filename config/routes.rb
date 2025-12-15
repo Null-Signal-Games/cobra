@@ -41,7 +41,6 @@ Rails.application.routes.draw do
         post :self_report, on: :member
         get :match_slips, on: :collection
         get :view_decks, on: :member
-        get :pairing_presets, on: :member
         get :sharing, on: :collection
         get :markdown, on: :collection
       end
@@ -51,6 +50,7 @@ Rails.application.routes.draw do
       get :view_pairings, on: :collection
       get :pairings_data, on: :collection
       get :brackets, on: :collection
+      get :round_data, on: :member
     end
     get :bracket, on: :member
     resources :stages, only: %i[show create update destroy] do
