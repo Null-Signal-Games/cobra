@@ -15,6 +15,10 @@
 
   let leftPlayer = $state(pairing.player1);
   let rightPlayer = $state(pairing.player2);
+  if (pairing.player2.side == "corp" && stage.is_single_sided) {
+    leftPlayer = pairing.player2;
+    rightPlayer = pairing.player1;
+  }
   let showScorePresets = $state(!pairing.reported);
   let customScore: ScoreReport = $state({
     score1: pairing.score1,

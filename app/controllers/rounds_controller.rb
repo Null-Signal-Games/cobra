@@ -24,7 +24,8 @@ class RoundsController < ApplicationController
 
     render json: {
       policy: {
-        update: @tournament.user == current_user
+        update: @tournament.user == current_user,
+        custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
       },
       tournament: {
         id: @tournament.id,
@@ -36,8 +37,8 @@ class RoundsController < ApplicationController
         unlocked_players: @tournament.unlocked_players.count,
         allow_streaming_opt_out: @tournament.allow_streaming_opt_out
       },
-      is_player_meeting: @tournament.round_ids.empty?,
-      stages: pairings_data_stages
+      stages: pairings_data_stages,
+      warnings: ([@tournament.current_stage&.validate_table_count] if policy(@tournament).update?)
     }
   end
 
@@ -165,10 +166,12 @@ class RoundsController < ApplicationController
     players = pairings_data_players
     @tournament.stages.includes(:rounds).map do |stage|
       {
+        id: stage.id,
         name: stage.format.titleize,
         format: stage.format,
         is_single_sided: stage.single_sided?,
         is_elimination: stage.elimination?,
+        view_decks: stage.decks_visible_to(current_user),
         rounds: pairings_data_rounds(stage, players),
         player_count: stage.players.count
       }
@@ -200,23 +203,21 @@ class RoundsController < ApplicationController
   end
 
   def pairings_data_rounds(stage, players)
-    view_decks = stage.decks_visible_to(current_user) ? true : false
-
-    self_reports_by_pairing_id = if current_user
-                                   SelfReport.joins(pairing: :round)
-                                             .where(rounds: { stage_id: stage.id }, report_player_id: current_user.id)
-                                             .index_by(&:pairing_id)
-                                 else
-                                   {}
-                                 end
+    self_reports_by_pairing_id = SelfReport.joins(pairing: :round)
+                                           .where(rounds: { stage_id: stage.id })
+                                           .group_by(&:pairing_id)
+    # Convert the reports to hashes so they can be modified later
+    self_reports_by_pairing_id.each do |key, value|
+      self_reports_by_pairing_id[key] = value.map(&:attributes)
+    end
 
     # Get data for all paired rounds
     stage.rounds.map do |round|
-      pairings_data_round(stage, players, view_decks, round, self_reports_by_pairing_id)
+      pairings_data_round(stage, players, round, self_reports_by_pairing_id)
     end
   end
 
-  def pairings_data_round(stage, players, view_decks, round, self_reports_by_pairing_id)
+  def pairings_data_round(stage, players, round, self_reports_by_pairing_id)
     pairings = []
     pairings_reported = 0
     pairings_fields = %i[id table_number player1_id player2_id side intentional_draw
@@ -225,24 +226,38 @@ class RoundsController < ApplicationController
     id, table_number, player1_id, player2_id, side, intentional_draw,
       two_for_one, score1, score1_corp, score1_runner, score2, score2_corp, score2_runner|
       pairings_reported += score1.nil? && score2.nil? ? 0 : 1
-      self_report = self_reports_by_pairing_id[id]
-      if self_report
-        self_report_result = { report_player_id: self_report.report_player_id }
+      self_reports = self_reports_by_pairing_id[id]
+
+      # Restrict non-TOs to only their own reports
+      if self_reports && current_user != @tournament.user
+        self_reports = self_reports.select { |r| r['report_player_id'] == current_user.id }
+      end
+
+      # TODO: Move label logic and score_label() to FE
+      if self_reports&.any? && @tournament.user != current_user
         if stage.single_sided? && side == 'player1_is_corp'
-          self_report_result[:label] = score_label(@tournament.swiss_format, player1_side(side),
-                                                   self_report.score1, self_report.score1_corp,
-                                                   self_report.score1_runner,
-                                                   self_report.score2,
-                                                   self_report.score2_corp,
-                                                   self_report.score2_runner)
+          self_reports.each do |r|
+            r[:label] = score_label(@tournament.swiss_format,
+                                    player1_side(side),
+                                    r['score1'],
+                                    r['score1_corp'],
+                                    r['score1_runner'],
+                                    r['score2'],
+                                    r['score2_corp'],
+                                    r['score2_runner'])
+          end
         else
           # Player 2 is the corp (left side) player
-          self_report_result[:label] = score_label(@tournament.swiss_format, player2_side(side),
-                                                   self_report.score2, self_report.score2_corp,
-                                                   self_report.score2_runner,
-                                                   self_report.score1,
-                                                   self_report.score1_corp,
-                                                   self_report.score1_runner)
+          self_reports.each do |r|
+            r[:label] = score_label(@tournament.swiss_format,
+                                    player2_side(side),
+                                    r['score2'],
+                                    r['score2_corp'],
+                                    r['score2_runner'],
+                                    r['score1'],
+                                    r['score1_corp'],
+                                    r['score1_runner'])
+          end
         end
       end
 
@@ -251,9 +266,8 @@ class RoundsController < ApplicationController
         table_number:,
         table_label: stage.elimination? ? "Game #{table_number}" : "Table #{table_number}",
         policy: {
-          view_decks:,
           self_report: SelfReporting.self_report_allowed(current_user,
-                                                         self_report,
+                                                         self_reports&.any? ? self_reports[0] : nil,
                                                          players[player1_id]&.dig('user_id'),
                                                          players[player2_id]&.dig('user_id')) &&
                        score1.nil? && score2.nil? && @tournament.allow_self_reporting
@@ -269,12 +283,15 @@ class RoundsController < ApplicationController
         },
         player1: pairings_data_player(players[player1_id], player1_side(side)),
         player2: pairings_data_player(players[player2_id], player2_side(side)),
+        score1:,
+        score2:,
         score_label: score_label(@tournament.swiss_format, player1_side(side),
                                  score1, score1_corp, score1_runner,
                                  score2, score2_corp, score2_runner),
         intentional_draw:,
         two_for_one:,
-        self_report: self_report_result
+        self_reports:,
+        reported: score1.present? || score2.present?
       }
     end
 

@@ -22,7 +22,7 @@ Rails.application.routes.draw do
 
   namespace :beta do
     resources :tournaments do
-      resources :rounds, only: %i[index] do
+      resources :rounds, only: %i[index create] do
         resources :pairings, only: %i[destroy] do
           post :report, on: :member
           delete :reset_self_report, on: :member
@@ -30,8 +30,12 @@ Rails.application.routes.draw do
         patch :complete, on: :member
         patch :update_timer, on: :member
       end
-      resources :stages, only: %i[destroy] do
-      end
+      resources :stages, only: %i[create destroy]
+      patch :open_registration, on: :member
+      patch :close_registration, on: :member
+      patch :lock_player_registrations, on: :member
+      patch :unlock_player_registrations, on: :member
+      post :cut, on: :member
     end
   end
 

@@ -1,4 +1,5 @@
 import type { Identity } from "../identities/Identity";
+import { globalMessages } from "../utils/GlobalMessageState.svelte";
 import type { ScoreReport } from "./SelfReport";
 
 declare const Routes: {
@@ -24,7 +25,10 @@ export async function loadPairings(
     },
   );
 
-  return (await response.json()) as PairingsData;
+  const data = (await response.json()) as PairingsData;
+  globalMessages.warnings = data.warnings ?? [];
+
+  return data;
 }
 
 export async function loadSharingData(
@@ -41,11 +45,16 @@ export async function loadSharingData(
   return (await response.json()) as SharingData;
 }
 
-export interface PairingsData {
-  policy: TournamentPolicies;
-  tournament: Tournament;
-  is_player_meeting: boolean;
-  stages: Stage[];
+export class PairingsData {
+  policy = new TournamentPolicies();
+  tournament = new Tournament();
+  stages: Stage[] = [];
+  warnings?: string[] = [];
+}
+
+export class TournamentPolicies {
+  update = false;
+  custom_table_numbering = false;
 }
 
 export class SharingData {
@@ -54,11 +63,6 @@ export class SharingData {
   constructor() {
     this.pages = [];
   }
-}
-
-export interface TournamentPolicies {
-  update: boolean;
-  custom_table_numbering: boolean;
 }
 
 export class Tournament {

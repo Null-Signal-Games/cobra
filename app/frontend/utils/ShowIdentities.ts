@@ -5,5 +5,5 @@ const initialValue: boolean = JSON.parse(
 ) as boolean;
 export const showIdentities = writable(initialValue);
 showIdentities.subscribe(
-  (value) => (localStorage.show_identities = JSON.stringify(value)),
+  (value) => (localStorage.showIdentities = JSON.stringify(value)),
 );
