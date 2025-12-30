@@ -1,24 +1,25 @@
 <script lang="ts">
-  import type { Pairing, Player, TournamentPolicies } from "./PairingsData";
+  import type { Pairing, PairingsContext, Player } from "./PairingsData";
   import Identity from "../identities/Identity.svelte";
   import { showIdentities } from "../utils/ShowIdentities";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
+  import { getContext } from "svelte";
 
   let {
     player,
     pairing,
     left_or_right,
     is_single_sided,
-    tournamentPolicies,
     changePlayerSide,
   }: {
     player: Player;
     pairing: Pairing;
     left_or_right: string;
     is_single_sided: boolean;
-    tournamentPolicies?: TournamentPolicies;
     changePlayerSide: (player: Player, side: string) => void;
   } = $props();
+
+  const pairingsContext: PairingsContext = getContext("pairingsContext");
 </script>
 
 {#snippet setSideButton(player: Player, side: string)}
@@ -44,7 +45,7 @@
   <!-- Side -->
   {#if is_single_sided && pairing.player1.id && pairing.player2.id}
     <br />
-    {#if tournamentPolicies?.update}
+    {#if pairingsContext.showOrganizerView}
       <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
       {@render setSideButton(player, "corp")}
       <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->

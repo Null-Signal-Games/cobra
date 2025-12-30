@@ -1,3 +1,6 @@
+import { globalMessages } from "../utils/GlobalMessageState.svelte";
+import { csrfToken } from "../utils/network";
+
 declare const Routes: {
   settings_tournament_stage_path: (
     tournamentId: number,
@@ -24,7 +27,6 @@ export interface TableRange {
 export class StageData {
   stage: Stage;
   warning?: string;
-  csrf_token: string;
 
   constructor() {
     this.stage = {
@@ -34,7 +36,6 @@ export class StageData {
       format: null,
       table_ranges: [],
     };
-    this.csrf_token = "";
   }
 }
 
@@ -61,17 +62,20 @@ export async function loadStage(
       method: "GET",
     },
   );
+
+  const data = (await response.json()) as StageData;
+  globalMessages.warnings = data.warning ? [data.warning] : [];
+
   if (!response.ok) {
     throw new Error(
       `HTTP ${response.status.toString()}: ${response.statusText}`,
     );
   }
 
-  return (await response.json()) as StageData;
+  return data;
 }
 
 export async function saveStage(
-  csrfToken: string,
   tournamentId: number,
   stage: Stage,
 ): Promise<SaveStageResponse> {
@@ -82,7 +86,7 @@ export async function saveStage(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-CSRF-Token": csrfToken,
+        "X-CSRF-Token": csrfToken(),
       },
       body: JSON.stringify({ stage }),
     },

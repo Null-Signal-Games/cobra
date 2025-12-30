@@ -3,15 +3,9 @@ import { globalMessages } from "../utils/GlobalMessageState.svelte";
 import type { ScoreReport } from "./SelfReport";
 
 declare const Routes: {
-  pairings_data_tournament_rounds_path: (tournamentId: number) => string;
   markdown_tournament_round_pairings_path: (
     tournamentId: number,
     roundId: number,
-  ) => string;
-  pairing_presets_tournament_round_pairing_path: (
-    tournamentId: number,
-    roundId: number,
-    id: number,
   ) => string;
 };
 
@@ -19,7 +13,7 @@ export async function loadPairings(
   tournamentId: number,
 ): Promise<PairingsData> {
   const response = await fetch(
-    Routes.pairings_data_tournament_rounds_path(tournamentId),
+    `/beta/tournaments/${tournamentId}/rounds/pairings_data`,
     {
       method: "GET",
     },
@@ -43,6 +37,10 @@ export async function loadSharingData(
   );
 
   return (await response.json()) as SharingData;
+}
+
+export interface PairingsContext {
+  showOrganizerView: boolean;
 }
 
 export class PairingsData {

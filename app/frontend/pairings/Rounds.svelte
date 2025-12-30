@@ -1,7 +1,11 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, setContext } from "svelte";
   import Stage from "./Stage.svelte";
-  import { loadPairings, PairingsData } from "./PairingsData";
+  import {
+    loadPairings,
+    PairingsData,
+    type PairingsContext,
+  } from "./PairingsData";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { showIdentities } from "../utils/ShowIdentities";
   import GlobalMessages from "../widgets/GlobalMessages.svelte";
@@ -12,10 +16,20 @@
   let { tournamentId }: { tournamentId: number } = $props();
 
   let data = $state(new PairingsData());
+  let forcePlayerView = $state(false);
+  let ctx: PairingsContext = $state({ showOrganizerView: false });
+
+  setContext("pairingsContext", ctx);
 
   onMount(async () => {
     data = await loadPairings(tournamentId);
+    ctx.showOrganizerView = data.policy.update;
   });
+
+  function toggleForcePlayerView() {
+    forcePlayerView = !forcePlayerView;
+    ctx.showOrganizerView = data.policy.update && !forcePlayerView;
+  }
 
   function addSwissStage() {
     void redirectRequest(`/beta/tournaments/${tournamentId}/stages`, "POST");
@@ -77,7 +91,7 @@
 {#if data}
   {#if data.stages.length == 0}
     <!-- Add Swiss stage button -->
-    {#if data.policy.update}
+    {#if ctx.showOrganizerView}
       <button type="button" class="btn btn-success" onclick={addSwissStage}>
         <FontAwesomeIcon icon="plus" /> Add Swiss stage
       </button>
@@ -93,7 +107,7 @@
           <FontAwesomeIcon icon="list-ul" /> Player meeting
         </a>
       {:else}
-        {#if data.policy.update}
+        {#if ctx.showOrganizerView}
           <button
             type="button"
             class="btn btn-primary"
@@ -121,6 +135,20 @@
         >
           <FontAwesomeIcon icon="question" /> FAQ
         </button>
+        {#if data.policy.update}
+          <button
+            type="button"
+            class="btn btn-primary float-right"
+            onclick={toggleForcePlayerView}
+          >
+            {#if ctx.showOrganizerView}
+              <FontAwesomeIcon icon="users" /> See player pairings view
+            {:else}
+              <FontAwesomeIcon icon="user" /> See organizer pairings view
+            {/if}
+          </button>
+        {/if}
+
         {#if !$showReportedPairings}
           <div class="alert alert-info mt-3">
             Reported scores are currently hidden on this page. This will not
@@ -131,7 +159,7 @@
     </div>
 
     <!-- Tournament admin controls -->
-    {#if data.policy.update}
+    {#if ctx.showOrganizerView}
       <div class="mt-3">
         {#if data.tournament.registration_open}
           <button
@@ -197,7 +225,7 @@
     </div>
 
     <!-- Elimination stage controls -->
-    {#if data.policy.update && data.stages.length > 0 && !data.stages[data.stages.length - 1].is_elimination}
+    {#if ctx.showOrganizerView && data.stages.length > 0 && !data.stages[data.stages.length - 1].is_elimination}
       <h4>Cut to...</h4>
       <table>
         <tbody>

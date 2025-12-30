@@ -2,7 +2,6 @@
   import { type Pairing, Player, type Round, type Stage } from "./PairingsData";
   import { type ScoreReport, scorePresets, selfReport } from "./SelfReport";
   import ModalDialog from "../widgets/ModalDialog.svelte";
-  import { csrfToken } from "../utils/network";
 
   let {
     tournamentId,
@@ -49,7 +48,6 @@
       tournamentId,
       round.id,
       pairing.id,
-      csrfToken(),
       report,
     );
     if (!response.success) {
@@ -61,21 +59,15 @@
   }
 
   async function onCustomSelfReportSubmit(score1: number, score2: number) {
-    const response = await selfReport(
-      tournamentId,
-      round.id,
-      pairing.id,
-      csrfToken(),
-      {
-        score1,
-        score2,
-        intentional_draw: false,
-        score1_corp: null,
-        score1_runner: null,
-        score2_corp: null,
-        score2_runner: null,
-      },
-    );
+    const response = await selfReport(tournamentId, round.id, pairing.id, {
+      score1,
+      score2,
+      intentional_draw: false,
+      score1_corp: null,
+      score1_runner: null,
+      score2_corp: null,
+      score2_runner: null,
+    });
     if (!response.success) {
       alert(response.error);
       return;

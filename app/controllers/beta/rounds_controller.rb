@@ -76,6 +76,29 @@ module Beta
       render json: { url: beta_tournament_rounds_path(@tournament) }, status: :ok
     end
 
+    def pairings_data
+      authorize @tournament, :show?
+
+      render json: {
+        policy: {
+          update: @tournament.user == current_user,
+          custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
+        },
+        tournament: {
+          id: @tournament.id,
+          player_meeting: @tournament.round_ids.empty?,
+          registration_open: @tournament.registration_open?,
+          registration_unlocked: @tournament.registration_unlocked?,
+          self_registration: @tournament.self_registration?,
+          locked_players: @tournament.locked_players.count,
+          unlocked_players: @tournament.unlocked_players.count,
+          allow_streaming_opt_out: @tournament.allow_streaming_opt_out
+        },
+        stages: pairings_data_stages,
+        warnings: ([@tournament.current_stage&.validate_table_count] if policy(@tournament).update?)
+      }
+    end
+
     def round_data
       authorize @tournament, :update?
 
@@ -129,6 +152,37 @@ module Beta
       end
 
       pairings_data_round(round.stage, players, round, self_reports_by_pairing_id)
+    end
+
+    def pairings_data_stages
+      players = pairings_data_players
+      @tournament.stages.includes(:rounds).map do |stage|
+        {
+          id: stage.id,
+          name: stage.format.titleize,
+          format: stage.format,
+          is_single_sided: stage.single_sided?,
+          is_elimination: stage.elimination?,
+          view_decks: stage.decks_visible_to(current_user),
+          rounds: pairings_data_rounds(stage, players),
+          player_count: stage.players.count
+        }
+      end
+    end
+
+    def pairings_data_rounds(stage, players)
+      self_reports_by_pairing_id = SelfReport.joins(pairing: :round)
+                                             .where(rounds: { stage_id: stage.id })
+                                             .group_by(&:pairing_id)
+      # Convert the reports to hashes so they can be modified later
+      self_reports_by_pairing_id.each do |key, value|
+        self_reports_by_pairing_id[key] = value.map(&:attributes)
+      end
+
+      # Get data for all paired rounds
+      stage.rounds.map do |round|
+        pairings_data_round(stage, players, round, self_reports_by_pairing_id)
+      end
     end
 
     def pairings_data_round(stage, players, round, self_reports_by_pairing_id)
@@ -227,12 +281,15 @@ module Beta
     def pairings_data_player(player, side)
       {
         id: (player['id'] if player),
+        name: (player['name'] if player),
         name_with_pronouns: name_with_pronouns(player),
         side:,
         user_id: (player['user_id'] if player),
         side_label: side_label(side),
         corp_id: id(player, 'corp'),
-        runner_id: id(player, 'runner')
+        runner_id: id(player, 'runner'),
+        include_in_stream: (player['include_in_stream'] if player),
+        active: (player['active'] if player)
       }
     end
 
@@ -246,7 +303,9 @@ module Beta
           p.corp_identity,
           ci.faction as corp_faction,
           p.runner_identity,
-          ri.faction AS runner_faction
+          ri.faction AS runner_faction,
+          p.include_in_stream,
+          p.active
         FROM
           players p
           LEFT JOIN identities AS ci ON p.corp_identity_ref_id = ci.id

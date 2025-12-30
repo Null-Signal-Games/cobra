@@ -31,6 +31,7 @@ Rails.application.routes.draw do
         patch :complete, on: :member
         get :round_data, on: :member
         patch :update_timer, on: :member
+        get :pairings_data, on: :collection
       end
       resources :stages, only: %i[create destroy]
       patch :open_registration, on: :member
@@ -62,7 +63,6 @@ Rails.application.routes.draw do
         post :self_report, on: :member
         get :match_slips, on: :collection
         get :view_decks, on: :member
-        get :pairing_presets, on: :member
         get :sharing, on: :collection
         get :markdown, on: :collection
       end

@@ -1,8 +1,14 @@
 <script lang="ts">
   import Round from "./Round.svelte";
-  import type { Stage, Tournament, TournamentPolicies } from "./PairingsData";
+  import type {
+    PairingsContext,
+    Stage,
+    Tournament,
+    TournamentPolicies,
+  } from "./PairingsData";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { redirectRequest } from "../utils/network";
+  import { getContext } from "svelte";
 
   let {
     tournament,
@@ -15,6 +21,8 @@
     startExpanded: boolean;
     tournamentPolicies?: TournamentPolicies;
   } = $props();
+
+  const pairingsContext: PairingsContext = getContext("pairingsContext");
 
   function deleteStage() {
     if (
@@ -39,9 +47,9 @@
     </div>
 
     <!-- Admin controls -->
-    {#if tournamentPolicies?.update}
+    {#if pairingsContext.showOrganizerView}
       <div class="col-sm-2">
-        {#if !stage.is_elimination && tournamentPolicies.custom_table_numbering}
+        {#if !stage.is_elimination && tournamentPolicies?.custom_table_numbering}
           <a
             href="/tournaments/{tournament.id}/stages/{stage.id}"
             class="btn btn-warning mx-1"
@@ -57,7 +65,7 @@
   </div>
 
   <!-- Rounds -->
-  {#if !tournamentPolicies?.update && stage.rounds.length > 0 && stage.rounds[stage.rounds.length - 1].pairings.length > 30}
+  {#if !pairingsContext.showOrganizerView && stage.rounds.length > 0 && stage.rounds[stage.rounds.length - 1].pairings.length > 30}
     <div class="alert alert-info">
       Due to the number of players, only the most recent round will be displayed
       on this page to help page load.
@@ -67,7 +75,6 @@
       round={stage.rounds[stage.rounds.length - 1]}
       {stage}
       {startExpanded}
-      {tournamentPolicies}
     />
   {:else}
     {#each stage.rounds.filter((r) => r.id) as round, index (round.id)}
@@ -76,7 +83,6 @@
         {round}
         {stage}
         startExpanded={startExpanded && index === stage.rounds.length - 1}
-        {tournamentPolicies}
       />
     {/each}
   {/if}

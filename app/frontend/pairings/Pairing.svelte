@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { getContext, onMount } from "svelte";
   import {
     type Pairing,
+    type PairingsContext,
     type Player,
     type Round,
     type Stage,
     Tournament,
-    type TournamentPolicies,
   } from "./PairingsData";
   import {
     type ScoreReport,
@@ -25,14 +25,14 @@
     stage,
     round,
     pairing,
-    tournamentPolicies,
   }: {
     tournament: Tournament;
     stage: Stage;
     round: Round;
     pairing: Pairing;
-    tournamentPolicies?: TournamentPolicies;
   } = $props();
+
+  const pairingsContext: PairingsContext = getContext("pairingsContext");
 
   let leftPlayer = $state(pairing.player1);
   let rightPlayer = $state(pairing.player2);
@@ -127,7 +127,7 @@
   >
     {pairing.table_label}
 
-    {#if tournamentPolicies?.update && tournament.allow_streaming_opt_out}
+    {#if pairingsContext.showOrganizerView && tournament.allow_streaming_opt_out}
       {#if pairing.player1.include_in_stream && pairing.player2.include_in_stream}
         <span title="May be included in video coverage.">
           <FontAwesomeIcon icon="video-camera" cssClass="text-success" />
@@ -151,7 +151,7 @@
 
   <!-- Player 1 -->
   {#if stage.view_decks}
-    {#if tournamentPolicies?.update}
+    {#if pairingsContext.showOrganizerView}
       {#if stage.is_single_sided}
         <a
           href="/tournaments/{tournament.id}/rounds/{round.id}/pairings/{pairing.id}/view_decks?back_to=rounds"
@@ -176,12 +176,11 @@
     {pairing}
     left_or_right="left"
     is_single_sided={stage.is_single_sided}
-    {tournamentPolicies}
     {changePlayerSide}
   />
 
   <!-- Score -->
-  {#if tournamentPolicies?.update && (!stage.is_single_sided || pairing.player1.side)}
+  {#if pairingsContext.showOrganizerView && (!stage.is_single_sided || pairing.player1.side)}
     <AdminReportOptions {stage} {pairing} {submitScore} />
   {:else}
     <!-- Player view -->
@@ -203,17 +202,16 @@
     {pairing}
     left_or_right="right"
     is_single_sided={stage.is_single_sided}
-    {tournamentPolicies}
     {changePlayerSide}
   />
-  {#if !tournamentPolicies?.update && stage.view_decks && !pairing.player1.side && pairing.player2.id}
+  {#if !pairingsContext.showOrganizerView && stage.view_decks && !pairing.player1.side && pairing.player2.id}
     <a href="../players/{pairing.player2.id}/view_decks?back_to=pairings">
       <FontAwesomeIcon icon="eye" /> View decks
     </a>
   {/if}
 
   <!-- Self-reporting -->
-  {#if tournamentPolicies?.update}
+  {#if pairingsContext.showOrganizerView}
     <div class="row-sm1 mr-3">
       <button
         type="button"

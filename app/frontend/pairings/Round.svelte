@@ -2,28 +2,29 @@
   import type {
     Stage,
     Round,
-    TournamentPolicies,
     Tournament,
+    PairingsContext,
   } from "./PairingsData";
   import Pairing from "./Pairing.svelte";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { redirectRequest } from "../utils/network";
   import { showReportedPairings } from "../utils/ShowReportedPairings";
   import RoundTimerControls from "./RoundTimerControls.svelte";
+  import { getContext } from "svelte";
 
   let {
     tournament,
     stage,
     round,
     startExpanded,
-    tournamentPolicies,
   }: {
     tournament: Tournament;
     stage: Stage;
     round: Round;
     startExpanded: boolean;
-    tournamentPolicies?: TournamentPolicies;
   } = $props();
+
+  const pairingsContext: PairingsContext = getContext("pairingsContext");
 
   function completeRound() {
     if (
@@ -60,7 +61,7 @@
   <div class="collapse{startExpanded ? ' show' : ''}" id="round{round.id}">
     <div class="col-12 my-3">
       <!-- Admin controls -->
-      {#if tournamentPolicies?.update}
+      {#if pairingsContext.showOrganizerView}
         <a
           class="btn btn-warning"
           href="/beta/tournaments/{tournament.id}/rounds/{round.id}"
@@ -93,23 +94,17 @@
       </a>
 
       <!-- Timer controls -->
-      {#if tournamentPolicies?.update && !round.completed}
+      {#if pairingsContext.showOrganizerView && !round.completed}
         <RoundTimerControls tournamentId={tournament.id} {round} />
       {/if}
 
       <!-- Pairings -->
       {#each round.pairings as pairing (pairing.id)}
         {#if $showReportedPairings || !pairing.reported}
-          {#if tournamentPolicies?.update}
+          {#if pairingsContext.showOrganizerView}
             <hr />
           {/if}
-          <Pairing
-            {tournament}
-            {pairing}
-            {round}
-            {stage}
-            {tournamentPolicies}
-          />
+          <Pairing {tournament} {pairing} {round} {stage} />
         {/if}
       {/each}
     </div>

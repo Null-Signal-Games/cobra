@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, setContext } from "svelte";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import Pairing from "./Pairing.svelte";
   import { type RoundData, loadRound } from "./RoundData";
@@ -15,6 +15,8 @@
   } = $props();
 
   let data: RoundData | undefined = $state();
+
+  setContext("pairingsContext", { showOrganizerView: true });
 
   onMount(async () => {
     data = await loadRound(tournamentId, roundId);
@@ -112,7 +114,6 @@
         {pairing}
         round={data.round}
         stage={data.stage}
-        tournamentPolicies={data.policy}
       />
     {/each}
     <hr />

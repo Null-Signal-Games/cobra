@@ -41,7 +41,7 @@ class StagesController < ApplicationController
       return render json: { error: error }, status: :unprocessable_content
     end
 
-    render json: { url: tournament_stage_path(@tournament, @stage) }, stats: :ok
+    render json: { url: tournament_stage_path(@tournament, @stage) }, status: :ok
   end
 
   def destroy
@@ -78,8 +78,7 @@ class StagesController < ApplicationController
         format: stage.format.titleize,
         table_ranges: table_range_json(stage)
       },
-      warning: stage.validate_table_count,
-      csrf_token: form_authenticity_token
+      warning: stage.validate_table_count
     }
   end
 
