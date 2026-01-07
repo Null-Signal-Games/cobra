@@ -1,11 +1,17 @@
 import type { Identity } from "../identities/Identity";
 import { globalMessages } from "../utils/GlobalMessageState.svelte";
+import { csrfToken } from "../utils/network";
 import type { ScoreReport } from "./SelfReport";
 
 declare const Routes: {
   markdown_tournament_round_pairings_path: (
     tournamentId: number,
     roundId: number,
+  ) => string;
+  beta_tournament_round_pairing_path: (
+    tournamentId: number,
+    roundId: number,
+    pairingId: number,
   ) => string;
 };
 
@@ -37,6 +43,26 @@ export async function loadSharingData(
   );
 
   return (await response.json()) as SharingData;
+}
+
+export async function deletePairing(
+  tournamentId: number,
+  roundId: number,
+  pairingId: number,
+): Promise<boolean> {
+  const response = await fetch(
+    Routes.beta_tournament_round_pairing_path(tournamentId, roundId, pairingId),
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+    },
+  );
+
+  return response.status === 200;
 }
 
 export interface PairingsContext {
@@ -145,7 +171,7 @@ export interface SelfReport {
 }
 
 export interface PairingPolicies {
-  view_decks: boolean;
+  view_decks?: boolean;
   self_report: boolean;
 }
 

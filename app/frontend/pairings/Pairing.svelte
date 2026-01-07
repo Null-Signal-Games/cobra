@@ -25,11 +25,13 @@
     stage,
     round,
     pairing,
+    deleteCallback,
   }: {
     tournament: Tournament;
     stage: Stage;
     round: Round;
     pairing: Pairing;
+    deleteCallback?: (pairingId: number) => void;
   } = $props();
 
   const pairingsContext: PairingsContext = getContext("pairingsContext");
@@ -79,17 +81,6 @@
       `/beta/tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/report`,
       "POST",
       { side: `player1_is_${sideValue}` },
-    );
-  }
-
-  function deletePairing() {
-    if (!confirm("Are you sure? This cannot be reversed.")) {
-      return;
-    }
-
-    void redirectRequest(
-      `/beta/tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}`,
-      "DELETE",
     );
   }
 
@@ -224,7 +215,13 @@
           <FontAwesomeIcon icon="exclamation-triangle" />
         {/if}
       </button>
-      <button type="button" class="btn btn-danger" onclick={deletePairing}>
+      <button
+        class="btn btn-danger"
+        onclick={() => {
+          deleteCallback?.(pairing.id);
+        }}
+        aria-label="delete"
+      >
         <FontAwesomeIcon icon="trash" />
       </button>
     </div>

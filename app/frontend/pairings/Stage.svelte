@@ -15,11 +15,13 @@
     stage,
     startExpanded,
     tournamentPolicies,
+    deletePairingCallback,
   }: {
     tournament: Tournament;
     stage: Stage;
     startExpanded: boolean;
     tournamentPolicies?: TournamentPolicies;
+    deletePairingCallback?: (roundId: number, pairingId: number) => void;
   } = $props();
 
   const pairingsContext: PairingsContext = getContext("pairingsContext");
@@ -75,6 +77,7 @@
       round={stage.rounds[stage.rounds.length - 1]}
       {stage}
       {startExpanded}
+      {deletePairingCallback}
     />
   {:else}
     {#each stage.rounds.filter((r) => r.id) as round, index (round.id)}
@@ -83,6 +86,7 @@
         {round}
         {stage}
         startExpanded={startExpanded && index === stage.rounds.length - 1}
+        {deletePairingCallback}
       />
     {/each}
   {/if}

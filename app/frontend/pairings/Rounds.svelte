@@ -2,6 +2,7 @@
   import { onMount, setContext } from "svelte";
   import Stage from "./Stage.svelte";
   import {
+    deletePairing,
     loadPairings,
     PairingsData,
     type PairingsContext,
@@ -81,6 +82,19 @@
       number: num,
       ...(single_elim && { elimination_type: "single" }),
     });
+  }
+
+  async function deletePairingCallback(roundId: number, pairingId: number) {
+    if (!confirm("Are you sure? This cannot be reversed.")) {
+      return;
+    }
+
+    const success = await deletePairing(tournamentId, roundId, pairingId);
+    if (!success) {
+      return;
+    }
+
+    data = await loadPairings(tournamentId);
   }
 </script>
 
@@ -220,6 +234,7 @@
           startExpanded={index === data.stages.length - 1}
           tournament={data.tournament}
           tournamentPolicies={data.policy}
+          {deletePairingCallback}
         />
       {/each}
     </div>

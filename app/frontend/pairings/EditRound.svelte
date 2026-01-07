@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount, setContext } from "svelte";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
-  import Pairing from "./Pairing.svelte";
   import { type RoundData, loadRound } from "./RoundData";
   import { csrfToken, redirectRequest } from "../utils/network";
   import GlobalMessages from "../widgets/GlobalMessages.svelte";
+  import Pairing from "./Pairing.svelte";
+  import { deletePairing } from "./PairingsData";
 
   let {
     tournamentId,
@@ -54,6 +55,19 @@
       `/beta/tournaments/${tournamentId}/rounds/${data.round.id}`,
       "DELETE",
     );
+  }
+
+  async function deletePairingCallback(pairingId: number) {
+    if (!data || !confirm("Are you sure? This cannot be reversed.")) {
+      return;
+    }
+
+    const success = await deletePairing(tournamentId, roundId, pairingId);
+    if (!success) {
+      return;
+    }
+
+    data = await loadRound(tournamentId, roundId);
   }
 </script>
 
@@ -114,6 +128,7 @@
         {pairing}
         round={data.round}
         stage={data.stage}
+        deleteCallback={deletePairingCallback}
       />
     {/each}
     <hr />
@@ -123,15 +138,19 @@
   <div class="col-12">
     {#if data.round.unpaired_players && data.round.unpaired_players.length !== 0}
       {#each data.round.unpaired_players as player (player.id)}
-        {player.name}
-        {#if player.active === false}
-          (Dropped){/if}
+        <div>
+          {player.name}
+          {#if player.active === false}
+            (Dropped)
+          {/if}
+        </div>
       {/each}
 
       {#snippet playerSelect(id: string)}
         <select
           id={`pairing_${id}`}
           name={`pairing[${id}]`}
+          aria-label={`New pairing ${id}`}
           class="form-control mx-2"
         >
           <option value="">(Bye)</option>
@@ -152,6 +171,7 @@
         <input
           id="pairing_table_number"
           name="pairing[table_number]"
+          aria-label="New pairing table number"
           type="number"
           class="form-control"
           placeholder="Table number"
@@ -159,7 +179,12 @@
         <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
         {@render playerSelect("player1_id")}
         {#if data.stage.is_single_sided}
-          <select id="side" name="pairing[side]" class="form-control mx-2">
+          <select
+            id="side"
+            name="pairing[side]"
+            aria-label="New pairing player 1 side"
+            class="form-control mx-2"
+          >
             <option value="">Player 1 Side</option>
             <option value="player1_is_corp">Corp</option>
             <option value="player1_is_runner">Runner</option>

@@ -18,7 +18,7 @@ module Beta
 
       pairing.destroy
 
-      render json: { url: beta_tournament_round_path(tournament, round) }, status: :ok
+      head :ok
     end
 
     def report
