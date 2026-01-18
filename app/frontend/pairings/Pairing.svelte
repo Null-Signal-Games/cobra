@@ -24,14 +24,16 @@
     tournament,
     stage,
     round,
-    pairing,
+    pairing = $bindable(),
     deleteCallback,
+    reportScoreCallback,
   }: {
     tournament: Tournament;
     stage: Stage;
     round: Round;
     pairing: Pairing;
     deleteCallback?: (pairingId: number) => void;
+    reportScoreCallback?: (pairingId: number, report: ScoreReport) => void;
   } = $props();
 
   const pairingsContext: PairingsContext = getContext("pairingsContext");
@@ -81,14 +83,6 @@
       `/beta/tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/report`,
       "POST",
       { side: `player1_is_${sideValue}` },
-    );
-  }
-
-  function submitScore(score: ScoreReport) {
-    void redirectRequest(
-      `/beta/tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/report`,
-      "POST",
-      score,
     );
   }
 
@@ -172,7 +166,7 @@
 
   <!-- Score -->
   {#if pairingsContext.showOrganizerView && (!stage.is_single_sided || pairing.player1.side)}
-    <AdminReportOptions {stage} {pairing} {submitScore} />
+    <AdminReportOptions {stage} bind:pairing {reportScoreCallback} />
   {:else}
     <!-- Player view -->
     <div class="col-sm-2 centre_score">
@@ -231,7 +225,7 @@
         <SelfReportOptions
           tournamentId={tournament.id}
           {stage}
-          {round}
+          roundId={round.id}
           {pairing}
         />
       {/if}
@@ -258,7 +252,7 @@
       type="button"
       class="btn btn-primary"
       onclick={() => {
-        submitScore(report);
+        reportScoreCallback?.(pairing.id, report);
       }}
       disabled={pairing.reported}
     >

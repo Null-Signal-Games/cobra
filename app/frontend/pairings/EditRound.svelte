@@ -6,6 +6,7 @@
   import GlobalMessages from "../widgets/GlobalMessages.svelte";
   import Pairing from "./Pairing.svelte";
   import { deletePairing } from "./PairingsData";
+  import { reportScore, type ScoreReport } from "./SelfReport";
 
   let {
     tournamentId,
@@ -69,6 +70,15 @@
 
     data = await loadRound(tournamentId, roundId);
   }
+
+  async function reportScoreCallback(pairingId: number, report: ScoreReport) {
+    const success = await reportScore(tournamentId, roundId, pairingId, report);
+    if (!success) {
+      return;
+    }
+
+    data = await loadRound(tournamentId, roundId);
+  }
 </script>
 
 <GlobalMessages />
@@ -121,14 +131,15 @@
     </p>
 
     <!-- Pairings -->
-    {#each data.round.pairings as pairing (pairing.id)}
+    {#each data.round.pairings as pairing, index (pairing.id)}
       <hr />
       <Pairing
         tournament={data.tournament}
-        {pairing}
+        bind:pairing={data.round.pairings[index]}
         round={data.round}
         stage={data.stage}
         deleteCallback={deletePairingCallback}
+        {reportScoreCallback}
       />
     {/each}
     <hr />

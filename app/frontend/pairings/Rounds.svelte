@@ -13,6 +13,7 @@
   import ModalDialog from "../widgets/ModalDialog.svelte";
   import { showReportedPairings } from "../utils/ShowReportedPairings";
   import { redirectRequest } from "../utils/network";
+  import { reportScore, type ScoreReport } from "./SelfReport";
 
   let { tournamentId }: { tournamentId: number } = $props();
 
@@ -90,6 +91,19 @@
     }
 
     const success = await deletePairing(tournamentId, roundId, pairingId);
+    if (!success) {
+      return;
+    }
+
+    data = await loadPairings(tournamentId);
+  }
+
+  async function reportScoreCallback(
+    roundId: number,
+    pairingId: number,
+    report: ScoreReport,
+  ) {
+    const success = await reportScore(tournamentId, roundId, pairingId, report);
     if (!success) {
       return;
     }
@@ -230,11 +244,12 @@
     <div class="mt-3">
       {#each data.stages as stage, index (stage.format)}
         <Stage
-          {stage}
+          bind:stage={data.stages[index]}
           startExpanded={index === data.stages.length - 1}
           tournament={data.tournament}
           tournamentPolicies={data.policy}
           {deletePairingCallback}
+          {reportScoreCallback}
         />
       {/each}
     </div>

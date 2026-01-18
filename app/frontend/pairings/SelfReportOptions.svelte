@@ -1,17 +1,17 @@
 <script lang="ts">
-  import { type Pairing, Player, type Round, type Stage } from "./PairingsData";
+  import { type Pairing, Player, type Stage } from "./PairingsData";
   import { type ScoreReport, scorePresets, selfReport } from "./SelfReport";
   import ModalDialog from "../widgets/ModalDialog.svelte";
 
   let {
     tournamentId,
     stage,
-    round,
+    roundId,
     pairing,
   }: {
     tournamentId: number;
     stage: Stage;
-    round: Round;
+    roundId: number;
     pairing: Pairing;
   } = $props();
 
@@ -46,7 +46,7 @@
 
     const response = await selfReport(
       tournamentId,
-      round.id,
+      roundId,
       pairing.id,
       report,
     );
@@ -59,7 +59,7 @@
   }
 
   async function onCustomSelfReportSubmit(score1: number, score2: number) {
-    const response = await selfReport(tournamentId, round.id, pairing.id, {
+    const response = await selfReport(tournamentId, roundId, pairing.id, {
       score1,
       score2,
       intentional_draw: false,

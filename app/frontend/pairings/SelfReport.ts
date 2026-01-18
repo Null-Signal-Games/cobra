@@ -9,6 +9,33 @@ declare const Routes: {
   ) => string;
 };
 
+export async function reportScore(
+  tournamentId: number,
+  roundId: number,
+  pairingId: number,
+  data: ScoreReport,
+): Promise<boolean> {
+  // Remove UI-specific data to prevent parameter errors on the server
+  const cleanData = { ...data };
+  delete cleanData.label;
+  delete cleanData.extra_self_report_label;
+
+  const response = await fetch(
+    `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({ pairing: cleanData }),
+    },
+  );
+
+  return response.status === 200;
+}
+
 export async function selfReport(
   tournamentId: number,
   roundId: number,

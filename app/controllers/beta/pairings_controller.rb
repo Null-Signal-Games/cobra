@@ -26,7 +26,7 @@ module Beta
 
       save_report
 
-      render json: { url: beta_tournament_rounds_path(@tournament) }, status: :ok
+      head :ok
     end
 
     def reset_self_report

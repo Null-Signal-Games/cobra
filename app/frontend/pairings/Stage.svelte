@@ -9,19 +9,26 @@
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import { redirectRequest } from "../utils/network";
   import { getContext } from "svelte";
+  import type { ScoreReport } from "./SelfReport";
 
   let {
     tournament,
-    stage,
+    stage = $bindable(),
     startExpanded,
     tournamentPolicies,
     deletePairingCallback,
+    reportScoreCallback,
   }: {
     tournament: Tournament;
     stage: Stage;
     startExpanded: boolean;
     tournamentPolicies?: TournamentPolicies;
     deletePairingCallback?: (roundId: number, pairingId: number) => void;
+    reportScoreCallback?: (
+      roundId: number,
+      pairingId: number,
+      report: ScoreReport,
+    ) => void;
   } = $props();
 
   const pairingsContext: PairingsContext = getContext("pairingsContext");
@@ -74,19 +81,21 @@
     </div>
     <Round
       {tournament}
-      round={stage.rounds[stage.rounds.length - 1]}
+      bind:round={stage.rounds[stage.rounds.length - 1]}
       {stage}
       {startExpanded}
       {deletePairingCallback}
+      {reportScoreCallback}
     />
   {:else}
-    {#each stage.rounds.filter((r) => r.id) as round, index (round.id)}
+    {#each stage.rounds as round, index (round.id)}
       <Round
         {tournament}
-        {round}
+        bind:round={stage.rounds[index]}
         {stage}
         startExpanded={startExpanded && index === stage.rounds.length - 1}
         {deletePairingCallback}
+        {reportScoreCallback}
       />
     {/each}
   {/if}

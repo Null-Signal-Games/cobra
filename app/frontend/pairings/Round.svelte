@@ -11,19 +11,26 @@
   import { showReportedPairings } from "../utils/ShowReportedPairings";
   import RoundTimerControls from "./RoundTimerControls.svelte";
   import { getContext } from "svelte";
+  import type { ScoreReport } from "./SelfReport";
 
   let {
     tournament,
     stage,
-    round,
+    round = $bindable(),
     startExpanded,
     deletePairingCallback,
+    reportScoreCallback,
   }: {
     tournament: Tournament;
     stage: Stage;
     round: Round;
     startExpanded: boolean;
     deletePairingCallback?: (roundId: number, pairingId: number) => void;
+    reportScoreCallback?: (
+      roundId: number,
+      pairingId: number,
+      report: ScoreReport,
+    ) => void;
   } = $props();
 
   const pairingsContext: PairingsContext = getContext("pairingsContext");
@@ -101,18 +108,21 @@
       {/if}
 
       <!-- Pairings -->
-      {#each round.pairings as pairing (pairing.id)}
+      {#each round.pairings as pairing, index (pairing.id)}
         {#if $showReportedPairings || !pairing.reported}
           {#if pairingsContext.showOrganizerView}
             <hr />
           {/if}
           <Pairing
             {tournament}
-            {pairing}
+            bind:pairing={round.pairings[index]}
             {round}
             {stage}
             deleteCallback={(pairingId: number) => {
               deletePairingCallback?.(round.id, pairingId);
+            }}
+            reportScoreCallback={(pairingId: number, report: ScoreReport) => {
+              reportScoreCallback?.(round.id, pairingId, report);
             }}
           />
         {/if}
