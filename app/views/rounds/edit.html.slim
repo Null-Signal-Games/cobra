@@ -1,6 +1,6 @@
 .col-12
   h2= "Round #{@round.number}: Advanced Settings"
-  => link_to tournament_round_path(@tournament, @round), class: 'btn btn-primary' do
+  => link_to correct_beta_path(tournament_round_path(@tournament, @round)), class: 'btn btn-primary' do
     => fa_icon 'arrow-left'
     | Back to round
 .col-12.mt-3

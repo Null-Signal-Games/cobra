@@ -22,11 +22,11 @@ html
           ul.navbar-nav.ml-auto
             - if Flipper.enabled?(:beta_testing, current_user)
               - if cookies[:beta_enabled] == "true"
-                li.nav-item.nav-link.text-light = link_to beta_set_beta_path(beta_enabled: false), method: :post
+                li.nav-item.nav-link.text-light = link_to beta_set_beta_path(beta_enabled: false, redirect: CGI.escape(request.path)), method: :post
                   => fa_icon 'flask'
                   | Switch to Classic
               - else
-                li.nav-item.nav-link.text-light = link_to beta_set_beta_path(beta_enabled: true), method: :post
+                li.nav-item.nav-link.text-light = link_to beta_set_beta_path(beta_enabled: true, redirect: CGI.escape(request.path)), method: :post
                   => fa_icon 'flask'
                   | Switch to Beta
             li.nav-item= link_to help_path, class: 'nav-link text-light' do

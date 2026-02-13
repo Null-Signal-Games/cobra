@@ -119,7 +119,7 @@
 
       <!-- Pairings -->
       {#each round.pairings as pairing (pairing.id)}
-        {#if $showReportedPairings || !pairing.reported}
+        {#if !pairingsContext.showOrganizerView || $showReportedPairings || !pairing.reported}
           {#if pairingsContext.showOrganizerView}
             <hr />
           {/if}

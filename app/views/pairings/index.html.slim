@@ -1,7 +1,7 @@
 ruby:
   @decks_visible = @round.stage.decks_visible_to(current_user)
 .col-12
-  p.dontprint= link_to 'javascript:history.back()', class: 'btn btn-primary' do
+  p.dontprint= link_to correct_beta_path(tournament_rounds_path(@tournament)), class: 'btn btn-primary' do
     => fa_icon 'arrow-left'
     | Back to pairings
 

@@ -8,7 +8,9 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorised
   rescue_from ActiveRecord::RecordNotFound, with: :error
 
-  helper_method :current_user, :user_signed_in?
+  helper_method :current_user, :user_signed_in?, :correct_beta_path
+
+  BETA_PATHS = [%r{^/tournaments/[0-9]+/rounds$}, %r{^/tournaments/[0-1]+/rounds/[0-9]+$}].freeze
 
   def current_user
     @current_user ||= load_current_user
@@ -51,5 +53,18 @@ class ApplicationController < ActionController::Base
     return nil unless id
 
     User.find_by(id:)
+  end
+
+  def correct_beta_path(path)
+    return '/' if path.blank?
+
+    new_path = path
+    if cookies[:beta_enabled] == 'false'
+      new_path.delete_prefix!('/beta')
+    elsif !new_path.start_with?('/beta') && BETA_PATHS.any? { |r| new_path =~ r }
+      new_path.prepend('/beta')
+    end
+
+    new_path
   end
 end

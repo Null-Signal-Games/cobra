@@ -1,6 +1,6 @@
 .col-12.players
   p
-    = link_to meeting_tournament_players_path(@tournament), class: 'btn btn-primary' do
+    = link_to meeting_tournament_players_path(@tournament, back_to: 'players'), class: 'btn btn-primary' do
       => fa_icon 'list'
       | Player meeting
 

@@ -217,7 +217,7 @@
     <div>
       {#if data.tournament.player_meeting}
         <a
-          href="/tournaments/{tournamentId}/players/meeting"
+          href={`/tournaments/${tournamentId}/players/meeting?back_to=${ctx.showOrganizerView ? "pairings" : "view_pairings"}`}
           class="btn btn-primary"
         >
           <FontAwesomeIcon icon="list-ul" /> Player meeting
@@ -265,7 +265,7 @@
           </button>
         {/if}
 
-        {#if !$showReportedPairings}
+        {#if ctx.showOrganizerView && !$showReportedPairings}
           <div class="alert alert-info mt-3">
             Reported scores are currently hidden on this page. This will not
             affect other users viewing this page.

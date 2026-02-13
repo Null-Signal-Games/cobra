@@ -1,5 +1,5 @@
 .dontprint.col-12.mb-3
-  => link_to 'javascript:history.back()', class: 'btn btn-primary' do
+  => link_to correct_beta_path(tournament_rounds_path(@tournament)), class: 'btn btn-primary' do
     => fa_icon 'arrow-left'
     | Back to pairings
   - if params[:collate]
