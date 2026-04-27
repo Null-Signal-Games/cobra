@@ -16,6 +16,9 @@
   p= link_to save_json_tournament_path(@tournament), class: 'btn btn-success', target: '_blank' do |f|
     => fa_icon 'arrow-circle-down'
     | Download as JSON
+  p= button_to cut_tournament_path(@tournament, number: 2, elimination_type: 'single'), method: :post, class: 'btn btn-success' do
+    => fa_icon 'scissors'
+    | Single-Elimination Top 2
   p= button_to cut_tournament_path(@tournament, number: 3, elimination_type: 'single'), method: :post, class: 'btn btn-success' do
     => fa_icon 'scissors'
     | Single-Elimination Top 3

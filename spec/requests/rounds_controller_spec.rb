@@ -146,7 +146,7 @@ RSpec.describe RoundsController do
     describe 'during cut before any results' do
       before do
         Pairer.new(tournament.new_round!, Random.new(0)).pair!
-        tournament.cut_to!(:double_elim, 3)
+        tournament.cut_to!(:single_elim, 3)
         Pairer.new(tournament.new_round!, Random.new(0)).pair!
       end
 
@@ -274,7 +274,7 @@ RSpec.describe RoundsController do
                                'score2' => nil,
                                'score_label' => ' - ', 'two_for_one' => false,
                                'table_label' => 'Game 1', 'table_number' => 1, 'self_reports' => nil,
-                               'round' => 1, 'winner_game' => 2, 'loser_game' => nil, 'bracket_type' => 'upper' }
+                               'round' => 1, 'bracket_type' => 'upper', 'winner_game' => 2, 'loser_game' => nil }
                            ],
                            'pairings_reported' => 0,
                            'length_minutes' => 40,
@@ -283,8 +283,13 @@ RSpec.describe RoundsController do
                          {
                            'number' => 2,
                            'pairings' => [
-                             { 'table_number' => 2, 'round' => 2, 'winner_game' => nil, 'loser_game' => nil,
-                               'bracket_type' => 'upper' }
+                             {
+                               'table_number' => 2,
+                               'round' => 2,
+                               'bracket_type' => 'upper',
+                               'winner_game' => nil,
+                               'loser_game' => nil
+                             }
                            ]
                          }
                        ]
@@ -506,8 +511,8 @@ RSpec.describe RoundsController do
 
   def cut_stage_with_rounds(rounds)
     {
-      'name' => 'Double Elim',
-      'format' => 'double_elim',
+      'name' => 'Single Elim',
+      'format' => 'single_elim',
       'is_single_sided' => true,
       'is_elimination' => true,
       'rounds' => rounds,

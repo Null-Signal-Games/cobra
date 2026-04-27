@@ -454,7 +454,7 @@ RSpec.describe PlayersController do
           pairing.update!(score1: 6, score2: 0)
         end
         round.update!(completed: true)
-        tournament.cut_to!(:double_elim, 3)
+        tournament.cut_to!(:single_elim, 3)
         Pairer.new(tournament.new_round!, Random.new(0)).pair!
       end
 
@@ -467,7 +467,7 @@ RSpec.describe PlayersController do
             'is_player_meeting' => false,
             'manual_seed' => false,
             'stages' => [
-              { 'format' => 'double_elim',
+              { 'format' => 'single_elim',
                 'any_decks_viewable' => false,
                 'rounds_complete' => 0,
                 'standings' => [
@@ -499,7 +499,7 @@ RSpec.describe PlayersController do
           pairing.update!(score1: 6, score2: 0)
         end
         swiss_round.update!(completed: true)
-        tournament.cut_to!(:double_elim, 3)
+        tournament.cut_to!(:single_elim, 3)
         Pairer.new(tournament.new_round!, Random.new(0)).pair!
         cut_round = tournament.current_stage.rounds.last
         cut_round.pairings.each do |pairing|
@@ -517,7 +517,7 @@ RSpec.describe PlayersController do
             'is_player_meeting' => false,
             'manual_seed' => false,
             'stages' => [
-              { 'format' => 'double_elim',
+              { 'format' => 'single_elim',
                 'any_decks_viewable' => false,
                 'rounds_complete' => 1,
                 'standings' => [

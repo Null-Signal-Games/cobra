@@ -103,7 +103,8 @@ module Beta
 
       number = params[:number].to_i
       format = params[:elimination_type] == 'single' ? :single_elim : :double_elim
-      return redirect_to standings_tournament_players_path(@tournament) unless [3, 4, 8, 16].include? number
+      return redirect_to standings_tournament_players_path(@tournament) unless
+        Bracket::Factory.valid_bracket?(number, single_elim: format == :single_elim)
 
       @tournament.cut_to!(format, number)
 
