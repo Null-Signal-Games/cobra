@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'deck visibility' do
+RSpec.describe 'deck visibility', type: :feature do
   let(:tournament) { create(:tournament) }
   let(:unregistered_user) { create(:user) }
 
@@ -28,11 +28,11 @@ RSpec.describe 'deck visibility' do
   describe 'view decks of players' do
     describe 'private lists' do
       it 'does not show decks of your opponent' do
-        expect(jill.decks_visible_to(jack.user)).to be(false)
+        expect(jill.decks_visible_to?(jack.user)).to be(false)
       end
 
       it 'does not show your own deck as visible' do
-        expect(jack.decks_visible_to(jack.user)).to be(false)
+        expect(jack.decks_visible_to?(jack.user)).to be(false)
       end
     end
 
@@ -40,31 +40,31 @@ RSpec.describe 'deck visibility' do
       before { tournament.update(cut_deck_visibility: :cut_decks_open) }
 
       it 'shows decks of your opponent' do
-        expect(jill.decks_visible_to(jack.user)).to be(true)
+        expect(jill.decks_visible_to?(jack.user)).to be(true)
       end
 
       it 'shows decks of a player in another cut pairing' do
-        expect(jill.decks_visible_to(alice.user)).to be(true)
+        expect(jill.decks_visible_to?(alice.user)).to be(true)
       end
 
       it 'shows your own deck is visible' do
-        expect(jack.decks_visible_to(jack.user)).to be(true)
+        expect(jack.decks_visible_to?(jack.user)).to be(true)
       end
 
       it 'shows decks of a cut player to the TO' do
-        expect(jack.decks_visible_to(tournament.user)).to be(true)
+        expect(jack.decks_visible_to?(tournament.user)).to be(true)
       end
 
       it 'does not show decks to a player not in the cut' do
-        expect(jill.decks_visible_to(bubble_boy.user)).to be(false)
+        expect(jill.decks_visible_to?(bubble_boy.user)).to be(false)
       end
 
       it 'does not show decks of a player not in the cut' do
-        expect(bubble_boy.decks_visible_to(jill.user)).to be(false)
+        expect(bubble_boy.decks_visible_to?(jill.user)).to be(false)
       end
 
       it 'does not show decks to the TO when player is not in the cut' do
-        expect(bubble_boy.decks_visible_to(tournament.user)).to be(false)
+        expect(bubble_boy.decks_visible_to?(tournament.user)).to be(false)
       end
     end
 
@@ -72,35 +72,35 @@ RSpec.describe 'deck visibility' do
       before { tournament.update(cut_deck_visibility: :cut_decks_public) }
 
       it 'shows decks of your opponent' do
-        expect(jill.decks_visible_to(jack.user)).to be(true)
+        expect(jill.decks_visible_to?(jack.user)).to be(true)
       end
 
       it 'shows decks of a player in another cut pairing' do
-        expect(jill.decks_visible_to(alice.user)).to be(true)
+        expect(jill.decks_visible_to?(alice.user)).to be(true)
       end
 
       it 'shows your own deck is visible' do
-        expect(jack.decks_visible_to(jack.user)).to be(true)
+        expect(jack.decks_visible_to?(jack.user)).to be(true)
       end
 
       it 'shows decks of a cut player to the TO' do
-        expect(jack.decks_visible_to(tournament.user)).to be(true)
+        expect(jack.decks_visible_to?(tournament.user)).to be(true)
       end
 
       it 'shows decks to a player not in the cut' do
-        expect(jill.decks_visible_to(bubble_boy.user)).to be(true)
+        expect(jill.decks_visible_to?(bubble_boy.user)).to be(true)
       end
 
       it 'shows decks to an unauthenticated user' do
-        expect(jill.decks_visible_to(nil)).to be(true)
+        expect(jill.decks_visible_to?(nil)).to be(true)
       end
 
       it 'does not show decks of a player not in the cut' do
-        expect(bubble_boy.decks_visible_to(jill.user)).to be(false)
+        expect(bubble_boy.decks_visible_to?(jill.user)).to be(false)
       end
 
       it 'does not show decks of a player not in the cut to the TO' do
-        expect(bubble_boy.decks_visible_to(tournament.user)).to be(false)
+        expect(bubble_boy.decks_visible_to?(tournament.user)).to be(false)
       end
     end
 
@@ -108,16 +108,16 @@ RSpec.describe 'deck visibility' do
       before { tournament.update(swiss_deck_visibility: :swiss_decks_open) }
 
       it 'shows decks of a player in swiss to another player in swiss' do
-        expect(jack.decks_visible_to(alice.user)).to be(true)
+        expect(jack.decks_visible_to?(alice.user)).to be(true)
       end
 
       it 'does not show decks of a player in swiss to an unauthenticated user' do
-        expect(jack.decks_visible_to(nil)).to be(false)
+        expect(jack.decks_visible_to?(nil)).to be(false)
       end
 
       it 'shows decks of a player in single sided swiss to another player in swiss' do
         swiss.update(format: :single_sided_swiss)
-        expect(jack.decks_visible_to(alice.user)).to be(true)
+        expect(jack.decks_visible_to?(alice.user)).to be(true)
       end
     end
 
@@ -125,16 +125,16 @@ RSpec.describe 'deck visibility' do
       before { tournament.update(swiss_deck_visibility: :swiss_decks_public) }
 
       it 'shows decks of a player in swiss to another player in swiss' do
-        expect(jack.decks_visible_to(alice.user)).to be(true)
+        expect(jack.decks_visible_to?(alice.user)).to be(true)
       end
 
       it 'shows decks of a player in swiss to an unauthenticated user' do
-        expect(jack.decks_visible_to(nil)).to be(true)
+        expect(jack.decks_visible_to?(nil)).to be(true)
       end
 
       it 'shows decks of a player in single sided swiss to another player in swiss' do
         swiss.update(format: :single_sided_swiss)
-        expect(jack.decks_visible_to(alice.user)).to be(true)
+        expect(jack.decks_visible_to?(alice.user)).to be(true)
       end
     end
   end
@@ -148,27 +148,27 @@ RSpec.describe 'deck visibility' do
 
     describe 'private lists' do
       it 'does not let you see decks in your pairing' do
-        expect(pairing.decks_visible_to(jack.user)).to be(false)
+        expect(pairing.decks_visible_to?(jack.user)).to be(false)
       end
 
       it 'does not let you see decks in a pairing of other players' do
-        expect(pairing.decks_visible_to(alice.user)).to be(false)
+        expect(pairing.decks_visible_to?(alice.user)).to be(false)
       end
 
       it 'does not let you see decks when not in cut' do
-        expect(pairing.decks_visible_to(bubble_boy.user)).to be(false)
+        expect(pairing.decks_visible_to?(bubble_boy.user)).to be(false)
       end
 
       it 'does not let you see decks when unregistered' do
-        expect(pairing.decks_visible_to(unregistered_user)).to be(false)
+        expect(pairing.decks_visible_to?(unregistered_user)).to be(false)
       end
 
       it 'does not let you see decks when unauthenticated' do
-        expect(pairing.decks_visible_to(nil)).to be(false)
+        expect(pairing.decks_visible_to?(nil)).to be(false)
       end
 
       it 'forces the TO to use the players tab to see decks' do
-        expect(pairing.decks_visible_to(tournament.user)).to be(false)
+        expect(pairing.decks_visible_to?(tournament.user)).to be(false)
       end
     end
 
@@ -176,27 +176,27 @@ RSpec.describe 'deck visibility' do
       before { tournament.update(cut_deck_visibility: :cut_decks_open) }
 
       it 'allows you to see decks in your pairing' do
-        expect(pairing.decks_visible_to(jack.user)).to be(true)
+        expect(pairing.decks_visible_to?(jack.user)).to be(true)
       end
 
       it 'allows you to see decks in a pairing of other players' do
-        expect(pairing.decks_visible_to(alice.user)).to be(true)
+        expect(pairing.decks_visible_to?(alice.user)).to be(true)
       end
 
       it 'does not let you see decks when not in cut' do
-        expect(pairing.decks_visible_to(bubble_boy.user)).to be(false)
+        expect(pairing.decks_visible_to?(bubble_boy.user)).to be(false)
       end
 
       it 'does not let you see decks when unregistered' do
-        expect(pairing.decks_visible_to(unregistered_user)).to be(false)
+        expect(pairing.decks_visible_to?(unregistered_user)).to be(false)
       end
 
       it 'does not let you see decks when unauthenticated' do
-        expect(pairing.decks_visible_to(nil)).to be(false)
+        expect(pairing.decks_visible_to?(nil)).to be(false)
       end
 
       it 'allows the TO to see decks' do
-        expect(pairing.decks_visible_to(tournament.user)).to be(true)
+        expect(pairing.decks_visible_to?(tournament.user)).to be(true)
       end
     end
 
@@ -204,27 +204,27 @@ RSpec.describe 'deck visibility' do
       before { tournament.update(cut_deck_visibility: :cut_decks_public) }
 
       it 'allows you to see decks in your pairing' do
-        expect(pairing.decks_visible_to(jack.user)).to be(true)
+        expect(pairing.decks_visible_to?(jack.user)).to be(true)
       end
 
       it 'allows you to see decks in a pairing of other players' do
-        expect(pairing.decks_visible_to(alice.user)).to be(true)
+        expect(pairing.decks_visible_to?(alice.user)).to be(true)
       end
 
       it 'allows you to see decks when not in cut' do
-        expect(pairing.decks_visible_to(bubble_boy.user)).to be(true)
+        expect(pairing.decks_visible_to?(bubble_boy.user)).to be(true)
       end
 
       it 'allows you to see decks when unregistered' do
-        expect(pairing.decks_visible_to(unregistered_user)).to be(true)
+        expect(pairing.decks_visible_to?(unregistered_user)).to be(true)
       end
 
       it 'allows you to see decks when unauthenticated' do
-        expect(pairing.decks_visible_to(nil)).to be(true)
+        expect(pairing.decks_visible_to?(nil)).to be(true)
       end
 
       it 'allows the TO to see decks' do
-        expect(pairing.decks_visible_to(tournament.user)).to be(true)
+        expect(pairing.decks_visible_to?(tournament.user)).to be(true)
       end
     end
   end
@@ -240,13 +240,13 @@ RSpec.describe 'deck visibility' do
       before { tournament.update(cut_deck_visibility: :cut_decks_public) }
 
       it 'does not let you see decks in your pairing' do
-        expect(pairing.decks_visible_to(jack.user)).to be(false)
+        expect(pairing.decks_visible_to?(jack.user)).to be(false)
       end
     end
 
     describe 'open list swiss' do
       it 'does not show decks for a pairing as 4 decks is too many for one screen' do
-        expect(pairing.decks_visible_to(jack.user)).to be(false)
+        expect(pairing.decks_visible_to?(jack.user)).to be(false)
       end
     end
   end
@@ -262,7 +262,7 @@ RSpec.describe 'deck visibility' do
       before { tournament.update(cut_deck_visibility: :cut_decks_public) }
 
       it 'does not show decks as they have not been set for the pairing' do
-        expect(pairing.decks_visible_to(jack.user)).to be(false)
+        expect(pairing.decks_visible_to?(jack.user)).to be(false)
       end
     end
   end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PairingsHelper
+module PairingsHelper # rubocop:disable Metrics/ModuleLength,Style/Documentation
   def pairing_player_select(form, label, round)
     form.input label,
                collection: round.unpaired_players,
@@ -32,7 +32,7 @@ module PairingsHelper
   end
 
   def side_value(player, side, pairing)
-    return unless player_is_in_pairing(player, pairing)
+    return unless player_is_in_pairing?(player, pairing)
 
     %i[player1_is_corp player1_is_runner].tap do |options|
       options.reverse! if (side == :runner) ^ (pairing.player2_id == player.id)
@@ -40,7 +40,7 @@ module PairingsHelper
   end
 
   def set_side_button(player, side, pairing)
-    return unless player_is_in_pairing(player, pairing)
+    return unless player_is_in_pairing?(player, pairing)
 
     value = side_value(player, side, pairing)
     active = (pairing.side.try(:to_sym) == value)
@@ -125,12 +125,12 @@ module PairingsHelper
   end
 
   def side_label_for(pairing, player)
-    return nil unless pairing.side && player_is_in_pairing(player, pairing)
+    return nil unless pairing.side && player_is_in_pairing?(player, pairing)
 
     "(#{pairing.side_for(player).to_s.titleize})"
   end
 
-  def player_is_in_pairing(player, pairing)
+  def player_is_in_pairing?(player, pairing)
     pairing.player1_id == player.id || pairing.player2_id == player.id
   end
 

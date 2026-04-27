@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Beta
-  class TournamentsController < ApplicationController
+  class TournamentsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
     before_action :set_tournament, only: %i[
       show update open_registration close_registration lock_player_registrations unlock_player_registrations
       cut stats id_and_faction_data cut_conversion_rates
@@ -25,9 +25,7 @@ module Beta
         if !first_stage.nil? &&
            ((params[:swiss_format] == 'single_sided' && first_stage.swiss?) ||
            (params[:swiss_format] == 'double_sided' && first_stage.single_sided_swiss?))
-          if !@tournament.rounds.empty?
-            error = "Can't change Swiss format when rounds exist."
-          else
+          if @tournament.rounds.empty?
             case params[:swiss_format] # rubocop:disable Metrics/BlockNesting
             when 'single_sided'
               first_stage.single_sided_swiss!
@@ -35,6 +33,8 @@ module Beta
               first_stage.swiss!
             end
             first_stage.save
+          else
+            error = "Can't change Swiss format when rounds exist."
           end
         end
       end

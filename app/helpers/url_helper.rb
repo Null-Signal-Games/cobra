@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module UrlHelper
+module UrlHelper # rubocop:disable Style/Documentation
   def tournament_url(slug, request)
     server = "#{request.protocol}#{request.host}"
     server += ":#{request.port}" if !request.port.nil? && (request.port != 80) && (request.port != 443)

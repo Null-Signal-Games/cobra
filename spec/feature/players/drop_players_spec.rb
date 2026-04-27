@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'dropping players' do
+RSpec.describe 'dropping players', type: :feature do
   let(:tournament) { create(:tournament) }
   let!(:player) { create(:player, tournament:, active: true) }
 

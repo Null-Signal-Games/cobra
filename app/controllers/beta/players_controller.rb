@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Beta
-  class PlayersController < ApplicationController
+  class PlayersController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
     before_action :set_tournament
     before_action :set_player, only: %i[update destroy lock_registration unlock_registration drop reinstate]
 
@@ -48,7 +48,7 @@ module Beta
       player = @tournament.players.create(params.except(:corp_deck, :runner_deck))
       @tournament.current_stage.players << player unless @tournament.current_stage.nil?
       @tournament.update(any_player_unlocked: true,
-                         all_players_unlocked: @tournament.locked_players.count.zero?)
+                         all_players_unlocked: @tournament.locked_players.none?)
 
       render json: { player: helpers.player_json(player) }
     end
@@ -72,8 +72,8 @@ module Beta
       authorize @tournament, :update?
 
       @player.destroy
-      @tournament.update(any_player_unlocked: @tournament.unlocked_players.count.positive?,
-                         all_players_unlocked: @tournament.locked_players.count.zero?)
+      @tournament.update(any_player_unlocked: @tournament.unlocked_players.any?,
+                         all_players_unlocked: @tournament.locked_players.none?)
 
       head :ok
     end
@@ -91,7 +91,7 @@ module Beta
 
       @player.update(registration_locked: true)
       @tournament.update(all_players_unlocked: false,
-                         any_player_unlocked: @tournament.unlocked_players.count.positive?)
+                         any_player_unlocked: @tournament.unlocked_players.any?)
 
       head :ok
     end
@@ -101,7 +101,7 @@ module Beta
 
       @player.update(registration_locked: false)
       @tournament.update(any_player_unlocked: true,
-                         all_players_unlocked: @tournament.locked_players.count.zero?)
+                         all_players_unlocked: @tournament.locked_players.none?)
 
       head :ok
     end

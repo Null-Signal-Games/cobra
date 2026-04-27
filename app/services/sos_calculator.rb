@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SosCalculator
+class SosCalculator # rubocop:disable Style/Documentation
   def self.calculate!(stage)
     players = stage.players.includes(:tournament).index_by(&:id)
 

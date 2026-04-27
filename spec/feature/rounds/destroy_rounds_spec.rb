@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Destroying rounds' do
+RSpec.describe 'Destroying rounds', type: :feature do
   let(:round) { create(:round) }
 
   before do

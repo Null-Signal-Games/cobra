@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Nrdb
-  class Connection
+  class Connection # rubocop:disable Style/Documentation
     def initialize(user = nil, access_token = nil)
       @user = user
       @access_token = access_token || user.try(:nrdb_access_token)

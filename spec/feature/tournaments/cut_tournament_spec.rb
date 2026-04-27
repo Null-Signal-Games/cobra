@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'cutting tournament' do
+RSpec.describe 'cutting tournament', type: :feature do
   let(:tournament) do
     create(:tournament, player_count: 10)
   end
@@ -12,7 +12,7 @@ RSpec.describe 'cutting tournament' do
       end
 
       it 'does not display link' do
-        expect(page).not_to have_content('Cut to Top')
+        expect(page).to have_no_content('Cut to Top')
       end
     end
   end

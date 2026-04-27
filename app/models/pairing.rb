@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Pairing < ApplicationRecord
+class Pairing < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style/Documentation
   belongs_to :round, touch: true
   belongs_to :player1, class_name: 'Player', optional: true
   belongs_to :player2, class_name: 'Player', optional: true
@@ -11,8 +11,8 @@ class Pairing < ApplicationRecord
 
   scope :non_bye, -> { where('player1_id IS NOT NULL AND player2_id IS NOT NULL') }
   scope :bye, -> { where('player1_id IS NULL OR player2_id IS NULL') }
-  scope :reported, -> { where.not(score1: nil, score2: nil) }
-  scope :completed, -> { joins(:round).where('rounds.completed = ?', true) }
+  scope :reported, -> { where('score1 IS NOT NULL AND score2 IS NOT NULL') }
+  scope :completed, -> { joins(:round).where(rounds: { completed: true }) }
   scope :for_stage, ->(stage) { joins(:round).where(rounds: { stage: }) }
   scope :for_player, ->(player) { where(player1: player).or(where(player2: player)) }
   scope :for_players, lambda { |player1, player2|
@@ -81,10 +81,10 @@ class Pairing < ApplicationRecord
     player1_is_corp? ? :runner : :corp
   end
 
-  def decks_visible_to(user)
+  def decks_visible_to?(user)
     return false if !stage.single_sided? || side.nil?
 
-    stage.decks_visible_to(user)
+    stage.decks_visible_to?(user)
   end
 
   def player1_deck

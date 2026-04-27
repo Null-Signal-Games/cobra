@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ApplicationPolicy
+class ApplicationPolicy # rubocop:disable Style/Documentation
   attr_reader :user, :record
 
   def initialize(user, record)
@@ -13,7 +13,7 @@ class ApplicationPolicy
   end
 
   def show?
-    scope.where(id: record.id).exists?
+    scope.exists?(id: record.id)
   end
 
   def create?
@@ -48,7 +48,7 @@ class ApplicationPolicy
     Pundit.policy_scope!(user, record.class)
   end
 
-  class Scope
+  class Scope # rubocop:disable Style/Documentation
     attr_reader :user, :scope
 
     def initialize(user, scope)

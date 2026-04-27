@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class OauthController < ApplicationController
+class OauthController < ApplicationController # rubocop:disable Style/Documentation
   before_action :skip_authorization
 
   def auth

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'registering for a tournament' do
+RSpec.describe 'registering for a tournament', type: :feature do
   let(:organiser) { create(:user) }
   let(:player) { create(:user) }
   let(:tournament) { create(:tournament, user: organiser, self_registration: true) }

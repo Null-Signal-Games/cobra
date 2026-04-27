@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'showing a round' do
+RSpec.describe 'showing a round', type: :feature do
   let(:round) { create(:round) }
 
   before do

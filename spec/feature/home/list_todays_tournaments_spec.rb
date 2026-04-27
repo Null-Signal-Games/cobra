@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe "list today's tournaments" do
+RSpec.describe "list today's tournaments", type: :feature do
   let!(:today) do
     create(:tournament, date: Date.current.beginning_of_day, name: 'TodayGNK', slug: 'TEST')
   end
@@ -15,14 +15,14 @@ RSpec.describe "list today's tournaments" do
 
   it "only shows today's tournaments" do
     aggregate_failures do
-      expect(page).not_to have_content('YesterdayGNK')
+      expect(page).to have_no_content('YesterdayGNK')
       expect(page).to have_content('TodayGNK')
-      expect(page).not_to have_content('TomorrowGNK')
+      expect(page).to have_no_content('TomorrowGNK')
     end
   end
 
   it 'does not show private tournaments' do
-    expect(page).not_to have_content('PrivateGNK')
+    expect(page).to have_no_content('PrivateGNK')
   end
 
   it 'links to more tournaments' do

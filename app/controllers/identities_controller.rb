@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class IdentitiesController < ApplicationController
+class IdentitiesController < ApplicationController # rubocop:disable Style/Documentation
   include IdentitiesHelper
 
   def index

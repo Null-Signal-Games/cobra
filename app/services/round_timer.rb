@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RoundTimer
+class RoundTimer # rubocop:disable Style/Documentation
   def initialize(round)
     @round = round
   end
@@ -18,7 +18,7 @@ class RoundTimer
   end
 
   def show?
-    round_timer_activations.count.positive? && !completed?
+    round_timer_activations.any? && !completed?
   end
 
   def paused?
@@ -50,14 +50,15 @@ class RoundTimer
   end
 
   def header
-    "in #{@round.name}#{paused? ? ' (paused)' : ''}:"
+    "in #{@round.name}#{' (paused)' if paused?}:"
   end
-
-  private
 
   RunningState = Struct.new(:started, :paused, :finish_time)
   PausedState = Struct.new(:started, :paused, :remaining_seconds)
   NotStartedState = Struct.new(:started, :paused, :length_minutes)
+
+  private
+
   attr_reader :round
 
   delegate :round_timer_activations, :completed?, :length_minutes, to: :round

@@ -2,7 +2,7 @@
 
 # TODO(plural): Add debug level logging to the pairings class to allow dumping details out.
 module PairingStrategies
-  class SingleSidedSwiss < Base
+  class SingleSidedSwiss < Base # rubocop:disable Metrics/ClassLength,Style/Documentation
     CORP = 1
     RUNNER = 2
 

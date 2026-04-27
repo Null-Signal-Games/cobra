@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PairingStrategies
-  class Base
+  class Base # rubocop:disable Style/Documentation
     attr_reader :round, :random
 
     delegate :stage, to: :round

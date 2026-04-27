@@ -17,7 +17,11 @@ RSpec.describe Player do
   describe '#non_bye_pairings' do
     let!(:pairing1) { create(:pairing, player1: player) }
     let!(:pairing2) { create(:pairing, player2: player) }
-    let!(:bye_pairing) { create(:pairing, player1: player, player2: nil) }
+
+    before do
+      # Create a bye pairing.
+      create(:pairing, player1: player, player2: nil)
+    end
 
     it 'only returns non-byes' do
       expect(player.non_bye_pairings).to eq([pairing1, pairing2])
@@ -29,8 +33,11 @@ RSpec.describe Player do
     let(:incomplete) { create(:round, completed: false) }
     let!(:pairing1) { create(:pairing, round: complete, player1: player) }
     let!(:pairing2) { create(:pairing, round: complete, player1: player) }
-    let!(:pairing3) { create(:pairing, round: incomplete, player1: player) }
-    let!(:another) { create(:pairing, round: complete) }
+
+    before do
+      create(:pairing, round: incomplete, player1: player)
+      create(:pairing, round: complete)
+    end
 
     it 'only returns pairings from complete rounds' do
       expect(player.eligible_pairings).to contain_exactly(pairing1, pairing2)
@@ -58,7 +65,10 @@ RSpec.describe Player do
   describe 'opponents' do
     let!(:pairing1) { create(:pairing, player1: player, score1: 6) }
     let!(:pairing2) { create(:pairing, player1: player, score1: 3) }
-    let!(:pairing3) { create(:pairing, player1: player, player2: nil, score1: 6) }
+
+    before do
+      create(:pairing, player1: player, player2: nil, score1: 6)
+    end
 
     describe '#opponents' do
       let(:nil_player) { instance_double(NilPlayer) }

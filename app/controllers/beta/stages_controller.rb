@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Beta
-  class StagesController < ApplicationController
+  class StagesController < ApplicationController # rubocop:disable Style/Documentation
     before_action :set_tournament
     before_action :set_stage, only: %i[destroy]
     before_action :authorize_beta_testing

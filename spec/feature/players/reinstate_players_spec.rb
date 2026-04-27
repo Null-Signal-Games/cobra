@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'reinstating players' do
+RSpec.describe 'reinstating players', type: :feature do
   let(:tournament) { create(:tournament) }
   let!(:player) { create(:player, tournament:, active: false) }
 

@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-class ApplicationController < ActionController::Base
+class ApplicationController < ActionController::Base # rubocop:disable Style/Documentation
   protect_from_forgery with: :exception
 
   include Pundit::Authorization
+
   after_action :verify_authorized
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorised
   rescue_from ActiveRecord::RecordNotFound, with: :error

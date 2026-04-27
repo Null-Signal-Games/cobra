@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Bracket
-  class Base
+  class Base # rubocop:disable Style/Documentation
     include Engine
 
     attr_reader :stage
@@ -14,7 +14,7 @@ module Bracket
       @stage = stage
       @pairings = stage.rounds.select(&:completed?)
                        .map(&:pairings).flatten
-      @seed_by_player = stage.registrations.map { |r| [r.player_id, r.seed] }.to_h
+      @seed_by_player = stage.registrations.to_h { |r| [r.player_id, r.seed] }
     end
 
     def pair(number)

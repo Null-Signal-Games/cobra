@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'reporting scores for pairings' do
+RSpec.describe 'reporting scores for pairings', type: :feature do
   let(:tournament) { create(:tournament) }
   let(:stage) { tournament.current_stage }
   let(:round) { create(:round, tournament:, stage:) }
@@ -177,7 +177,7 @@ RSpec.describe 'reporting scores for pairings' do
     end
 
     it 'stores score' do
-      all(:link, '...')[0].click
+      first(:link, '...').click
       fill_in :pairing_score1, with: '3'
       fill_in :pairing_score2, with: '0'
       click_button 'Save'
@@ -239,7 +239,7 @@ RSpec.describe 'reporting scores for pairings' do
     end
 
     it 'sets side scores appropriately' do
-      all(:link, '...')[0].click
+      first(:link, '...').click
       fill_in :pairing_score1, with: '3'
       fill_in :pairing_score2, with: '0'
       click_button 'Save'
@@ -302,7 +302,7 @@ RSpec.describe 'reporting scores for pairings' do
     end
 
     it 'sets side scores appropriately' do
-      all(:link, '...')[0].click
+      first(:link, '...').click
       fill_in :pairing_score1, with: '3'
       fill_in :pairing_score2, with: '0'
       click_button 'Save'

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'listing rounds' do
+RSpec.describe 'listing rounds', type: :feature do
   let(:tournament) { create(:tournament) }
   let(:stage) { create(:stage, tournament:) }
 
@@ -28,13 +28,18 @@ RSpec.describe 'listing rounds' do
 
       visit tournament_rounds_path(tournament)
 
-      expect(page).not_to have_content('There are not enough tables to cover all players')
+      # Positive assertion before negative assertion to avoid false positives on the negative.
+      expect(page).to have_content('Cobra')
+      expect(page).to have_no_content('There are not enough tables to cover all players')
     end
   end
 
   context 'with multiple rounds' do
     let!(:round1) { create(:round, tournament:, stage: tournament.current_stage, number: 1) }
-    let!(:round2) { create(:round, tournament:, stage: tournament.current_stage, number: 2) }
+
+    before do
+      create(:round, tournament:, stage: tournament.current_stage, number: 2)
+    end
 
     it 'lists all rounds' do
       visit tournament_rounds_path(tournament)
@@ -58,7 +63,7 @@ RSpec.describe 'listing rounds' do
         aggregate_failures do
           expect(page).to have_content('Round 1')
           expect(page).to have_content('Round 2')
-          expect(page).not_to have_content('only the most recent round')
+          expect(page).to have_no_content('only the most recent round')
         end
       end
 
@@ -85,7 +90,8 @@ RSpec.describe 'listing rounds' do
 
         visit tournament_rounds_path(tournament)
 
-        expect(page).not_to have_content('There are not enough tables to cover all players')
+        expect(page).to have_content('Cobra')
+        expect(page).to have_no_content('There are not enough tables to cover all players')
       end
     end
   end

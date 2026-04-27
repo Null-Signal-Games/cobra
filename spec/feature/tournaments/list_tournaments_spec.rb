@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'listing tournaments' do
+RSpec.describe 'listing tournaments', type: :feature do
   before do
     create(:tournament, name: 'Some Tournament')
     create(:tournament, name: 'Private Tournament', private: true)
@@ -12,6 +12,6 @@ RSpec.describe 'listing tournaments' do
   end
 
   it 'does not show private tournaments' do
-    expect(page).not_to have_content('Private Tournament')
+    expect(page).to have_no_content('Private Tournament')
   end
 end

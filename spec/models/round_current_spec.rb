@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'round.current?' do
+RSpec.describe 'round.current?', type: :feature do
   let(:tournament) { create(:tournament, player_count: 4) }
 
   context 'round is in swiss' do

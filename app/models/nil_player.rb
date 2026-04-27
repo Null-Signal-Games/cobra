@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class NilPlayer
+class NilPlayer # rubocop:disable Style/Documentation
   def to_partial_path
     'players/player'
   end

@@ -1,14 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Completing rounds' do
+RSpec.describe 'Completing rounds', type: :feature do
   let(:tournament) { create(:tournament) }
   let(:stage) { create(:stage, tournament:) }
   let(:round) { create(:round, tournament:, stage:, completed: false) }
   let(:player1) { create(:player, tournament: round.tournament) }
   let(:player2) { create(:player, tournament: round.tournament) }
-  let!(:pairing) do
-    create(:pairing, player1:, player2:, round:)
-  end
 
   before do
     sign_in round.tournament.user

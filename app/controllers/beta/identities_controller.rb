@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Beta
-  class IdentitiesController < ApplicationController
+  class IdentitiesController < ApplicationController # rubocop:disable Style/Documentation
     include IdentitiesHelper
 
     def index

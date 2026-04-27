@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Round < ApplicationRecord
+class Round < ApplicationRecord # rubocop:disable Style/Documentation
   belongs_to :stage, touch: true
   belongs_to :tournament, touch: true
   has_many :pairings, -> { order(:table_number) }, dependent: :destroy # rubocop:disable Rails/InverseOf

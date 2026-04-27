@@ -2,7 +2,7 @@
 
 class CreatePlayers < ActiveRecord::Migration[5.0]
   def change
-    create_table :players do |t| # rubocop:disable Rails/CreateTableWithTimestamps
+    create_table :players do |t|
       t.string :name
       t.references :tournament, foreign_key: true
     end

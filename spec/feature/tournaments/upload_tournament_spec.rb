@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'uploading tournament' do
+RSpec.describe 'uploading tournament', type: :feature do
   let(:tournament) { create(:tournament) }
   let(:uploader) { instance_double(AbrUpload) }
 

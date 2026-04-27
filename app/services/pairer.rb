@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Pairer
+class Pairer # rubocop:disable Style/Documentation
   attr_reader :round, :random
 
   delegate :stage, to: :round

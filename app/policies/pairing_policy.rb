@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class PairingPolicy < ApplicationPolicy
+class PairingPolicy < ApplicationPolicy # rubocop:disable Style/Documentation
   def view_decks?
-    record.decks_visible_to(user)
+    record.decks_visible_to?(user)
   end
 
   def can_self_report?

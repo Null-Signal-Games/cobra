@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ProfilesController < ApplicationController
+class ProfilesController < ApplicationController # rubocop:disable Style/Documentation
   def index
     skip_authorization
   end

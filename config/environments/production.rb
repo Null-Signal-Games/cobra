@@ -93,11 +93,11 @@ Rails.application.configure do
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
   config.abr_host = 'https://alwaysberunning.net'
-  config.abr_auth = ENV['ABRAUTH']
+  config.abr_auth = ENV.fetch('ABRAUTH', nil)
   config.nrdb = {
-    client_id: ENV['NRDB_CLIENT'],
-    client_secret: ENV['NRDB_SECRET'],
-    redirect_uri: "https://#{ENV['COBRA_DOMAIN']}/oauth/callback"
+    client_id: ENV.fetch('NRDB_CLIENT', nil),
+    client_secret: ENV.fetch('NRDB_SECRET', nil),
+    redirect_uri: "https://#{ENV.fetch('COBRA_DOMAIN', nil)}/oauth/callback"
   }
   config.nrdb_api_host = 'https://api.netrunnerdb.com'
 end

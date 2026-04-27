@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module Bracket
-  module Engine
+  module Engine # rubocop:disable Style/Documentation
     def self.included(base)
       base.extend ClassMethods
     end
 
-    module ClassMethods
-      def game(number, p1, p2, options = {})
+    module ClassMethods # rubocop:disable Style/Documentation
+      def game(number, p1, p2, options = {}) # rubocop:disable Naming/MethodParameterName
         class_eval do
           @games ||= []
           @games << {

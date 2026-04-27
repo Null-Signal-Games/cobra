@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class TournamentsController < ApplicationController
+class TournamentsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
   before_action :set_tournament, only: %i[
     show info edit edit_form update destroy
     upload_to_abr save_json cut qr my_tournament registration timer
@@ -109,6 +109,10 @@ class TournamentsController < ApplicationController
     render json: helpers.demo_tournament_json, status: :ok
   end
 
+  def edit
+    authorize @tournament
+  end
+
   def create
     authorize Tournament
 
@@ -162,10 +166,6 @@ class TournamentsController < ApplicationController
     end
   end
 
-  def edit
-    authorize @tournament
-  end
-
   def edit_form
     authorize @tournament
     render json: helpers.tournament_settings_json(@tournament)
@@ -184,9 +184,7 @@ class TournamentsController < ApplicationController
       if !first_stage.nil? &&
          ((params[:swiss_format] == 'single_sided' && first_stage.swiss?) ||
          (params[:swiss_format] == 'double_sided' && first_stage.single_sided_swiss?))
-        if !@tournament.rounds.empty?
-          error = "Can't change Swiss format when rounds exist."
-        else
+        if @tournament.rounds.empty?
           case params[:swiss_format] # rubocop:disable Metrics/BlockNesting
           when 'single_sided'
             first_stage.single_sided_swiss!
@@ -194,6 +192,8 @@ class TournamentsController < ApplicationController
             first_stage.swiss!
           end
           first_stage.save
+        else
+          error = "Can't change Swiss format when rounds exist."
         end
       end
     end
@@ -333,28 +333,28 @@ class TournamentsController < ApplicationController
     authorize @tournament, :edit?
 
     @tournament.close_registration!
-    redirect_back(fallback_location: tournament_rounds_path(@tournament))
+    redirect_back_or_to(tournament_rounds_path(@tournament))
   end
 
   def open_registration
     authorize @tournament, :edit?
 
     @tournament.open_registration!
-    redirect_back(fallback_location: tournament_rounds_path(@tournament))
+    redirect_back_or_to(tournament_rounds_path(@tournament))
   end
 
   def lock_player_registrations
     authorize @tournament, :edit?
 
     @tournament.lock_player_registrations!
-    redirect_back(fallback_location: tournament_rounds_path(@tournament))
+    redirect_back_or_to(tournament_rounds_path(@tournament))
   end
 
   def unlock_player_registrations
     authorize @tournament, :edit?
 
     @tournament.unlock_player_registrations!
-    redirect_back(fallback_location: tournament_rounds_path(@tournament))
+    redirect_back_or_to(tournament_rounds_path(@tournament))
   end
 
   def cut_conversion_rates

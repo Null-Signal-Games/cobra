@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe TournamentsController, type: :request do
+RSpec.describe TournamentsController do
   describe '#update' do
     let(:user) { create(:user) }
     let(:other_user) { create(:user) }
@@ -60,7 +60,7 @@ RSpec.describe TournamentsController, type: :request do
         patch tournament_path(tournament), params: invalid_params, as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(JSON.parse(response.body)).to eq(
+        expect(response.parsed_body).to eq(
           {
             'errors' => { 'name' => ["can't be blank"] }
           }
@@ -142,7 +142,7 @@ RSpec.describe TournamentsController, type: :request do
         tournament.reload
         expect(tournament).to be_double_sided
         expect(response).to have_http_status(:unprocessable_content)
-        expect(JSON.parse(response.body)).to eq(
+        expect(response.parsed_body).to eq(
           {
             'errors' => { 'base' => "Can't change Swiss format when rounds exist." }
           }

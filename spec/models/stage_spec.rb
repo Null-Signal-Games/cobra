@@ -61,7 +61,10 @@ RSpec.describe Stage do
     let(:round1) { create(:round, stage:, completed: true) }
     let(:round2) { create(:round, stage:, completed: false) }
     let!(:pairing1) { create(:pairing, round: round1) }
-    let!(:pairing2) { create(:pairing, round: round2) }
+
+    before do
+      create(:pairing, round: round2)
+    end
 
     it 'only returns pairings from completed rounds' do
       expect(stage.eligible_pairings).to eq([pairing1])
@@ -71,8 +74,11 @@ RSpec.describe Stage do
   describe '#seed' do
     let(:player1) { create(:player, tournament:, skip_registration: true) }
     let(:player2) { create(:player, tournament:, skip_registration: true) }
-    let!(:reg1) { create(:registration, player: player1, stage:, seed: 1) }
-    let!(:reg2) { create(:registration, player: player2, stage:, seed: 2) }
+
+    before do
+      create(:registration, player: player1, stage:, seed: 1)
+      create(:registration, player: player2, stage:, seed: 2)
+    end
 
     it 'returns player for correct seeded registration' do
       aggregate_failures do

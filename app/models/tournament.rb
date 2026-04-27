@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Tournament < ApplicationRecord
+class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style/Documentation
   has_many :players, -> { order(:id) }, dependent: :destroy # rubocop:disable Rails/InverseOf
   belongs_to :user
   has_many :stages, -> { order(:number) }, dependent: :destroy # rubocop:disable Rails/InverseOf
@@ -16,6 +16,7 @@ class Tournament < ApplicationRecord
   NULL_ATTRS = %w[organizer_contact event_link description additional_prizes_description time_zone card_set_id
                   format_id deckbuilding_restriction_id official_prize_kit_id tournament_type_id registration_starts
                   tournament_starts].freeze
+  before_validation :generate_slug, on: :create, unless: :slug
   before_save :nil_if_blank
 
   # TODO(plural): Rename double_elim to elimination
@@ -33,7 +34,6 @@ class Tournament < ApplicationRecord
   validates :name, :slug, presence: true
   validates :slug, uniqueness: true # rubocop:disable Rails/UniqueValidationWithoutIndex
 
-  before_validation :generate_slug, on: :create, unless: :slug
   before_create :default_date, unless: :date
   after_create :create_stage
 
@@ -76,7 +76,7 @@ class Tournament < ApplicationRecord
   end
 
   def registration_unlocked?
-    self_registration? && (!registration_closed? || unlocked_players.count.positive?)
+    self_registration? && (!registration_closed? || unlocked_players.any?)
   end
 
   def stage_decks_open?(stage)
@@ -375,12 +375,12 @@ class Tournament < ApplicationRecord
   def build_id_stats_sql(id, is_cut: false)
     ids_where = if is_cut
                   'p.tournament_id = ? AND p.id IN (SELECT player_id FROM registrations WHERE stage_id IN (' \
-                  'SELECT MAX(id) FROM stages WHERE tournament_id = ?))'
+                    'SELECT MAX(id) FROM stages WHERE tournament_id = ?))'
                 else
                   'p.tournament_id = ?'
                 end
 
-    sql = <<~SQL
+    sql = <<~SQL.squish
       WITH corp_ids AS (
         SELECT
           1 AS side,

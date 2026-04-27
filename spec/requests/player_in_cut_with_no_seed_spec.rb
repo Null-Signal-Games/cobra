@@ -41,8 +41,8 @@ RSpec.describe 'a completed top cut with a player with no seed' do
     tournament.cut_to!(:double_elim, 4)
     tournament.pair_new_round!
     cut_round1 = round_number(1)
-    @unseeded = cut_round1.unpaired_players.first
-    set_table_player1(cut_round1, 1, @unseeded)
+    unseeded = cut_round1.unpaired_players.first
+    set_table_player1(cut_round1, 1, unseeded)
     set_round_score1_and_pair_new 1, 3
     set_round_score1_and_pair_new 2, 3
     set_round_score1_and_pair_new 3, 3

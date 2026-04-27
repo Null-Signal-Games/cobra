@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PlayerPolicy < ApplicationPolicy
+class PlayerPolicy < ApplicationPolicy # rubocop:disable Style/Documentation
   def create?
     user
   end
@@ -10,6 +10,6 @@ class PlayerPolicy < ApplicationPolicy
   end
 
   def view_decks?
-    record.decks_visible_to(user)
+    record.decks_visible_to?(user)
   end
 end

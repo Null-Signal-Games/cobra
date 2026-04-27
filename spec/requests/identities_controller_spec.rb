@@ -10,7 +10,7 @@ RSpec.describe IdentitiesController do
 
       get identities_path
 
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json['corp']).to contain_exactly(
         { 'label' => ampere.autocomplete, 'value' => ampere.name },
         { 'label' => etf.autocomplete, 'value' => etf.name }

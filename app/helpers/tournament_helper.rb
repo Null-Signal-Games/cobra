@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module TournamentHelper
+module TournamentHelper # rubocop:disable Style/Documentation
   def short_date(tournament)
     return unless tournament.date
 
@@ -74,8 +74,8 @@ module TournamentHelper
       options: {
         tournament_types: TournamentType.all.map { |t| { id: t.id, name: t.name } },
         formats: Format.all.map { |f| { id: f.id, name: f.name } },
-        card_sets: CardSet.all.order(date_release: :desc).map { |c| { id: c.id, name: c.name } },
-        deckbuilding_restrictions: DeckbuildingRestriction.all.order(date_start: :desc).map do |d|
+        card_sets: CardSet.order(date_release: :desc).map { |c| { id: c.id, name: c.name } },
+        deckbuilding_restrictions: DeckbuildingRestriction.order(date_start: :desc).map do |d|
           { id: d.id, name: d.name }
         end,
         time_zones: ActiveSupport::TimeZone.all.map { |z| { id: z.name, name: z.to_s } },

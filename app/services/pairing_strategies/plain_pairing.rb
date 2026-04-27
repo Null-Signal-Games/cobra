@@ -4,7 +4,7 @@
 # without the full overhead of the ActiveRecord Pairing object. This exists to keep
 # the pairing logic light on memory and object allocation / GC overhead.
 module PairingStrategies
-  class PlainPairing
+  class PlainPairing # rubocop:disable Style/Documentation
     def initialize(player1, player1_score, player2, player2_score)
       @player1 = player1
       @player1_score = player1_score

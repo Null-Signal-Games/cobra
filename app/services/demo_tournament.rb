@@ -2,7 +2,7 @@
 
 require 'faker'
 
-class DemoTournament
+class DemoTournament # rubocop:disable Style/Documentation
   def self.create(tournament_name: nil, format: nil, first_round_byes: 0, num_players: 0, assign_ids: false, owner: nil) # rubocop:disable Metrics/ParameterLists
     Rails.logger.debug 'Creating demo tournament...'
 
@@ -14,12 +14,12 @@ class DemoTournament
     raise 'First round byes cannot exceed the number of players' if first_round_byes > num_players
     raise 'Owner cannot be nil' if owner.nil?
 
-    Rails.logger.debug "  Tournament name: #{tournament_name}"
-    Rails.logger.debug "  Format: #{format}"
-    Rails.logger.debug "  First round byes: #{first_round_byes}"
-    Rails.logger.debug "  Num players: #{num_players}"
-    Rails.logger.debug "  Assign IDs: #{assign_ids}"
-    Rails.logger.debug "  Owner: #{owner.nrdb_username}"
+    Rails.logger.debug { "  Tournament name: #{tournament_name}" }
+    Rails.logger.debug { "  Format: #{format}" }
+    Rails.logger.debug { "  First round byes: #{first_round_byes}" }
+    Rails.logger.debug { "  Num players: #{num_players}" }
+    Rails.logger.debug { "  Assign IDs: #{assign_ids}" }
+    Rails.logger.debug { "  Owner: #{owner.nrdb_username}" }
     corp_ids = []
     runner_ids = []
     Identity.find_each do |id|
@@ -37,7 +37,7 @@ class DemoTournament
 
     num_players.times do
       p = Player.new(name: Faker::Name.unique.name, tournament:)
-      Rails.logger.debug "  Creating player: #{p.name}"
+      Rails.logger.debug { "  Creating player: #{p.name}" }
       if assign_ids
         corp_id = corp_ids.sample(1).first
         p.corp_identity = corp_id[:name]
@@ -53,7 +53,7 @@ class DemoTournament
     tournament.save!
 
     if first_round_byes.positive?
-      Rails.logger.debug "  Assigning #{first_round_byes} first round byes"
+      Rails.logger.debug { "  Assigning #{first_round_byes} first round byes" }
       players = Player.where(tournament:)
       byes = players.sample(first_round_byes)
       byes.each do |bye_player|

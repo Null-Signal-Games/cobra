@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RoundTimerActivation < ApplicationRecord
+class RoundTimerActivation < ApplicationRecord # rubocop:disable Style/Documentation
   belongs_to :round, touch: true
   has_one :tournament, through: :round
 

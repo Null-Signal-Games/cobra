@@ -29,8 +29,8 @@ require 'stackprof'
 # If profiles are requested, they the files will be written to the current directory.
 # See https://github.com/tmm1/stackprof?tab=readme-ov-file#sampling for more info on working with stackprof.
 
-RSpec.describe 'load testing' do
-  let(:write_json_file) { %w[1 true].include?(ENV['WRITE_JSON_FILE']) || false }
+RSpec.describe 'load testing' do # rubocop:disable RSpec/DescribeClass
+  let(:write_json_file) { %w[1 true].include?(ENV.fetch('WRITE_JSON_FILE', nil)) || false }
   let(:num_rounds) do
     if ENV['NUM_ROUNDS'].nil? || ENV['NUM_ROUNDS'].strip.empty? || ENV['NUM_ROUNDS'].strip.to_i == 0
       15
@@ -372,7 +372,7 @@ RSpec.describe 'load testing' do
   end
 
   def timer
-    (Time.zone.now - (@start || Time.zone.now)).seconds.tap do
+    (Time.zone.now - (@start || Time.zone.now)).seconds.tap do # rubocop:disable RSpec/InstanceVariable
       @start = Time.zone.now
     end
   end
@@ -463,10 +463,10 @@ RSpec.describe 'load testing' do
       expect(players.map(&:id) - [nil]).to match_array(tournament.players.active.map(&:id))
       if i == 0
         # The first round can have multiple byes if there are players with first round byes.
-        expect(players.select { |p| p.is_a? NilPlayer }.length).to be <= (1 + num_first_round_byes)
+        expect(players.grep(NilPlayer).length).to be <= (1 + num_first_round_byes)
       else
         # After the first round, we should only have at most a single bye.
-        expect(players.select { |p| p.is_a? NilPlayer }.length).to be <= 1
+        expect(players.grep(NilPlayer).length).to be <= 1
       end
 
       # How many times have players played each opponent they have faced at the start of this round?
@@ -510,10 +510,10 @@ RSpec.describe 'load testing' do
         else
           player_score = scores_by_player[r['player_id']]
           opponent_score = scores_by_player[r['opponent_id']]
-          if player_score != opponent_score
-            pairing_types[:up_or_down] += 1
-          else
+          if player_score == opponent_score
             pairing_types[:same] += 1
+          else
+            pairing_types[:up_or_down] += 1
           end
         end
       end

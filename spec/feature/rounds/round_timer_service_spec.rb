@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'round timer service' do
+RSpec.describe 'round timer service', type: :feature do
   let(:tournament) { create(:tournament) }
   let(:round) { create(:round, stage: tournament.current_stage) }
 

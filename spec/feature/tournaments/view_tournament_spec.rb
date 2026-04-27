@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'viewing a tournament' do
+RSpec.describe 'viewing a tournament', type: :feature do
   context 'with public tournament' do
     let(:tournament) { create(:tournament) }
 

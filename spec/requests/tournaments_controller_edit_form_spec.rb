@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe TournamentsController, type: :request do
+RSpec.describe TournamentsController do
   describe '#edit' do
     let(:user) { create(:user) }
     let(:other_user) { create(:user) }
@@ -37,7 +37,7 @@ RSpec.describe TournamentsController, type: :request do
         expect(response).to be_successful
         expect(response.content_type).to include('application/json')
 
-        data = JSON.parse(response.body)
+        data = response.parsed_body
         data['tournament']&.delete 'created_at'
         data['tournament']&.delete 'updated_at'
         expect(data['tournament']).to eq(
@@ -76,7 +76,7 @@ RSpec.describe TournamentsController, type: :request do
 
         get edit_form_tournament_path(tournament), as: :json
 
-        data = JSON.parse(response.body)
+        data = response.parsed_body
         expect(data['options'].except('time_zones')).to eq(
           {
             'tournament_types' => [

@@ -3,8 +3,8 @@
 FactoryBot.define do
   factory :pairing do
     round
-    association :player1, factory: :player
-    association :player2, factory: :player
+    player1 factory: %i[player]
+    player2 factory: %i[player]
     score1 { 0 }
     score2 { 0 }
     side { nil }

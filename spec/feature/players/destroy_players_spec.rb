@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'destroying players' do
+RSpec.describe 'destroying players', type: :feature do
   let(:tournament) { create(:tournament) }
   let!(:player) { create(:player, tournament:) }
 

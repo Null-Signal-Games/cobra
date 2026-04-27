@@ -80,7 +80,7 @@ RSpec.describe TournamentsController do
     it 'returns tournament.side_win_percentages JSON' do
       get cut_conversion_rates_tournament_path(tournament)
 
-      expect(JSON.parse(response.body))
+      expect(response.parsed_body)
         .to eq([{ 'foo' => 'bar' }, { 'baz' => 'qux' }])
     end
   end
@@ -98,7 +98,7 @@ RSpec.describe TournamentsController do
     it 'returns tournament.side_win_percentages JSON' do
       get side_win_percentages_tournament_path(tournament)
 
-      expect(JSON.parse(response.body))
+      expect(response.parsed_body)
         .to eq([{ 'foo' => 'bar' }, { 'baz' => 'qux' }])
     end
   end
@@ -116,7 +116,7 @@ RSpec.describe TournamentsController do
     it 'returns tournament.id_and_faction_data JSON' do
       get id_and_faction_data_tournament_path(tournament)
 
-      expect(JSON.parse(response.body))
+      expect(response.parsed_body)
         .to eq([{ 'foo' => 'bar' }, { 'baz' => 'qux' }])
     end
   end
@@ -135,7 +135,7 @@ RSpec.describe TournamentsController do
         get my_tournament_tournament_path(tournament, format: :json)
 
         expect(response).to have_http_status(:unauthorized)
-        expect(JSON.parse(response.body)).to eq('error' => 'Not authorized')
+        expect(response.parsed_body).to eq('error' => 'Not authorized')
       end
 
       it 'redirects when not signed in (HTML)' do
@@ -158,7 +158,7 @@ RSpec.describe TournamentsController do
         get my_tournament_tournament_path(tournament, format: :json)
 
         expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)).to include('pairings')
+        expect(response.parsed_body).to include('pairings')
       end
 
       it 'renders the my_tournament page (HTML)' do
@@ -180,7 +180,7 @@ RSpec.describe TournamentsController do
         get my_tournament_tournament_path(tournament, format: :json)
 
         expect(response).to have_http_status(:unauthorized)
-        expect(JSON.parse(response.body)).to eq('error' => 'You are not registered in this tournament.')
+        expect(response.parsed_body).to eq('error' => 'You are not registered in this tournament.')
       end
 
       it 'redirects with message (HTML)' do

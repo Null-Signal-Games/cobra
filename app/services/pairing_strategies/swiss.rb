@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PairingStrategies
-  class Swiss < Base
+  class Swiss < Base # rubocop:disable Style/Documentation
     def initialize(round, random = Random)
       super
       @bye_winner_score = 6

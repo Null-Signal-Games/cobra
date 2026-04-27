@@ -9,7 +9,7 @@ require 'rails/all'
 Bundler.require(*Rails.groups)
 
 module Cobra
-  class Application < Rails::Application
+  class Application < Rails::Application # rubocop:disable Style/Documentation
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 

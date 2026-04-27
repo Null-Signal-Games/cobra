@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class TournamentPolicy < ApplicationPolicy
+class TournamentPolicy < ApplicationPolicy # rubocop:disable Style/Documentation
   def show?
     !record.private? || record.user == user
   end

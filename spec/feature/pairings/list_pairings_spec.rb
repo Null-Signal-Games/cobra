@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'list pairings for a round' do
+RSpec.describe 'list pairings for a round', type: :feature do
   context 'with swiss tournament' do
     let(:tournament) { create(:tournament) }
     let(:stage) { create(:stage, tournament:) }
@@ -72,7 +72,8 @@ RSpec.describe 'list pairings for a round' do
       sign_in tournament.user
       visit tournament_rounds_path(tournament)
 
-      expect(page).not_to have_content('3-0 0-3')
+      expect(page).to have_content('Corp Runner') # Verify present content to avoid false positives for following check.
+      expect(page).to have_no_content('3-0 0-3')
     end
 
     it 'displays preset score options after side selection' do

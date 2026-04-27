@@ -5,7 +5,7 @@
 # the pairing logic light on memory and object allocation / GC overhead.
 
 module PairingStrategies
-  class PlainPlayer
+  class PlainPlayer # rubocop:disable Style/Documentation
     def initialize(id, name, active, first_round_bye, # rubocop:disable Metrics/ParameterLists
                    points: 0, opponents: {}, side_bias: 0, fixed_table_number: nil, had_bye: false)
       @id = id

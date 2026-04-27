@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'view help page' do
+RSpec.describe 'view help page', type: :feature do
   before do
     visit help_path
   end

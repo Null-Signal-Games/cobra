@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Bracket
-  class Top16 < Base
+  class Top16 < Base # rubocop:disable Style/Documentation
     game 1, seed(1), seed(16), round: 1, winner_game: 13, loser_game: 9, bracket_type: :upper
     game 2, seed(8), seed(9), round: 1, winner_game: 13, loser_game: 9, bracket_type: :upper
     game 3, seed(5), seed(12), round: 1, winner_game: 14, loser_game: 10, bracket_type: :upper

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Standings
+class Standings # rubocop:disable Style/Documentation
   include Enumerable
 
   attr_reader :stage

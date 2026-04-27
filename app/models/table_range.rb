@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class TableRange < ApplicationRecord
+class TableRange < ApplicationRecord # rubocop:disable Style/Documentation
   belongs_to :stage, touch: true
 
   default_scope { order(:first_table) }

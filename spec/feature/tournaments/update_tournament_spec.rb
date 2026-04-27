@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'updating tournament' do
+RSpec.describe 'updating tournament', type: :feature do
   let(:tournament) do
     create(:tournament, name: 'Old Tournament Name')
   end

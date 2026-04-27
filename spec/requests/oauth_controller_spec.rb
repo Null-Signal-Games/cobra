@@ -3,7 +3,7 @@
 RSpec.describe OauthController do
   describe '#auth' do
     it 'redirects to NRDB' do
-      expect_any_instance_of(ActionDispatch::Request).to receive(:host).at_least(:once).and_return('localhost')
+      expect_any_instance_of(ActionDispatch::Request).to receive(:host).at_least(:once).and_return('localhost') # rubocop:disable RSpec/AnyInstance
 
       get login_path
 
@@ -20,7 +20,7 @@ RSpec.describe OauthController do
     end
 
     before do
-      expect_any_instance_of(ActionDispatch::Request).to receive(:host).at_least(:once).and_return('localhost') # rubocop:disable RSpec/ExpectInHook
+      expect_any_instance_of(ActionDispatch::Request).to receive(:host).at_least(:once).and_return('localhost') # rubocop:disable RSpec/ExpectInHook,RSpec/AnyInstance
       allow(Nrdb::Oauth).to receive(:get_access_token)
         .with('some_code')
         .and_return(token_data)
@@ -44,7 +44,9 @@ RSpec.describe OauthController do
     end
 
     context 'when user exists' do
-      let!(:user) { create(:user, nrdb_id: 12, nrdb_username: 'jill') }
+      before do
+        create(:user, nrdb_id: 12, nrdb_username: 'jill')
+      end
 
       it 'does not create a user' do
         expect do

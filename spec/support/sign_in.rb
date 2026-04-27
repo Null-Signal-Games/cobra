@@ -2,13 +2,13 @@
 
 module SignIn
   def sign_in(user)
-    allow_any_instance_of(ApplicationController)
+    allow_any_instance_of(ApplicationController) # rubocop:disable RSpec/AnyInstance
       .to receive(:current_user)
       .and_return(user)
   end
 
   def sign_out
-    allow_any_instance_of(ApplicationController)
+    allow_any_instance_of(ApplicationController) # rubocop:disable RSpec/AnyInstance
       .to receive(:current_user)
       .and_return(nil)
   end

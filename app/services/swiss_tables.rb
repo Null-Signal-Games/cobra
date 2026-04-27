@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module SwissTables
+module SwissTables # rubocop:disable Style/Documentation
   def self.assign_table_numbers!(pairings, table_ranges = [])
     PairingOrder.new(pairings, table_ranges).apply_numbers!
   end
 
-  class PairingOrder
+  class PairingOrder # rubocop:disable Style/Documentation
     def initialize(pairings, table_ranges)
       @non_byes = []
       @byes = []
@@ -39,7 +39,7 @@ module SwissTables
     end
   end
 
-  class Numbers
+  class Numbers # rubocop:disable Style/Documentation
     def initialize(table_ranges)
       @fixed_numbers = Set[]
       @table_ranges = table_ranges

@@ -59,7 +59,7 @@ class ExpandTournamentAttributes < ActiveRecord::Migration[7.2]
       t.timestamps
       t.index :name, unique: true
     end
-    add_reference :custom_prizes, :tournament, foreign_key: true, null: false # rubocop:disable Rails/NotNullColumn
+    add_reference :custom_prizes, :tournament, foreign_key: true, null: false
 
     create_table :card_sets, id: :string do |t|
       t.string :name

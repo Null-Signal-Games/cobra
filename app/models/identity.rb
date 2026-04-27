@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Identity < ApplicationRecord
+class Identity < ApplicationRecord # rubocop:disable Style/Documentation
   enum :side, { corp: 1, runner: 2 }
 
   ALIASES = {

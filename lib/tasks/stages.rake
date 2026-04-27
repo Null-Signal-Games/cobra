@@ -43,7 +43,7 @@ namespace :stages do
       puts 'Cleaning erroneous tournaments'
       Tournament.all.select { |t| t.stages.count > 2 }.each do |tournament|
         puts "Cleaning tournament #{tournament.id}"
-        tournament.stages.select { |s| s.rounds.count.zero? }.each do |stage|
+        tournament.stages.select { |s| s.rounds.none? }.each do |stage|
           puts "Destroying stage #{stage.id}"
           stage.destroy!
         end

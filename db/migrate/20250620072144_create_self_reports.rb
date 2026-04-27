@@ -2,7 +2,7 @@
 
 class CreateSelfReports < ActiveRecord::Migration[7.2]
   def change
-    create_table :self_reports do |t| # rubocop:disable Rails/CreateTableWithTimestamps
+    create_table :self_reports do |t|
       t.integer :pairing_id
       t.integer :report_player_id
       t.integer :score1

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module StandingStrategies
-  class Base
+  class Base # rubocop:disable Style/Documentation
     attr_reader :stage
 
     def initialize(stage)

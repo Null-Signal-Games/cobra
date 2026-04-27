@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class RoundsController < ApplicationController
+class RoundsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
   before_action :set_tournament
   before_action :set_round, only: %i[edit update destroy repair complete update_timer]
 
@@ -80,16 +80,16 @@ class RoundsController < ApplicationController
                           .index_by(&:id).merge({ nil => NilPlayer.new })
   end
 
+  def edit
+    authorize @tournament, :update?
+  end
+
   def create
     authorize @tournament, :update?
 
     @tournament.pair_new_round!
 
     redirect_to tournament_rounds_path(@tournament)
-  end
-
-  def edit
-    authorize @tournament, :update?
   end
 
   def update
@@ -162,7 +162,7 @@ class RoundsController < ApplicationController
         format: stage.format,
         is_single_sided: stage.single_sided?,
         is_elimination: stage.elimination?,
-        view_decks: stage.decks_visible_to(current_user),
+        view_decks: stage.decks_visible_to?(current_user),
         rounds: pairings_data_rounds(stage, players),
         player_count: stage.players.count
       }
@@ -362,8 +362,8 @@ class RoundsController < ApplicationController
       nil
     else
       {
-        "name": player["#{side}_identity"],
-        "faction": player["#{side}_faction"]
+        name: player["#{side}_identity"],
+        faction: player["#{side}_faction"]
       }
     end
   end
@@ -402,7 +402,7 @@ class RoundsController < ApplicationController
     end
 
     # Massage the game data to look more like the pairing data for convenience
-    bracket&.new&.games&.map do |game|
+    bracket.new.games&.map do |game|
       {
         id: nil,
         table_number: game[:number],

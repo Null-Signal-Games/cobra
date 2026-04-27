@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PairingStrategies
-  class DoubleElim < Base
+  class DoubleElim < Base # rubocop:disable Style/Documentation
     def pair!
       bracket.new(stage).pair(round.number).each do |pairing|
         round.pairings.create(

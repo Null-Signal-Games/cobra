@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PlayersHelper
+module PlayersHelper # rubocop:disable Style/Documentation
   # TODO: This and player_hash_json() should be merged
   def player_json(player, side = nil)
     {
@@ -57,12 +57,12 @@ module PlayersHelper
   end
 
   def id(player, side)
-    return { "name": '', "faction": '' } if player.nil?
+    return { name: '', faction: '' } if player.nil?
 
     id = Identity.find_or_initialize_by(name: player["#{side}_identity"])
     {
-      "name": id.name,
-      "faction": id.faction
+      name: id.name,
+      faction: id.faction
     }
   end
 end

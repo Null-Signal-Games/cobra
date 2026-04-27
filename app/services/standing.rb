@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Standing
+class Standing # rubocop:disable Style/Documentation
   attr_reader :player, :points, :sos, :extended_sos, :bye_points, :corp_points, :runner_points
 
   delegate :name, :pronouns, :name_with_pronouns, to: :player

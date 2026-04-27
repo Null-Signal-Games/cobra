@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class SideDeterminer
+class SideDeterminer # rubocop:disable Style/Documentation
   def self.determine_sides(player1, player2, stage)
-    return nil unless player_has_pairings(player1, stage) || player_has_pairings(player2, stage)
+    return nil unless player_has_pairings?(player1, stage) || player_has_pairings?(player2, stage)
 
     diff1 = differential(player1)
     diff2 = differential(player2)
@@ -26,7 +26,7 @@ class SideDeterminer
     end
   end
 
-  def self.player_has_pairings(player, stage)
+  def self.player_has_pairings?(player, stage)
     player.pairings.reported.for_stage(stage).any?
   end
 end

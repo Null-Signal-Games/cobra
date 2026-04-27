@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BetaController < ApplicationController
+class BetaController < ApplicationController # rubocop:disable Style/Documentation
   def set_beta
     authorize :beta, :beta_testing_enabled?
 

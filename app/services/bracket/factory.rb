@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Bracket
-  class Factory
+  class Factory # rubocop:disable Style/Documentation
     def self.bracket_for(num_players, single_elim: false)
       raise 'bracket size not supported' unless [3, 4, 8, 16].include? num_players
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Report
-  def report(round, number, p1, score1, p2, score2, side = nil) # rubocop:disable Metrics/ParameterLists
+  def report(round, number, p1, score1, p2, score2, side = nil) # rubocop:disable Metrics/ParameterLists,Naming/MethodParameterName
     create(:pairing,
            round:,
            player1: p1,

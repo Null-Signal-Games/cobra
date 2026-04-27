@@ -64,11 +64,9 @@ RSpec.describe SwissImplementation do
     end
 
     context 'with odd number of players' do
-      i = 0
-      %i[snap crackle pop].each do |name|
-        i += 1
-        let(name) { SwissImplementation::Player.new(i) }
-      end
+      let(:snap) { SwissImplementation::Player.new(1, 'snap') }
+      let(:crackle) { SwissImplementation::Player.new(2, 'crackle') }
+      let(:pop) { SwissImplementation::Player.new(3, 'pop') }
       let(:players) { [snap, crackle, pop] }
 
       it 'pairs correctly' do

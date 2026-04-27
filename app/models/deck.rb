@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Deck < ApplicationRecord
+class Deck < ApplicationRecord # rubocop:disable Style/Documentation
   belongs_to :player
   belongs_to :user
   has_many :deck_cards, dependent: :destroy

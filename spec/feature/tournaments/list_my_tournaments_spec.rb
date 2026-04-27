@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'listing my tournaments' do
+RSpec.describe 'listing my tournaments', type: :feature do
   let(:me) { create(:user) }
 
   before do
@@ -24,7 +24,7 @@ RSpec.describe 'listing my tournaments' do
     end
 
     it 'does not show other user\'s tournaments' do
-      expect(page).not_to have_content('Not My Tournament')
+      expect(page).to have_no_content('Not My Tournament')
     end
   end
 

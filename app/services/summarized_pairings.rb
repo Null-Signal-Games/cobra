@@ -2,12 +2,12 @@
 
 require 'graph_matching'
 
-class SummarizedPairings
+class SummarizedPairings # rubocop:disable Style/Documentation
   def self.for_user_in_tournament(user_id, tournament_id)
     sql = ActiveRecord::Base.sanitize_sql(
       [
-        'SELECT * FROM summarized_pairings WHERE tournament_id = ? AND '\
-        '(player1_user_id = ? OR player2_user_id = ?) '\
+        'SELECT * FROM summarized_pairings WHERE tournament_id = ? AND ' \
+        '(player1_user_id = ? OR player2_user_id = ?) ' \
         'ORDER BY stage_number, round_number',
         tournament_id, user_id, user_id
       ]

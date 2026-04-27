@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module StandingStrategies
-  class DoubleElim < Base
+  class DoubleElim < Base # rubocop:disable Style/Documentation
     def calculate!
       bracket.new(stage).standings
     end

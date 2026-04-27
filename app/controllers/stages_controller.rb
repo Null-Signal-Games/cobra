@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class StagesController < ApplicationController
+class StagesController < ApplicationController # rubocop:disable Style/Documentation
   before_action :set_tournament
   before_action :set_stage, only: %i[show update destroy settings]
 
@@ -83,18 +83,14 @@ class StagesController < ApplicationController
   end
 
   def table_range_json(stage)
-    table_ranges = []
-
-    stage.table_ranges.each do |tr|
-      table_ranges << {
+    stage.table_ranges.map do |tr|
+      {
         id: tr.id,
         stage_id: tr.stage_id,
         first_table: tr.first_table,
         last_table: tr.last_table
       }
     end
-
-    table_ranges
   end
 
   def validate_table_ranges(new_ranges_params)
@@ -104,7 +100,7 @@ class StagesController < ApplicationController
       return 'The first table must be less than the last table.' if range_a.first_table > range_a.last_table
 
       ranges.each do |range_b|
-        if range_a != range_b && \
+        if range_a != range_b &&
            (range_b.in_range?(range_a.first_table) || range_b.in_range?(range_a.last_table))
           return 'Table ranges cannot overlap.'
         end

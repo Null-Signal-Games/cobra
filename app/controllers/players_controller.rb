@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PlayersController < ApplicationController
+class PlayersController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
   before_action :set_tournament
   before_action :set_player, only: %i[update destroy drop reinstate
                                       lock_registration unlock_registration registration view_decks]
@@ -46,7 +46,7 @@ class PlayersController < ApplicationController
     player = @tournament.players.create(params.except(:corp_deck, :runner_deck))
     @tournament.current_stage.players << player unless @tournament.current_stage.nil?
     @tournament.update(any_player_unlocked: true,
-                       all_players_unlocked: @tournament.locked_players.count.zero?)
+                       all_players_unlocked: @tournament.locked_players.none?)
 
     if player.user_id
       if @tournament.nrdb_deck_registration?
@@ -110,8 +110,8 @@ class PlayersController < ApplicationController
     authorize @tournament, :update?
 
     @player.destroy
-    @tournament.update(any_player_unlocked: @tournament.unlocked_players.count.positive?,
-                       all_players_unlocked: @tournament.locked_players.count.zero?)
+    @tournament.update(any_player_unlocked: @tournament.unlocked_players.any?,
+                       all_players_unlocked: @tournament.locked_players.none?)
 
     redirect_to tournament_players_path(@tournament)
   end
@@ -204,7 +204,7 @@ class PlayersController < ApplicationController
             id: r['player_id'],
             active: r['player_active'],
             name_with_pronouns:
-              "#{r['player_name']}#{r['player_pronouns'].present? ? " (#{r['player_pronouns']})" : ''}",
+              "#{r['player_name']}#{" (#{r['player_pronouns']})" if r['player_pronouns'].present?}",
             corp_id: {
               name: r['corp_id_name'],
               faction: r['corp_id_faction']
@@ -222,7 +222,7 @@ class PlayersController < ApplicationController
             id: r['player_id'],
             active: r['player_active'],
             name_with_pronouns:
-              "#{r['player_name']}#{r['player_pronouns'].present? ? " (#{r['player_pronouns']})" : ''}",
+              "#{r['player_name']}#{" (#{r['player_pronouns']})" if r['player_pronouns'].present?}",
             corp_id: { name: nil, faction: nil },
             runner_id: { name: nil, faction: nil }
           },
@@ -284,7 +284,7 @@ class PlayersController < ApplicationController
       Rails.logger.info 'Computing cut standings'
       return compute_and_render_cut_standings stage
     end
-    if stage.rounds.select(&:completed?).any?
+    if stage.rounds.any?(&:completed?)
       # Standings are stored explicitly at the end of a swiss round, so load those
       return render_completed_standings stage
     end
@@ -294,7 +294,7 @@ class PlayersController < ApplicationController
   end
 
   def compute_and_render_cut_standings(stage)
-    seed_by_player = stage.registrations.map { |r| [r.player_id, r.seed] }.to_h
+    seed_by_player = stage.registrations.to_h { |r| [r.player_id, r.seed] }
     stage.standings.each_with_index.map do |standing, i|
       {
         player: standings_player(standing.player),
@@ -354,7 +354,7 @@ class PlayersController < ApplicationController
 
   def standings_policy(player)
     {
-      view_decks: player&.decks_visible_to(current_user) ? true : false
+      view_decks: player&.decks_visible_to?(current_user)
     }
   end
 
@@ -380,7 +380,7 @@ class PlayersController < ApplicationController
 
     @player.update(registration_locked: true)
     @tournament.update(all_players_unlocked: false,
-                       any_player_unlocked: @tournament.unlocked_players.count.positive?)
+                       any_player_unlocked: @tournament.unlocked_players.any?)
 
     redirect_to tournament_players_path(@tournament)
   end
@@ -390,7 +390,7 @@ class PlayersController < ApplicationController
 
     @player.update(registration_locked: false)
     @tournament.update(any_player_unlocked: true,
-                       all_players_unlocked: @tournament.locked_players.count.zero?)
+                       all_players_unlocked: @tournament.locked_players.none?)
 
     redirect_to tournament_players_path(@tournament)
   end

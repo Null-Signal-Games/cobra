@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AbrUpload
+class AbrUpload # rubocop:disable Style/Documentation
   attr_reader :tournament
 
   def initialize(tournament, tournament_url)

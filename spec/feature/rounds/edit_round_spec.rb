@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'making advanced round edits' do
+RSpec.describe 'making advanced round edits', type: :feature do
   let(:round) { create(:round, weight: 1.0) }
 
   before do

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Nrdb
-  class Oauth
+  class Oauth # rubocop:disable Style/Documentation
     def self.auth_uri(_host)
       URI('https://netrunnerdb.com/oauth/v2/auth').tap do |uri|
         uri.query = {

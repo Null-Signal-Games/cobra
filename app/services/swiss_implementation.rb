@@ -2,12 +2,12 @@
 
 require 'graph_matching'
 
-module SwissImplementation
-  def self.pair(players, options = {}, &block)
-    Pairer.new(options).pair(players, &block)
+module SwissImplementation # rubocop:disable Style/Documentation
+  def self.pair(players, options = {}, &)
+    Pairer.new(options).pair(players, &)
   end
 
-  class Player
+  class Player # rubocop:disable Style/Documentation
     attr_accessor :id, :delta, :exclude, :label
 
     def initialize(id, label = '')
@@ -18,18 +18,18 @@ module SwissImplementation
     end
   end
 
-  class Bye; end
+  class Bye; end # rubocop:disable Lint/EmptyClass
 
-  class Pairer
+  class Pairer # rubocop:disable Style/Documentation
     def initialize(options = {})
       @delta_key = options[:delta_key] || :delta
       @exclude_key = options[:exclude_key] || :exclude
       @bye_delta = options[:bye_delta] || -1
     end
 
-    def pair(player_data, &block)
+    def pair(player_data, &)
       @player_data = player_data
-      edges = graph(&block).maximum_weighted_matching(true).edges
+      edges = graph(&).maximum_weighted_matching(true).edges
       edges.map do |pairing|
         [players[pairing[0]], players[pairing[1]]]
       end
@@ -56,12 +56,12 @@ module SwissImplementation
       GraphMatching::Graph::WeightedGraph.send('[]', *edges)
     end
 
-    def permitted?(a, b)
+    def permitted?(a, b) # rubocop:disable Naming/MethodParameterName
       targets(a).include?(b) && targets(b).include?(a)
     end
 
-    def delta(a, b)
-      0 - (delta_value(a) - delta_value(b))**2
+    def delta(a, b) # rubocop:disable Naming/MethodParameterName
+      0 - ((delta_value(a) - delta_value(b))**2)
     end
 
     def targets(player)

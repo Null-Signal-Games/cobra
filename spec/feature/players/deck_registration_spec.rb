@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'registering a deck from NetrunnerDB' do
+RSpec.describe 'registering a deck from NetrunnerDB', type: :feature do
   let(:organiser) { create(:user, nrdb_access_token: 'a_token') }
   let(:player) { create(:user, nrdb_access_token: 'a_token') }
   let(:tournament) { create(:tournament, user: organiser, self_registration: true, nrdb_deck_registration: true) }
@@ -46,10 +46,15 @@ RSpec.describe 'registering a deck from NetrunnerDB' do
     click_link 'Close registration'
     sign_in player
     visit registration_tournament_path(tournament)
-    expect(page).not_to have_selector '#nrdb_decks'
+
+    # Verify present content first to avoid false positives for following check.
+    expect(page).to have_content('My Registration Information')
+    expect(page).to have_no_css '#nrdb_decks'
   end
 
   context 'submitting decks' do
+    let(:new_player) { Player.last }
+
     before do
       register_as_player
       VCR.use_cassette 'nrdb_decks/az_palantir_and_jammy_hb' do
@@ -68,29 +73,28 @@ RSpec.describe 'registering a deck from NetrunnerDB' do
                                     ]
         click_button 'Submit'
       end
-      @new_player = Player.last
     end
 
     it 'saves the identities' do
-      expect(@new_player.corp_identity).to eq('Haas-Bioroid: Engineering the Future')
-      expect(@new_player.runner_identity).to eq('Az McCaffrey: Mechanical Prodigy')
+      expect(new_player.corp_identity).to eq('Haas-Bioroid: Engineering the Future')
+      expect(new_player.runner_identity).to eq('Az McCaffrey: Mechanical Prodigy')
     end
 
     it 'saves the decks' do
-      expect(@new_player.corp_deck.identity_title).to eq('Haas-Bioroid: Engineering the Future')
-      expect(@new_player.runner_deck.identity_title).to eq('Az McCaffrey: Mechanical Prodigy')
+      expect(new_player.corp_deck.identity_title).to eq('Haas-Bioroid: Engineering the Future')
+      expect(new_player.runner_deck.identity_title).to eq('Az McCaffrey: Mechanical Prodigy')
     end
 
     it 'saves the cards' do
-      expect(@new_player.corp_deck.deck_cards.map { |card| [card.title, card.quantity] })
+      expect(new_player.corp_deck.deck_cards.map { |card| [card.title, card.quantity] })
         .to eq([['Accelerated Beta Test', 3]])
-      expect(@new_player.runner_deck.deck_cards.map { |card| [card.title, card.quantity] })
+      expect(new_player.runner_deck.deck_cards.map { |card| [card.title, card.quantity] })
         .to eq([['Diversion of Funds', 3]])
     end
 
     it 'records the user who saved the decks' do
-      expect(@new_player.corp_deck.user).to eq(player)
-      expect(@new_player.runner_deck.user).to eq(player)
+      expect(new_player.corp_deck.user).to eq(player)
+      expect(new_player.runner_deck.user).to eq(player)
     end
 
     it 'displays the decks when locked' do
@@ -99,10 +103,10 @@ RSpec.describe 'registering a deck from NetrunnerDB' do
       click_link 'Close registration'
       sign_in player
       visit registration_tournament_path(tournament)
-      expect(page).not_to have_selector '#nrdb_decks'
-      expect(page).to have_selector '#display_decks'
-      expect(find('#player_corp_deck', visible: false).value).to match(/^\{.+}$/)
-      expect(find('#player_runner_deck', visible: false).value).to match(/^\{.+}$/)
+      expect(page).to have_css '#display_decks'
+      expect(page).to have_no_css '#nrdb_decks'
+      expect(find_by_id('player_corp_deck', visible: false).value).to match(/^\{.+}$/)
+      expect(find_by_id('player_runner_deck', visible: false).value).to match(/^\{.+}$/)
     end
   end
 
@@ -133,7 +137,7 @@ RSpec.describe 'registering a deck from NetrunnerDB' do
   end
 
   def displayed_decks_names
-    find('#nrdb_decks').all('li').map { |deck| deck.find('p').text }
+    find_by_id('nrdb_decks').all('li').map { |deck| deck.find('p').text }
   end
 
   def select_corp_deck(deck)

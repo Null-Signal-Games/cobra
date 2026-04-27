@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module SelfReporting
+module SelfReporting # rubocop:disable Style/Documentation
   # A user is allowed to report a pairing when:
   #   a. the user is logged in
   #   b. has not already reported

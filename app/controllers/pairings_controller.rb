@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PairingsController < ApplicationController
+class PairingsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
   before_action :set_tournament
   before_action :round, only: %i[sharing markdown]
   attr_reader :tournament
@@ -88,7 +88,7 @@ class PairingsController < ApplicationController
 
     save_report
 
-    redirect_back(fallback_location: tournament_rounds_path(tournament))
+    redirect_back_or_to(tournament_rounds_path(tournament))
   end
 
   def reset_self_report
@@ -96,7 +96,7 @@ class PairingsController < ApplicationController
 
     SelfReport.where(pairing_id: pairing.id).destroy_all
 
-    redirect_back(fallback_location: tournament_rounds_path(tournament))
+    redirect_back_or_to(tournament_rounds_path(tournament))
   end
 
   def self_report
@@ -184,19 +184,19 @@ class PairingsController < ApplicationController
   end
 
   def pairing_params
-    params.require(:pairing).permit(:player1_id, :player2_id, :table_number, :side)
+    params.expect(pairing: %i[player1_id player2_id table_number side])
   end
 
   def score_params
-    params.require(:pairing)
-          .permit(:score1_runner, :score1_corp, :score2_runner, :score2_corp,
-                  :score1, :score2, :side, :intentional_draw, :two_for_one)
+    params
+      .expect(pairing: %i[score1_runner score1_corp score2_runner score2_corp
+                          score1 score2 side intentional_draw two_for_one])
   end
 
   def self_report_score_params
-    params.require(:pairing)
-          .permit(:score1_runner, :score1_corp, :score2_runner, :score2_corp,
-                  :score1, :score2, :side, :intentional_draw, :two_for_one)
+    params
+      .expect(pairing: %i[score1_runner score1_corp score2_runner score2_corp
+                          score1 score2 side intentional_draw two_for_one])
   end
 
   def pairing_player_markdown(name, pronouns, is_corp)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class NrtmJson
+class NrtmJson # rubocop:disable Metrics/ClassLength,Style/Documentation
   attr_reader :tournament
 
   def initialize(tournament)
@@ -14,7 +14,7 @@ class NrtmJson
     players = []
     if tournament.show_identities?
       preliminaryRounds = swiss_stage&.rounds&.count
-      players = swiss_stage&.standings&.each_with_index&.map do |standing, i|
+      players = swiss_stage&.standings&.each_with_index&.map do |standing, i| # rubocop:disable Style/SafeNavigationChainLength
         {
           id: standing.player.id,
           name: standing.name,
@@ -59,7 +59,9 @@ class NrtmJson
   private
 
   def swiss_stage
-    @swiss_stage ||= tournament.stages.find_by(format: %i[swiss single_sided_swiss])
+    return @swiss_stage if defined?(@swiss_stage)
+
+    @swiss_stage = tournament.stages.find_by(format: %i[swiss single_sided_swiss])
   end
 
   def swiss_pairing_data

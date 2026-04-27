@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'show player meeting' do
+RSpec.describe 'show player meeting', type: :feature do
   let(:tournament) { create(:tournament) }
 
   it 'displays meeting pairings' do

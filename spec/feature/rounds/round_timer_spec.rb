@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'round timer' do
+RSpec.describe 'round timer', type: :feature do
   let(:tournament) { create(:tournament) }
   let(:round) { create(:round, tournament:, stage: tournament.current_stage) }
 
@@ -16,7 +16,7 @@ RSpec.describe 'round timer' do
     end
 
     it 'does not show the round timer if not started' do
-      expect(page).not_to have_content(timer_display_message)
+      expect(page).to have_no_content(timer_display_message)
     end
 
     it 'hides the round timer when reset' do
@@ -24,7 +24,7 @@ RSpec.describe 'round timer' do
         click_on 'Start'
         click_on 'Reset'
       end
-      expect(page).not_to have_content(timer_display_message)
+      expect(page).to have_no_content(timer_display_message)
     end
 
     it 'shows the round timer when paused' do
@@ -42,13 +42,13 @@ RSpec.describe 'round timer' do
       end
       travel_to Time.zone.local(2022, 8, 29, 15, 30)
       click_on 'Complete'
-      expect(page).not_to have_content(timer_display_message)
+      expect(page).to have_no_content(timer_display_message)
       expect(round.timer.state).to have_attributes(paused: true, remaining_seconds: 35 * 60)
     end
 
     it 'does not show the timer form when the round is completed' do
       click_on 'Complete'
-      expect(page).not_to have_selector(round_timer_form)
+      expect(page).to have_no_selector(round_timer_form)
     end
   end
 

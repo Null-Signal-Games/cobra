@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'destroying a stage' do
+RSpec.describe 'destroying a stage', type: :feature do
   let(:tournament) { create(:tournament) }
 
   before do

@@ -5,8 +5,11 @@ RSpec.describe RoundsController do
     let(:organiser) { create(:user) }
     let(:tournament) { create(:tournament, name: 'My Tournament', user: organiser) }
     let!(:alice) { create(:player, tournament:, name: 'Alice', pronouns: 'she/her') }
-    let!(:bob) { create(:player, tournament:, name: 'Bob', pronouns: 'he/him') }
-    let!(:charlie) { create(:player, tournament:, name: 'Charlie', pronouns: 'she/her') }
+
+    before do
+      create(:player, tournament:, name: 'Bob', pronouns: 'he/him')
+      create(:player, tournament:, name: 'Charlie', pronouns: 'she/her')
+    end
 
     describe 'during player meeting' do
       it 'displays without logging in' do

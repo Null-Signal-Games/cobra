@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe TournamentsController, type: :request do
+RSpec.describe TournamentsController do
   describe '#create' do
     let(:user) { create(:user) }
 
@@ -21,7 +21,7 @@ RSpec.describe TournamentsController, type: :request do
         )
 
         expect(response).to have_http_status(:created)
-        expect(JSON.parse(response.body)).to eq(
+        expect(response.parsed_body).to eq(
           {
             'id' => tournament.id,
             'name' => 'Test Tournament',
@@ -50,7 +50,7 @@ RSpec.describe TournamentsController, type: :request do
         post tournaments_path, params: invalid_params, as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(JSON.parse(response.body)).to eq(
+        expect(response.parsed_body).to eq(
           {
             'errors' => { 'name' => ["can't be blank"] }
           }

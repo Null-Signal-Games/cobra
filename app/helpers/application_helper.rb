@@ -2,8 +2,8 @@
 
 require 'redcarpet'
 
-module ApplicationHelper
-  class ResponsiveImgRenderer < Redcarpet::Render::HTML
+module ApplicationHelper # rubocop:disable Style/Documentation
+  class ResponsiveImgRenderer < Redcarpet::Render::HTML # rubocop:disable Style/Documentation
     def image(link, _title, alt_text)
       %(<img class="img-fluid" src=#{link} alt=#{alt_text}>)
     end

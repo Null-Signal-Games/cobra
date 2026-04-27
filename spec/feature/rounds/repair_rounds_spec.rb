@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe 'Re-pairing rounds' do
+RSpec.describe 'Re-pairing rounds', type: :feature do
   let(:tournament) { create(:tournament) }
   let(:round) { create(:round, tournament:, stage: tournament.current_stage) }
-  let!(:player1) { create(:player, tournament:) }
-  let!(:player2) { create(:player, tournament:) }
 
   before do
+    create(:player, tournament:)
+    create(:player, tournament:)
     sign_in round.tournament.user
     visit tournament_round_path(round.tournament, round)
   end

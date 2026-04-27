@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SelfReport < ApplicationRecord
+class SelfReport < ApplicationRecord # rubocop:disable Style/Documentation
   belongs_to :pairing, touch: true
 
   before_save :normalise_scores_before_save

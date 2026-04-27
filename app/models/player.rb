@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Player < ApplicationRecord
+class Player < ApplicationRecord # rubocop:disable Style/Documentation
   belongs_to :tournament
   belongs_to :user, optional: true
   belongs_to :previous, class_name: 'Player', optional: true
@@ -11,8 +11,8 @@ class Player < ApplicationRecord
   has_many :standing_rows, dependent: :destroy
   has_many :decks, dependent: :destroy
 
-  before_destroy :destroy_pairings
   before_save :set_identities
+  before_destroy :destroy_pairings
 
   scope :active, -> { where(active: true) }
   scope :dropped, -> { where(active: false) }
@@ -98,8 +98,8 @@ class Player < ApplicationRecord
     decks.find_by side_id: 'runner'
   end
 
-  def decks_visible_to(user)
-    registrations.any? { |r| r.stage.decks_visible_to(user) }
+  def decks_visible_to?(user)
+    registrations.any? { |r| r.stage.decks_visible_to?(user) }
   end
 
   def name_with_pronouns

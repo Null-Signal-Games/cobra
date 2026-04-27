@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'destroying pairings' do
+RSpec.describe 'destroying pairings', type: :feature do
   let(:player1) { create(:player, tournament: round.tournament) }
   let(:player2) { create(:player, tournament: round.tournament) }
   let(:round) { create(:round) }

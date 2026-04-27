@@ -10,12 +10,9 @@ RSpec.describe PairingsController do
     describe 'when self reporting is disabled' do
       let(:tournament) { create(:tournament, name: 'SR Disabled', user: organiser, allow_self_reporting: false) }
 
-      let!(:bob) do
+      before do
         create(:player, tournament:, name: 'Bob', pronouns: 'he/him',
                         user_id: bob_nrdb.id)
-      end
-
-      before do
         Pairer.new(tournament.new_round!, Random.new(0)).pair!
       end
 
@@ -43,13 +40,13 @@ RSpec.describe PairingsController do
     end
 
     describe 'when self reporting is enabled' do
-      let!(:alice) { create(:player, tournament:, name: 'Alice', pronouns: 'she/her', user_id: alice_nrdb.id) }
-      let!(:bob) { create(:player, tournament:, name: 'Bob', pronouns: 'he/him', user_id: bob_nrdb.id) }
-      let!(:charlie) { create(:player, tournament:, name: 'Charlie', pronouns: 'she/her', user_id: charlie_nrdb.id) }
-
       let(:tournament) { create(:tournament, name: 'SR Enabled', user: organiser, allow_self_reporting: true) }
 
       before do
+        create(:player, tournament:, name: 'Alice', pronouns: 'she/her', user_id: alice_nrdb.id)
+        create(:player, tournament:, name: 'Bob', pronouns: 'he/him', user_id: bob_nrdb.id)
+        create(:player, tournament:, name: 'Charlie', pronouns: 'she/her', user_id: charlie_nrdb.id)
+
         Round.delete_all
         Pairer.new(tournament.new_round!, Random.new(0)).pair!
       end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'destroying tournaments' do
+RSpec.describe 'destroying tournaments', type: :feature do
   let(:tournament) { create(:tournament) }
   let(:round) { create(:round, tournament:, stage: tournament.current_stage) }
 

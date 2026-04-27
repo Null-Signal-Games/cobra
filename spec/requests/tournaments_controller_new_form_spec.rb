@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe TournamentsController, type: :request do
+RSpec.describe TournamentsController do
   describe '#new' do
     let(:user) { create(:user) }
 
@@ -22,7 +22,7 @@ RSpec.describe TournamentsController, type: :request do
 
         expect(response).to be_successful
         expect(response.content_type).to include('application/json')
-        data = JSON.parse(response.body)
+        data = response.parsed_body
         expect(data['tournament']).to eq(
           {
             'date' => '2023-05-15',

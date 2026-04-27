@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'updating players' do
+RSpec.describe 'updating players', type: :feature do
   let(:tournament) { create(:tournament, manual_seed: true) }
 
   before do

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PairingSorters
-  class Ranked
+  class Ranked # rubocop:disable Style/Documentation
     def self.sort(pairings)
       pairings.sort do |a, b|
         b.combined_points <=> a.combined_points

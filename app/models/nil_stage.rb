@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class NilStage
+class NilStage # rubocop:disable Style/Documentation
   def players
     Player.none
   end

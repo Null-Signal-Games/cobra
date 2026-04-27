@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Stage < ApplicationRecord
+class Stage < ApplicationRecord # rubocop:disable Style/Documentation
   belongs_to :tournament, touch: true
   has_many :rounds, dependent: :destroy
   has_many :registrations, dependent: :destroy
@@ -83,7 +83,7 @@ class Stage < ApplicationRecord
     tournament.stage_decks_public?(self)
   end
 
-  def decks_visible_to(user)
+  def decks_visible_to?(user)
     if decks_open?
       user == tournament.user || users.exists?(user&.id)
     else
@@ -106,7 +106,7 @@ class Stage < ApplicationRecord
       return
     end
 
-    'There are not enough tables to cover all players' \
-    " (players without byes: #{num_pairable_players}, tables: #{custom_table_numbers_count})."
+    'There are not enough tables to cover all players ' \
+      "(players without byes: #{num_pairable_players}, tables: #{custom_table_numbers_count})."
   end
 end

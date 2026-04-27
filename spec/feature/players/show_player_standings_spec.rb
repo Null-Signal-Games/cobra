@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'showing player standings' do
+RSpec.describe 'showing player standings', type: :feature do
   let(:tournament) { create(:tournament) }
 
   before do
