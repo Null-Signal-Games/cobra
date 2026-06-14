@@ -17,7 +17,7 @@
             "version": "3.4.4" // Change to match Ruby version from Gemfile
         },
         "ghcr.io/devcontainers/features/node:1": {
-            "version": 20 // Change Node version as required
+            "version": 24 // Change Node version as required
         },
         "ghcr.io/devcontainers/features/common-utils:2.4.3": {
             "username": "vscode",
