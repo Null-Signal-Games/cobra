@@ -6,6 +6,8 @@
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import RegistrationCard from "../players/RegistrationCard.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
+  import { marked } from "marked";
+  import DOMPurify from "dompurify";
 
   let {
     tournamentId,
@@ -245,6 +247,61 @@
             <div class="spinner-border m-auto"></div>
           </div>
         {/if}
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <h5 class="mb-0">Additional Details</h5>
+          </div>
+          
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              {#if tournament.description}
+                <h5>Description:</h5>
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                <p>{@html DOMPurify.sanitize(marked(tournament.description, { async: false }))}</p>
+              {/if}
+            </li>
+            {#if tournament.event_link}
+              <li class="list-group-item">
+                <h5>More Information:</h5>
+                <a href={tournament.event_link} target="_blank">{tournament.event_link}</a>
+              </li>
+            {/if}
+            <li class="list-group-item">
+              <h5>Format and Deckbuilding:</h5>
+              <div>Swiss Format: {tournament.swiss_format}</div>
+              {#if tournament.format_id}
+                <!-- TODO: Format name -->
+                <div>Game Format: {tournament.format_id}</div>
+              {/if}
+              {#if tournament.deckbuilding_restriction_id}
+                <!-- TODO: Restriction name -->
+                <div>Deckbuilding Restrictions: {tournament.deckbuilding_restriction_id}</div>
+              {/if}
+              {#if tournament.decklist_required}
+                <div>Decklists are required for this event.</div>
+              {/if}
+            </li>
+            {#if tournament.official_prize_kit_id ?? tournament.additional_prizes_description}
+              <li class="list-group-item">
+                {#if tournament.official_prize_kit_id}
+                  <h5>Prizes</h5>
+                  <!-- TODO: Prize kit name -->
+                  <p>Official Prize Kit: {tournament.official_prize_kit_id}</p>
+                {/if}
+                {#if tournament.additional_prizes_description}
+                  <h5>Additional Prizes</h5>
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                  <p>{@html DOMPurify.sanitize(marked(tournament.additional_prizes_description, { async: false }))}</p>
+                {/if}
+              </li>
+            {/if}
+          </ul>
+        </div>
       </div>
     </div>
   </div>

@@ -85,7 +85,7 @@ html
             = link_to timer_tournament_path(@tournament)
               = render 'rounds/round_timer', round: @tournament.rounds.includes([:round_timer_activations]).last
         ul.nav.nav-tabs.dontprint
-          - if policy(@tournament).show?
+          - if (!Flipper.enabled?(:beta_testing, current_user) || cookies[:beta_enabled] != "true") && policy(@tournament).show?
             li.nav-item= link_to info_tournament_path(@tournament), class: "nav-link #{'active' if controller_name == 'tournaments' && action_name == 'info'}" do
               => fa_icon 'info-circle'
               | Info

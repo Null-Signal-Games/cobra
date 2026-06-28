@@ -35,5 +35,9 @@
     "vite": "^8",
     "vite-plugin-ruby": "^5.2.1",
     "vitest": "^4"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.11",
+    "marked": "^18.0.5"
   }
 }
