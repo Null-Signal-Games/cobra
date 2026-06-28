@@ -71,14 +71,18 @@
 
 {#if tournament}
   <div class="container">
+    <!-- Notices -->
     <div class="row">
-      <!-- Overview -->
-      <div class="col-md-6">
-        <!-- Notice -->
+      <div class="col-md-12">
         {#each notices as notice (notice)}
           <div class="alert alert-info">{notice}</div>
         {/each}
+      </div>
+    </div>
 
+    <div class="row">
+      <!-- Overview -->
+      <div class="col-md-6">
         <div class="card">
           <!-- Shortcode -->
           {#if tournament.slug}
@@ -188,6 +192,14 @@
               </ModalDialog>
             </div>
           </li>
+
+          <!-- More Information -->
+          {#if tournament.event_link}
+            <li class="list-group-item">
+              <div class="small text-secondary">More Information:</div>
+              <a href={tournament.event_link} target="_blank">{tournament.event_link}</a>
+            </li>
+          {/if}
         </div>
       </div>
 
@@ -250,6 +262,7 @@
       </div>
     </div>
 
+    <!-- Additional Details -->
     <div class="row mt-3">
       <div class="col-md-12">
         <div class="card">
@@ -258,6 +271,7 @@
           </div>
           
           <ul class="list-group list-group-flush">
+            <!-- Description -->
             <li class="list-group-item">
               {#if tournament.description}
                 <h5>Description:</h5>
@@ -265,12 +279,8 @@
                 <p>{@html DOMPurify.sanitize(marked(tournament.description, { async: false }))}</p>
               {/if}
             </li>
-            {#if tournament.event_link}
-              <li class="list-group-item">
-                <h5>More Information:</h5>
-                <a href={tournament.event_link} target="_blank">{tournament.event_link}</a>
-              </li>
-            {/if}
+
+            <!-- Format and Deckbuilding -->
             <li class="list-group-item">
               <h5>Format and Deckbuilding:</h5>
               <div>Swiss Format: {tournament.swiss_format}</div>
@@ -286,6 +296,8 @@
                 <div>Decklists are required for this event.</div>
               {/if}
             </li>
+
+            <!-- Prizes -->
             {#if tournament.official_prize_kit_id ?? tournament.additional_prizes_description}
               <li class="list-group-item">
                 {#if tournament.official_prize_kit_id}
