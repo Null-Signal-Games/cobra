@@ -27,6 +27,7 @@ export class Tournament {
   description: string | null = null;
   additional_prizes_description: string | null = null;
   official_prize_kit_id: number | null = null;
+  official_prize_kit_name: string | null = null;
   stage = "";
   manual_seed = false;
   self_registration = false;
@@ -42,7 +43,9 @@ export class Tournament {
   swiss_format = "";
   tournament_type_id: number | null = null;
   format_id: number | null = null;
+  format_name: string | null = null;
   deckbuilding_restriction_id: number | null = null;
+  deckbuilding_restriction_name: string | null = null;
   card_set_id: number | null = null;
   active_player_count = 0;
   dropped_player_count = 0;

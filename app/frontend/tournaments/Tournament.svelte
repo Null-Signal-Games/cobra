@@ -274,7 +274,7 @@
             <!-- Description -->
             <li class="list-group-item">
               {#if tournament.description}
-                <h5>Description:</h5>
+                <h5>Description</h5>
                 <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 <p>{@html DOMPurify.sanitize(marked(tournament.description, { async: false }))}</p>
               {/if}
@@ -282,15 +282,13 @@
 
             <!-- Format and Deckbuilding -->
             <li class="list-group-item">
-              <h5>Format and Deckbuilding:</h5>
+              <h5>Format and Deckbuilding</h5>
               <div>Swiss Format: {swissFormatDisplayString(tournament.swiss_format)}</div>
               {#if tournament.format_id}
-                <!-- TODO: Format name -->
-                <div>Game Format: {tournament.format_id}</div>
+                <div>Game Format: {tournament.format_name}</div>
               {/if}
               {#if tournament.deckbuilding_restriction_id}
-                <!-- TODO: Restriction name -->
-                <div>Deckbuilding Restrictions: {tournament.deckbuilding_restriction_id}</div>
+                <div>Deckbuilding Restrictions: {tournament.deckbuilding_restriction_name}</div>
               {/if}
               {#if tournament.decklist_required}
                 <div>Decklists are required for this event.</div>
@@ -302,8 +300,7 @@
               <li class="list-group-item">
                 {#if tournament.official_prize_kit_id}
                   <h5>Prizes</h5>
-                  <!-- TODO: Prize kit name -->
-                  <p>Official Prize Kit: {tournament.official_prize_kit_id}</p>
+                  <p>Official Prize Kit: {tournament.official_prize_kit_name}</p>
                 {/if}
                 {#if tournament.additional_prizes_description}
                   <h5>Additional Prizes</h5>
