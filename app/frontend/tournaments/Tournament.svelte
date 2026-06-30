@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import GlobalMessages from "../widgets/GlobalMessages.svelte";
-  import { loadQRCode, loadTournament, Tournament } from "./TournamentSettings";
+  import { loadQRCode, loadTournament, Tournament, swissFormatDisplayString } from "./TournamentSettings";
   import { loadPlayerByUserId, Player } from "../players/PlayersData";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import RegistrationCard from "../players/RegistrationCard.svelte";
@@ -283,7 +283,7 @@
             <!-- Format and Deckbuilding -->
             <li class="list-group-item">
               <h5>Format and Deckbuilding:</h5>
-              <div>Swiss Format: {tournament.swiss_format}</div>
+              <div>Swiss Format: {swissFormatDisplayString(tournament.swiss_format)}</div>
               {#if tournament.format_id}
                 <!-- TODO: Format name -->
                 <div>Game Format: {tournament.format_id}</div>

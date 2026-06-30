@@ -127,6 +127,15 @@ export interface TournamentSettingsData {
   csrf_token: string;
 }
 
+export function swissFormatDisplayString(format: string) {
+  if (format === "single_sided") {
+    return "Single-sided";
+  } else if (format === "double_sided") {
+    return "Double-sided";
+  }
+  return "Unknown";
+}
+
 export function emptyTournamentOptions(): TournamentOptions {
   return {
     tournament_types: [],

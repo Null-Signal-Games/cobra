@@ -5,6 +5,7 @@
   } from "./DemoTournamentSettings";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import ProgressButton from "../widgets/ProgressButton.svelte";
+  import { swissFormatDisplayString } from "./TournamentSettings";
 
   let {
     tournament,
@@ -44,8 +45,8 @@
     class="form-control"
     bind:value={tournamentEdit.swiss_format}
   >
-    <option value="double_sided">Double-sided</option>
-    <option value="single_sided">Single-sided</option>
+    <option value="double_sided">{swissFormatDisplayString("double_sided")}</option>
+    <option value="single_sided">{swissFormatDisplayString("single_sided")}</option>
   </select>
   {#if errors.swiss_format}
     <div class="invalid-feedback d-block">{errors.swiss_format}</div>
