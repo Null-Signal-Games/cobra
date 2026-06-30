@@ -110,12 +110,17 @@ describe("Tournament", () => {
         );
 
         // Registration card
-        expect(
-          screen.getByLabelText("registration information"),
-        ).toHaveTextContent("Sign in");
-        expect(
-          screen.getByLabelText("registration information"),
-        ).toHaveTextContent("Create NRDB Account");
+        const regInfoCard = screen.getByLabelText("registration information");
+        expect(regInfoCard).toHaveTextContent("Sign in");
+        expect(regInfoCard).toHaveTextContent("Create NRDB Account");
+
+        // Additional details
+        const detailsCard = screen.getByLabelText("additional details");
+        expect(detailsCard).toHaveTextContent("Description This is a test tournament.");
+        expect(detailsCard).toHaveTextContent("Swiss Format: Single-sided");
+        expect(detailsCard).not.toHaveTextContent("Game Format:");
+        expect(detailsCard).toHaveTextContent("Official Prize Kit: 2026 Test Tournament Kit");
+        expect(detailsCard).not.toHaveTextContent("Additional Prizes");
       });
     });
 

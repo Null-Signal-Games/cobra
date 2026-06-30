@@ -263,7 +263,7 @@
     </div>
 
     <!-- Additional Details -->
-    <div class="row mt-3">
+    <div class="row mt-3" aria-label="additional details">
       <div class="col-md-12">
         <div class="card">
           <div class="card-header d-flex justify-content-between">
