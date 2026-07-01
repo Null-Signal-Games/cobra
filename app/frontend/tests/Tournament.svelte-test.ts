@@ -119,7 +119,7 @@ describe("Tournament", () => {
         expect(detailsCard).toHaveTextContent("Description This is a test tournament.");
         expect(detailsCard).toHaveTextContent("Swiss Format: Single-sided");
         expect(detailsCard).not.toHaveTextContent("Game Format:");
-        expect(detailsCard).toHaveTextContent("Official Prize Kit: 2026 Test Tournament Kit");
+        expect(detailsCard).toHaveTextContent("Official Prize Kit 2026 Test Tournament Kit");
         expect(detailsCard).not.toHaveTextContent("Additional Prizes");
       });
     });

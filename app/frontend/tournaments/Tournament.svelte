@@ -272,13 +272,13 @@
           
           <ul class="list-group list-group-flush">
             <!-- Description -->
-            <li class="list-group-item">
-              {#if tournament.description}
+            {#if tournament.description}
+              <li class="list-group-item">
                 <h5>Description</h5>
                 <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                 <p>{@html DOMPurify.sanitize(marked(tournament.description, { async: false }))}</p>
-              {/if}
-            </li>
+              </li>
+            {/if}
 
             <!-- Format and Deckbuilding -->
             <li class="list-group-item">

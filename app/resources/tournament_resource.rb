@@ -33,7 +33,7 @@ class TournamentResource < ApplicationResource
   attribute :additional_prizes_description, :string
   attribute :official_prize_kit_id, :integer
   attribute :official_prize_kit_name, :string do
-    @object.official_prize_kit.name
+    @object.official_prize_kit&.name
   end
 
   attribute :stage, :string
@@ -55,7 +55,7 @@ class TournamentResource < ApplicationResource
   attribute :tournament_type_id, :integer
   attribute :format_id, :integer
   attribute :format_name, :string do
-    @object.format.name
+    @object.format&.name
   end
   attribute :deckbuilding_restriction_id, :string
   attribute :deckbuilding_restriction_name, :string do
