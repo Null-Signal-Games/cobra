@@ -15,6 +15,7 @@ class ApplicationController < ActionController::Base # rubocop:disable Style/Doc
     %r{^/$},
     %r{^/tournaments$},
     %r{^/tournaments/[0-9]+$},
+    %r{^/tournaments/[0-9]+/info$},
     %r{^/tournaments/[0-9]+/players$},
     %r{^/tournaments/[0-9]+/registration$},
     %r{^/tournaments/[0-9]+/rounds$},

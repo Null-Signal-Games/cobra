@@ -3,7 +3,7 @@
 module Beta
   class TournamentsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
     before_action :set_tournament, only: %i[
-      show update qr registration open_registration close_registration lock_player_registrations
+      show update info qr registration open_registration close_registration lock_player_registrations
       unlock_player_registrations cut stats id_and_faction_data cut_conversion_rates
     ]
     before_action :authorize_beta_testing
@@ -74,6 +74,10 @@ module Beta
           end
         end
       end
+    end
+
+    def info
+      redirect_to beta_tournament_path(@tournament)
     end
 
     def qr
