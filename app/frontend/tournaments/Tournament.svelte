@@ -297,17 +297,19 @@
 
             <!-- Prizes -->
             {#if tournament.official_prize_kit_id ?? tournament.additional_prizes_description}
-              <li class="list-group-item">
-                {#if tournament.official_prize_kit_id}
-                  <h5>Prizes</h5>
-                  <p>Official Prize Kit: {tournament.official_prize_kit_name}</p>
-                {/if}
-                {#if tournament.additional_prizes_description}
+              {#if tournament.official_prize_kit_id}
+                <li class="list-group-item">
+                  <h5>Official Prize Kit</h5>
+                  <p>{tournament.official_prize_kit_name}</p>
+                </li>
+              {/if}
+              {#if tournament.additional_prizes_description}
+                <li class="list-group-item">
                   <h5>Additional Prizes</h5>
                   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
                   <p>{@html DOMPurify.sanitize(marked(tournament.additional_prizes_description, { async: false }))}</p>
-                {/if}
-              </li>
+                </li>
+              {/if}
             {/if}
           </ul>
         </div>
