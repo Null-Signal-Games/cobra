@@ -79,7 +79,7 @@ Rails.application.configure do
   # Configure Semantic Logger to output logs in JSON format to the log file,
   # and colorized text to STDOUT if the server is running.
   config.rails_semantic_logger.appenders do |appenders|
-    SemanticLogger.application = 'cobra'
+    config.semantic_logger.application = 'cobra'
     appenders.add(file_name: Rails.root.join('log', "#{Rails.env}.log").to_s, formatter: :json)
   end
 

@@ -59,5 +59,5 @@ if @options && @options[:workers].to_i.positive?
     ActiveRecord::Base.establish_connection if defined?(ActiveRecord::Base)
   end
 else
-  SemanticLogger.add_appender(io: $stdout, formatter: :json) # unless exists
+  SemanticLogger.add_appender(io: $stdout, formatter: :json)
 end
