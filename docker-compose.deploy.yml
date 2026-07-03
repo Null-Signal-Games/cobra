@@ -1,11 +1,10 @@
 # Define the logging configuration once
 x-logging: &default-logging
-    logging:
-      driver: "local"
-      options:
-        max-size: "100m"
-        max-file: "7"
-        compress: "true"
+  driver: "local"
+  options:
+    max-size: "100m"
+    max-file: "7"
+    compress: "true"
 
 services:
   app:
