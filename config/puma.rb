@@ -45,3 +45,23 @@ plugin :solid_queue if ENV['SOLID_QUEUE_IN_PUMA']
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
 pidfile ENV['PIDFILE'] if ENV['PIDFILE']
+
+def setup_stdout_logging
+  return unless defined?(SemanticLogger)
+
+  # Add the STDOUT appender purely for the Puma process lifecycle
+  SemanticLogger.add_appender(io: $stdout, formatter: :json)
+
+  # Reopen all appenders (both the file and the newly added stdout)
+  # This securely flushes handles and forks the logging thread for the worker
+  SemanticLogger.reopen
+end
+
+if @options && @options[:workers].to_i.positive?
+  # Set up the forked process with our logging config.
+  before_worker_boot do
+    setup_stdout_logging
+  end
+else
+  setup_stdout_logging
+end
