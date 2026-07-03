@@ -39,6 +39,7 @@ gem 'slim-rails'
 gem 'turbolinks', '~> 5'
 gem 'uglifier', '>= 1.3.0'
 gem 'vite_rails'
+gem 'rails_semantic_logger'
 
 group :development, :test do
   gem 'brakeman'
