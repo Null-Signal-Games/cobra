@@ -7,12 +7,12 @@ SimpleCov.enable_coverage :branch
 SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 
 SimpleCov.start do
-  add_filter 'spec/'
-  add_filter 'test/'
-  add_group 'Controllers', 'app/controllers'
-  add_group 'Models', 'app/models'
-  add_group 'Resources', 'app/resources'
-  add_group 'Libraries', 'lib'
+  skip 'spec/'
+  skip 'test/'
+  group 'Controllers', 'app/controllers'
+  group 'Models', 'app/models'
+  group 'Resources', 'app/resources'
+  group 'Libraries', 'lib'
 end
 
 RSpec.configure do |config|
