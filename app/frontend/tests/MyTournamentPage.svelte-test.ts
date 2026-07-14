@@ -93,7 +93,7 @@ describe("MyTournamentPage", () => {
           getByRole(currentRow, "button", { name: /report pairing/i }),
         );
 
-        const reportDialog = document.getElementById("reportModal");
+        const reportDialog = document.getElementById(`reportModal-${MockPairing1.id}`);
         expect(reportDialog).not.toBeNull();
         if (!reportDialog) {
           return;

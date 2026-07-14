@@ -10,9 +10,20 @@
   }
 
   let { id, headerText, children, footer }: Props = $props();
+
+  function portal(node: HTMLElement) {
+    document.body.appendChild(node);
+    return {
+      destroy() {
+        if (node.parentNode) {
+          node.parentNode.removeChild(node);
+        }
+      }
+    };
+  }
 </script>
 
-<div {id} class="modal fade" role="dialog" tabindex="-1" aria-hidden="true">
+<div {id} class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" use:portal>
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
