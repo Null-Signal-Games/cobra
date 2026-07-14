@@ -54,7 +54,6 @@ group :development, :test do
   gem 'ruby-lsp-rspec', require: false
   gem 'simplecov'
   gem 'simplecov-cobertura'
-  gem 'simplecov-html'
 end
 
 group :test do
