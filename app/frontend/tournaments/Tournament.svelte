@@ -1,11 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import GlobalMessages from "../widgets/GlobalMessages.svelte";
-  import { loadQRCode, loadTournament, Tournament } from "./TournamentSettings";
+  import { loadQRCode, loadTournament, Tournament, swissFormatDisplayString } from "./TournamentSettings";
   import { loadPlayerByUserId, Player } from "../players/PlayersData";
   import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
   import RegistrationCard from "../players/RegistrationCard.svelte";
   import ModalDialog from "../widgets/ModalDialog.svelte";
+  import { marked } from "marked";
+  import DOMPurify from "dompurify";
 
   let {
     tournamentId,
@@ -69,14 +71,18 @@
 
 {#if tournament}
   <div class="container">
+    <!-- Notices -->
     <div class="row">
-      <!-- Overview -->
-      <div class="col-md-6">
-        <!-- Notice -->
+      <div class="col-md-12">
         {#each notices as notice (notice)}
           <div class="alert alert-info">{notice}</div>
         {/each}
+      </div>
+    </div>
 
+    <div class="row">
+      <!-- Overview -->
+      <div class="col-md-6">
         <div class="card">
           <!-- Shortcode -->
           {#if tournament.slug}
@@ -186,6 +192,14 @@
               </ModalDialog>
             </div>
           </li>
+
+          <!-- More Information -->
+          {#if tournament.event_link}
+            <li class="list-group-item">
+              <div class="small text-secondary">More Information:</div>
+              <a href={tournament.event_link} target="_blank">{tournament.event_link}</a>
+            </li>
+          {/if}
         </div>
       </div>
 
@@ -245,6 +259,60 @@
             <div class="spinner-border m-auto"></div>
           </div>
         {/if}
+      </div>
+    </div>
+
+    <!-- Additional Details -->
+    <div class="row mt-3" aria-label="additional details">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <h5 class="mb-0">Additional Details</h5>
+          </div>
+          
+          <ul class="list-group list-group-flush">
+            <!-- Description -->
+            {#if tournament.description}
+              <li class="list-group-item">
+                <h5>Description</h5>
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                <p>{@html DOMPurify.sanitize(marked(tournament.description, { async: false }))}</p>
+              </li>
+            {/if}
+
+            <!-- Format and Deckbuilding -->
+            <li class="list-group-item">
+              <h5>Format and Deckbuilding</h5>
+              <div>Swiss Format: {swissFormatDisplayString(tournament.swiss_format)}</div>
+              {#if tournament.format_id}
+                <div>Game Format: {tournament.format_name}</div>
+              {/if}
+              {#if tournament.deckbuilding_restriction_id}
+                <div>Deckbuilding Restrictions: {tournament.deckbuilding_restriction_name}</div>
+              {/if}
+              {#if tournament.decklist_required}
+                <div>Decklists are required for this event.</div>
+              {/if}
+            </li>
+
+            <!-- Prizes -->
+            {#if tournament.official_prize_kit_id ?? tournament.additional_prizes_description}
+              {#if tournament.official_prize_kit_id}
+                <li class="list-group-item">
+                  <h5>Official Prize Kit</h5>
+                  <p>{tournament.official_prize_kit_name}</p>
+                </li>
+              {/if}
+              {#if tournament.additional_prizes_description}
+                <li class="list-group-item">
+                  <h5>Additional Prizes</h5>
+                  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                  <p>{@html DOMPurify.sanitize(marked(tournament.additional_prizes_description, { async: false }))}</p>
+                </li>
+              {/if}
+            {/if}
+          </ul>
+        </div>
       </div>
     </div>
   </div>

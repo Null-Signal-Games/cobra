@@ -76,6 +76,13 @@ Rails.application.configure do
   # Annotate rendered view with file names.
   config.action_view.annotate_rendered_view_with_filenames = true
 
+  # Configure Semantic Logger to output logs in JSON format to the log file,
+  # and colorized text to STDOUT if the server is running.
+  config.rails_semantic_logger.appenders do |appenders|
+    config.semantic_logger.application = 'cobra'
+    appenders.add(file_name: Rails.root.join('log', "#{Rails.env}.log").to_s, formatter: :json)
+  end
+
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
 

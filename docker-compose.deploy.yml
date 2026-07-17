@@ -1,9 +1,19 @@
+# Define the logging configuration once
+x-logging: &default-logging
+  driver: "local"
+  options:
+    max-size: "100m"
+    max-file: "7"
+    compress: "true"
+
 services:
   app:
+    logging: *default-logging
     networks:
       - backend
       - null_signal
   db:
+    logging: *default-logging
     networks:
       - backend
 

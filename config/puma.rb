@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'semantic_logger'
+
 # This configuration file will be evaluated by Puma. The top-level methods that
 # are invoked here are part of Puma's configuration DSL. For more information
 # about methods provided by the DSL, see https://puma.io/puma/Puma/DSL.html.
@@ -45,3 +47,19 @@ plugin :solid_queue if ENV['SOLID_QUEUE_IN_PUMA']
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
 pidfile ENV['PIDFILE'] if ENV['PIDFILE']
+
+if @options && @options[:workers].to_i.positive?
+  before_fork do
+    SemanticLogger.flush if defined?(SemanticLogger)
+  end
+
+  # Set up the forked process with our logging config.
+  before_worker_boot do
+    SemanticLogger.add_appender(io: $stdout, formatter: :json) # unless exists
+    # This securely flushes handles and forks the logging thread for the worker
+    SemanticLogger.reopen
+    ActiveRecord::Base.establish_connection if defined?(ActiveRecord::Base)
+  end
+else
+  SemanticLogger.add_appender(io: $stdout, formatter: :json)
+end

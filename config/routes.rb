@@ -57,6 +57,7 @@ Rails.application.routes.draw do
         get :decks, on: :collection
         get :decks, on: :member
       end
+      get :info, on: :member
       get :qr, on: :member
       get :registration, on: :member
       resources :stages, only: %i[create destroy]
