@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { COBRA_API_SERVER } from '$app/env/public';
   import { onMount } from "svelte";
   import type { TournamentInfo, TournamentsResponse } from "$lib/utils/api_types";
   import TournamentRow from "$lib/components/TournamentRow.svelte";
@@ -13,7 +14,7 @@
     loading = true;
     const today = new Date();
     const dateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-    const url = `http://localhost:3000/api/v1/public/tournaments?page[size]=100&include=tournament_type&filter[date]=${dateString}&sort=name`;
+    const url = `${COBRA_API_SERVER}/api/v1/public/tournaments?page[size]=100&include=tournament_type&filter[date]=${dateString}&sort=name`;
 
     try {
       const response = await fetch(url, {
