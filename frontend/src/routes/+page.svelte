@@ -5,6 +5,7 @@
   import TournamentRow from "$lib/components/TournamentRow.svelte";
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
 
   let tournaments: TournamentInfo[] = $state([]);
   let tournamentTypes: Record<string, string> = $state({});
@@ -56,7 +57,7 @@
 
   <h4>Today's tournaments</h4>
   {#if loading}
-    <div>Loading...</div>
+    <LoadingSpinner />
   {:else if tournaments.length === 0}
     <i>None</i>
   {:else}
