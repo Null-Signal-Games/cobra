@@ -87,7 +87,7 @@ In the Rails API container:
 $ rails server
 ```
 
-In the Sveltekit container:
+In the Sveltekit container, inside the /frontend directory:
 ```sh
 $ npm run dev
 ```
