@@ -25,12 +25,14 @@ If you open this folder in VS Code it will prompt you to re-open in the
 devcontainer. From there, your terminal will be in the container and you will have a
 self-contained, full-featured development environment.
 
+There are two containers used by Cobra: one for the Rails API backend and another to serve the Sveltekit frontend. These containers can be opened in separate VS Code windows simulataneously using the command palette. The [VS Code documentation](https://code.visualstudio.com/remote/advancedcontainers/connect-multiple-containers) provides more detail on managing multiple devcontainers.
+
 ### Local dev with Docker Compose
-If you want to develop with docker outside of VS Code, these instructions are
+If you want to develop with Docker outside of VS Code, these instructions are
 for you. This set up is preferred over local environment dev to keep
 development and deployed versions consistent.
 
-Local changes are live refreshed for both ruby and svelte aside from server-startup configuration.
+Local changes are live refreshed for both Ruby and Svelte aside from server-startup configuration.
 
 1. Set up config files
    ```sh
@@ -78,12 +80,18 @@ $ psql postgres
 $ rails db:create db:migrate
 ```
 
-Start local server in your IDE, or with the Rails CLI (this was installed when you ran `bundle`):
+### Important commands
+#### Start the servers
+In the Rails API container:
 ```sh
 $ rails server
 ```
 
-### Important commands
+In the Sveltekit container:
+```sh
+$ npm run dev
+```
+
 #### Update IDs from the NRDB API
 ```sh
 $ bundle exec rails ids:update
