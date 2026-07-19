@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_08_193019) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_19_232518) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -747,7 +747,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_08_193019) do
               swp.runner_id_name,
               swp.runner_id_faction,
               swp.player_active,
-              sft."position",
+              COALESCE((sft."position")::bigint, row_number() OVER (PARTITION BY swp.stage_id ORDER BY sft."position", swp.seed, swp.player_name, swp.player_id)) AS "position",
               sft.points,
               sft.corp_points,
               sft.runner_points,
