@@ -55,9 +55,6 @@ export interface Printing {
   };
 }
 
-export type TournamentsResponse = ApiResponse<
-  TournamentInfo,
-  TournamentTypeInfo
->;
+export type TournamentsResponse = ApiResponse<TournamentInfo, TournamentTypeInfo>;
 export type TournamentTypesResponse = ApiResponse<TournamentTypeInfo>;
 export type PrintingsResponse = ApiResponse<Printing>;

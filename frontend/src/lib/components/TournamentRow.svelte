@@ -32,16 +32,13 @@
 
     <h6 class="card-subtitle mb-2 text-muted">
       {#if tournament.attributes.date}
-        {new Date(tournament.attributes.date).toLocaleString(
-          navigator.languages,
-          {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-            timeZone: "UTC",
-          },
-        )} -
+        {new Date(tournament.attributes.date).toLocaleString(navigator.languages, {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+          timeZone: "UTC",
+        })} -
       {/if}
       {tournament.attributes.active_player_count}
       {new Intl.PluralRules(navigator.languages).select(

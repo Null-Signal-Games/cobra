@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { COBRA_API_SERVER } from '$app/env/public';
+  import { COBRA_API_SERVER } from "$app/env/public";
   import { onMount } from "svelte";
   import type { TournamentInfo, TournamentsResponse } from "$lib/utils/api_types";
   import TournamentRow from "$lib/components/TournamentRow.svelte";
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-	import LoadingSpinner from '$lib/components/LoadingSpinner.svelte';
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
 
   let tournaments: TournamentInfo[] = $state([]);
   let tournamentTypes: Record<string, string> = $state({});
@@ -76,19 +76,9 @@
 
 <div class="mt-2">
   <!-- TODO: Add route for shortcode lookup -->
-  <form
-    action="/tournaments/shortlink"
-    method="get"
-    class="form-inline justify-content-center"
-  >
+  <form action="/tournaments/shortlink" method="get" class="form-inline justify-content-center">
     <label class="mx-2" for="slug">Got a shortcode?</label>
-    <input
-      type="text"
-      class="form-control mr-2"
-      placeholder="SHRT"
-      name="slug"
-      id="slug"
-    />
+    <input type="text" class="form-control mr-2" placeholder="SHRT" name="slug" id="slug" />
     <button type="submit" class="btn btn-primary mr-2">
       <i class="fa fa-arrow-right"></i>
       Go to tournament
