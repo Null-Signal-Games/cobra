@@ -15,7 +15,7 @@ class SideDeterminer # rubocop:disable Style/Documentation
 
   # positive for more often corp, negative for more often runner
   def self.differential(player)
-    player.pairings.reported.inject(0) do |total, pairing|
+    player.pairings.reported.for_stage(stage).inject(0) do |total, pairing|
       total += 1 if pairing.player1 == player && pairing.player1_is_corp?
       total += 1 if pairing.player2 == player && pairing.player1_is_runner?
 
