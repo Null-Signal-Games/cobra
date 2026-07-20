@@ -7,4 +7,5 @@ JsRoutes.setup do |c|
   # Sprockets integration uses nil and creates a global variable in JS from the namespace value
   c.module_type = nil
   c.namespace = 'Routes'
+  c.include_undefined_query_parameters = false
 end
