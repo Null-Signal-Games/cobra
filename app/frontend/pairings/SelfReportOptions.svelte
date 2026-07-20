@@ -47,12 +47,12 @@
   type="button"
   class="btn btn-primary"
   data-toggle="modal"
-  data-target="#reportModal"
+  data-target="#reportModal-{pairing.id}"
 >
   Report Pairing
 </button>
 
-<ModalDialog id="reportModal" headerText="Report Pairing">
+<ModalDialog id="reportModal-{pairing.id}" headerText="Report Pairing">
   <p>Please click the button for the result to report this pairing:</p>
   <p>
     {left_player.name_with_pronouns} vs. {right_player.name_with_pronouns}
