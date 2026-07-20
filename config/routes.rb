@@ -13,7 +13,10 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :jsonapi } do
     namespace :v1 do
       namespace :public do
-        resources :tournaments, only: %i[index show]
+        resources :tournaments, only: %i[index show] do
+          resources :standings, only: %i[index show]
+          resources :pairings, only: %i[index show]
+        end
         resources :tournament_types, only: %i[index show]
         resources :users, only: %i[show]
         resources :stages, only: %i[index show]
