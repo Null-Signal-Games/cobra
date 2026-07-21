@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "lint": "eslint app",
+    "lint": "eslint app && eslint frontend",
+    "prettier:write": "prettier --write .",
     "svelte-check": "svelte-check",
     "test": "vitest run",
     "test:watch": "vitest",

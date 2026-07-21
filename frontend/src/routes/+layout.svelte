@@ -5,8 +5,9 @@
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import { COBRA_API_SERVER } from "$app/env/public";
   import { page } from "$app/state";
+  import type { Snippet } from "svelte";
 
-  let { children } = $props();
+  let { children }: { children: Snippet } = $props();
 </script>
 
 <svelte:head>
@@ -26,7 +27,7 @@
     <a href={resolve("/")} class="navbar-brand">Cobra (BETA)</a>
     <ul class="navbar-nav ml-auto">
       <li class="nav-item">
-        <a href="{COBRA_API_SERVER}{page.url.pathname}" class="nav-link text-light">
+        <a href="{COBRA_API_SERVER}{page.url.pathname}" rel="external" class="nav-link text-light">
           <FontAwesomeIcon icon="flask" />
           Switch to classic
         </a>

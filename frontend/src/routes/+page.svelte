@@ -6,6 +6,7 @@
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import { resolve } from "$app/paths";
 
   let tournaments: TournamentInfo[] = $state([]);
   let tournamentTypes: Record<string, string> = $state({});
@@ -89,7 +90,7 @@
 <div class="mt-3 text-center">
   <p>
     <!-- TODO: Add route for recent tournaments page -->
-    <a href="/beta/tournaments" class="btn btn-primary">
+    <a href={resolve("/")} class="btn btn-primary">
       <i class="fa fa-users"></i>
       More tournaments
     </a>
