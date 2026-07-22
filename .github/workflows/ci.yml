@@ -71,6 +71,10 @@ jobs:
 
       - name: Run CI
         run: bundle exec bin/ci
+      
+      - name: Install frontend NPM dependencies
+        working-directory: ./frontend
+        run: npm run check
 
   build_and_push:
     name: Build docker image
