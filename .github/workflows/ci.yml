@@ -64,6 +64,10 @@ jobs:
 
       - name: Install NPM dependencies
         run: npm install
+      
+      - name: Install frontend NPM dependencies
+        working-directory: ./frontend
+        run: npm install
 
       - name: Run CI
         run: bundle exec bin/ci
