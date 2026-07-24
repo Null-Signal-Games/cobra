@@ -27,6 +27,6 @@
     "vitest-setup.*.ts",
     "vitest.config.ts"
   ],
-  "exclude": ["app/assets/javascripts/awesomplete.js", "app/assets/javascripts/cable.js", "frontend"],
+  "exclude": ["app/assets/javascripts/awesomplete.js", "app/assets/javascripts/cable.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
