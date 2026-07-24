@@ -37,5 +37,8 @@
     "vite": "^8.1.0",
     "vite-plugin-ruby": "^5.2.2",
     "vitest": "^4"
+  },
+  "allowScripts": {
+    "msw@2.15.0": true
   }
 }
