@@ -33,8 +33,17 @@ class StandingResource < ApplicationResource
     @object.side_bias.to_i
   end
 
-  belongs_to :stage, resource: StageResource
-  belongs_to :player, resource: PlayerResource
+  belongs_to :stage, resource: StageResource do
+    link do |standing|
+      "/api/v1/public/tournaments/#{standing.tournament_id}/stages/#{standing.stage_id}"
+    end
+  end
+
+  belongs_to :player, resource: PlayerResource do
+    link do |standing|
+      "/api/v1/public/tournaments/#{standing.tournament_id}/players/#{standing.player_id}" if standing.player_id
+    end
+  end
 
   # Enforce the tournament_id filter as required
   filter :tournament_id, :integer, required: true

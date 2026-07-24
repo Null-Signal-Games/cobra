@@ -17,6 +17,8 @@ RSpec.describe 'Public API Rounds' do
       json = api_num_results("/api/v1/public/tournaments/#{tournament.id}/rounds", 1)
       expect(json['data'].first['links']['self']).to include("/tournaments/#{tournament.id}/rounds/")
       expect(json['data'].first['links']['self']).not_to include(':tournament_id')
+      expect(json['links']['self']).to include("/tournaments/#{tournament.id}/rounds")
+      expect(json['links']['self']).not_to include(':tournament_id')
     end
   end
 

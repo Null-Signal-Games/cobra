@@ -20,7 +20,11 @@ class StageResource < ApplicationResource
   attribute :updated_at, :datetime
 
   belongs_to :tournament
-  has_many :rounds
+  has_many :rounds do
+    link do |stage|
+      "/api/v1/public/tournaments/#{stage.tournament_id}/rounds?filter[stage_id]=#{stage.id}"
+    end
+  end
 
   filter :tournament_id, :integer, required: true
 end

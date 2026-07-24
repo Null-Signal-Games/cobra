@@ -22,7 +22,11 @@ class RoundResource < ApplicationResource
   attribute :created_at, :datetime
   attribute :updated_at, :datetime
 
-  belongs_to :stage
+  belongs_to :stage do
+    link do |round|
+      "/api/v1/public/tournaments/#{round.tournament_id}/stages/#{round.stage_id}"
+    end
+  end
   belongs_to :tournament
 
   filter :tournament_id, :integer, required: true
