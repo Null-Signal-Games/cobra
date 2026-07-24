@@ -11,7 +11,7 @@ class PairingResource < ApplicationResource
   # Construct the self link manually since we have non-standard scoping and
   # the default impl from Graphiti is incorrect in this case.
   link :self do |model|
-    "#{context.request.base_url}/api/v1/public/tournaments/#{model.round.tournament_id}/pairings/#{model.id}"
+    "/api/v1/public/tournaments/#{model.round.tournament_id}/pairings/#{model.id}"
   end
 
   attribute :id, :integer

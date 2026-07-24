@@ -38,8 +38,9 @@ RSpec.describe 'Public API Tournaments' do
         deckbuilding_restriction: '/api/v1/public/deckbuilding_restrictions/',
         format: '/api/v1/public/formats/',
         official_prize_kit: '/api/v1/public/official_prize_kits/',
-        stages: '/api/v1/public/stages',
-        rounds: '/api/v1/public/rounds'
+        stages: 'stages',
+        rounds: 'rounds',
+        players: 'players'
       )
     end
 

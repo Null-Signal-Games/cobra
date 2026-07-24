@@ -2,7 +2,12 @@
 
 # Public resource for Player objects.
 class PlayerResource < ApplicationResource
-  primary_endpoint '/players', %i[index show]
+  primary_endpoint '/tournaments/:tournament_id/players', %i[index show]
+  self.validate_endpoints = false
+
+  link :self do |model|
+    "/api/v1/public/tournaments/#{model.tournament_id}/players/#{model.id}"
+  end
 
   self.default_page_size = 50
 

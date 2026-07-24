@@ -2,7 +2,12 @@
 
 # Public resource for Stage objects.
 class StageResource < ApplicationResource
-  primary_endpoint '/stages', %i[index show]
+  primary_endpoint '/tournaments/:tournament_id/stages', %i[index show]
+  self.validate_endpoints = false
+
+  link :self do |model|
+    "/api/v1/public/tournaments/#{model.tournament_id}/stages/#{model.id}"
+  end
 
   self.default_page_size = 50
 
@@ -16,4 +21,6 @@ class StageResource < ApplicationResource
 
   belongs_to :tournament
   has_many :rounds
+
+  filter :tournament_id, :integer, required: true
 end

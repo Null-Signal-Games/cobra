@@ -6,6 +6,8 @@ module Api
       # Controller for the Player resource. A tournament ID is required and enforced in the resource.
       class PlayersController < PublicApiController
         def index
+          params[:filter] ||= {}
+          params[:filter][:tournament_id] = params[:tournament_id]
           add_total_stat(params)
           base_scope = players_base_scope
           players = PlayerResource.all(params, base_scope)
@@ -13,7 +15,7 @@ module Api
         end
 
         def show
-          base_scope = players_base_scope
+          base_scope = players_base_scope.where(tournament_id: params[:tournament_id])
           player = PlayerResource.find(params, base_scope)
           respond_with(player)
         end

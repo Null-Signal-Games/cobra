@@ -2,7 +2,12 @@
 
 # Public resource for Round objects.
 class RoundResource < ApplicationResource
-  primary_endpoint '/rounds', %i[index show]
+  primary_endpoint '/tournaments/:tournament_id/rounds', %i[index show]
+  self.validate_endpoints = false
+
+  link :self do |model|
+    "/api/v1/public/tournaments/#{model.tournament_id}/rounds/#{model.id}"
+  end
 
   self.default_page_size = 50
 
@@ -19,4 +24,6 @@ class RoundResource < ApplicationResource
 
   belongs_to :stage
   belongs_to :tournament
+
+  filter :tournament_id, :integer, required: true
 end

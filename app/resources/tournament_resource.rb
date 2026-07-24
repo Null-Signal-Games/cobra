@@ -80,8 +80,21 @@ class TournamentResource < ApplicationResource
   belongs_to :format
   belongs_to :official_prize_kit
   belongs_to :user
-  has_many :stages
-  has_many :rounds
+  has_many :stages do
+    link do |tournament|
+      "/api/v1/public/tournaments/#{tournament.id}/stages"
+    end
+  end
+  has_many :rounds do
+    link do |tournament|
+      "/api/v1/public/tournaments/#{tournament.id}/rounds"
+    end
+  end
+  has_many :players do
+    link do |tournament|
+      "/api/v1/public/tournaments/#{tournament.id}/players"
+    end
+  end
 
   def create_timestamp(date, time_24h, timezone)
     return nil if date.nil? || time_24h.nil? || timezone.nil?
