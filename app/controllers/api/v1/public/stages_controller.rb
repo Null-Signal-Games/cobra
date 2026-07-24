@@ -6,6 +6,8 @@ module Api
       # Controller for the Stage resource.
       class StagesController < PublicApiController
         def index
+          params[:filter] ||= {}
+          params[:filter][:tournament_id] = params[:tournament_id]
           add_total_stat(params)
           base_scope = stages_base_scope
           stages = StageResource.all(params, base_scope)
@@ -13,7 +15,7 @@ module Api
         end
 
         def show
-          base_scope = stages_base_scope
+          base_scope = stages_base_scope.where(tournament_id: params[:tournament_id])
           stage = StageResource.find(params, base_scope)
           respond_with(stage)
         end
