@@ -95,6 +95,11 @@ class TournamentResource < ApplicationResource
       "/api/v1/public/tournaments/#{tournament.id}/players"
     end
   end
+  has_many :pairings do
+    link do |tournament|
+      "/api/v1/public/tournaments/#{tournament.id}/pairings"
+    end
+  end
 
   def create_timestamp(date, time_24h, timezone)
     return nil if date.nil? || time_24h.nil? || timezone.nil?

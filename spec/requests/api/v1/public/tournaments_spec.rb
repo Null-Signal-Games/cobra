@@ -40,7 +40,8 @@ RSpec.describe 'Public API Tournaments' do
         official_prize_kit: '/api/v1/public/official_prize_kits/',
         stages: 'stages',
         rounds: 'rounds',
-        players: 'players'
+        players: 'players',
+        pairings: 'pairings'
       )
     end
 

@@ -5,6 +5,7 @@ class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style
   belongs_to :user
   has_many :stages, -> { order(:number) }, dependent: :destroy # rubocop:disable Rails/InverseOf
   has_many :rounds
+  has_many :pairings, through: :rounds
   belongs_to :format, optional: true
   belongs_to :deckbuilding_restriction, optional: true
   belongs_to :official_prize_kit, optional: true
