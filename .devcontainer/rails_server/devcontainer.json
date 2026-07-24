@@ -1,9 +1,9 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ruby-rails-postgres
 {
-    "name": "Cobra Devcontainer",
-    "dockerComposeFile": "docker-compose.yml",
-    "service": "app",
+    "name": "Cobra API Devcontainer",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "api",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
@@ -32,6 +32,12 @@
         3000,
         5432
     ],
+    "portsAttributes": {
+      "3000": {
+        "label": "API",
+        "onAutoForward": "notify"
+      }
+    },
     // Use 'postCreateCommand' to run commands after the container is created.
     "postCreateCommand": "bundle install && bundle exec rails db:setup && npm install",
 

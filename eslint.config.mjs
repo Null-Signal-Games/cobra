@@ -28,6 +28,9 @@ export default ts.config(
     },
   },
   {
+    ignores: ["frontend/.svelte-kit/**/*"],
+  },
+  {
     languageOptions: {
       parserOptions: {
         projectService: true,

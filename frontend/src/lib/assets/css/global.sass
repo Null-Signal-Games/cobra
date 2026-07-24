@@ -1,0 +1,85 @@
+@use 'sass:color';
+
+html
+  position: relative
+  min-height: 100%
+
+body
+  color: #333
+  padding-top: 70px
+  margin-bottom: 60px
+
+.footer
+  position: absolute
+  bottom: 0
+  width: 100%
+  padding-top: 18px
+  padding-bottom: 18px
+
+a
+  text-decoration: none
+  color: #1b98f8
+
+  &:hover
+    text-decoration: none
+
+nav.navbar, .footer
+  $color__dark-bg: rgb(37, 42, 58)
+  background: $color__dark-bg
+  color: #f8f9fa
+
+  .dropdown-menu
+    background: color.adjust($color__dark-bg, $lightness: 20%)
+
+  .navbar-brand
+    color: #ffc94c
+
+  .nav-item
+    a, .nav-link
+      color: #fff
+
+      &:hover
+        background: rgb(55, 60, 90)
+
+@media print
+  body
+    padding-top: 0
+    zoom: 0.7
+
+  .container
+    width: auto
+
+  .main-content
+    padding-top: 0 !important
+
+  .dontprint
+    display: none !important
+
+  .slips
+    position: absolute
+
+    .match_slip
+      page-break-inside: avoid
+
+  // This is particularly used for deck registration, as the cards are displayed in striped tables,
+  // and there's a button to print the decks.
+  .table-striped tbody tr:nth-of-type(2n+1)
+    background-color: transparent !important
+  .table-striped tbody tr:nth-of-type(2n+1) td
+    background-color: #f2f2f2 !important
+  .table .thead-dark tr th, .table-striped-horizontal tbody tr td:nth-of-type(2n)
+    color: #fff !important
+    background-color: #343a40 !important
+  .table-light, .table-striped-horizontal tbody tr td:nth-of-type(2n+1)
+    background-color: #fdfdfe !important
+  .table
+    -webkit-print-color-adjust: exact !important
+    print-color-adjust: exact !important
+    color-adjust: exact !important
+
+.table-striped-horizontal tbody tr td:nth-of-type(2n)
+  color: #fff
+  background-color: #343a40
+
+.table-striped-horizontal tbody tr td:nth-of-type(2n+1)
+  background-color: #fdfdfe
