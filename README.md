@@ -16,11 +16,6 @@ The application has a Docker
 [DevContainer](https://code.visualstudio.com/docs/devcontainers/containers)
 setup. If you use VS Code, this is the easiest way to develop for Cobra.
 
-To use it, first create the database.yml file:
-```sh
-$ cat config/database.example.app-in-docker.yml | sed s/localhost/db/ > config/database.yml
-```
-
 If you open this folder in VS Code it will prompt you to re-open in the
 devcontainer. From there, your terminal will be in the container and you will have a
 self-contained, full-featured development environment.
