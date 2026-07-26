@@ -97,8 +97,8 @@ RSpec.describe 'Public API Standings' do
     it 'has expected relationships' do
       has_relationships(
         "/api/v1/public/tournaments/#{tournament.id}/standings/#{stage.id}:#{standing_row.position}",
-        stage: '/api/v1/public/stages/',
-        player: '/api/v1/public/players/'
+        stage: 'stages',
+        player: 'players'
       )
     end
 

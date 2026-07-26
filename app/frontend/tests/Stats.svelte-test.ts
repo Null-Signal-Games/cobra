@@ -26,36 +26,56 @@ const ResizeObserver = vi.fn(function () {
     disconnect: vi.fn(),
   };
 });
-const SVGElement = vi.fn(() => ({
+
+Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+  configurable: true,
+  get() {
+    return 500;
+  },
+});
+Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+  configurable: true,
+  get() {
+    return 300;
+  },
+});
+Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+  configurable: true,
+  get() {
+    return 500;
+  },
+});
+Object.defineProperty(HTMLElement.prototype, "clientHeight", {
+  configurable: true,
+  get() {
+    return 300;
+  },
+});
+
+
+
+Object.assign(window.SVGElement.prototype, {
   getScreenCTM: vi.fn(() => ({
-    writable: true,
-    value: vi.fn(),
+    x: 10,
+    y: 10,
+    inverse: vi.fn(),
+    multiply: vi.fn(),
   })),
   getBBox: vi.fn(() => ({
-    writable: true,
-    value: vi.fn().mockReturnValue({
-      x: 10,
-      y: 10,
-      width: 100,
-      height: 100,
-    }),
+    x: 10,
+    y: 10,
+    width: 100,
+    height: 100,
   })),
-  getComputedTextLength: vi.fn(() => ({
-    writable: true,
-    value: vi.fn().mockReturnValue(10),
-  })),
+  getComputedTextLength: vi.fn(() => 10),
   createSVGMatrix: vi.fn(() => ({
-    writable: true,
-    value: vi.fn().mockReturnValue({
-      x: 10,
-      y: 10,
-      inverse: vi.fn(),
-      multiply: vi.fn(),
-    }),
+    x: 10,
+    y: 10,
+    inverse: vi.fn(),
+    multiply: vi.fn(),
   })),
-}));
+});
 vi.stubGlobal("ResizeObserver", ResizeObserver);
-vi.stubGlobal("SVGElement", SVGElement);
 
 describe("Stats", () => {
   beforeEach(async () => {
@@ -92,7 +112,8 @@ describe("Stats", () => {
       ["Anarch", "Shaper"],
     ],
   ])("faction charts", (testName, divId, factions) => {
-    it(testName, () => {
+    it(testName, async () => {
+      await new Promise((r) => setTimeout(r, 0));
       const chartDiv = document.getElementById(divId);
       expect(chartDiv).not.toBeNull();
       if (!chartDiv) {

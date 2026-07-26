@@ -28,9 +28,6 @@ export default ts.config(
     },
   },
   {
-    ignores: ["frontend/.svelte-kit/**/*"],
-  },
-  {
     languageOptions: {
       parserOptions: {
         projectService: true,
@@ -65,5 +62,9 @@ export default ts.config(
         svelteConfig,
       },
     },
+  },
+  {
+    files: ["**/*.js", "**/*.mjs", "**/*.cjs"],
+    ...ts.configs.disableTypeChecked,
   },
 );

@@ -39,10 +39,9 @@
         </a>
       </li>
       <li class="nav-item dropdown">
-        <a
-          href="#"
+        <button
+          type="button"
           id="tournamentTypeDropdown"
-          role="button"
           data-toggle="dropdown"
           aria-haspopup="true"
           aria-expanded="false"
@@ -50,14 +49,13 @@
         >
           <FontAwesomeIcon icon="trophy" />
           Tournament types
-        </a>
+        </button>
         <!-- TODO: Menu -->
       </li>
       <li class="nav-item dropdown">
-        <a
-          href="#"
+        <button
+          type="button"
           id="userDropdown"
-          role="button"
           data-toggle="dropdown"
           aria-haspopup="true"
           aria-expanded="false"
@@ -65,7 +63,7 @@
         >
           <FontAwesomeIcon icon="user" />
           Sign in
-        </a>
+        </button>
         <!-- TODO: Menu -->
       </li>
     </ul>

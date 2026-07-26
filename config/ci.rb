@@ -14,9 +14,9 @@ CI.run do
 
   step 'Tests: System', 'bundle exec rspec'
 
-  step 'Lint: Javascript', 'npm run lint'
-  step 'Lint: Svelte', 'npm run svelte-check'
-  step 'Tests: Vite', 'npm run test'
+  step 'Lint: Javascript', 'env VITE_RUBY_ROOT=. npm run lint'
+  step 'Lint: Svelte', 'env VITE_RUBY_ROOT=. npm run svelte-check'
+  step 'Tests: Vite', 'env VITE_RUBY_ROOT=. npm run test'
 
   # Optional: set a green GitHub commit status to unblock PR merge.
   # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`.

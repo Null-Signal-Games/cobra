@@ -57,15 +57,11 @@ export async function loadPairings(
 ) {
   const betaEnabledCookie = await cookieStore.get("beta_enabled");
 
-  let url = "";
-  if (userId) {
-    url = `/tournaments/${tournamentId}/rounds/pairings_data/${userId}`;
-  } else {
-    url =
-      betaEnabledCookie?.value === "true"
-        ? Routes.pairings_data_beta_tournament_rounds_path(tournamentId)
-        : Routes.pairings_data_tournament_rounds_path(tournamentId);
-  }
+  const url = userId
+    ? `/tournaments/${tournamentId}/rounds/pairings_data/${userId}`
+    : betaEnabledCookie?.value === "true"
+      ? Routes.pairings_data_beta_tournament_rounds_path(tournamentId)
+      : Routes.pairings_data_tournament_rounds_path(tournamentId);
 
   const response = await fetch(url, {
     method: "GET",
