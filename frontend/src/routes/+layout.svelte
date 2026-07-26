@@ -33,7 +33,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a href={resolve("/")} class="nav-link text-light">
+        <a href={resolve("/help")} class="nav-link text-light">
           <FontAwesomeIcon icon="life-ring" />
           How to
         </a>

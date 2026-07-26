@@ -1,12 +1,12 @@
 <script lang="ts">
-  import FontAwesomeIcon from "../widgets/FontAwesomeIcon.svelte";
+  import FontAwesomeIcon from "./FontAwesomeIcon.svelte";
 </script>
 
 <div class="col-3">
   <div class="sticky-top navbar navbar-light" id="help_contents">
     <nav class="nav nav-pills flex-column">
       <a class="nav-link" href="#help_login">Log In</a>
-      <a class="nav-link" href="help_create">Create a Tournament</a>
+      <a class="nav-link" href="#help_create">Create a Tournament</a>
       <nav class="nav nav-pills flex-column">
         <a class="nav-link ml-3" href="#help_shortcode">What's a shortcode?</a>
       </nav>
@@ -269,7 +269,7 @@
     before marking it as "Private" or you won't be able to find it!
   </div>
 
-  <h4 id="help_abr">What is "Upload to Always Be Running"?</h4>
+  <h4 id="help_abr">What is "Upload to Always Be Running?"</h4>
   <p>
     Always Be Running is a tournament results aggregator, and results from your
     tournament on Cobra can be uploaded directly to it!

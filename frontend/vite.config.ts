@@ -4,7 +4,15 @@ import adapter from "@sveltejs/adapter-auto";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
+import path from "path";
+
 export default defineConfig({
+  resolve: {
+    alias: {
+      "$frontendlib": path.resolve(__dirname, "src/lib"),
+      "$frontendsrc": path.resolve(__dirname, "src"),
+    },
+  },
   plugins: [
     sveltekit({
       compilerOptions: {

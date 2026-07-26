@@ -16,7 +16,12 @@
     "allowJs": true,
     "checkJs": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "$frontendlib/*": ["frontend/src/lib/*"],
+      "$frontendsrc/*": ["frontend/src/*"]
+    }
   },
   "include": [
     "app/**/*.ts",

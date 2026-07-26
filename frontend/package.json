@@ -4,16 +4,17 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
     "build": "vite build",
-    "preview": "vite preview",
-    "prepare": "svelte-kit sync || echo ''",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "prettier --check . && eslint .",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "dev": "vite dev",
     "format": "prettier --write .",
+    "lint": "prettier --check . && eslint .",
+    "prepare": "svelte-kit sync || echo ''",
+    "preview": "vite preview",
     "test:unit": "vitest",
-    "test": "npm run test:unit -- --run"
+    "test": "npm run test:unit -- --run",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -29,7 +30,7 @@
     "playwright": "^1.60.0",
     "prettier": "^3.8.3",
     "prettier-plugin-svelte": "^4.1.0",
-    "sass-embedded": "^1.100.0",
+    "sass": "^1.85.1",
     "svelte": "^5.56.1",
     "svelte-check": "^4.6.0",
     "typescript": "^6.0.3",

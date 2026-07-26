@@ -1,5 +1,5 @@
 import { mount } from "svelte";
-import HelpPage from "../home/HelpPage.svelte";
+import HelpPage from "$frontendlib/components/HelpPage.svelte";
 
 document.addEventListener("turbolinks:load", () => {
   const anchor = document.getElementById("help_anchor");
