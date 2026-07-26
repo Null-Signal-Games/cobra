@@ -54,9 +54,9 @@ RSpec.describe 'Public API Pairings' do
     it 'has expected relationships' do
       has_relationships(
         "/api/v1/public/tournaments/#{tournament.id}/pairings/#{pairing.id}",
-        round: '/api/v1/public/rounds/',
-        player1: '/api/v1/public/players/',
-        player2: '/api/v1/public/players/'
+        round: 'rounds',
+        player1: '/api/v1/public/tournaments/',
+        player2: '/api/v1/public/tournaments/'
       )
     end
 

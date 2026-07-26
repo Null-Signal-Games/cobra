@@ -6,6 +6,8 @@ module Api
       # Controller for the Round resource.
       class RoundsController < PublicApiController
         def index
+          params[:filter] ||= {}
+          params[:filter][:tournament_id] = params[:tournament_id]
           add_total_stat(params)
           base_scope = rounds_base_scope
           rounds = RoundResource.all(params, base_scope)
@@ -13,7 +15,7 @@ module Api
         end
 
         def show
-          base_scope = rounds_base_scope
+          base_scope = rounds_base_scope.where(tournament_id: params[:tournament_id])
           round = RoundResource.find(params, base_scope)
           respond_with(round)
         end

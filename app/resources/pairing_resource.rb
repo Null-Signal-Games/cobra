@@ -11,7 +11,7 @@ class PairingResource < ApplicationResource
   # Construct the self link manually since we have non-standard scoping and
   # the default impl from Graphiti is incorrect in this case.
   link :self do |model|
-    "#{context.request.base_url}/api/v1/public/tournaments/#{model.round.tournament_id}/pairings/#{model.id}"
+    "/api/v1/public/tournaments/#{model.round.tournament_id}/pairings/#{model.id}"
   end
 
   attribute :id, :integer
@@ -27,9 +27,23 @@ class PairingResource < ApplicationResource
   attribute :intentional_draw, :boolean
   attribute :two_for_one, :boolean
 
-  belongs_to :round, resource: RoundResource
-  belongs_to :player1, resource: PlayerResource
-  belongs_to :player2, resource: PlayerResource
+  belongs_to :round, resource: RoundResource do
+    link do |pairing|
+      "/api/v1/public/tournaments/#{pairing.round.tournament_id}/rounds/#{pairing.round_id}"
+    end
+  end
+
+  belongs_to :player1, resource: PlayerResource do
+    link do |pairing|
+      "/api/v1/public/tournaments/#{pairing.round.tournament_id}/players/#{pairing.player1_id}" if pairing.player1_id
+    end
+  end
+
+  belongs_to :player2, resource: PlayerResource do
+    link do |pairing|
+      "/api/v1/public/tournaments/#{pairing.round.tournament_id}/players/#{pairing.player2_id}" if pairing.player2_id
+    end
+  end
 
   # Enforce the tournament_id filter as required
   filter :tournament_id, :integer, required: true do
