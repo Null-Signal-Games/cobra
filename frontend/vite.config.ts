@@ -9,8 +9,8 @@ import path from "path";
 export default defineConfig({
   resolve: {
     alias: {
-      "$frontendlib": path.resolve(__dirname, "src/lib"),
-      "$frontendsrc": path.resolve(__dirname, "src"),
+      $frontendlib: path.resolve(__dirname, "src/lib"),
+      $frontendsrc: path.resolve(__dirname, "src"),
     },
   },
   plugins: [
