@@ -85,9 +85,9 @@
   {/if}
   <li class="nav-item">
     <a
-      href={resolve(`/tournaments/${tournament.id}/rounds`)}
+      href={resolve(canEdit ? `/tournaments/${tournament.id}/organizer/rounds` : `/tournaments/${tournament.id}/rounds`)}
       class="nav-link"
-      class:active={page.route.id as string === "/tournaments/[tournamentId]/rounds"}
+      class:active={page.route.id as string === (canEdit ? "/tournaments/[tournamentId]/organizer/rounds" : "/tournaments/[tournamentId]/rounds")}
     >
       <FontAwesomeIcon icon="calendar-check-o" /> Pairings
     </a>

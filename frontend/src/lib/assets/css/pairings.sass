@@ -1,0 +1,38 @@
+.round_pairing
+
+  .left_player_name
+    text-align: right
+
+  .centre_score
+    text-align: center
+
+    .score-badge
+      margin-left: 0.6em
+
+  .custom_score
+    display: none
+  
+  &.self_reports_match
+    background: var(--cobra-self-report-bg)
+    border-radius: 15px
+    padding: 5px
+
+  &.reported
+    .custom_score
+      display: block
+
+    .preset_score
+      display: none
+
+  .ids
+    display: none
+    font-size: 0.6em
+    line-height: 1.4em
+
+.match_slip
+  min-height: 220px
+
+.current_user_row
+  background-color: var(--cobra-pairing-highlight)
+  padding: 10px
+  border-radius: 10px

@@ -14,7 +14,14 @@ export default ts.config(
       ts.configs.stylisticTypeChecked,
       svelte.configs.recommended,
     ],
-    ignores: ["**/venv/", "app/assets/**/*", "public/**/*", "tmp/", "vendor/"],
+    ignores: [
+      "**/venv/",
+      "app/assets/**/*",
+      "public/**/*",
+      "tmp/",
+      "vendor/",
+      "frontend/**"
+    ],
     rules: {
       "@typescript-eslint/restrict-template-expressions": [
         "error",

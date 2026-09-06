@@ -138,7 +138,7 @@
   </div>
 </nav>
 
-<div class="container py-3">
+<div class="container">
   <GlobalMessages />
 
   {@render children()}

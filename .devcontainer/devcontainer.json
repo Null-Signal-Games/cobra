@@ -7,6 +7,9 @@
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
     // Direct all gem installations (gem install & bundle install) into the persistent .bundle volume
     "containerEnv": {
+        "LANG": "en_US.UTF-8",
+        "LANGUAGE": "en_US:en",
+        "LC_ALL": "en_US.UTF-8",
         "GEM_HOME": "/home/vscode/.bundle",
         "GEM_PATH": "/home/vscode/.bundle:/usr/local/rvm/gems/default:/usr/local/rvm/gems/default@global",
         "BUNDLE_PATH": "/home/vscode/.bundle",

@@ -55,6 +55,11 @@ export interface TournamentOptions {
   official_prize_kits: { id: number; name: string }[];
 }
 
+export class TournamentPolicies {
+  update = false;
+  custom_table_numbering = false;
+}
+
 export interface FeatureFlags {
   allow_self_reporting?: boolean;
 }

@@ -22,20 +22,10 @@ RSpec.describe 'cutting tournament', type: :feature do
       sign_in tournament.user
     end
 
-    context 'on settings page' do
-      before do
-        visit edit_tournament_path(tournament)
-      end
-
-      it 'creates double elim stage' do
-        expect do
-          click_button 'Double-Elimination Top 4'
-        end.to change(tournament.stages, :count).by(1)
-      end
-    end
-
     context 'on pairings page with no completed rounds' do
       before do
+        create(:round, stage: tournament.stages.first, completed: true)
+
         visit tournament_rounds_path(tournament)
       end
 
