@@ -43,6 +43,8 @@ module TournamentHelper # rubocop:disable Style/Documentation
       format_id: tournament.format_id,
       deckbuilding_restriction_id: tournament.deckbuilding_restriction_id,
       card_set_id: tournament.card_set_id,
+      active_player_count: tournament.players.active.count,
+      dropped_player_count: tournament.players.dropped.count,
       created_at: tournament.created_at,
       updated_at: tournament.updated_at
     }
