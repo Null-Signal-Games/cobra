@@ -8,7 +8,7 @@
   import { getFaction } from "$lib/utils/factions";
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
 
-  let { data, params }: PageProps = $props();
+  let { data }: PageProps = $props();
   let { stats, stages, cutStats } = $derived(data);
 
   interface PieChartData {
@@ -209,7 +209,7 @@
     {#if stages.some((s) => s.rounds.length > 0)}
       <h3>Swiss Rounds</h3>
 
-      {#if stats?.swiss}
+      {#if stats.swiss}
         <!-- Swiss stage faction pie charts -->
         <div class="row">
           <div class="col-md-6">
@@ -276,7 +276,7 @@
       {#if stages.length > 1}
         <h3>Elimination Rounds</h3>
 
-        {#if stats?.elim}
+        {#if stats.elim}
           <!-- Elimination stage faction pie charts -->
           <div class="row">
             <div class="col-md-6">
