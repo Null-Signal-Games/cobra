@@ -205,7 +205,7 @@ module Beta
         running: current_round&.timer&.running?,
         paused: current_round&.timer&.paused?,
         started: current_round&.timer&.started?,
-        state: current_round.timer&.state
+        state: current_round&.timer&.state
       }
     end
 
