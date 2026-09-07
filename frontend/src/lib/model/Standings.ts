@@ -6,6 +6,7 @@ export interface StandingsData {
   stages: Stage[];
 }
 
+// TODO: consolidate classes and interfaces between this and src/lib/model/Stage.ts
 export interface Stage {
   format: string;
   rounds_complete: number;
