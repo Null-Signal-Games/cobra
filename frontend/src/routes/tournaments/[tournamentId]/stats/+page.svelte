@@ -9,7 +9,6 @@
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
 
   let { data, params }: PageProps = $props();
-  let { tournamentId } = $derived(params);
   let { stats, stages, cutStats } = $derived(data);
 
   interface PieChartData {
@@ -18,49 +17,45 @@
     colors: string[];
   }
 
-  $effect(() => {
-    // Only run if stats data is present
-    const stats = data.stats;
-    if (!stats) return;
-    const activeCharts: ApexCharts[] = [];
-    // Swiss charts
-    if (stats.swiss) {
-      const c1 = renderPieChart("swiss-corp-faction-chart", stats.swiss.corp.factions);
-      const c2 = renderPieChart("swiss-runner-faction-chart", stats.swiss.runner.factions);
-      if (c1) activeCharts.push(c1);
-      if (c2) activeCharts.push(c2);
-    }
-    // Cut charts, if elimination stage present.
-    if (data.stages.length > 1 && stats.elim) {
-      const c3 = renderPieChart("elim-corp-faction-chart", stats.elim.corp.factions);
-      const c4 = renderPieChart("elim-runner-faction-chart", stats.elim.runner.factions);
-      if (c3) activeCharts.push(c3);
-      if (c4) activeCharts.push(c4);
-    }
-    // Cleanup: destroy chart instances when component unmounts or data updates
-    return () => {
-      activeCharts.forEach((chart) => chart.destroy());
-    };
-  });
-  function renderPieChart(elementId: string, factionData: FactionStats[]) {
-    const element = document.getElementById(elementId);
-    if (!element) return null;
+  function pieChart(node: HTMLElement, factionData: FactionStats[]) {
     const factions = getPieChartData(factionData);
     const options: ApexOptions = {
       chart: {
-        type: "pie",
-        height: "300px",
         offsetY: 20,
         animations: { enabled: false },
         selection: { enabled: false },
+        height: "300px",
+        type: "pie",
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+      },
+      plotOptions: {
+        pie: {
+          expandOnClick: false,
+          dataLabels: { offset: -10 },
+        },
       },
       series: factions.series,
       labels: factions.labels,
       colors: factions.colors,
     };
-    const chart = new ApexCharts(element, options);
+
+    const chart = new ApexCharts(node, options);
     void chart.render();
-    return chart;
+
+    return {
+      update(newFactionData: FactionStats[]) {
+        const updated = getPieChartData(newFactionData);
+        void chart.updateOptions({
+          series: updated.series,
+          labels: updated.labels,
+          colors: updated.colors,
+        });
+      },
+      destroy() {
+        chart.destroy();
+      },
+    };
   }
 
   // Sort by count in descending order, then by ID in ascending order
@@ -111,44 +106,6 @@
     });
 
     return results;
-  }
-
-  function drawPieChart(elementId: string, data: FactionStats[]) {
-    const element = document.getElementById(elementId);
-    if (!element) {
-      return;
-    }
-
-    const factions = getPieChartData(data);
-    const options: ApexOptions = {
-      chart: {
-        offsetY: 20,
-        animations: {
-          enabled: false,
-        },
-        selection: {
-          enabled: false,
-        },
-        height: "300px",
-        type: "pie",
-        fontFamily:
-          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-      },
-      plotOptions: {
-        pie: {
-          expandOnClick: false,
-          dataLabels: {
-            offset: -10,
-          },
-        },
-      },
-      series: factions.series,
-      labels: factions.labels,
-      colors: factions.colors,
-    };
-
-    var chart = new ApexCharts(element, options);
-    void chart.render();
   }
 </script>
 <div class="col-12">
@@ -265,7 +222,7 @@
               <tbody>
                 <tr>
                   <td>
-                    <div id="swiss-corp-faction-chart"></div>
+                    <div id="swiss-corp-faction-chart" use:pieChart={stats.swiss.corp.factions}></div>
                   </td>
                 </tr>
               </tbody>
@@ -281,7 +238,7 @@
               <tbody>
                 <tr>
                   <td>
-                    <div id="swiss-runner-faction-chart"></div>
+                    <div id="swiss-runner-faction-chart" use:pieChart={stats.swiss.runner.factions}></div>
                   </td>
                 </tr>
               </tbody>
@@ -332,7 +289,7 @@
                 <tbody>
                   <tr>
                     <td>
-                      <div id="elim-corp-faction-chart"></div>
+                      <div id="elim-corp-faction-chart" use:pieChart={stats.elim.corp.factions}></div>
                     </td>
                   </tr>
                 </tbody>
@@ -348,7 +305,7 @@
                 <tbody>
                   <tr>
                     <td>
-                      <div id="elim-runner-faction-chart"></div>
+                      <div id="elim-runner-faction-chart" use:pieChart={stats.elim.runner.factions}></div>
                     </td>
                   </tr>
                 </tbody>
