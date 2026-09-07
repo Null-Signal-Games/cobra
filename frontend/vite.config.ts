@@ -31,6 +31,9 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
   },
+  optimizeDeps: {
+    include: ["apexcharts"],
+  },
   test: {
     expect: { requireAssertions: true },
     projects: [
