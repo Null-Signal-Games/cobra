@@ -25,7 +25,9 @@ RSpec.describe TournamentsController do
         data = response.parsed_body
         expect(data['tournament']).to eq(
           {
+            'active_player_count' => 0,
             'date' => '2023-05-15',
+            'dropped_player_count' => 0,
             'private' => false,
             'swiss_format' => 'double_sided',
             'allow_self_reporting' => false,

@@ -42,12 +42,14 @@ RSpec.describe TournamentsController do
         data['tournament']&.delete 'updated_at'
         expect(data['tournament']).to eq(
           {
+            'active_player_count' => 0,
             'all_players_unlocked' => true,
             'allow_self_reporting' => false,
             'any_player_unlocked' => true,
             'cut_deck_visibility' => 'cut_decks_private',
             'date' => '2023-05-15',
             'decklist_required' => false,
+            'dropped_player_count' => 0,
             'id' => tournament.id,
             'manual_seed' => true,
             'name' => 'Test Tournament',
