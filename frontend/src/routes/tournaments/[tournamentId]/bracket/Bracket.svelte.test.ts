@@ -106,6 +106,9 @@ describe("Bracket Page Container", () => {
 
     expect(screen.getByText("No elimination bracket available.")).toBeDefined();
     expect(screen.queryByRole("img", { name: "Bracket" })).toBeNull();
+    
+    const button = screen.queryByRole("button", { name: /show\/hide identities/i });
+    expect(button).toBeNull();
   });
 
   it("renders elimination stage heading and BracketDisplay when an elimination stage is present", () => {
