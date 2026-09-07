@@ -69,6 +69,11 @@ describe("Rounds", () => {
         render(Rounds, { tournamentId: 1 });
       });
 
+      it("has no cut links when no rounds have been completed", () => {
+        expect(screen.queryByText(/add swiss stage/i)).not.toBeNull();
+        expect(screen.queryByText(/cut to\.\.\./i)).toBeNull();
+      });
+
       it("creates a new swiss stage", async () => {
         expect(screen.queryByText(/^swiss$/i)).toBeNull();
 
@@ -214,6 +219,11 @@ describe("Rounds", () => {
     describe("with no completed rounds", () => {
       beforeEach(() => {
         render(Rounds, { tournamentId: 1 });
+      });
+
+      it("has no cut links when no rounds have been completed", () => {
+        expect(screen.queryByText(/^swiss$/i)).not.toBeNull();
+        expect(screen.queryByText(/cut to\.\.\./i)).toBeNull();
       });
 
       describe("complete round", () => {
@@ -540,7 +550,7 @@ describe("Rounds", () => {
         expect(screen.queryByText(/round 2/i)).not.toBeNull();
       });
 
-      it("creates a single elim cut stage", async () => {
+      it("shows cut buttons and allows creating single elim stage", async () => {
         expect(screen.queryByText(/^single elim$/i)).toBeNull();
 
         vi.spyOn(MockPairingsData, "stages", "get").mockReturnValue([
@@ -558,7 +568,7 @@ describe("Rounds", () => {
         expect(screen.queryByText(/^single elim$/i)).not.toBeNull();
       });
 
-      it("creates a double elim cut stage", async () => {
+      it("shows cut buttons and allows creating double elim stage", async () => {
         expect(screen.queryByText(/^double elim$/i)).toBeNull();
 
         vi.spyOn(MockPairingsData, "stages", "get").mockReturnValue([
@@ -597,6 +607,7 @@ describe("Rounds", () => {
         expect(screen.queryByText(/unlock all players/i)).toBeNull();
         expect(screen.queryByText(/lock all players/i)).toBeNull();
         expect(screen.queryByText(/pair new round!/i)).toBeNull();
+        expect(screen.queryByText(/cut to\.\.\./i)).toBeNull();
       });
 
       it("the TO stage controls", () => {

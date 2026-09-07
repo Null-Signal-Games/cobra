@@ -69,7 +69,7 @@
     = render @stages
 
     - if policy(@tournament).update?
-        - unless @stages.last.elimination?
+      - if !@stages.last.elimination? && !@stages.last.rounds.where(completed: true).empty?
           h4 Cut to...
           table
             tbody
