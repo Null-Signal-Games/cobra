@@ -94,9 +94,9 @@
   </li>
   <li class="nav-item">
     <a
-      href={resolve(`/tournaments/${tournament.id}/players/standings`)}
+      href={resolve(`/tournaments/${tournament.id}/standings`)}
       class="nav-link"
-      class:active={page.route.id as string === "/tournaments/[tournamentId]/players/standings"}
+      class:active={page.route.id === "/tournaments/[tournamentId]/standings"}
     >
       <FontAwesomeIcon icon="list-ol" /> Standings
     </a>

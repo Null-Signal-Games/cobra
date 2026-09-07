@@ -3,6 +3,7 @@ import type { Card, Deck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
 import type { Player } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
+import type { StandingsData } from "$lib/model/Standings";
 import { Tournament, type FeatureFlags, type TournamentOptions } from "$lib/model/Tournament";
 import type { TournamentsResponse } from "$lib/utils/api_types";
 import { ValidationError, type Errors } from "$lib/utils/errors";
@@ -234,4 +235,21 @@ function cardRequestObject(card: Card) {
   const { id, deck_id, created_at, updated_at, ...newCard } = card;
 
   return newCard;
+}
+
+export async function loadStandings(tournamentId: number, altFetch = fetch): Promise<StandingsData> {
+  const response = await altFetch(
+    `${COBRA_API_SERVER}/tournaments/${tournamentId}/players/standings_data`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+  if (!response.ok) {
+    throw new Error(`Failed to load standings: ${response.statusText}`);
+  }
+  return (await response.json()) as StandingsData;
 }
