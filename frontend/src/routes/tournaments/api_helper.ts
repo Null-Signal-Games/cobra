@@ -1,4 +1,5 @@
 import { COBRA_API_SERVER } from "$app/env/public";
+import type { BracketData } from "$lib/model/Bracket";
 import type { Card, Deck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
 import type { Player } from "$lib/model/Player";
@@ -252,4 +253,16 @@ export async function loadStandings(tournamentId: number, altFetch = fetch): Pro
     throw new Error(`Failed to load standings: ${response.statusText}`);
   }
   return (await response.json()) as StandingsData;
+}
+
+
+export async function loadBrackets(tournamentId: number, altFetch = fetch): Promise<BracketData> {
+  const response = await altFetch(
+    `${COBRA_API_SERVER}/tournaments/${tournamentId}/rounds/brackets`,
+    {
+      method: "GET",
+    },
+  );
+
+  return (await response.json()) as BracketData;
 }
