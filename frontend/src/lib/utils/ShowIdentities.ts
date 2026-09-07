@@ -1,14 +1,17 @@
 import { browser } from "$app/env";
 import { writable } from "svelte/store";
 
-const initialValue: boolean = browser
-  ? JSON.parse(localStorage.getItem("showIdentities") ?? "true") as boolean
-  : true;
-export const showIdentities = writable(initialValue);
-showIdentities.subscribe(
-  (value) => {
-    if (browser) {
-      localStorage.showIdentities = JSON.stringify(value);
-    }
-  }
-);
+const STORAGE_KEY = "showIdentities";
+
+const initialValue: boolean =
+  browser && typeof localStorage !== "undefined"
+    ? (JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "true") as boolean)
+    : true;
+
+export const showIdentities = writable<boolean>(initialValue);
+
+if (browser && typeof localStorage !== "undefined") {
+  showIdentities.subscribe((value) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+  });
+}
