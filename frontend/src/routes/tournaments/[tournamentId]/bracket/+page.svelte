@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PageProps } from "./$types";
-  import BracketDisplay from "$lib/components/BracketDisplay.svelte";
+  import BracketDisplay from "./BracketDisplay.svelte";
 
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import { showIdentities } from "$lib/utils/ShowIdentities";

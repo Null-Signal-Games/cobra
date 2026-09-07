@@ -6,7 +6,7 @@
   } from "$lib/model/Bracket";
   import BracketMatchNode from "./BracketMatchNode.svelte";
   import { SvelteMap } from "svelte/reactivity";
-  import { showIdentities } from "../utils/ShowIdentities.js";
+  import { showIdentities } from "$lib/utils/ShowIdentities.js";
 
   let { stage }: { stage: BracketStage } = $props();
 
