@@ -444,6 +444,7 @@ RSpec.describe RoundsController do
   def default_tournament
     {
       'abr_code' => nil,
+      'active_player_count' => 3,
       'additional_prizes_description' => nil,
       'all_players_unlocked' => true,
       'allow_self_reporting' => false,
@@ -454,6 +455,7 @@ RSpec.describe RoundsController do
       'deckbuilding_restriction_id' => nil,
       'decklist_required' => false,
       'description' => nil,
+      'dropped_player_count' => 0,
       'event_link' => nil,
       'format_id' => nil,
       'id' => tournament.id,

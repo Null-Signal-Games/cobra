@@ -19,7 +19,7 @@ module Beta
       respond_to do |format|
         format.html
         format.json do
-          render json: { tournament: @tournament, csrf_token: form_authenticity_token }
+          render json: { tournament: helpers.tournament_json(@tournament), csrf_token: form_authenticity_token }
         end
       end
     end
