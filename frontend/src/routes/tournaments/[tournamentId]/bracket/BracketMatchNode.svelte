@@ -1,0 +1,314 @@
+<script lang="ts">
+  import type {
+    BracketPairing,
+    Player,
+    PlayerSource,
+    PredecessorMap,
+  } from "$lib/model/Bracket";
+  import type { Identity } from "$lib/model/Identity";
+  import IdentityComponent from "$lib/components/identity/Identity.svelte";
+  import { showIdentities } from "$lib/utils/ShowIdentities";
+
+  let {
+    match,
+    allMatches,
+    predecessorMap,
+    isSingleElim = false,
+    x,
+    y,
+    width,
+    height,
+  }: {
+    match: BracketPairing;
+    allMatches: BracketPairing[];
+    predecessorMap: PredecessorMap;
+    isSingleElim?: boolean;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } = $props();
+
+  function parseWinnerSide(
+    scoreLabel: string | null | undefined,
+  ): "corp" | "runner" | null {
+    if (!scoreLabel) return null;
+    const res = /\((C|R)\)/.exec(scoreLabel);
+    if (!res) return null;
+    return res[1] === "C" ? "corp" : "runner";
+  }
+
+  function hasWinner(match: BracketPairing): boolean {
+    return !!(
+      match.score_label &&
+      (match.score_label.includes("R") || match.score_label.includes("C"))
+    );
+  }
+
+  function isWinner(player: Player | undefined | null): boolean {
+    if (!player) return false;
+    if (!hasWinner(match)) return false;
+    const winnerSide = parseWinnerSide(match.score_label);
+    return winnerSide === player.side;
+  }
+
+  function isLoser(player: Player | undefined | null): boolean {
+    if (!player) return false;
+    if (!hasWinner(match)) return false;
+    const winnerSide = parseWinnerSide(match.score_label);
+    return winnerSide !== player.side;
+  }
+
+  function getIdentity(player: Player): Identity | undefined | null {
+    if (player.side === "corp") {
+      return player.corp_id;
+    } else if (player.side === "runner") {
+      return player.runner_id;
+    }
+    return null;
+  }
+
+  let topPlayer = $derived(
+    match.player1?.side === "corp" ? match.player1 : match.player2,
+  );
+  let bottomPlayer = $derived(
+    match.player1?.side === "corp" ? match.player2 : match.player1,
+  );
+
+  function getPlayerBySide(
+    match: BracketPairing,
+    isWinner: boolean,
+  ): Player | null {
+    if (!hasWinner(match)) return null;
+    if (!match.player1 || !match.player2) return null;
+    const winnerSide = parseWinnerSide(match.score_label);
+    const player1IsWinner = match.player1.side === winnerSide;
+    return player1IsWinner === isWinner ? match.player1 : match.player2;
+  }
+
+  function getWinner(match: BracketPairing): Player | null {
+    return getPlayerBySide(match, true);
+  }
+
+  function getLoser(match: BracketPairing): Player | null {
+    return getPlayerBySide(match, false);
+  }
+
+  function getPlayerFromSource(source: PlayerSource | null): string | null {
+    if (!source) return null;
+
+    const sourceMatch = allMatches.find((m) => m.table_number === source.game);
+    if (!sourceMatch) return null;
+
+    const player =
+      source.method === "winner"
+        ? getWinner(sourceMatch)
+        : getLoser(sourceMatch);
+    return player ? player.name_with_pronouns : null;
+  }
+
+  function getFallbackText(source: PlayerSource | null): string | null {
+    if (!source) return null;
+
+    const role = source.method === "winner" ? "Winner" : "Loser";
+    return `${role} of ${String(source.game)}`;
+  }
+
+  let sources = $derived(predecessorMap[match.table_number] ?? []);
+  let topPlayerName = $derived(getPlayerFromSource(sources[0] ?? null));
+  let topFallback = $derived(getFallbackText(sources[0] ?? null));
+  let bottomPlayerName = $derived(getPlayerFromSource(sources[1] ?? null));
+  let bottomFallback = $derived(getFallbackText(sources[1] ?? null));
+</script>
+
+<g transform={`translate(${x}, ${y})`}>
+  <rect {width} {height} rx="6" ry="6" class="match-box" />
+  {#if !isSingleElim}
+    <text x="8" y={height / 2} class="game-label" dominant-baseline="middle"
+      >{match.table_number}</text
+    >
+  {/if}
+  <foreignObject
+    x={isSingleElim ? 8 : 28}
+    y="2"
+    width={isSingleElim ? width - 20 : width - 40}
+    height={height - 4}
+  >
+    <div xmlns="http://www.w3.org/1999/xhtml" class="small content">
+      <div class="player-line d-flex" class:mb-1={$showIdentities}>
+        <div
+          class="flex-fill pr-2 {match.score_label
+            ? !hasWinner(match)
+              ? ''
+              : isWinner(topPlayer)
+                ? 'winner'
+                : 'loser'
+            : ''}"
+        >
+          {#if topPlayer}
+            {@const identity = getIdentity(topPlayer)}
+            <div class="player-info">
+              {#if isSingleElim && topPlayer.seed != null}
+                <span class="seed-label">{topPlayer.seed}</span>
+              {/if}
+              {#if identity}
+                <IdentityComponent
+                  {identity}
+                  include_name={false}
+                  gray_out={isLoser(topPlayer)}
+                />
+              {/if}
+              <span class="truncate">
+                {topPlayer.name_with_pronouns}
+              </span>
+            </div>
+            {#if $showIdentities}
+              {#if identity}
+                <div class="ids">
+                  <IdentityComponent
+                    {identity}
+                    include_icon={false}
+                    gray_out={isLoser(topPlayer)}
+                  />
+                </div>
+              {/if}
+            {/if}
+          {:else if match.player1_seed != null}
+            <span class="truncate placeholder-text"
+              >New {match.player1_seed} seed</span
+            >
+          {:else if topPlayerName ?? topFallback}
+            <span
+              class="truncate"
+              class:placeholder-text={topPlayerName == null}
+            >
+              {topPlayerName ?? topFallback}
+            </span>
+          {:else}
+            <em class="text-muted">TBD</em>
+          {/if}
+        </div>
+      </div>
+      <div class="player-line d-flex">
+        <div
+          class="flex-fill pr-2 {match.score_label
+            ? !hasWinner(match)
+              ? ''
+              : isWinner(bottomPlayer)
+                ? 'winner'
+                : 'loser'
+            : ''}"
+        >
+          {#if bottomPlayer}
+            {@const identity = getIdentity(bottomPlayer)}
+            <div class="player-info">
+              {#if isSingleElim && bottomPlayer.seed != null}
+                <span class="seed-label">{bottomPlayer.seed}</span>
+              {/if}
+              {#if identity}
+                <IdentityComponent
+                  {identity}
+                  include_name={false}
+                  gray_out={isLoser(bottomPlayer)}
+                />
+              {/if}
+              <span class="truncate">
+                {bottomPlayer.name_with_pronouns}
+              </span>
+            </div>
+            {#if $showIdentities}
+              {#if identity}
+                <div class="ids">
+                  <IdentityComponent
+                    {identity}
+                    include_icon={false}
+                    gray_out={isLoser(bottomPlayer)}
+                  />
+                </div>
+              {/if}
+            {/if}
+          {:else if match.player2_seed != null}
+            <span class="truncate placeholder-text"
+              >New {match.player2_seed} seed</span
+            >
+          {:else if bottomPlayerName ?? bottomFallback}
+            <span
+              class="truncate"
+              class:placeholder-text={bottomPlayerName == null}
+            >
+              {bottomPlayerName ?? bottomFallback}
+            </span>
+          {:else}
+            <em class="text-muted">TBD</em>
+          {/if}
+        </div>
+      </div>
+    </div>
+  </foreignObject>
+</g>
+
+<style>
+  .match-box {
+    fill: var(--cobra-card-bg);
+    stroke: var(--cobra-border);
+  }
+  .small {
+    font-size: 0.85rem;
+    line-height: 1.1rem;
+  }
+  .content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--cobra-text);
+  }
+  .winner {
+    font-weight: 600;
+    color: var(--cobra-text);
+  }
+  .loser {
+    color: var(--cobra-text-muted);
+  }
+  .player-line {
+    white-space: nowrap;
+    overflow: visible;
+  }
+  .player-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .truncate {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: bottom;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .game-label {
+    font-size: 0.75rem;
+    fill: var(--cobra-text-muted);
+    font-weight: 500;
+  }
+  .seed-label {
+    font-size: 0.75rem;
+    color: var(--cobra-text-muted);
+    font-weight: 500;
+    min-width: 1.2em;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .ids {
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow-x: hidden;
+    overflow-y: visible;
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+  .placeholder-text {
+    color: var(--cobra-text-muted);
+    font-style: italic;
+  }
+</style>
