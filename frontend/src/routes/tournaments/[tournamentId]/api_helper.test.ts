@@ -10,19 +10,19 @@ describe("tournament api_helper score reporting", () => {
   const mockFetch = vi.fn<typeof fetch>();
 
   function getFetchCall(callIndex = 0) {
-    const [input, init] = mockFetch.mock.calls[callIndex];
+    const [input, requestOptions] = mockFetch.mock.calls[callIndex];
     const url =
       typeof input === "string"
         ? input
         : input instanceof URL
           ? input.href
           : input.url;
-    const headers = (init?.headers ?? {}) as Record<string, string>;
+    const headers = (requestOptions?.headers ?? {}) as Record<string, string>;
     const body =
-      typeof init?.body === "string"
-        ? (JSON.parse(init.body) as Record<string, unknown>)
+      typeof requestOptions?.body === "string"
+        ? (JSON.parse(requestOptions.body) as Record<string, unknown>)
         : {};
-    return { url, init, headers, body };
+    return { url, requestOptions, headers, body };
   }
 
   beforeEach(() => {
@@ -37,10 +37,10 @@ describe("tournament api_helper score reporting", () => {
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
-      const { url, init, body } = getFetchCall();
+      const { url, requestOptions, body } = getFetchCall();
       expect(url).toContain("/beta/tournaments/10/rounds/2/pairings/42/report");
-      expect(init?.method).toBe("POST");
-      expect(init?.credentials).toBe("include");
+      expect(requestOptions?.method).toBe("POST");
+      expect(requestOptions?.credentials).toBe("include");
       expect(body).toEqual({ side: "player1_is_corp" });
     });
 
@@ -73,9 +73,9 @@ describe("tournament api_helper score reporting", () => {
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
-      const { url, init, body } = getFetchCall();
+      const { url, requestOptions, body } = getFetchCall();
       expect(url).toContain("/beta/tournaments/10/rounds/2/pairings/42/report");
-      expect(init?.method).toBe("POST");
+      expect(requestOptions?.method).toBe("POST");
       expect(body.self_report).toBe(true);
       expect(body.pairing).toEqual({
         score1: 3,
@@ -118,12 +118,12 @@ describe("tournament api_helper score reporting", () => {
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
-      const { url, init } = getFetchCall();
+      const { url, requestOptions } = getFetchCall();
       expect(url).toContain(
         "/beta/tournaments/10/rounds/2/pairings/42/reset_self_report",
       );
-      expect(init?.method).toBe("DELETE");
-      expect(init?.credentials).toBe("include");
+      expect(requestOptions?.method).toBe("DELETE");
+      expect(requestOptions?.credentials).toBe("include");
     });
 
     it("sends explicit csrf token in headers", async () => {
