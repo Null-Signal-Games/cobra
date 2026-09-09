@@ -31,20 +31,20 @@ const createRound = (overrides: Partial<Round>): Round => ({
   ...overrides
 });
 
-const alice = createPlayer({
+const evie = createPlayer({
   id: 1,
   user_id: 1,
-  name: "Alice",
-  name_with_pronouns: "Alice",
+  name: "evie",
+  name_with_pronouns: "evie (she/her)",
   corp_id: { name: "Corp" } as never,
   runner_id: { name: "Runner" } as never
 });
 
-const bob = createPlayer({
+const locks = createPlayer({
   id: 2,
   user_id: 2,
-  name: "Bob",
-  name_with_pronouns: "Bob"
+  name: "locks",
+  name_with_pronouns: "locks (he/him)"
 });
 
 const bye = createPlayer({
@@ -86,7 +86,7 @@ describe("transformations", () => {
                 id: 10, table_number: 1, table_label: "1", policy: { self_report: false },
                 reported: true, intentional_draw: false, two_for_one: false, self_reports: null, winner_game: null, loser_game: null, bracket_type: null, ui_metadata: { row_highlighted: false },
                 score1: 3, score2: 0, score1_corp: 0, score1_runner: 0, score2_corp: 0, score2_runner: 0, score_label: "Bye",
-                player1: alice,
+                player1: evie,
                 player2: bye
               }]
             })
@@ -105,8 +105,8 @@ describe("transformations", () => {
         id, table_number: 1, table_label: "1", policy: { self_report: false },
         reported, intentional_draw: false, two_for_one: false, self_reports: null, winner_game: null, loser_game: null, bracket_type: null, ui_metadata: { row_highlighted: false },
         score1, score2, score1_corp: corp1, score1_runner: run1, score2_corp: 0, score2_runner: 0, score_label: "Done",
-        player1: alice,
-        player2: bob
+        player1: evie,
+        player2: locks
       });
 
       const data: PairingsData = {

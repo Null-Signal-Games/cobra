@@ -37,7 +37,7 @@
   function isLatestRound(myPairing: MyTournamentPairing): boolean {
     if (!pairings || pairings.stages.length === 0) return false;
     const latestStage = pairings.stages[pairings.stages.length - 1];
-    if (!latestStage || latestStage.rounds.length === 0) return false;
+    if (latestStage.rounds.length === 0) return false;
     const latestRound = latestStage.rounds[latestStage.rounds.length - 1];
     return (
       myPairing.stage.id === latestStage.id &&
@@ -90,7 +90,7 @@
       pairingId,
       report,
       selfReport,
-      data.tournamentData?.csrf_token,
+      data.tournamentData.csrf_token,
     );
     if (!success) {
       return;

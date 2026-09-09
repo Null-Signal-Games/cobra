@@ -7,7 +7,23 @@ import {
 import type { ScoreReport } from "$lib/model/ScoreReport";
 
 describe("tournament api_helper score reporting", () => {
-  const mockFetch = vi.fn();
+  const mockFetch = vi.fn<typeof fetch>();
+
+  function getFetchCall(callIndex = 0) {
+    const [input, init] = mockFetch.mock.calls[callIndex];
+    const url =
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url;
+    const headers = (init?.headers ?? {}) as Record<string, string>;
+    const body =
+      typeof init?.body === "string"
+        ? (JSON.parse(init.body) as Record<string, unknown>)
+        : {};
+    return { url, init, headers, body };
+  }
 
   beforeEach(() => {
     vi.resetAllMocks();
@@ -21,11 +37,11 @@ describe("tournament api_helper score reporting", () => {
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
-      const [url, options] = mockFetch.mock.calls[0];
+      const { url, init, body } = getFetchCall();
       expect(url).toContain("/beta/tournaments/10/rounds/2/pairings/42/report");
-      expect(options.method).toBe("POST");
-      expect(options.credentials).toBe("include");
-      expect(JSON.parse(options.body)).toEqual({ side: "player1_is_corp" });
+      expect(init?.method).toBe("POST");
+      expect(init?.credentials).toBe("include");
+      expect(body).toEqual({ side: "player1_is_corp" });
     });
 
     it("returns false when response is not ok", async () => {
@@ -57,12 +73,11 @@ describe("tournament api_helper score reporting", () => {
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
-      const [url, options] = mockFetch.mock.calls[0];
+      const { url, init, body } = getFetchCall();
       expect(url).toContain("/beta/tournaments/10/rounds/2/pairings/42/report");
-      expect(options.method).toBe("POST");
-      const parsedBody = JSON.parse(options.body);
-      expect(parsedBody.self_report).toBe(true);
-      expect(parsedBody.pairing).toEqual({
+      expect(init?.method).toBe("POST");
+      expect(body.self_report).toBe(true);
+      expect(body.pairing).toEqual({
         score1: 3,
         score2: 0,
         score1_corp: 3,
@@ -71,8 +86,9 @@ describe("tournament api_helper score reporting", () => {
         score2_corp: 0,
         intentional_draw: false,
       });
-      expect(parsedBody.pairing.label).toBeUndefined();
-      expect(parsedBody.pairing.extra_self_report_label).toBeUndefined();
+      const pairing = body.pairing as Record<string, unknown>;
+      expect(pairing.label).toBeUndefined();
+      expect(pairing.extra_self_report_label).toBeUndefined();
     });
 
     it("returns false on network error", async () => {
@@ -102,12 +118,12 @@ describe("tournament api_helper score reporting", () => {
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
-      const [url, options] = mockFetch.mock.calls[0];
+      const { url, init } = getFetchCall();
       expect(url).toContain(
         "/beta/tournaments/10/rounds/2/pairings/42/reset_self_report",
       );
-      expect(options.method).toBe("DELETE");
-      expect(options.credentials).toBe("include");
+      expect(init?.method).toBe("DELETE");
+      expect(init?.credentials).toBe("include");
     });
 
     it("sends explicit csrf token in headers", async () => {
@@ -117,9 +133,9 @@ describe("tournament api_helper score reporting", () => {
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
-      const [url, options] = mockFetch.mock.calls[0];
+      const { url, headers } = getFetchCall();
       expect(url).not.toContain("//beta");
-      expect(options.headers["X-CSRF-Token"]).toBe("explicit-csrf-token");
+      expect(headers["X-CSRF-Token"]).toBe("explicit-csrf-token");
     });
   });
 
@@ -139,9 +155,9 @@ describe("tournament api_helper score reporting", () => {
 
       await reportScore(10, 2, 42, report, true, "test-csrf-token", mockFetch);
 
-      const [url, options] = mockFetch.mock.calls[0];
+      const { url, headers } = getFetchCall();
       expect(url).not.toContain("//beta");
-      expect(options.headers["X-CSRF-Token"]).toBe("test-csrf-token");
+      expect(headers["X-CSRF-Token"]).toBe("test-csrf-token");
     });
 
     it("uses explicit csrf token when provided to changePlayerSide", async () => {
@@ -149,9 +165,9 @@ describe("tournament api_helper score reporting", () => {
 
       await changePlayerSide(10, 2, 42, "runner", "test-side-token", mockFetch);
 
-      const [url, options] = mockFetch.mock.calls[0];
+      const { url, headers } = getFetchCall();
       expect(url).not.toContain("//beta");
-      expect(options.headers["X-CSRF-Token"]).toBe("test-side-token");
+      expect(headers["X-CSRF-Token"]).toBe("test-side-token");
     });
   });
 });
