@@ -160,6 +160,29 @@ export async function pairRound(csrfToken: string, tournamentId: number) {
   return response.status === 200;
 }
 
+export async function completeRound(
+  csrfToken: string,
+  tournamentId: number,
+  roundId: number,
+  completed: boolean,
+): Promise<boolean> {
+  const response = await fetch(
+    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds/${roundId}/complete`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+      body: JSON.stringify({ completed: completed }),
+    },
+  );
+
+  return response.status === 200;
+}
+
 export async function reportScore(
   tournamentId: number,
   roundId: number,

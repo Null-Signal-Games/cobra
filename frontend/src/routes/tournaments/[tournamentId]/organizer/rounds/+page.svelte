@@ -10,7 +10,12 @@
   import { showReportedPairings } from "$lib/utils/ShowReportedPairings";
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidate } from "$app/navigation";
-  import { createStage, pairRound, reportScore } from "../../api_helper";
+  import {
+    completeRound,
+    createStage,
+    pairRound,
+    reportScore
+  } from "../../api_helper";
 
   let { data, params }: PageProps = $props();
 
@@ -93,9 +98,18 @@
     await invalidate("pairings:load");
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function completeRoundCallback(roundId: number) {
-    // TODO: Implement
+    const success = await completeRound(
+      data.tournamentData.csrf_token,
+      data.tournamentData.tournament.id,
+      roundId,
+      true
+    );
+    if (!success) {
+      return;
+    }
+
+    await invalidate("pairings:load");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
