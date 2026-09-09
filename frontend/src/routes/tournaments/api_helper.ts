@@ -10,6 +10,8 @@ import type { TournamentsResponse } from "$lib/utils/api_types";
 import { ValidationError, type Errors } from "$lib/utils/errors";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
+const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
+
 export interface TournamentData {
   tournament: Tournament,
   csrf_token: string,
@@ -32,9 +34,17 @@ export interface TournamentCreateErrorResponse {
   errors: Errors;
 }
 
+export function csrfToken() {
+  return typeof document !== "undefined"
+    ? (document
+        .querySelector("meta[name='csrf-token']")
+        ?.getAttribute("content") ?? "")
+    : "";
+}
+
 export async function loadTournament(tournamentId: number, altFetch = fetch) {
   const response = await altFetch(
-    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}`,
+    `${apiServer}/beta/tournaments/${tournamentId}`,
     {
       method: "GET",
       credentials: "include",
@@ -73,7 +83,7 @@ export async function loadTournaments(url: string, altFetch = fetch): Promise<To
 
 export function tournamentsApiUrl(tournamentTypeId?: string): string {
   const query = [
-    `${COBRA_API_SERVER}/api/v1/public/tournaments?page[size]=10`,
+    `${apiServer}/api/v1/public/tournaments?page[size]=10`,
     "include=tournament_type",
     "sort=-date,name",
   ];
@@ -88,7 +98,7 @@ export function tournamentsApiUrl(tournamentTypeId?: string): string {
 export async function loadNewTournament(
   fetch: typeof globalThis.fetch,
 ): Promise<TournamentSettingsData> {
-  const response = await fetch(`${COBRA_API_SERVER}/tournaments/new_form`, {
+  const response = await fetch(`${apiServer}/tournaments/new_form`, {
     credentials: "include",
     headers: { Accept: "application/json" },
     method: "GET",
@@ -104,7 +114,7 @@ export async function createTournament(
   csrfToken: string,
   tournament: Tournament,
 ): Promise<TournamentCreateResponse> {
-  const response = await fetch(`${COBRA_API_SERVER}/tournaments`, {
+  const response = await fetch(`${apiServer}/tournaments`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -129,7 +139,7 @@ export async function createTournament(
 export async function loadPlayerByUserId(tournamentId: number, userId: number, altFetch = fetch) {
   try {
     const response = await altFetch(
-      `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/players/by_user_id/${userId}`,
+      `${apiServer}/beta/tournaments/${tournamentId}/players/by_user_id/${userId}`,
       {
         method: "GET",
         credentials: "include",
@@ -149,8 +159,8 @@ export async function savePlayer(
 ) {
   const route =
     player.id === 0
-      ? `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/players`
-      : `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/player/${player.id}`;
+      ? `${apiServer}/beta/tournaments/${tournamentId}/players`
+      : `${apiServer}/beta/tournaments/${tournamentId}/player/${player.id}`;
   const response = await fetch(route, {
     method: player.id === 0 ? "POST" : "PATCH",
     credentials: "include",
@@ -175,7 +185,7 @@ export async function savePlayer(
 }
 
 export async function loadIdentityNames() {
-  const response = await fetch(`${COBRA_API_SERVER}/beta/identities`, {
+  const response = await fetch(`${apiServer}/beta/identities`, {
     method: "GET",
   });
 
@@ -183,7 +193,7 @@ export async function loadIdentityNames() {
 }
 
 export async function loadCurrentRoundTimer(tournamentId: number, csrfToken?: string) {
-  const response = await fetch(`${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/current_round_timer`, {
+  const response = await fetch(`${apiServer}/beta/tournaments/${tournamentId}/current_round_timer`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -240,7 +250,7 @@ function cardRequestObject(card: Card) {
 
 export async function loadStandings(tournamentId: number, altFetch = fetch): Promise<StandingsData> {
   const response = await altFetch(
-    `${COBRA_API_SERVER}/tournaments/${tournamentId}/players/standings_data`,
+    `${apiServer}/tournaments/${tournamentId}/players/standings_data`,
     {
       method: "GET",
       credentials: "include",
@@ -258,7 +268,7 @@ export async function loadStandings(tournamentId: number, altFetch = fetch): Pro
 
 export async function loadBrackets(tournamentId: number, altFetch = fetch): Promise<BracketData> {
   const response = await altFetch(
-    `${COBRA_API_SERVER}/tournaments/${tournamentId}/rounds/brackets`,
+    `${apiServer}/tournaments/${tournamentId}/rounds/brackets`,
     {
       method: "GET",
     },
