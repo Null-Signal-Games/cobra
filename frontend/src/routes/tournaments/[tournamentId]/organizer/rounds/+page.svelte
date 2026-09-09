@@ -10,7 +10,7 @@
   import { showReportedPairings } from "$lib/utils/ShowReportedPairings";
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidate } from "$app/navigation";
-  import { reportScore } from "../../api_helper";
+  import { createStage, pairRound, reportScore } from "../../api_helper";
 
   let { data, params }: PageProps = $props();
 
@@ -20,13 +20,41 @@
     forcePlayerView = !forcePlayerView;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function addStage(cutSingleElim?: boolean, cutCount?: number) {
-    // TODO: Implement
+    const success = await createStage(
+      data.tournamentData.csrf_token,
+      data.tournamentData.tournament.id,
+      cutSingleElim,
+      cutCount,
+    );
+    if (!success) {
+      return;
+    }
+
+    await invalidate("pairings:load");
   }
 
-  function pairNewRound() {
-    // TODO: Implement
+  async function pairNewRound() {
+    if (
+      data.tournamentData.tournament.self_registration &&
+      (!data.tournamentData.tournament.registration_closed ||
+        data.tournamentData.tournament.any_player_unlocked) &&
+      !confirm(
+        "Registration is still open or some players are unlocked. Pair new round anyway?",
+      )
+    ) {
+      return;
+    }
+
+    const success = await pairRound(
+      data.tournamentData.csrf_token,
+      data.tournamentData.tournament.id
+    );
+    if (!success) {
+      return;
+    }
+
+    await invalidate("pairings:load");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

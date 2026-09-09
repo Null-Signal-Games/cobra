@@ -115,6 +115,51 @@ export async function changePlayerSide(
   }
 }
 
+export async function createStage(
+  csrfToken: string,
+  tournamentId: number,
+  cutSingleElim?: boolean,
+  cutCount?: number,
+) {
+  const isCut = cutSingleElim !== undefined && cutCount !== undefined;
+  const path = isCut
+    ? `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/cut`
+    : `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/stages`;
+  const body = isCut
+    ? { number: cutCount, ...(cutSingleElim && { elimination_type: "single" }) }
+    : null;
+
+  const response = await fetch(path, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+    body: JSON.stringify(body),
+  });
+
+  return response.status === 200;
+}
+
+export async function pairRound(csrfToken: string, tournamentId: number) {
+  const response = await fetch(
+    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken
+      },
+    },
+  );
+
+  return response.status === 200;
+}
+
 export async function reportScore(
   tournamentId: number,
   roundId: number,
