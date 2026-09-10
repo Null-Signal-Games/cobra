@@ -8,7 +8,7 @@
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { showIdentities } from "$lib/utils/ShowIdentities";
-  import { invalidate } from "$app/navigation";
+  import { invalidateAll } from "$app/navigation";
   import { reportScore } from "../api_helper";
 
   let { data, params }: PageProps = $props();
@@ -32,7 +32,7 @@
       return;
     }
 
-    await invalidate("pairings:load");
+    await invalidateAll();
   }
 </script>
 

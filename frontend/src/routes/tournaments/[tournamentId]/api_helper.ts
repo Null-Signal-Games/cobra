@@ -160,6 +160,50 @@ export async function pairRound(csrfToken: string, tournamentId: number) {
   return response.status === 200;
 }
 
+export async function setRegistrationStatus(
+  csrfToken: string,
+  tournamentId: number,
+  open: boolean,
+): Promise<boolean> {
+  const path = open
+    ? `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/open_registration`
+    : `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/close_registration`;
+
+  const response = await fetch(path, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+  });
+
+  return response.status === 200;
+}
+
+export async function setPlayerRegistrationStatus(
+  csrfToken: string,
+  tournamentId: number,
+  locked: boolean,
+): Promise<boolean> {
+  const path = locked
+    ? `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/lock_player_registration`
+    : `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/unlock_player_registration`;
+
+  const response = await fetch(path, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+  });
+
+  return response.status === 200;
+}
+
 export async function completeRound(
   csrfToken: string,
   tournamentId: number,
@@ -177,6 +221,57 @@ export async function completeRound(
         "X-CSRF-Token": csrfToken,
       },
       body: JSON.stringify({ completed: completed }),
+    },
+  );
+
+  return response.status === 200;
+}
+
+export async function updateRoundTimer(
+  csrfToken: string,
+  tournamentId: number,
+  roundId: number,
+  length_minutes: number,
+  operation: string,
+): Promise<boolean> {
+  const response = await fetch(
+    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds/${roundId}/update_timer`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+      body: JSON.stringify({
+        length_minutes: length_minutes,
+        operation: operation,
+      }),
+    },
+  );
+
+  return response.status === 200;
+}
+
+export async function changePlayerSide(
+  csrfToken: string,
+  tournamentId: number,
+  roundId: number,
+  pairingId: number,
+  side: string,
+): Promise<boolean> {
+  const response = await fetch(
+    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+      body: JSON.stringify({ side: `player1_is_${side}` }),
     },
   );
 
@@ -264,4 +359,26 @@ export async function resetReports(
     globalMessages.errors.push(`Failed to reset self report: ${err.message}`);
     return false;
   }
+}
+
+export async function deletePairing(
+  csrfToken: string,
+  tournamentId: number,
+  roundId: number,
+  pairingId: number,
+): Promise<boolean> {
+  const response = await fetch(
+    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+    },
+  );
+
+  return response.status === 200;
 }

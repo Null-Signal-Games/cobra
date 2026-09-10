@@ -9,12 +9,17 @@
   import type { PageProps } from "./$types";
   import { showReportedPairings } from "$lib/utils/ShowReportedPairings";
   import { showIdentities } from "$lib/utils/ShowIdentities";
-  import { invalidate } from "$app/navigation";
+  import { invalidateAll } from "$app/navigation";
   import {
+    changePlayerSide,
     completeRound,
     createStage,
+    deletePairing,
     pairRound,
-    reportScore
+    reportScore,
+    setPlayerRegistrationStatus as setPlayerRegistrationStatusRequest,
+    setRegistrationStatus as setRegistrationStatusRequest,
+    updateRoundTimer,
   } from "../../api_helper";
 
   let { data, params }: PageProps = $props();
@@ -36,7 +41,7 @@
       return;
     }
 
-    await invalidate("pairings:load");
+    await invalidateAll();
   }
 
   async function pairNewRound() {
@@ -59,27 +64,65 @@
       return;
     }
 
-    await invalidate("pairings:load");
+    await invalidateAll();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function setRegistrationStatus(open: boolean) {
-    // TODO: Implement
+    const success = await setRegistrationStatusRequest(
+      data.tournamentData.csrf_token,
+      data.tournamentData.tournament.id,
+      open,
+    );
+    if (!success) {
+      return;
+    }
+
+    await invalidateAll();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function setPlayerRegistrationStatus(open: boolean) {
-    // TODO: Implement
+    const success = await setPlayerRegistrationStatusRequest(
+      data.tournamentData.csrf_token,
+      data.tournamentData.tournament.id,
+      open,
+    );
+    if (!success) {
+      return;
+    }
+
+    await invalidateAll();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function deletePairingCallback(roundId: number, pairingId: number) {
-    // TODO: Implement
+  async function deletePairingCallback(roundId: number, pairingId: number) {
+    if (!confirm("Are you sure? This cannot be reversed.")) {
+      return;
+    }
+
+    const success = await deletePairing(
+      data.tournamentData.csrf_token,
+      data.tournamentData.tournament.id,
+      roundId,
+      pairingId);
+    if (!success) {
+      return;
+    }
+
+    await invalidateAll();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function changePlayerSideCallback(roundId: number, pairingId: number, side: string) {
-    // TODO: Implement
+    const success = await changePlayerSide(
+      data.tournamentData.csrf_token,
+      data.tournamentData.tournament.id,
+      roundId,
+      pairingId,
+      side,
+    );
+    if (!success) {
+      return;
+    }
+
+    await invalidateAll();
   }
 
   async function reportScoreCallback(roundId: number, pairingId: number, report: ScoreReport, selfReport: boolean) {
@@ -95,7 +138,7 @@
       return;
     }
 
-    await invalidate("pairings:load");
+    await invalidateAll();
   }
 
   async function completeRoundCallback(roundId: number) {
@@ -109,12 +152,29 @@
       return;
     }
 
-    await invalidate("pairings:load");
+    await invalidateAll();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function updateTimerCallback(roundId: number, length_minutes: number, operation: string) {
-    // TODO: Implement
+  async function updateTimerCallback(roundId: number, length_minutes: number, operation: string) {
+    if (
+      operation === "reset" &&
+      !confirm("This will clear all elapsed time in the round. Are you sure?")
+    ) {
+      return;
+    }
+
+    const success = await updateRoundTimer(
+      data.tournamentData.csrf_token,
+      data.tournamentData.tournament.id,
+      roundId,
+      length_minutes,
+      operation,
+    );
+    if (!success) {
+      return;
+    }
+
+    await invalidateAll();
   }
 </script>
 
