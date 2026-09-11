@@ -29,6 +29,12 @@
   }
 </style>
 
+<svelte:head>
+  {#if data.tournamentData.csrf_token}
+    <meta name="csrf-token" content={data.tournamentData.csrf_token} />
+  {/if}
+</svelte:head>
+
 <!-- Tournament header -->
 <div class="row dontprint">
   <div class="col-md">
@@ -59,14 +65,13 @@
       <FontAwesomeIcon icon="trophy" /> Tournament
     </a>
   </li>
-  
-  <!-- TODO: Remove the 'as string' casts throughout once the route id exists. -->
-  {#if data.player}
+
+  {#if authStore.user}
     <li class="nav-item">
     <a
-      href={resolve(`/tournaments/${tournament.id}/my_tournament`)}
+      href={resolve(`/tournaments/${tournament.id}/me`)}
       class="nav-link"
-      class:active={page.route.id as string === "/tournaments/[tournamentId]/my_tournament"}
+      class:active={page.route.id as string === "/tournaments/[tournamentId]/me"}
     >
         <FontAwesomeIcon icon="user" /> Me
       </a>
