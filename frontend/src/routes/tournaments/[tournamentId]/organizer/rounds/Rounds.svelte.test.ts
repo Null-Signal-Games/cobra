@@ -30,7 +30,7 @@ import {
   MockSingleElimCutStage,
   MockDoubleElimCutStage,
   MockTournament,
-} from "../../RoundsTestData";
+} from "./RoundsTestData";
 import type { TournamentPolicies } from "$lib/model/Tournament";
 
 const MockPolicy: TournamentPolicies = {
