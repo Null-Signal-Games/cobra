@@ -123,8 +123,8 @@ export async function createStage(
 ) {
   const isCut = cutSingleElim !== undefined && cutCount !== undefined;
   const path = isCut
-    ? `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/cut`
-    : `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/stages`;
+    ? `${apiServer}/beta/tournaments/${tournamentId}/cut`
+    : `${apiServer}/beta/tournaments/${tournamentId}/stages`;
   const body = isCut
     ? { number: cutCount, ...(cutSingleElim && { elimination_type: "single" }) }
     : null;
@@ -145,7 +145,7 @@ export async function createStage(
 
 export async function pairRound(csrfToken: string, tournamentId: number) {
   const response = await fetch(
-    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds`,
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds`,
     {
       method: "POST",
       credentials: "include",
@@ -166,8 +166,8 @@ export async function setRegistrationStatus(
   open: boolean,
 ): Promise<boolean> {
   const path = open
-    ? `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/open_registration`
-    : `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/close_registration`;
+    ? `${apiServer}/beta/tournaments/${tournamentId}/open_registration`
+    : `${apiServer}/beta/tournaments/${tournamentId}/close_registration`;
 
   const response = await fetch(path, {
     method: "PATCH",
@@ -188,8 +188,8 @@ export async function setPlayerRegistrationStatus(
   locked: boolean,
 ): Promise<boolean> {
   const path = locked
-    ? `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/lock_player_registration`
-    : `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/unlock_player_registration`;
+    ? `${apiServer}/beta/tournaments/${tournamentId}/lock_player_registration`
+    : `${apiServer}/beta/tournaments/${tournamentId}/unlock_player_registration`;
 
   const response = await fetch(path, {
     method: "PATCH",
@@ -211,7 +211,7 @@ export async function completeRound(
   completed: boolean,
 ): Promise<boolean> {
   const response = await fetch(
-    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds/${roundId}/complete`,
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/complete`,
     {
       method: "PATCH",
       credentials: "include",
@@ -235,7 +235,7 @@ export async function updateRoundTimer(
   operation: string,
 ): Promise<boolean> {
   const response = await fetch(
-    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds/${roundId}/update_timer`,
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/update_timer`,
     {
       method: "PATCH",
       credentials: "include",
@@ -344,7 +344,7 @@ export async function deletePairing(
   pairingId: number,
 ): Promise<boolean> {
   const response = await fetch(
-    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}`,
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}`,
     {
       method: "DELETE",
       credentials: "include",
