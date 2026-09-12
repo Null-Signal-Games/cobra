@@ -112,11 +112,11 @@
 
   async function changePlayerSideCallback(roundId: number, pairingId: number, side: string) {
     const success = await changePlayerSide(
-      data.tournamentData.csrf_token,
       data.tournamentData.tournament.id,
       roundId,
       pairingId,
       side,
+      data.tournamentData.csrf_token,
     );
     if (!success) {
       return;
@@ -127,12 +127,12 @@
 
   async function reportScoreCallback(roundId: number, pairingId: number, report: ScoreReport, selfReport: boolean) {
     const success = await reportScore(
-      data.tournamentData.csrf_token,
       data.tournamentData.tournament.id,
       roundId,
       pairingId,
       report,
       selfReport,
+      data.tournamentData.csrf_token,
     );
     if (!success) {
       return;

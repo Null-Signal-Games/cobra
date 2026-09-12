@@ -254,30 +254,6 @@ export async function updateRoundTimer(
   return response.status === 200;
 }
 
-export async function changePlayerSide(
-  csrfToken: string,
-  tournamentId: number,
-  roundId: number,
-  pairingId: number,
-  side: string,
-): Promise<boolean> {
-  const response = await fetch(
-    `${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
-    {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken,
-      },
-      body: JSON.stringify({ side: `player1_is_${side}` }),
-    },
-  );
-
-  return response.status === 200;
-}
-
 export async function reportScore(
   tournamentId: number,
   roundId: number,
