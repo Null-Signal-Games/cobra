@@ -8,6 +8,8 @@
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { showIdentities } from "$lib/utils/ShowIdentities";
+  import { invalidateAll } from "$app/navigation";
+  import { reportScore } from "../api_helper";
 
   let { data, params }: PageProps = $props();
 
@@ -17,9 +19,20 @@
     forcePlayerView = !forcePlayerView;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function reportScoreCallback(roundId: number, pairingId: number, report: ScoreReport, selfReport: boolean) {
-    // TODO: Implement
+    const success = await reportScore(
+      data.tournamentData.tournament.id,
+      roundId,
+      pairingId,
+      report,
+      selfReport,
+      data.tournamentData.csrf_token,
+    );
+    if (!success) {
+      return;
+    }
+
+    await invalidateAll();
   }
 </script>
 
@@ -27,7 +40,7 @@
   <GlobalMessages />
   
   <p></p>
-  
+
   {#if data.stages.length > 0}
     <!-- Upper controls -->
     <div>
