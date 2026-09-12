@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { CreateMyTournamentSummary } from "./transformations";
-import type { PairingsData } from "../../routes/tournaments/[tournamentId]/api_helper";
+import type { PairingsData } from "$lib/api/cobraBeta";
 import type { Player } from "$lib/model/Player";
 import type { Round } from "$lib/model/Round";
 
