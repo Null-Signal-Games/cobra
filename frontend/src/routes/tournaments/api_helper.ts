@@ -193,7 +193,7 @@ export async function loadIdentityNames() {
 }
 
 export async function loadCurrentRoundTimer(tournamentId: number, csrfToken?: string, altFetch = fetch) {
-  const response = await altFetch(`${COBRA_API_SERVER}/beta/tournaments/${tournamentId}/current_round_timer`, {
+  const response = await altFetch(`${apiServer}/beta/tournaments/${tournamentId}/current_round_timer`, {
     method: "GET",
     credentials: "include",
     headers: {
