@@ -7,7 +7,7 @@
   import PagingRow from "$lib/components/PagingRow.svelte";
   import TournamentRow from "$lib/components/TournamentRow.svelte";
   import { COBRA_API_SERVER } from "$app/env/public";
-  import { loadTournaments } from "./api_helper";
+  import { loadTournaments } from "$lib/api/v1";
 
   let {
     typeId = null,
