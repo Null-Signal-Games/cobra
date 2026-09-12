@@ -329,7 +329,7 @@
     </div>
   
     <!-- Elimination stage controls -->
-    {#if data.stages.length > 0 && !data.stages[data.stages.length - 1].is_elimination}
+    {#if data.stages.length > 0 && !data.stages[data.stages.length - 1].is_elimination && data.stages[data.stages.length - 1].rounds.some((r) => r.completed)}
       <h4>Cut to...</h4>
       <table>
         <tbody>
