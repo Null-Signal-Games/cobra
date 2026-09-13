@@ -31,3 +31,10 @@ export interface PairingPolicies {
   view_decks?: boolean;
   self_report: boolean;
 }
+
+export interface NewPairing {
+  table_number: number | null;
+  player1_id: number;
+  side: string;
+  player2_id: number;
+}

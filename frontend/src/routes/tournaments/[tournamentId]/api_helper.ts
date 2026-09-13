@@ -1,4 +1,5 @@
 import { COBRA_API_SERVER } from "$app/env/public";
+import type { Round } from "$lib/model/Round";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import type { Stage } from "$lib/model/Stage";
 import type { Stats, CutStats } from "$lib/model/Stats";
@@ -13,6 +14,14 @@ export class PairingsData {
   policy = new TournamentPolicies();
   stages: Stage[] = [];
   warnings?: string[] = [];
+}
+
+export interface RoundData {
+  tournament: Tournament;
+  stage: Stage;
+  round: Round;
+  policy?: TournamentPolicies;
+  warnings?: string[];
 }
 
 export async function loadPairings(
@@ -373,6 +382,7 @@ export async function loadTournamentSettings(
   }
   return (await response.json()) as TournamentSettingsData;
 }
+
 export async function updateTournamentSettings(
   csrfToken: string,
   tournament: Tournament,
@@ -487,4 +497,23 @@ export async function deleteStage(
     globalMessages.errors.push(`Failed to delete stage: ${err.message}`);
     return false;
   }
+}
+
+export async function loadRound(
+  tournamentId: number,
+  roundId: number,
+  altFetch = fetch,
+): Promise<RoundData> {
+  const response = await altFetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/round_data`,
+    {
+      method: "GET",
+      credentials: "include",
+    },
+  );
+
+  const data = (await response.json()) as RoundData;
+  globalMessages.warnings = data.warnings ?? [];
+
+  return data;
 }
