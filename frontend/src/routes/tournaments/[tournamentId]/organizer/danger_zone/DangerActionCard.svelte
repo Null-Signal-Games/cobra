@@ -23,7 +23,7 @@
     completeText?: string;
     inputId?: string;
     buttonId?: string;
-    onDelete: () => Promise<boolean>;
+    onDelete: (confirmationName: string) => Promise<boolean>;
   } = $props();
 
   let typedName = $state("");
@@ -55,7 +55,7 @@
       id={buttonId}
       disabled={!matches}
       confirm={confirmDeletion}
-      onclick={onDelete}
+      onclick={() => onDelete(typedName)}
       {inProgressText}
       {completeText}
     >

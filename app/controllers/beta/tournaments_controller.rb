@@ -86,6 +86,12 @@ module Beta
     def destroy
       authorize @tournament
 
+      confirmation_name = params[:confirmation_name]
+      if confirmation_name.blank? || confirmation_name.strip != @tournament.name.strip
+        return render json: { error: 'Confirmation name does not match the tournament name' },
+                      status: :unprocessable_content
+      end
+
       Tournament.includes(stages: %i[rounds registrations standing_rows table_ranges],
                           players: %i[decks registrations standing_rows]).find(@tournament.id).destroy!
 

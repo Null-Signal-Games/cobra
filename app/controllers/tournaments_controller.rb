@@ -238,6 +238,21 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
   def destroy
     authorize @tournament
 
+    confirmation_name = params[:confirmation_name]
+    if confirmation_name.blank? || confirmation_name.strip != @tournament.name.strip
+      respond_to do |format|
+        format.html do
+          redirect_back_or_to danger_zone_tournament_path(@tournament),
+                              alert: 'Confirmation name does not match the tournament name'
+        end
+        format.json do
+          render json: { error: 'Confirmation name does not match the tournament name' },
+                 status: :unprocessable_content
+        end
+      end
+      return
+    end
+
     Tournament.includes(stages: %i[rounds registrations standing_rows table_ranges],
                         players: %i[decks registrations standing_rows]).find(@tournament.id).destroy!
 

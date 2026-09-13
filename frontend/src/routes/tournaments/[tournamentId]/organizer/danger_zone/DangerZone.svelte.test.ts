@@ -23,7 +23,7 @@ describe("Danger Zone Page", () => {
 
   const mockTournament = new Tournament();
   mockTournament.id = 1;
-  mockTournament.name = "World Championship 2026";
+  mockTournament.name = "Danger Noodle";
 
   const mockSwissStage: Stage = {
     id: 101,
@@ -110,7 +110,7 @@ describe("Danger Zone Page", () => {
     expect(deleteTournamentBtn).toBeDisabled();
 
     await user.clear(tournamentInput);
-    await user.type(tournamentInput, "World Championship 2026");
+    await user.type(tournamentInput, "Danger Noodle");
     expect(deleteTournamentBtn).toBeEnabled();
 
     await user.clear(tournamentInput);
@@ -128,11 +128,11 @@ describe("Danger Zone Page", () => {
       name: "Delete Tournament",
     });
 
-    await user.type(tournamentInput, "World Championship 2026");
+    await user.type(tournamentInput, "Danger Noodle");
     await user.click(deleteTournamentBtn);
 
     expect(confirmSpy).toHaveBeenCalledWith("Are you absolutely sure? This cannot be reversed.");
-    expect(deleteTournament).toHaveBeenCalledWith(1, "test-csrf-token");
+    expect(deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle", "test-csrf-token");
     expect(goto).toHaveBeenCalledWith("/tournaments");
   });
 
@@ -147,7 +147,7 @@ describe("Danger Zone Page", () => {
       name: "Delete Tournament",
     });
 
-    await user.type(tournamentInput, "World Championship 2026");
+    await user.type(tournamentInput, "Danger Noodle");
     await user.click(deleteTournamentBtn);
 
     expect(confirmSpy).toHaveBeenCalled();
@@ -166,10 +166,10 @@ describe("Danger Zone Page", () => {
       name: "Delete Tournament",
     });
 
-    await user.type(tournamentInput, "World Championship 2026");
+    await user.type(tournamentInput, "Danger Noodle");
     await user.click(deleteTournamentBtn);
 
-    expect(deleteTournament).toHaveBeenCalledWith(1, "test-csrf-token");
+    expect(deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle", "test-csrf-token");
     expect(goto).not.toHaveBeenCalled();
   });
 
@@ -186,13 +186,13 @@ describe("Danger Zone Page", () => {
 
     expect(deleteSwissBtn).toBeDisabled();
 
-    await user.type(swissInput, "World Championship 2026");
+    await user.type(swissInput, "Danger Noodle");
     expect(deleteSwissBtn).toBeEnabled();
 
     await user.click(deleteSwissBtn);
 
     expect(confirmSpy).toHaveBeenCalledWith("Are you absolutely sure? This cannot be reversed.");
-    expect(deleteStage).toHaveBeenCalledWith(1, 101, "test-csrf-token");
+    expect(deleteStage).toHaveBeenCalledWith(1, 101, "Danger Noodle", "test-csrf-token");
     expect(invalidateAll).toHaveBeenCalledOnce();
     expect(globalMessages.infos).toContain("Stage deleted.");
   });
@@ -208,7 +208,7 @@ describe("Danger Zone Page", () => {
       name: "Delete Single Sided Swiss Stage",
     });
 
-    await user.type(swissInput, "World Championship 2026");
+    await user.type(swissInput, "Danger Noodle");
     await user.click(deleteSwissBtn);
 
     expect(confirmSpy).toHaveBeenCalled();
@@ -227,10 +227,10 @@ describe("Danger Zone Page", () => {
       name: "Delete Single Elim Stage",
     });
 
-    await user.type(elimInput, "World Championship 2026");
+    await user.type(elimInput, "Danger Noodle");
     await user.click(deleteElimBtn);
 
-    expect(deleteStage).toHaveBeenCalledWith(1, 102, "test-csrf-token");
+    expect(deleteStage).toHaveBeenCalledWith(1, 102, "Danger Noodle", "test-csrf-token");
     expect(invalidateAll).not.toHaveBeenCalled();
     expect(globalMessages.infos).toHaveLength(0);
   });

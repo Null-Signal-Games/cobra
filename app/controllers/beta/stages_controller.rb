@@ -18,6 +18,12 @@ module Beta
     def destroy
       authorize @tournament, :update?
 
+      confirmation_name = params[:confirmation_name]
+      if confirmation_name.blank? || confirmation_name.strip != @tournament.name.strip
+        return render json: { error: 'Confirmation name does not match the tournament name' },
+                      status: :unprocessable_content
+      end
+
       @stage.destroy!
 
       head :ok

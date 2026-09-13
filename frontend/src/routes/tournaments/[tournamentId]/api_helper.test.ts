@@ -168,10 +168,15 @@ describe("tournament api_helper score reporting", () => {
   });
 
   describe("deleteTournament", () => {
-    it("makes a DELETE request to /beta/tournaments/:id and returns true on 200", async () => {
+    it("makes a DELETE request to /beta/tournaments/:id with confirmation_name and returns true on 200", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await deleteTournament(42, "csrf-test-token", mockFetch);
+      const result = await deleteTournament(
+        42,
+        "Danger Noodle",
+        "csrf-test-token",
+        mockFetch,
+      );
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const { url, requestOptions, headers } = getFetchCall();
@@ -179,12 +184,36 @@ describe("tournament api_helper score reporting", () => {
       expect(requestOptions?.method).toBe("DELETE");
       expect(requestOptions?.credentials).toBe("include");
       expect(headers["X-CSRF-Token"]).toBe("csrf-test-token");
+      expect(headers["Content-Type"]).toBe("application/json");
+      expect(requestOptions?.body).toBe(
+        JSON.stringify({ confirmation_name: "Danger Noodle" }),
+      );
     });
 
-    it("returns false and logs error on failure", async () => {
+    it("returns false and logs server error message on 422", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ error: "Confirmation name does not match the tournament name" }),
+          { status: 422, headers: { "Content-Type": "application/json" } },
+        ),
+      );
+
+      const result = await deleteTournament(42, "Wrong Name", "csrf-test-token", mockFetch);
+      expect(result).toBe(false);
+      expect(globalMessages.errors).toContain(
+        "Confirmation name does not match the tournament name",
+      );
+    });
+
+    it("returns false and logs fallback error on failure", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }));
 
-      const result = await deleteTournament(42, "csrf-test-token", mockFetch);
+      const result = await deleteTournament(
+        42,
+        "Danger Noodle",
+        "csrf-test-token",
+        mockFetch,
+      );
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain("Failed to delete tournament.");
     });
@@ -192,17 +221,28 @@ describe("tournament api_helper score reporting", () => {
     it("returns false and logs error on network exception", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Network failed"));
 
-      const result = await deleteTournament(42, "csrf-test-token", mockFetch);
+      const result = await deleteTournament(
+        42,
+        "Danger Noodle",
+        "csrf-test-token",
+        mockFetch,
+      );
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain("Failed to delete tournament: Network failed");
     });
   });
 
   describe("deleteStage", () => {
-    it("makes a DELETE request to /beta/tournaments/:tournamentId/stages/:stageId and returns true on 200", async () => {
+    it("makes a DELETE request to /beta/tournaments/:tournamentId/stages/:stageId with confirmation_name and returns true on 200", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await deleteStage(42, 7, "csrf-test-token", mockFetch);
+      const result = await deleteStage(
+        42,
+        7,
+        "Danger Noodle",
+        "csrf-test-token",
+        mockFetch,
+      );
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const { url, requestOptions, headers } = getFetchCall();
@@ -210,12 +250,37 @@ describe("tournament api_helper score reporting", () => {
       expect(requestOptions?.method).toBe("DELETE");
       expect(requestOptions?.credentials).toBe("include");
       expect(headers["X-CSRF-Token"]).toBe("csrf-test-token");
+      expect(headers["Content-Type"]).toBe("application/json");
+      expect(requestOptions?.body).toBe(
+        JSON.stringify({ confirmation_name: "Danger Noodle" }),
+      );
     });
 
-    it("returns false and logs error on failure", async () => {
+    it("returns false and logs server error message on 422", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ error: "Confirmation name does not match the tournament name" }),
+          { status: 422, headers: { "Content-Type": "application/json" } },
+        ),
+      );
+
+      const result = await deleteStage(42, 7, "Wrong Name", "csrf-test-token", mockFetch);
+      expect(result).toBe(false);
+      expect(globalMessages.errors).toContain(
+        "Confirmation name does not match the tournament name",
+      );
+    });
+
+    it("returns false and logs fallback error on failure", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }));
 
-      const result = await deleteStage(42, 7, "csrf-test-token", mockFetch);
+      const result = await deleteStage(
+        42,
+        7,
+        "Danger Noodle",
+        "csrf-test-token",
+        mockFetch,
+      );
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain("Failed to delete stage.");
     });
@@ -223,7 +288,13 @@ describe("tournament api_helper score reporting", () => {
     it("returns false and logs error on network exception", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Stage deletion network failed"));
 
-      const result = await deleteStage(42, 7, "csrf-test-token", mockFetch);
+      const result = await deleteStage(
+        42,
+        7,
+        "Danger Noodle",
+        "csrf-test-token",
+        mockFetch,
+      );
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain(
         "Failed to delete stage: Stage deletion network failed",

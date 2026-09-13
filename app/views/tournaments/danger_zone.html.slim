@@ -10,10 +10,9 @@
       = hidden_field_tag :name_for_confirmation, @tournament.name, id: 'name_for_confirmation'
 
       .d-flex.flex-column.align-items-center
-        = f.input_field :name,
+        = text_field_tag :confirmation_name, '',
                 class: 'form-control w-75 mb-3',
                 id: 'tournament_name',
-                value: '',
                 placeholder: 'Enter tournament name to confirm deletion'
         = button_tag type: :submit, id: 'delete_tournament_button', class: 'btn btn-danger text-nowrap', disabled: true, data: { confirm: 'Are you absolutely sure? This cannot be reversed.' } do
           => fa_icon 'trash'
@@ -40,10 +39,9 @@
         = hidden_field_tag :name_for_confirmation, @tournament.name, id: hidden_id
 
         .d-flex.flex-column.align-items-center
-          = f.input_field :name,
+          = text_field_tag :confirmation_name, '',
                   class: 'form-control w-75 mb-3',
                   id: input_id,
-                  value: '',
                   placeholder: 'Enter tournament name to confirm deletion'
           = button_tag type: :submit, id: button_id, class: 'btn btn-danger text-nowrap', disabled: true, data: { confirm: 'Are you absolutely sure? This cannot be reversed.' } do
             => fa_icon 'trash'

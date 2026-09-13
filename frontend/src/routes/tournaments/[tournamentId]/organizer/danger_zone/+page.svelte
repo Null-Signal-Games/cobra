@@ -9,9 +9,10 @@
 
   let { data }: PageProps = $props();
 
-  async function handleDeleteTournament(): Promise<boolean> {
+  async function handleDeleteTournament(confirmationName: string): Promise<boolean> {
     const success = await deleteTournament(
       data.tournamentData.tournament.id,
+      confirmationName,
       data.tournamentData.csrf_token,
     );
     if (success) {
@@ -21,10 +22,11 @@
     return false;
   }
 
-  async function handleDeleteStage(stageId: number): Promise<boolean> {
+  async function handleDeleteStage(stageId: number, confirmationName: string): Promise<boolean> {
     const success = await deleteStage(
       data.tournamentData.tournament.id,
       stageId,
+      confirmationName,
       data.tournamentData.csrf_token,
     );
     if (success) {
@@ -59,7 +61,7 @@
       buttonLabel="Delete {stage.name} Stage"
       inputId="tournament_stage_name_{stage.id}"
       buttonId="delete_stage_button_{stage.id}"
-      onDelete={() => handleDeleteStage(stage.id)}
+      onDelete={(name: string) => handleDeleteStage(stage.id, name)}
     />
   {/each}
 </div>

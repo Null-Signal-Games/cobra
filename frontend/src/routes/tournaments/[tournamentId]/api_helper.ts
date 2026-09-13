@@ -399,6 +399,7 @@ export async function updateTournamentSettings(
 
 export async function deleteTournament(
   tournamentId: number,
+  confirmationName: string,
   csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
 ): Promise<boolean> {
@@ -413,9 +414,21 @@ export async function deleteTournament(
         Accept: "application/json",
         "X-CSRF-Token": token,
       },
+      body: JSON.stringify({ confirmation_name: confirmationName }),
     });
 
     if (!response.ok) {
+      if (response.status === 422) {
+        try {
+          const errData = (await response.json()) as { error?: string };
+          if (errData.error) {
+            globalMessages.errors.push(errData.error);
+            return false;
+          }
+        } catch {
+          // ignore json parse error
+        }
+      }
       globalMessages.errors.push("Failed to delete tournament.");
       return false;
     }
@@ -431,6 +444,7 @@ export async function deleteTournament(
 export async function deleteStage(
   tournamentId: number,
   stageId: number,
+  confirmationName: string,
   csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
 ): Promise<boolean> {
@@ -447,10 +461,22 @@ export async function deleteStage(
           Accept: "application/json",
           "X-CSRF-Token": token,
         },
+        body: JSON.stringify({ confirmation_name: confirmationName }),
       },
     );
 
     if (!response.ok) {
+      if (response.status === 422) {
+        try {
+          const errData = (await response.json()) as { error?: string };
+          if (errData.error) {
+            globalMessages.errors.push(errData.error);
+            return false;
+          }
+        } catch {
+          // ignore json parse error
+        }
+      }
       globalMessages.errors.push("Failed to delete stage.");
       return false;
     }
