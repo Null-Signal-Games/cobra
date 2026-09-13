@@ -21,6 +21,7 @@ export interface TournamentSettingsData {
   tournament: Tournament;
   options: TournamentOptions;
   feature_flags: FeatureFlags;
+  can_change_swiss_format?: boolean;
   csrf_token: string;
 }
 
@@ -174,7 +175,7 @@ export async function savePlayer(
   let token = "";
   let tournamentId: number;
   let player: Player;
-  let organizerView = false;
+  let organizerView : boolean;
 
   if (typeof arg1 === "string") {
     token = arg1;

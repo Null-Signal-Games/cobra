@@ -65,7 +65,21 @@ RSpec.describe TournamentsController do
             'user_id' => tournament.user_id
           }
         )
+        expect(data['can_change_swiss_format']).to be true
         expect(data['csrf_token']).not_to be_empty
+      end
+
+      context 'when tournament has rounds' do
+        before do
+          tournament.pair_new_round!
+        end
+
+        it 'indicates swiss format cannot be changed' do
+          get edit_form_tournament_path(tournament), as: :json
+
+          data = response.parsed_body
+          expect(data['can_change_swiss_format']).to be false
+        end
       end
 
       it 'includes form options data' do

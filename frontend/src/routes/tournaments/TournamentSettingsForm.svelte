@@ -14,6 +14,7 @@
     tournament,
     options = emptyTournamentOptions(),
     featureFlags = {},
+    canChangeSwissFormat = true,
     submitLabel = "Save",
     submitIcon = "floppy-o",
     errors = {},
@@ -22,6 +23,7 @@
     tournament: Tournament;
     options?: TournamentOptions;
     featureFlags?: FeatureFlags;
+    canChangeSwissFormat?: boolean;
     submitLabel?: string;
     submitIcon?: string;
     errors?: Errors;
@@ -98,10 +100,18 @@
 
 <div class="form-group">
   <label for="swiss_format">Swiss format</label>
-  <select id="swiss_format" class="form-control" bind:value={tournamentEdit.swiss_format}>
+  <select
+    id="swiss_format"
+    class="form-control"
+    bind:value={tournamentEdit.swiss_format}
+    disabled={!canChangeSwissFormat}
+  >
     <option value="double_sided">{swissFormatDisplayString("double_sided")}</option>
     <option value="single_sided">{swissFormatDisplayString("single_sided")}</option>
   </select>
+  {#if !canChangeSwissFormat}
+    <small class="form-text text-muted">Swiss format cannot be changed once rounds exist.</small>
+  {/if}
   {#if errors.swiss_format}
     <div class="invalid-feedback d-block">{errors.swiss_format}</div>
   {/if}

@@ -128,9 +128,9 @@
   {#if canEdit}
     <li class="nav-item">
       <a
-        href={resolve(`/tournaments/${tournament.id}/edit`)}
+        href={resolve(`/tournaments/${tournament.id}/organizer/settings`)}
         class="nav-link"
-        class:active={page.route.id as string === "/tournaments/[tournamentId]/edit"}
+        class:active={page.route.id as string === "/tournaments/[tournamentId]/organizer/settings"}
       >
         <FontAwesomeIcon icon="cog" /> Settings
       </a>

@@ -33,9 +33,9 @@ export class Tournament {
   tournament_type_id: number | null = null;
   format_id: number | null = null;
   format_name: string | null = null;
-  deckbuilding_restriction_id: number | null = null;
+  deckbuilding_restriction_id: string | number | null = null;
   deckbuilding_restriction_name: string | null = null;
-  card_set_id: number | null = null;
+  card_set_id: string | number | null = null;
   active_player_count = 0;
   dropped_player_count = 0;
   created_at = "";
@@ -49,8 +49,8 @@ export class Tournament {
 export interface TournamentOptions {
   tournament_types: { id: number; name: string }[];
   formats: { id: number; name: string }[];
-  card_sets: { id: number; name: string }[];
-  deckbuilding_restrictions: { id: number; name: string }[];
+  card_sets: { id: string | number; name: string }[];
+  deckbuilding_restrictions: { id: string | number; name: string }[];
   time_zones: { id: string; name: string }[];
   official_prize_kits: { id: number; name: string }[];
 }
