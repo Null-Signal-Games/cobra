@@ -2,11 +2,14 @@
 
 module Beta
   class TournamentsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
+    include DangerZoneConfirmable
+
     before_action :set_tournament, only: %i[
       show update destroy info qr registration open_registration close_registration lock_player_registrations
       unlock_player_registrations cut stats id_and_faction_data cut_conversion_rates current_round_timer
     ]
     before_action :authorize_beta_testing
+    before_action :validate_confirmation_name, only: :destroy
 
     def index
       skip_authorization
@@ -84,14 +87,6 @@ module Beta
     end
 
     def destroy
-      authorize @tournament
-
-      confirmation_name = params[:confirmation_name]
-      if confirmation_name.blank? || confirmation_name.strip != @tournament.name.strip
-        return render json: { error: 'Confirmation name does not match the tournament name' },
-                      status: :unprocessable_content
-      end
-
       Tournament.includes(stages: %i[rounds registrations standing_rows table_ranges],
                           players: %i[decks registrations standing_rows]).find(@tournament.id).destroy!
 

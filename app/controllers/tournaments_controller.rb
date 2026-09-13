@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 class TournamentsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
+  include DangerZoneConfirmable
+
   before_action :set_tournament, only: %i[
     show info edit edit_form update destroy
     upload_to_abr save_json cut qr my_tournament registration timer
     close_registration open_registration lock_player_registrations unlock_player_registrations
     id_and_faction_data cut_conversion_rates side_win_percentages stats bracket danger_zone
   ]
+  before_action :validate_confirmation_name, only: :destroy
 
   def index
     authorize Tournament
@@ -236,23 +239,6 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
   end
 
   def destroy
-    authorize @tournament
-
-    confirmation_name = params[:confirmation_name]
-    if confirmation_name.blank? || confirmation_name.strip != @tournament.name.strip
-      respond_to do |format|
-        format.html do
-          redirect_back_or_to danger_zone_tournament_path(@tournament),
-                              alert: 'Confirmation name does not match the tournament name'
-        end
-        format.json do
-          render json: { error: 'Confirmation name does not match the tournament name' },
-                 status: :unprocessable_content
-        end
-      end
-      return
-    end
-
     Tournament.includes(stages: %i[rounds registrations standing_rows table_ranges],
                         players: %i[decks registrations standing_rows]).find(@tournament.id).destroy!
 

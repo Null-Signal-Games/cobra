@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class StagesController < ApplicationController # rubocop:disable Style/Documentation
+  include DangerZoneConfirmable
+
   before_action :set_tournament
   before_action :set_stage, only: %i[show update destroy settings]
+  before_action :validate_confirmation_name, only: :destroy
 
   def show
     authorize @tournament, :update?
@@ -45,23 +48,6 @@ class StagesController < ApplicationController # rubocop:disable Style/Documenta
   end
 
   def destroy
-    authorize @tournament, :update?
-
-    confirmation_name = params[:confirmation_name]
-    if confirmation_name.blank? || confirmation_name.strip != @tournament.name.strip
-      respond_to do |format|
-        format.html do
-          redirect_back_or_to danger_zone_tournament_path(@tournament),
-                              alert: 'Confirmation name does not match the tournament name'
-        end
-        format.json do
-          render json: { error: 'Confirmation name does not match the tournament name' },
-                 status: :unprocessable_content
-        end
-      end
-      return
-    end
-
     @stage.destroy!
 
     respond_to do |format|
