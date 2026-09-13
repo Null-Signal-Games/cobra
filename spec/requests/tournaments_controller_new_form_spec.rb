@@ -69,6 +69,7 @@ RSpec.describe TournamentsController do
             'allow_self_reporting' => false
           }
         )
+        expect(data['can_change_swiss_format']).to be true
         expect(data['csrf_token']).not_to be_empty
       end
     end

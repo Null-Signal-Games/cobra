@@ -21,6 +21,7 @@ export interface TournamentSettingsData {
   tournament: Tournament;
   options: TournamentOptions;
   feature_flags: FeatureFlags;
+  can_change_swiss_format?: boolean;
   csrf_token: string;
 }
 

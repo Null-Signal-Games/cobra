@@ -2,9 +2,10 @@ import { COBRA_API_SERVER } from "$app/env/public";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import type { Stage } from "$lib/model/Stage";
 import type { Stats, CutStats } from "$lib/model/Stats";
-import { TournamentPolicies } from "$lib/model/Tournament";
+import { Tournament, TournamentPolicies } from "$lib/model/Tournament";
+import { ValidationError, type Errors } from "$lib/utils/errors";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-import { csrfToken } from "../api_helper";
+import { csrfToken, type TournamentSettingsData } from "../api_helper";
 
 const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
 
@@ -357,4 +358,42 @@ export async function deletePairing(
   );
 
   return response.status === 200;
+}
+
+export async function loadTournamentSettings(
+  tournamentId: number,
+  fetch: typeof globalThis.fetch,
+): Promise<TournamentSettingsData> {
+  const response = await fetch(`${apiServer}/tournaments/${tournamentId}/edit_form`, {
+    credentials: "include",
+    headers: { Accept: "application/json" },
+    method: "GET",
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  return (await response.json()) as TournamentSettingsData;
+}
+export async function updateTournamentSettings(
+  csrfToken: string,
+  tournament: Tournament,
+): Promise<boolean> {
+  const response = await fetch(`${apiServer}/tournaments/${tournament.id}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+    body: JSON.stringify({ tournament }),
+  });
+  if (!response.ok) {
+    if (response.status === 422) {
+      const errorData = (await response.json()) as { errors: Errors };
+      throw new ValidationError(errorData.errors);
+    }
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  return true;
 }

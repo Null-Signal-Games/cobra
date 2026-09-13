@@ -86,6 +86,7 @@ module TournamentHelper # rubocop:disable Style/Documentation
       feature_flags: {
         allow_self_reporting: Flipper.enabled?(:allow_self_reporting)
       },
+      can_change_swiss_format: tournament.rounds.empty?,
       csrf_token: form_authenticity_token
     }
   end
