@@ -191,4 +191,18 @@ RSpec.describe TournamentsController do
       end
     end
   end
+
+  describe '#destroy' do
+    context 'when requesting json format' do
+      it 'destroys tournament and responds with ok' do
+        sign_in tournament.user
+
+        expect do
+          delete tournament_path(tournament), as: :json
+        end.to change(Tournament, :count).by(-1)
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
 end

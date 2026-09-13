@@ -241,7 +241,10 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
     Tournament.includes(stages: %i[rounds registrations standing_rows table_ranges],
                         players: %i[decks registrations standing_rows]).find(@tournament.id).destroy!
 
-    redirect_to tournaments_path
+    respond_to do |format|
+      format.html { redirect_to tournaments_path }
+      format.json { head :ok }
+    end
   end
 
   def upload_to_abr

@@ -3,7 +3,7 @@
 module Beta
   class TournamentsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
     before_action :set_tournament, only: %i[
-      show update info qr registration open_registration close_registration lock_player_registrations
+      show update destroy info qr registration open_registration close_registration lock_player_registrations
       unlock_player_registrations cut stats id_and_faction_data cut_conversion_rates current_round_timer
     ]
     before_action :authorize_beta_testing
@@ -81,6 +81,15 @@ module Beta
           end
         end
       end
+    end
+
+    def destroy
+      authorize @tournament
+
+      Tournament.includes(stages: %i[rounds registrations standing_rows table_ranges],
+                          players: %i[decks registrations standing_rows]).find(@tournament.id).destroy!
+
+      head :ok
     end
 
     def info
