@@ -115,6 +115,145 @@ export async function changePlayerSide(
   }
 }
 
+export async function createStage(
+  csrfToken: string,
+  tournamentId: number,
+  cutSingleElim?: boolean,
+  cutCount?: number,
+) {
+  const isCut = cutSingleElim !== undefined && cutCount !== undefined;
+  const path = isCut
+    ? `${apiServer}/beta/tournaments/${tournamentId}/cut`
+    : `${apiServer}/beta/tournaments/${tournamentId}/stages`;
+  const body = isCut
+    ? { number: cutCount, ...(cutSingleElim && { elimination_type: "single" }) }
+    : null;
+
+  const response = await fetch(path, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+    body: JSON.stringify(body),
+  });
+
+  return response.status === 200;
+}
+
+export async function pairRound(csrfToken: string, tournamentId: number) {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken
+      },
+    },
+  );
+
+  return response.status === 200;
+}
+
+export async function setRegistrationStatus(
+  csrfToken: string,
+  tournamentId: number,
+  open: boolean,
+): Promise<boolean> {
+  const path = open
+    ? `${apiServer}/beta/tournaments/${tournamentId}/open_registration`
+    : `${apiServer}/beta/tournaments/${tournamentId}/close_registration`;
+
+  const response = await fetch(path, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+  });
+
+  return response.status === 200;
+}
+
+export async function setPlayerRegistrationStatus(
+  csrfToken: string,
+  tournamentId: number,
+  locked: boolean,
+): Promise<boolean> {
+  const path = locked
+    ? `${apiServer}/beta/tournaments/${tournamentId}/lock_player_registration`
+    : `${apiServer}/beta/tournaments/${tournamentId}/unlock_player_registration`;
+
+  const response = await fetch(path, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+  });
+
+  return response.status === 200;
+}
+
+export async function completeRound(
+  csrfToken: string,
+  tournamentId: number,
+  roundId: number,
+  completed: boolean,
+): Promise<boolean> {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/complete`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+      body: JSON.stringify({ completed: completed }),
+    },
+  );
+
+  return response.status === 200;
+}
+
+export async function updateRoundTimer(
+  csrfToken: string,
+  tournamentId: number,
+  roundId: number,
+  length_minutes: number,
+  operation: string,
+): Promise<boolean> {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/update_timer`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+      body: JSON.stringify({
+        length_minutes: length_minutes,
+        operation: operation,
+      }),
+    },
+  );
+
+  return response.status === 200;
+}
+
 export async function reportScore(
   tournamentId: number,
   roundId: number,
@@ -196,4 +335,26 @@ export async function resetReports(
     globalMessages.errors.push(`Failed to reset self report: ${err.message}`);
     return false;
   }
+}
+
+export async function deletePairing(
+  csrfToken: string,
+  tournamentId: number,
+  roundId: number,
+  pairingId: number,
+): Promise<boolean> {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+    },
+  );
+
+  return response.status === 200;
 }

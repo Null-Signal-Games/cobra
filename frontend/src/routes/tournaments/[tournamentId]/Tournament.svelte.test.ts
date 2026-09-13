@@ -11,7 +11,6 @@ import userEvent from "@testing-library/user-event";
 import { Tournament } from "$lib/model/Tournament";
 import type { IdentityNames } from "$lib/model/Identity";
 import { Player } from "$lib/model/Player";
-import type { PageProps } from "./$types";
 import type { ComponentProps } from "svelte";
 import { authStore } from "$lib/utils/auth.svelte";
 import { page } from "$app/state";
@@ -103,8 +102,7 @@ const user = userEvent.setup();
 
 describe("Tournament", () => {
   const createProps = (
-    player: Player,
-    dataPartial: Partial<PageProps["data"]> = {},
+    player: Player
   ): ComponentProps<typeof TournamentPage> => ({
     params: {
       tournamentId: MockTournament.id.toString()
@@ -129,7 +127,6 @@ describe("Tournament", () => {
         }
       },
       player: player,
-      ...dataPartial,
     },
   });
 

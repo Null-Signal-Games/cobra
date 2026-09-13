@@ -388,8 +388,8 @@ export async function loadPlayers(tournamentId: number, altFetch = fetch) {
   return (await response.json()) as PlayersData;
 }
 
-export async function loadCurrentRoundTimer(tournamentId: number, csrfToken?: string) {
-  const response = await fetch(`${apiServer}/beta/tournaments/${tournamentId}/current_round_timer`, {
+export async function loadCurrentRoundTimer(tournamentId: number, csrfToken?: string, altFetch = fetch) {
+  const response = await altFetch(`${apiServer}/beta/tournaments/${tournamentId}/current_round_timer`, {
     method: "GET",
     credentials: "include",
     headers: {
