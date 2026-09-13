@@ -191,4 +191,33 @@ RSpec.describe TournamentsController do
       end
     end
   end
+
+  describe '#destroy' do
+    context 'when requesting json format' do
+      it 'destroys tournament and responds with ok when confirmation_name matches' do
+        sign_in tournament.user
+
+        expect do
+          delete tournament_path(tournament),
+                 params: { confirmation_name: tournament.name },
+                 as: :json
+        end.to change(Tournament, :count).by(-1)
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns unprocessable_content when confirmation_name does not match' do
+        sign_in tournament.user
+
+        expect do
+          delete tournament_path(tournament),
+                 params: { confirmation_name: 'Incorrect Name' },
+                 as: :json
+        end.not_to change(Tournament, :count)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body['error']).to eq('Confirmation name does not match the tournament name')
+      end
+    end
+  end
 end

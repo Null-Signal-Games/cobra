@@ -12,6 +12,7 @@
 
   let {
     css = "btn btn-info",
+    id,
     disabled = false,
     children,
     inProgressText = "In progress",
@@ -21,6 +22,7 @@
     onclick,
   }: {
     css?: string;
+    id?: string;
     disabled?: boolean;
     children: Snippet;
     inProgressText?: string;
@@ -48,6 +50,7 @@
 
 <button
   type="button"
+  {id}
   class={css}
   onclick={clicked}
   disabled={disabled || state !== State.DEFAULT}

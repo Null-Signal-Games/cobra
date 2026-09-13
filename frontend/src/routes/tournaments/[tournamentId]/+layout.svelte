@@ -7,7 +7,7 @@
   import { authStore } from "$lib/utils/auth.svelte";
   import RoundTimer from "./RoundTimer.svelte";
 
-  let { children, data }: { children: Snippet; data: LayoutData; } = $props();
+  let { children, data }: { children: Snippet; data: LayoutData } = $props();
 
   let tournament = $derived(data.tournamentData.tournament);
   let canEdit = $derived(tournament.user_id === authStore.user?.id);
@@ -22,12 +22,6 @@
     }
   });
 </script>
-
-<style>
-  .stream-link {
-    font-size: 2rem
-  }
-</style>
 
 <svelte:head>
   {#if data.tournamentData.csrf_token}
@@ -68,11 +62,11 @@
 
   {#if authStore.user}
     <li class="nav-item">
-    <a
-      href={resolve(`/tournaments/${tournament.id}/me`)}
-      class="nav-link"
-      class:active={page.route.id as string === "/tournaments/[tournamentId]/me"}
-    >
+      <a
+        href={resolve(`/tournaments/${tournament.id}/me`)}
+        class="nav-link"
+        class:active={(page.route.id as string) === "/tournaments/[tournamentId]/me"}
+      >
         <FontAwesomeIcon icon="user" /> Me
       </a>
     </li>
@@ -82,7 +76,7 @@
       <a
         href={resolve(`/tournaments/${tournament.id}/organizer/players`)}
         class="nav-link"
-        class:active={page.route.id as string === "/tournaments/[tournamentId]/organizer/players"}
+        class:active={(page.route.id as string) === "/tournaments/[tournamentId]/organizer/players"}
       >
         <FontAwesomeIcon icon="users" /> Players
       </a>
@@ -90,9 +84,16 @@
   {/if}
   <li class="nav-item">
     <a
-      href={resolve(canEdit ? `/tournaments/${tournament.id}/organizer/rounds` : `/tournaments/${tournament.id}/rounds`)}
+      href={resolve(
+        canEdit
+          ? `/tournaments/${tournament.id}/organizer/rounds`
+          : `/tournaments/${tournament.id}/rounds`,
+      )}
       class="nav-link"
-      class:active={page.route.id as string === (canEdit ? "/tournaments/[tournamentId]/organizer/rounds" : "/tournaments/[tournamentId]/rounds")}
+      class:active={(page.route.id as string) ===
+        (canEdit
+          ? "/tournaments/[tournamentId]/organizer/rounds"
+          : "/tournaments/[tournamentId]/rounds")}
     >
       <FontAwesomeIcon icon="calendar-check-o" /> Pairings
     </a>
@@ -111,7 +112,7 @@
     <a
       href={resolve(`/tournaments/${tournament.id}/bracket`)}
       class="nav-link"
-      class:active={page.route.id as string === "/tournaments/[tournamentId]/bracket"}
+      class:active={(page.route.id as string) === "/tournaments/[tournamentId]/bracket"}
     >
       <FontAwesomeIcon icon="sitemap" /> Bracket
     </a>
@@ -120,7 +121,7 @@
     <a
       href={resolve(`/tournaments/${tournament.id}/stats`)}
       class="nav-link"
-      class:active={page.route.id as string === "/tournaments/[tournamentId]/stats"}
+      class:active={(page.route.id as string) === "/tournaments/[tournamentId]/stats"}
     >
       <FontAwesomeIcon icon="pie-chart" /> Stats
     </a>
@@ -130,7 +131,8 @@
       <a
         href={resolve(`/tournaments/${tournament.id}/organizer/settings`)}
         class="nav-link"
-        class:active={page.route.id as string === "/tournaments/[tournamentId]/organizer/settings"}
+        class:active={(page.route.id as string) ===
+          "/tournaments/[tournamentId]/organizer/settings"}
       >
         <FontAwesomeIcon icon="cog" /> Settings
       </a>
@@ -139,9 +141,10 @@
   {#if canEdit}
     <li class="nav-item">
       <a
-        href={resolve(`/tournaments/${tournament.id}/danger_zone`)}
+        href={resolve(`/tournaments/${tournament.id}/organizer/danger_zone`)}
         class="nav-link"
-        class:active={page.route.id as string === "/tournaments/[tournamentId]/danger_zone"}
+        class:active={(page.route.id as string) ===
+          "/tournaments/[tournamentId]/organizer/danger_zone"}
       >
         <FontAwesomeIcon icon="trash" /> Danger Zone
       </a>
@@ -153,3 +156,9 @@
 <div class="row py-3 main-content">
   {@render children()}
 </div>
+
+<style>
+  .stream-link {
+    font-size: 2rem;
+  }
+</style>

@@ -25,10 +25,20 @@ RSpec.describe 'destroying tournaments and stages', type: :feature do
       round.pair!
     end
 
-    it 'destroys tournament and associated records' do
+    it 'does not destroy tournament when tournament name is not filled in' do
+      expect do
+        click_button 'Delete Tournament', disabled: true
+      end.not_to change(Tournament, :count)
+
+      expect(page).to have_text('Confirmation name does not match the tournament name')
+    end
+
+    it 'destroys tournament and associated records when tournament name is confirmed' do
       expect(page).to have_button('Delete Tournament', disabled: true)
       expect(find_by_id('tournament_name').value).to be_empty
       expect(find_by_id('name_for_confirmation', visible: :all).value).to eq(tournament.name)
+
+      fill_in 'tournament_name', with: tournament.name
 
       expect do
         click_button 'Delete Tournament', disabled: true
@@ -56,7 +66,17 @@ RSpec.describe 'destroying tournaments and stages', type: :feature do
                         visible: :all).value).to eq(tournament.name)
     end
 
+    it 'does not destroy stage when tournament name is not filled in' do
+      expect do
+        click_button 'Delete Single Sided Swiss Stage', disabled: true
+      end.not_to change(Stage, :count)
+
+      expect(page).to have_text('Confirmation name does not match the tournament name')
+    end
+
     it 'destroys a stage and leaves only the remaining stage section on the danger zone page' do
+      fill_in "tournament_stage_name_#{swiss_stage.id}", with: tournament.name
+
       expect do
         click_button 'Delete Single Sided Swiss Stage', disabled: true
       end.to change(Stage, :count).by(-1)

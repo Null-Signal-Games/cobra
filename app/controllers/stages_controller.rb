@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class StagesController < ApplicationController # rubocop:disable Style/Documentation
+  include DangerZoneConfirmable
+
   before_action :set_tournament
   before_action :set_stage, only: %i[show update destroy settings]
+  before_action :validate_confirmation_name, only: :destroy
 
   def show
     authorize @tournament, :update?
@@ -45,11 +48,12 @@ class StagesController < ApplicationController # rubocop:disable Style/Documenta
   end
 
   def destroy
-    authorize @tournament, :update?
-
     @stage.destroy!
 
-    redirect_to tournament_rounds_path(@tournament)
+    respond_to do |format|
+      format.html { redirect_to tournament_rounds_path(@tournament) }
+      format.json { head :ok }
+    end
   end
 
   def settings

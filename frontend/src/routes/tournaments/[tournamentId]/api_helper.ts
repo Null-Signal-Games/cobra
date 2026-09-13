@@ -35,7 +35,6 @@ export async function loadPairings(
   return data;
 }
 
-
 export async function loadStats(tournamentId: number, altFetch = fetch): Promise<Stats> {
   const response = await altFetch(
     `${apiServer}/beta/tournaments/${tournamentId}/id_and_faction_data`,
@@ -396,4 +395,96 @@ export async function updateTournamentSettings(
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
   return true;
+}
+
+export async function deleteTournament(
+  tournamentId: number,
+  confirmationName: string,
+  csrfOrFetch?: string | typeof fetch,
+  altFetch = fetch,
+): Promise<boolean> {
+  const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
+
+  try {
+    const response = await customFetch(`${apiServer}/beta/tournaments/${tournamentId}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": token,
+      },
+      body: JSON.stringify({ confirmation_name: confirmationName }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 422) {
+        try {
+          const errData = (await response.json()) as { error?: string };
+          if (errData.error) {
+            globalMessages.errors.push(errData.error);
+            return false;
+          }
+        } catch {
+          // ignore json parse error
+        }
+      }
+      globalMessages.errors.push("Failed to delete tournament.");
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    const err = e as Error;
+    globalMessages.errors.push(`Failed to delete tournament: ${err.message}`);
+    return false;
+  }
+}
+
+export async function deleteStage(
+  tournamentId: number,
+  stageId: number,
+  confirmationName: string,
+  csrfOrFetch?: string | typeof fetch,
+  altFetch = fetch,
+): Promise<boolean> {
+  const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
+
+  try {
+    const response = await customFetch(
+      `${apiServer}/beta/tournaments/${tournamentId}/stages/${stageId}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-CSRF-Token": token,
+        },
+        body: JSON.stringify({ confirmation_name: confirmationName }),
+      },
+    );
+
+    if (!response.ok) {
+      if (response.status === 422) {
+        try {
+          const errData = (await response.json()) as { error?: string };
+          if (errData.error) {
+            globalMessages.errors.push(errData.error);
+            return false;
+          }
+        } catch {
+          // ignore json parse error
+        }
+      }
+      globalMessages.errors.push("Failed to delete stage.");
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    const err = e as Error;
+    globalMessages.errors.push(`Failed to delete stage: ${err.message}`);
+    return false;
+  }
 }

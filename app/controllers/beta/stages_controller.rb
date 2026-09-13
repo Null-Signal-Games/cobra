@@ -2,9 +2,12 @@
 
 module Beta
   class StagesController < ApplicationController # rubocop:disable Style/Documentation
+    include DangerZoneConfirmable
+
     before_action :set_tournament
     before_action :set_stage, only: %i[destroy]
     before_action :authorize_beta_testing
+    before_action :validate_confirmation_name, only: :destroy
 
     def create
       authorize @tournament, :update?
@@ -16,8 +19,6 @@ module Beta
     end
 
     def destroy
-      authorize @tournament, :update?
-
       @stage.destroy!
 
       head :ok
