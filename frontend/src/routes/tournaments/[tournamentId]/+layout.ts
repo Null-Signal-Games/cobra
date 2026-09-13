@@ -10,7 +10,7 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
 
   return {
     tournamentData: tournament,
-    timer: await loadCurrentRoundTimer(tournamentId, tournament.csrf_token),
+    timer: await loadCurrentRoundTimer(tournamentId, tournament.csrf_token, fetch),
     player: user ? await loadPlayerByUserId(tournamentId, user.id, fetch) : null,
   };
 }
