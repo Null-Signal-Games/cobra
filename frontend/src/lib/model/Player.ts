@@ -1,5 +1,13 @@
 import type { Deck } from "./Deck";
 import { Identity } from "./Identity";
+import type { Tournament, TournamentPolicies } from "./Tournament";
+
+export interface PlayersData {
+  tournament: Tournament;
+  tournamentPolicies: TournamentPolicies;
+  activePlayers: Player[];
+  droppedPlayers: Player[];
+}
 
 export class Player {
   id = 0;

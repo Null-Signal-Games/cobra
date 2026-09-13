@@ -95,3 +95,20 @@ export function emptyTournamentOptions(): TournamentOptions {
     official_prize_kits: [],
   };
 }
+
+export function deckVisibilityString(
+  visibility: SwissDeckVisibility | CutDeckVisibility,
+) {
+  if (
+    visibility === SwissDeckVisibility.Open ||
+    visibility === CutDeckVisibility.Open
+  ) {
+    return "open";
+  } else if (
+    visibility === SwissDeckVisibility.Public ||
+    visibility === CutDeckVisibility.Public
+  ) {
+    return "public";
+  }
+  return "private";
+}

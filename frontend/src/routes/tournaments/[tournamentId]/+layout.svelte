@@ -80,9 +80,9 @@
   {#if canEdit}
     <li class="nav-item">
       <a
-        href={resolve(`/tournaments/${tournament.id}/players`)}
+        href={resolve(`/tournaments/${tournament.id}/organizer/players`)}
         class="nav-link"
-        class:active={page.route.id as string === "/tournaments/[tournamentId]/players"}
+        class:active={page.route.id as string === "/tournaments/[tournamentId]/organizer/players"}
       >
         <FontAwesomeIcon icon="users" /> Players
       </a>
