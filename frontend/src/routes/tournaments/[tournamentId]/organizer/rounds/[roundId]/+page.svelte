@@ -6,7 +6,17 @@
   import type { NewPairing } from '$lib/model/Pairing';
   import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
-    import type { ScoreReport } from '$lib/model/ScoreReport';
+  import type { ScoreReport } from '$lib/model/ScoreReport';
+  import {
+    changePlayerSide,
+    completeRound,
+    createPairing as createPairingRequest,
+    deletePairing,
+    deleteRound as deleteRoundRequest,
+    rePairRound,
+    reportScore,
+    resetReports,
+  } from '../../../api_helper';
 
   let { data, params }: PageProps = $props();
 
@@ -22,11 +32,11 @@
       return;
     }
 
-    // const success = await rePairRound(params.tournamentId, params.roundId);
-    // if (!success) {
-    //   // TODO: Notify the user
-    //   return;
-    // }
+    const success = await rePairRound(parseInt(params.tournamentId), parseInt(params.roundId));
+    if (!success) {
+      // TODO: Notify the user
+      return;
+    }
 
     await invalidateAll();
   }
@@ -40,11 +50,11 @@
       return;
     }
 
-    // const success = await completeRound(params.tournamentId, params.roundId, completed);
-    // if (!success) {
-    //   // TODO: Notify the user
-    //   return;
-    // }
+    const success = await completeRound(parseInt(params.tournamentId), parseInt(params.roundId), completed);
+    if (!success) {
+      // TODO: Notify the user
+      return;
+    }
 
     await invalidateAll();
   }
@@ -54,11 +64,11 @@
       return;
     }
 
-    // const success = await deleteRoundRequest(params.tournamentId, params.roundId);
-    // if (!success) {
-    //   // TODO: Notify the user
-    //   return;
-    // }
+    const success = await deleteRoundRequest(parseInt(params.tournamentId), parseInt(params.roundId));
+    if (!success) {
+      // TODO: Notify the user
+      return;
+    }
 
     await goto(resolve(`/tournaments/${params.tournamentId}/organizer/rounds`));
   }
@@ -66,15 +76,25 @@
   async function createPairing(e: SubmitEvent) {
     e.preventDefault();
 
-    // const success = await createPairingRequest(
-    //   params.tournamentId,
-    //   params.roundId,
-    //   newPairing,
-    // );
-    // if (!success) {
-    //   // TODO: Notify the user
-    //   return;
-    // }
+    if (!newPairing.table_number) {
+      alert("A table number is required");
+      return;
+    }
+
+    const success = await createPairingRequest(
+      parseInt(params.tournamentId),
+      parseInt(params.roundId),
+      newPairing,
+    );
+    if (!success) {
+      // TODO: Notify the user
+      return;
+    }
+
+    newPairing.table_number = null;
+    newPairing.player1_id = 0;
+    newPairing.side = "";
+    newPairing.player2_id = 0;
 
     await invalidateAll();
   }
@@ -84,52 +104,59 @@
       return;
     }
 
-    // const success = await deletePairing(params.tournamentId, params.roundId, pairingId);
-    // if (!success) {
-    //   // TODO: Notify the user
-    //   return;
-    // }
+    const success = await deletePairing(
+      parseInt(params.tournamentId),
+      parseInt(params.roundId),
+      pairingId,
+    );
+    if (!success) {
+      // TODO: Notify the user
+      return;
+    }
 
     await invalidateAll();
   }
 
   async function changePlayerSideCallback(pairingId: number, side: string) {
-    // const success = await changePlayerSide(
-    //   params.tournamentId,
-    //   params.roundId,
-    //   pairingId,
-    //   side,
-    // );
-    // if (!success) {
-    //   // TODO: Notify the user
-    //   return;
-    // }
+    const success = await changePlayerSide(
+      parseInt(params.tournamentId),
+      parseInt(params.roundId),
+      pairingId,
+      side,
+    );
+    if (!success) {
+      // TODO: Notify the user
+      return;
+    }
 
     await invalidateAll();
   }
 
   async function reportScoreCallback(pairingId: number, report: ScoreReport) {
-    // const success = await reportScore(
-    //   params.tournamentId,
-    //   params.roundId,
-    //   pairingId,
-    //   report,
-    //   false,
-    // );
-    // if (!success) {
-    //   // TODO: Notify the user
-    //   return;
-    // }
+    const success = await reportScore(
+      parseInt(params.tournamentId),
+      parseInt(params.roundId),
+      pairingId,
+      report,
+      false,
+    );
+    if (!success) {
+      // TODO: Notify the user
+      return;
+    }
 
     await invalidateAll();
   }
 
   async function resetReportsCallback(pairingId: number) {
-    // const success = await resetReports(params.tournamentId, params.roundId, pairingId);
-    // if (!success) {
-    //   // TODO: Notify the user
-    //   return;
-    // }
+    const success = await resetReports(
+      parseInt(params.tournamentId),
+      parseInt(params.roundId),
+      pairingId);
+    if (!success) {
+      // TODO: Notify the user
+      return;
+    }
 
     await invalidateAll();
   }

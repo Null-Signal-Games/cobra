@@ -64,17 +64,21 @@
   </div>
 
   <!-- Rounds -->
-  {#each stage.rounds as round, index (round.id)}
-    <Round
-      {tournament}
-      {round}
-      {stage}
-      startExpanded={startExpanded && index === stage.rounds.length - 1}
-      {deletePairingCallback}
-      {changePlayerSideCallback}
-      {reportScoreCallback}
-      completeCallback={completeRoundCallback}
-      {updateTimerCallback}
-    />
-  {/each}
+  {#if stage.rounds.length > 0}
+    {#each stage.rounds as round, index (round.id)}
+      <Round
+        {tournament}
+        {round}
+        {stage}
+        startExpanded={startExpanded && index === stage.rounds.length - 1}
+        {deletePairingCallback}
+        {changePlayerSideCallback}
+        {reportScoreCallback}
+        completeCallback={completeRoundCallback}
+        {updateTimerCallback}
+      />
+    {/each}
+  {:else}
+    This stage has no rounds.
+  {/if}
 </div>
