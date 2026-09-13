@@ -578,3 +578,25 @@ export async function deleteRound(
 
   return response.status === 200;
 }
+
+export async function saveSOSWeighting(
+  tournamentId: number,
+  roundId: number,
+  weight: number,
+): Promise<boolean> {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({ weight: weight }),
+    },
+  );
+
+  return response.status === 200;
+}

@@ -3,7 +3,7 @@
 module Beta
   class RoundsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
     before_action :set_tournament
-    before_action :set_round, only: %i[destroy repair complete update_timer round_data]
+    before_action :set_round, only: %i[update destroy repair complete update_timer round_data]
     before_action :authorize_beta_testing
 
     def index
@@ -20,6 +20,15 @@ module Beta
       authorize @tournament, :update?
 
       @tournament.pair_new_round!
+
+      head :ok
+    end
+
+    def update
+      authorize @tournament, :update?
+
+      round_params = params.require(:round).permit(:weight)
+      @round.update(round_params)
 
       head :ok
     end
@@ -208,6 +217,7 @@ module Beta
         id: round.id,
         number: round.number,
         completed: round.completed?,
+        weight: round.weight,
         pairings:,
         pairings_reported:,
         length_minutes: round.length_minutes,
