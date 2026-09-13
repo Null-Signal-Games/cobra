@@ -174,7 +174,7 @@ export async function savePlayer(
   let token = "";
   let tournamentId: number;
   let player: Player;
-  let organizerView = false;
+  let organizerView : boolean;
 
   if (typeof arg1 === "string") {
     token = arg1;
