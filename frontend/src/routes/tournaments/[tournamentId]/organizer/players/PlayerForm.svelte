@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import type { IdentityNames } from "$lib/model/Identity";
   import type { Tournament, TournamentPolicies } from "$lib/model/Tournament";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
@@ -248,7 +249,7 @@
   <!-- View decks -->
   {#if tournament.nrdb_deck_registration && playerEdit.id !== 0}
     <a
-      href={`/beta/tournaments/${tournament.id}/players/${playerEdit.id}/registration`}
+      href={resolve(`/tournaments/${tournament.id}/organizer/players/${playerEdit.id}/registration`)}
       class="btn btn-link text-info"
     >
       <FontAwesomeIcon icon="eye" />

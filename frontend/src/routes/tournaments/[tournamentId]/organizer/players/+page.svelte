@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import type { PageProps } from "./$types";
-
   import {
     Player,
   } from "$lib/model/Player";
@@ -28,10 +28,6 @@
   let newPlayer = $state(new Player());
 
   let registrationLockDescription = $derived.by(() => {
-    if (!data) {
-      return "";
-    }
-
     if (tournament.registration_closed) {
       if (tournament.all_players_unlocked) {
         return "closed, unlocked";
@@ -49,10 +45,6 @@
     return "open, all locked";
   });
   let deckVisibilityDescription = $derived.by(() => {
-    if (!data) {
-      return;
-    }
-
     return `swiss ${deckVisibilityString(tournament.swiss_deck_visibility)}, cut ${deckVisibilityString(tournament.cut_deck_visibility)}`;
   });
 
@@ -83,10 +75,6 @@
   }
 
   async function setCutDeckVisibility(visibility: CutDeckVisibility) {
-    if (!data) {
-      return;
-    }
-
     const tournamentEdit = $state.snapshot(tournament);
 
     if (visibility === CutDeckVisibility.Open) {
@@ -118,10 +106,6 @@
   }
 
   async function setSwissDeckVisibility(visibility: SwissDeckVisibility) {
-    if (!data) {
-      return;
-    }
-
     const tournamentEdit = $state.snapshot(tournament);
 
     if (visibility === SwissDeckVisibility.Open) {
@@ -153,10 +137,6 @@
   }
 
   async function downloadDecksSpreadsheet() {
-    if (!data) {
-      return;
-    }
-
     const decks = await loadDecks(tournamentId);
     downloadBlob(
       `Decks for ${tournament.name}.csv`,
@@ -165,10 +145,6 @@
   }
 
   function downloadStreamingSpreadsheet() {
-    if (!data) {
-      return;
-    }
-
     const contents =
       'Player,"Include in video coverage? (players were notified that in the cut it may not be possible to exclude them)"\n' +
       players.activePlayers
@@ -198,7 +174,7 @@
 
     {#if data}
     <a
-        href={`/tournaments/${tournamentId}/players/meeting?back_to=players`}
+        href={resolve(`/tournaments/${tournamentId}/players/meeting?back_to=players`)}
         class="btn btn-primary"
     >
         <FontAwesomeIcon icon="list-ul" /> Player meeting
@@ -212,7 +188,7 @@
             player={newPlayer}
             tournament={tournament}
             tournamentPolicies={players.tournamentPolicies}
-            identityNames={identityNames ?? { corp: [], runner: [] }}
+            identityNames={identityNames}
             organizerView={true}
             savedCallback={newPlayerSavedCallback}
         />
@@ -380,7 +356,7 @@
             {player}
             tournament={tournament}
             tournamentPolicies={players.tournamentPolicies}
-            identityNames={identityNames ?? { corp: [], runner: [] }}
+            identityNames={identityNames}
             organizerView={true}
             savedCallback={invalidateAll}
             droppedCallback={invalidateAll}

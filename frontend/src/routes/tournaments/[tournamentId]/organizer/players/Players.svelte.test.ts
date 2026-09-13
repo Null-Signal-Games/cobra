@@ -34,13 +34,14 @@ const user = userEvent.setup();
 let currentTournament: Tournament;
 let mockAlice: Player;
 let mockBob: Player;
-let rerenderFn: ((props: any) => void) | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let rerenderFn: ((props: any) => Promise<void>) | null = null;
 
 vi.mock("$app/navigation", () => ({
-  invalidateAll: vi.fn(() => {
-    if (rerenderFn && currentTournament) {
+  invalidateAll: vi.fn(async () => {
+    if (rerenderFn) {
       const clonedTournament = new Tournament(currentTournament);
-      rerenderFn({
+      await rerenderFn({
         params: { tournamentId: "1" },
         data: {
           players: {
@@ -53,32 +54,25 @@ vi.mock("$app/navigation", () => ({
             droppedPlayers: [],
           },
           identities: MockIdentityNames,
-        } as unknown as PageProps["data"],
+        },
       });
     }
-    return Promise.resolve();
   }),
 }));
 
 vi.mock("../../../api_helper", () => ({
   saveTournament: vi.fn((tournament: Tournament) => {
-    if (currentTournament) {
       currentTournament.swiss_deck_visibility = tournament.swiss_deck_visibility;
       currentTournament.cut_deck_visibility = tournament.cut_deck_visibility;
-    }
     return Promise.resolve(true);
   }),
   setPlayerRegistrationStatus: vi.fn((_id: number, locked: boolean) => {
-    if (currentTournament) {
-      currentTournament.all_players_unlocked = !locked;
-      currentTournament.any_player_unlocked = !locked;
-    }
+    currentTournament.all_players_unlocked = !locked;
+    currentTournament.any_player_unlocked = !locked;
     return Promise.resolve(true);
   }),
   setRegistrationStatus: vi.fn((_id: number, open: boolean) => {
-    if (currentTournament) {
-      currentTournament.registration_closed = !open;
-    }
+    currentTournament.registration_closed = !open;
     return Promise.resolve(true);
   }),
   reinstatePlayer: vi.fn(() => Promise.resolve(true)),
@@ -238,7 +232,7 @@ describe("Players", () => {
           data: {
             players: playersData,
             identities: MockIdentityNames,
-          } as unknown as PageProps["data"],
+          } as PageProps["data"],
         },
       });
       rerenderFn = res.rerender;
@@ -575,7 +569,7 @@ describe("Players", () => {
           data: {
             players: playersData,
             identities: MockIdentityNames,
-          } as unknown as PageProps["data"],
+          } as PageProps["data"],
         },
       });
     });
