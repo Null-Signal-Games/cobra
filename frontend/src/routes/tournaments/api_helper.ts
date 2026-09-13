@@ -2,7 +2,7 @@ import { COBRA_API_SERVER } from "$app/env/public";
 import type { BracketData } from "$lib/model/Bracket";
 import type { Card, Deck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
-import type { Player } from "$lib/model/Player";
+import type { Player, PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
 import type { StandingsData } from "$lib/model/Standings";
 import { Tournament, type FeatureFlags, type TournamentOptions } from "$lib/model/Tournament";
@@ -155,19 +155,49 @@ export async function loadPlayerByUserId(tournamentId: number, userId: number, a
 }
 
 export async function savePlayer(
-  csrfToken: string, tournamentId: number, player: Player, organizerView = false,
-) {
+  csrfToken: string,
+  tournamentId: number,
+  player: Player,
+  organizerView?: boolean,
+): Promise<Player>;
+export async function savePlayer(
+  tournamentId: number,
+  player: Player,
+  organizerView?: boolean,
+): Promise<Player>;
+export async function savePlayer(
+  arg1: string | number,
+  arg2: number | Player,
+  arg3?: Player | boolean,
+  arg4 = false,
+): Promise<Player> {
+  let token = "";
+  let tournamentId: number;
+  let player: Player;
+  let organizerView = false;
+
+  if (typeof arg1 === "string") {
+    token = arg1;
+    tournamentId = arg2 as number;
+    player = arg3 as Player;
+    organizerView = arg4;
+  } else {
+    tournamentId = arg1;
+    player = arg2 as Player;
+    organizerView = typeof arg3 === "boolean" ? arg3 : false;
+  }
+
   const route =
     player.id === 0
       ? `${apiServer}/beta/tournaments/${tournamentId}/players`
-      : `${apiServer}/beta/tournaments/${tournamentId}/player/${player.id}`;
+      : `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}`;
   const response = await fetch(route, {
     method: player.id === 0 ? "POST" : "PATCH",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "X-CSRF-Token": csrfToken,
+      "X-CSRF-Token": token || csrfToken(),
     },
     body: JSON.stringify({
       player: playerRequestObject(player),
@@ -184,12 +214,178 @@ export async function savePlayer(
   return result.player;
 }
 
-export async function loadIdentityNames() {
-  const response = await fetch(`${apiServer}/beta/identities`, {
+export async function reinstatePlayer(tournamentId: number, player: Player) {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}/reinstate`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({ player: playerRequestObject(player) }),
+    },
+  );
+
+  return response.status === 200;
+}
+
+export async function deletePlayer(tournamentId: number, player: Player) {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({ player: playerRequestObject(player) }),
+    },
+  );
+
+  return response.status === 200;
+}
+
+export async function togglePlayerLock(tournamentId: number, player: Player) {
+  const route = player.registration_locked
+    ? `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}/unlock_registration`
+    : `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}/lock_registration`;
+  const response = await fetch(route, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken(),
+    },
+    body: JSON.stringify({ player: playerRequestObject(player) }),
+  });
+
+  return response.status === 200;
+}
+
+export async function dropPlayer(tournamentId: number, player: Player) {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}/drop`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({ player: playerRequestObject(player) }),
+    },
+  );
+
+  return response.status === 200;
+}
+
+export async function setPlayerRegistrationStatus(
+  tournamentId: number,
+  locked: boolean,
+): Promise<boolean> {
+  const path = locked
+    ? `${apiServer}/beta/tournaments/${tournamentId}/lock_player_registrations`
+    : `${apiServer}/beta/tournaments/${tournamentId}/unlock_player_registrations`;
+
+  const response = await fetch(path, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken(),
+    },
+  });
+
+  return response.status === 200;
+}
+
+export async function setRegistrationStatus(
+  tournamentId: number,
+  open: boolean,
+): Promise<boolean> {
+  const path = open
+    ? `${apiServer}/beta/tournaments/${tournamentId}/open_registration`
+    : `${apiServer}/beta/tournaments/${tournamentId}/close_registration`;
+
+  const response = await fetch(path, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken(),
+    },
+  });
+
+  return response.status === 200;
+}
+
+export async function loadDecks(tournamentId: number, playerId?: number) {
+  const response = await fetch(
+    playerId === undefined
+      ? `${apiServer}/beta/tournaments/${tournamentId}/players/decks`
+      : `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}/decks`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  return (await response.json()) as Deck[];
+}
+
+export async function saveTournament(tournament: Tournament): Promise<boolean> {
+  const response = await fetch(`${apiServer}/beta/tournaments/${tournament.id}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken(),
+    },
+    body: JSON.stringify(tournament),
+  });
+
+  if (response.status !== 200) {
+    const data = (await response.json()) as { errors?: string[] };
+    globalMessages.errors = data.errors ?? [];
+  }
+
+  return response.status === 200;
+}
+
+export async function loadIdentityNames(altFetch = fetch) {
+  const response = await altFetch(`${apiServer}/beta/identities`, {
     method: "GET",
   });
 
   return (await response.json()) as IdentityNames;
+}
+
+export async function loadPlayers(tournamentId: number, altFetch = fetch) {
+  const response = await altFetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/players/players_data`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    },
+  );
+  return (await response.json()) as PlayersData;
 }
 
 export async function loadCurrentRoundTimer(tournamentId: number, csrfToken?: string) {
