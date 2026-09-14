@@ -189,9 +189,9 @@
 
 <div class="col-12">
   <GlobalMessages />
-  
+
   <p></p>
-  
+
   {#if data.stages.length == 0}
     <!-- Add Swiss stage button -->
     <button
@@ -208,7 +208,7 @@
     <div>
       {#if data.stages.every((s) => s.rounds.length === 0)}
         <a
-          href={resolve(`/tournaments/${params.tournamentId}/players/meeting?back_to=pairings`)}
+          href={resolve(`/tournaments/${params.tournamentId}/player_meeting`)}
           class="btn btn-primary"
         >
           <FontAwesomeIcon icon="list-ul" /> Player meeting
@@ -219,7 +219,6 @@
           class="btn btn-primary"
           onclick={() => {
             showReportedPairings.update((value) => !value);
-  
           }}
         >
           <FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
@@ -250,7 +249,7 @@
             <FontAwesomeIcon icon="users" /> See player pairings view
           </button>
         {/if}
-  
+
         {#if !$showReportedPairings}
           <div class="alert alert-info mt-3">
             Reported scores are currently hidden on this page. This will not
@@ -259,7 +258,7 @@
         {/if}
       {/if}
     </div>
-  
+
     <!-- Tournament admin controls -->
     <div class="mt-3">
       {#if !data.tournamentData.tournament.registration_closed}
@@ -305,7 +304,7 @@
           </button>
         {/if}
       {/if}
-  
+
       {#if data.stages.every((s) => s.rounds.every((r) => r.completed))}
         <button type="button" class="btn btn-success" onclick={pairNewRound}>
           <FontAwesomeIcon icon="plus" /> Pair new round!
@@ -319,7 +318,7 @@
         </span>
       {/if}
     </div>
-  
+
     <!-- Stages -->
     <div class="mt-3">
       {#each data.stages as stage, index (stage.format)}
@@ -336,7 +335,7 @@
         />
       {/each}
     </div>
-  
+
     <!-- Elimination stage controls -->
     {#if data.stages.length > 0 && !data.stages[data.stages.length - 1].is_elimination && data.stages[data.stages.length - 1].rounds.some((r) => r.completed)}
       <h4>Cut to...</h4>
@@ -383,7 +382,7 @@
         </tbody>
       </table>
     {/if}
-  
+
     <!-- FAQ dialog -->
     <ModalDialog id="faq" headerText="FAQ">
       <h5>How does self reporting work?</h5>

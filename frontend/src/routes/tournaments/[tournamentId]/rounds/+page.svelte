@@ -39,7 +39,7 @@
 
 <div class="col-12">
   <GlobalMessages />
-  
+
   <p></p>
 
   {#if data.stages.length > 0}
@@ -47,7 +47,7 @@
     <div>
       {#if data.stages.every((s) => s.rounds.length === 0)}
         <a
-          href={resolve(`/tournaments/${params.tournamentId}/players/meeting?back_to=view_pairings`)}
+          href={resolve(`/tournaments/${params.tournamentId}/player_meeting`)}
           class="btn btn-primary"
         >
           <FontAwesomeIcon icon="list-ul" /> Player meeting
@@ -81,7 +81,7 @@
         {/if}
       {/if}
     </div>
-  
+
     <!-- Stages -->
     <div class="mt-3">
       {#each data.stages as stage, index (stage.format)}
@@ -93,7 +93,7 @@
         />
       {/each}
     </div>
-  
+
     <!-- FAQ dialog -->
     <ModalDialog id="faq" headerText="FAQ">
       <h5>How does self reporting work?</h5>
