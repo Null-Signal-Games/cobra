@@ -87,7 +87,7 @@
         {/if}
         <a
           class="btn btn-primary"
-          href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings/match_slips`)}
+          href={resolve(`/tournaments/${tournament.id}/organizer/match_slips/${round.id}`)}
         >
           <FontAwesomeIcon icon="flag-checkered" /> Match slips
         </a>
