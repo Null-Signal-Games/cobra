@@ -250,7 +250,7 @@ describe("PairingsByName Page Component", () => {
   });
 
   it("calls history.back when clicking back link if history exists", async () => {
-    const historyBackSpy = vi.spyOn(window.history, "back").mockImplementation(() => {});
+    const historyBackSpy = vi.spyOn(window.history, "back").mockImplementation(() => { /* do nothing */ });
     Object.defineProperty(window.history, "length", { value: 3, configurable: true });
 
     render(PairingsByNamePage, {
