@@ -52,7 +52,7 @@
     <div class="col-sm-6 d-flex justify-content-end" aria-label="admin controls">
       {#if !stage.is_elimination && tournamentPolicies?.custom_table_numbering}
         <a
-          href={resolve(`/tournaments/${tournament.id}/stages/${stage.id}`)}
+          href={resolve(`/tournaments/${tournament.id}/organizer/edit_stage/${stage.id}`)}
           class="btn btn-warning mx-1"
           aria-label="edit stage"
         >

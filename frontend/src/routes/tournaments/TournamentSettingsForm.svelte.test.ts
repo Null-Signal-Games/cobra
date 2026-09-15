@@ -52,7 +52,7 @@ describe("TournamentSettingsForm dropdowns", () => {
       },
     });
 
-    const swissFormatSelect = screen.getByLabelText("Swiss format") as HTMLSelectElement;
+    const swissFormatSelect = screen.getByLabelText<HTMLSelectElement>("Swiss format");
     expect(swissFormatSelect.value).toBe("single_sided");
 
     const tournamentTypeSelect = screen.getByLabelText("Tournament Type") as HTMLSelectElement;
