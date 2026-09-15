@@ -43,7 +43,11 @@ export default defineConfig({
           name: "client",
           browser: {
             enabled: true,
-            provider: playwright(),
+            provider: playwright({
+              launchOptions: {
+                args: ["--disable-dev-shm-usage"],
+              },
+            }),
             instances: [{ browser: "chromium", headless: true }],
           },
           include: ["src/**/*.svelte.{test,spec}.{js,ts}"],
