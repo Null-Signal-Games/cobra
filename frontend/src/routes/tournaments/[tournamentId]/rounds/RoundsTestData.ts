@@ -121,6 +121,7 @@ export const MockRound1: Round = {
   length_minutes: 65,
   timer: MockRound1Timer,
   unpaired_players: [],
+  weight: 0
 };
 
 export const MockRound2: Round = {
@@ -144,6 +145,7 @@ export const MockRound2: Round = {
     }
   },
   unpaired_players: [],
+  weight: 0
 };
 
 export const MockSwissStage: Stage = {

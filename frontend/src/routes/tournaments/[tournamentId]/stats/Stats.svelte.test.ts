@@ -24,6 +24,7 @@ describe("Stats Page Container", () => {
         started: false,
         state: { started: false, paused: false },
       },
+      weight: 0,
     };
   }
 

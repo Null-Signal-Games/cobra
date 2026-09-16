@@ -28,6 +28,7 @@ const createRound = (overrides: Partial<Round>): Round => ({
   length_minutes: 0,
   timer: {} as never,
   unpaired_players: [],
+  weight: 0,
   ...overrides
 });
 
