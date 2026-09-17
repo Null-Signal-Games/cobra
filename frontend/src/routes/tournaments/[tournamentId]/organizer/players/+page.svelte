@@ -173,7 +173,7 @@
     <GlobalMessages />
 
     {#if data}
-      <a href={resolve(`/tournaments/${tournamentId}/player_meeting`)} class="btn btn-primary">
+      <a href={resolve(`/tournaments/${tournamentId}/player_meeting?back_to=players`)} class="btn btn-primary">
       <FontAwesomeIcon icon="list-ul" /> Player meeting
     </a>
 

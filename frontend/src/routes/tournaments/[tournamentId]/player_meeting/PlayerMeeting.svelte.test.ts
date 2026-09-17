@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
-import userEvent from "@testing-library/user-event";
 import PlayerMeetingPage from "./+page.svelte";
 import { createPlayerMeetingPairings, getBackDetails } from "./pairings";
 import { Player } from "$lib/model/Player";
@@ -58,33 +57,44 @@ describe("createPlayerMeetingPairings", () => {
 
 describe("getBackDetails", () => {
   it("returns 'Back to Players' when coming from players view", () => {
-    const details = getBackDetails("/tournaments/14/organizer/players", 14);
+    const details = getBackDetails("players", 14);
     expect(details.label).toBe("Back to Players");
     expect(details.path).toBe("/tournaments/14/organizer/players");
   });
 
   it("returns 'Back to Pairings' and organizer rounds path when coming from organizer rounds", () => {
-    const details = getBackDetails("/tournaments/14/organizer/rounds", 14);
+    const details = getBackDetails("pairings", 14);
     expect(details.label).toBe("Back to Pairings");
     expect(details.path).toBe("/tournaments/14/organizer/rounds");
   });
 
   it("returns 'Back to Pairings' and public rounds path when coming from public rounds", () => {
-    const details = getBackDetails("/tournaments/14/rounds", 14);
+    const details = getBackDetails("rounds", 14);
     expect(details.label).toBe("Back to Pairings");
     expect(details.path).toBe("/tournaments/14/rounds");
   });
 
-  it("defaults to 'Back to Pairings' when previousPath is null or unrecognized", () => {
-    const details = getBackDetails(null, 14);
-    expect(details.label).toBe("Back to Pairings");
-    expect(details.path).toBe("/tournaments/14/rounds");
+  it("defaults to 'Back to Tournament' when backTo is missing or unrecognized", () => {
+    expect(getBackDetails(null, 14)).toEqual({
+      label: "Back to Tournament",
+      path: "/tournaments/14",
+    });
+    expect(getBackDetails(undefined, 14)).toEqual({
+      label: "Back to Tournament",
+      path: "/tournaments/14",
+    });
+    expect(getBackDetails("", 14)).toEqual({
+      label: "Back to Tournament",
+      path: "/tournaments/14",
+    });
+    expect(getBackDetails("unrecognized_page", 14)).toEqual({
+      label: "Back to Tournament",
+      path: "/tournaments/14",
+    });
   });
 });
 
 describe("PlayerMeeting Page Component", () => {
-  const user = userEvent.setup();
-
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
@@ -119,6 +129,7 @@ describe("PlayerMeeting Page Component", () => {
         // @ts-expect-error PageProps additional layout data
         data: {
           players: mockPlayersData,
+          back_to: null,
         },
       },
     });
@@ -148,49 +159,74 @@ describe("PlayerMeeting Page Component", () => {
     expect(rows[3].textContent).toContain("Snap");
   });
 
-  it("displays 'Back to Players' when referrer came from players view", () => {
-    vi.spyOn(document, "referrer", "get").mockReturnValue(
-      `${window.location.origin}/tournaments/14/organizer/players`,
-    );
-
+  it("displays 'Back to Players' when back_to is players", () => {
     render(PlayerMeetingPage, {
       props: {
         params: { tournamentId: "14" },
         // @ts-expect-error PageProps additional layout data
         data: {
           players: mockPlayersData,
+          back_to: "players",
         },
       },
     });
 
     const backButton = screen.getByRole("link", { name: /Back to Players/i });
     expect(backButton).toBeDefined();
-    expect(backButton.getAttribute("href")).toContain("/tournaments/14/organizer/players");
+    expect(backButton.getAttribute("href")).toBe("/tournaments/14/organizer/players");
   });
 
-  it("displays 'Back to Pairings' when referrer came from pairings view", () => {
-    vi.spyOn(document, "referrer", "get").mockReturnValue(
-      `${window.location.origin}/tournaments/14/rounds`,
-    );
-
+  it("displays 'Back to Pairings' when back_to is pairings (organizer)", () => {
     render(PlayerMeetingPage, {
       props: {
         params: { tournamentId: "14" },
         // @ts-expect-error PageProps additional layout data
         data: {
           players: mockPlayersData,
+          back_to: "pairings",
         },
       },
     });
 
     const backButton = screen.getByRole("link", { name: /Back to Pairings/i });
     expect(backButton).toBeDefined();
-    expect(backButton.getAttribute("href")).toContain("/tournaments/14/rounds");
+    expect(backButton.getAttribute("href")).toBe("/tournaments/14/organizer/rounds");
   });
 
-  it("triggers window.history.back when clicking back and history is available", async () => {
-    const historyBackSpy = vi.spyOn(window.history, "back").mockImplementation(() => undefined);
-    Object.defineProperty(window.history, "length", { value: 2, configurable: true });
+  it("displays 'Back to Pairings' when back_to is rounds (public)", () => {
+    render(PlayerMeetingPage, {
+      props: {
+        params: { tournamentId: "14" },
+        // @ts-expect-error PageProps additional layout data
+        data: {
+          players: mockPlayersData,
+          back_to: "rounds",
+        },
+      },
+    });
+
+    const backButton = screen.getByRole("link", { name: /Back to Pairings/i });
+    expect(backButton).toBeDefined();
+    expect(backButton.getAttribute("href")).toBe("/tournaments/14/rounds");
+  });
+
+  it("defaults to 'Back to Tournament' when back_to is missing or unrecognized", () => {
+    const { unmount } = render(PlayerMeetingPage, {
+      props: {
+        params: { tournamentId: "14" },
+        // @ts-expect-error PageProps additional layout data
+        data: {
+          players: mockPlayersData,
+          back_to: null,
+        },
+      },
+    });
+
+    let backButton = screen.getByRole("link", { name: /Back to Tournament/i });
+    expect(backButton).toBeDefined();
+    expect(backButton.getAttribute("href")).toBe("/tournaments/14");
+
+    unmount();
 
     render(PlayerMeetingPage, {
       props: {
@@ -198,13 +234,13 @@ describe("PlayerMeeting Page Component", () => {
         // @ts-expect-error PageProps additional layout data
         data: {
           players: mockPlayersData,
+          back_to: "unrecognized_destination",
         },
       },
     });
 
-    const backButton = screen.getByRole("link", { name: /Back to/i });
-    await user.click(backButton);
-
-    expect(historyBackSpy).toHaveBeenCalled();
+    backButton = screen.getByRole("link", { name: /Back to Tournament/i });
+    expect(backButton).toBeDefined();
+    expect(backButton.getAttribute("href")).toBe("/tournaments/14");
   });
 });

@@ -13,33 +13,39 @@ export function createPlayerMeetingPairings(players: Player[]): [Player, Player 
   return pairings;
 }
 
-// Keep the details for what page to go back to and the label for the button in here instead of putting it in the URL.
 export interface BackDetails {
-  label: "Back to Players" | "Back to Pairings";
+  label: "Back to Players" | "Back to Pairings" | "Back to Tournament";
   path:
     | `/tournaments/${string}/organizer/players`
     | `/tournaments/${string}/organizer/rounds`
-    | `/tournaments/${string}/rounds`;
+    | `/tournaments/${string}/rounds`
+    | `/tournaments/${string}`;
 }
 
 export function getBackDetails(
-  previousPath: string | null | undefined,
+  backTo: string | null | undefined,
   tournamentId: string | number,
 ): BackDetails {
-  if (previousPath?.includes("/players")) {
-    return {
-      label: "Back to Players",
-      path: `/tournaments/${tournamentId}/organizer/players`,
-    };
+  switch (backTo) {
+    case "players":
+      return {
+        label: "Back to Players",
+        path: `/tournaments/${tournamentId}/organizer/players`,
+      };
+    case "pairings":
+      return {
+        label: "Back to Pairings",
+        path: `/tournaments/${tournamentId}/organizer/rounds`,
+      };
+    case "rounds":
+      return {
+        label: "Back to Pairings",
+        path: `/tournaments/${tournamentId}/rounds`,
+      };
+    default:
+      return {
+        label: "Back to Tournament",
+        path: `/tournaments/${tournamentId}`,
+      };
   }
-  if (previousPath?.includes("/organizer/rounds")) {
-    return {
-      label: "Back to Pairings",
-      path: `/tournaments/${tournamentId}/organizer/rounds`,
-    };
-  }
-  return {
-    label: "Back to Pairings",
-    path: `/tournaments/${tournamentId}/rounds`,
-  };
 }

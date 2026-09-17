@@ -47,7 +47,7 @@
     <div>
       {#if data.stages.every((s) => s.rounds.length === 0)}
         <a
-          href={resolve(`/tournaments/${params.tournamentId}/player_meeting`)}
+          href={resolve(`/tournaments/${params.tournamentId}/player_meeting?back_to=rounds`)}
           class="btn btn-primary"
         >
           <FontAwesomeIcon icon="list-ul" /> Player meeting
