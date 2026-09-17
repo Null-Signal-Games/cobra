@@ -29,7 +29,6 @@ import {
   reportScore,
   resetReports,
 } from "../../../api_helper";
-// import { MockRound1, MockSwissStage, MockTournament } from "../RoundsTestData";
 import type { PageProps } from "./$types";
 import { Tournament } from "$lib/model/Tournament";
 import { goto } from "$app/navigation";
