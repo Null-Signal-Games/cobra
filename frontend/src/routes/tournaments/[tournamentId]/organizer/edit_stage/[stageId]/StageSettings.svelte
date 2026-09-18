@@ -39,17 +39,6 @@
   let error = $state("");
   let newTableRangeEdit = $state<TableRangeEditInterface>();
 
-  let backHref = $derived(
-    resolve(`/tournaments/${tournamentId}/organizer/rounds`),
-  );
-
-  function handleBack(e: MouseEvent) {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      e.preventDefault();
-      window.history.back();
-    }
-  }
-
   onMount(async () => {
     if (!initialData) {
       data = await loadStage(tournamentId, stageId);
@@ -90,7 +79,7 @@
 </script>
 
 <p class="dontprint">
-  <a href={backHref} onclick={handleBack} class="btn btn-primary">
+  <a href={resolve(`/tournaments/${tournamentId}/organizer/rounds`)} class="btn btn-primary">
     <FontAwesomeIcon icon="arrow-left" /> Back to Pairings
   </a>
 </p>
