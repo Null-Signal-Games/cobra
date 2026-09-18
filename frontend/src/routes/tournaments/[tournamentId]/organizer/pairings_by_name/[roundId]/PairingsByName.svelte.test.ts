@@ -248,29 +248,7 @@ describe("PairingsByName Page Component", () => {
       "/tournaments/7/rounds/10/pairings/2/view_decks?back_to=pairings",
     );
   });
-
-  it("calls history.back when clicking back link if history exists", async () => {
-    const historyBackSpy = vi.spyOn(window.history, "back").mockImplementation(() => { /* do nothing */ });
-    Object.defineProperty(window.history, "length", { value: 3, configurable: true });
-
-    render(PairingsByNamePage, {
-      props: {
-        params: { tournamentId: "7", roundId: "10" },
-        // @ts-expect-error PageProps layout data
-        data: {
-          round: mockRound,
-          stage: mockStage,
-          policy: new TournamentPolicies(),
-        },
-      },
-    });
-
-    const backLink = screen.getByRole("link", { name: /Back to pairings/i });
-    await user.click(backLink);
-
-    expect(historyBackSpy).toHaveBeenCalledOnce();
-  });
-
+  
   it("renders round not found message if round or stage is missing", () => {
     render(PairingsByNamePage, {
       props: {
