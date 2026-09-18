@@ -87,19 +87,19 @@
         {/if}
         <a
           class="btn btn-primary"
-          href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings/match_slips`)}
+          href={resolve(`/tournaments/${tournament.id}/organizer/match_slips/${round.id}`)}
         >
           <FontAwesomeIcon icon="flag-checkered" /> Match slips
         </a>
         <a
           class="btn btn-primary"
-          href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings/sharing`)}
+          href={resolve(`/tournaments/${tournament.id}/organizer/export_markdown/${round.id}`)}
         >
           <FontAwesomeIcon icon="share" /> Export markdown
         </a>
         <a
           class="btn btn-primary"
-          href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings`)}
+          href={resolve(`/tournaments/${tournament.id}/organizer/pairings_by_name/${round.id}`)}
         >
           <FontAwesomeIcon icon="list-ul" /> Pairings by name
         </a>
