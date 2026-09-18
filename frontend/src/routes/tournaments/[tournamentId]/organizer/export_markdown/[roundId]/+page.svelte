@@ -17,21 +17,12 @@
         )
       : [],
   );
-
-  let backHref = $derived(resolve(`/tournaments/${params.tournamentId}/organizer/rounds`));
-
-  function handleBack(e: MouseEvent) {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      e.preventDefault();
-      window.history.back();
-    }
-  }
 </script>
 
 <div class="col-12">
 
 <p class="dontprint">
-  <a href={backHref} onclick={handleBack} class="btn btn-primary">
+  <a href={resolve(`/tournaments/${params.tournamentId}/organizer/rounds`)} class="btn btn-primary">
     <FontAwesomeIcon icon="arrow-left" /> Back to Pairings
   </a>
 </p>
