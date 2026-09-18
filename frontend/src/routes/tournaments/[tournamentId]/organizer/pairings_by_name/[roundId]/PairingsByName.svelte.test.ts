@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
-import userEvent from "@testing-library/user-event";
 import PairingsByNamePage from "./+page.svelte";
 import { formatPlayerDisplay, generatePairingsByName } from "./pairings_by_name";
 import { Player } from "$lib/model/Player";
@@ -140,8 +139,6 @@ describe("pairings_by_name helper logic", () => {
 });
 
 describe("PairingsByName Page Component", () => {
-  const user = userEvent.setup();
-
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
