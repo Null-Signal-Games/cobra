@@ -35,7 +35,6 @@ import { goto } from "$app/navigation";
 
 export const MockPageData: PageProps["data"] = {
   tournamentTypes: [],
-  tournament: new Tournament(),
   policy: { update: true, custom_table_numbering: false },
   stage: {
     id: 1,

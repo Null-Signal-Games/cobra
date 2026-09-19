@@ -225,7 +225,7 @@
   {#each data.round.pairings as pairing (pairing.id)}
     <hr />
     <Pairing
-      tournament={data.tournament}
+      tournament={data.tournamentData.tournament}
       {pairing}
       round={data.round}
       stage={data.stage}
