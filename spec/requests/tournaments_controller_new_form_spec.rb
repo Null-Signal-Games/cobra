@@ -39,7 +39,8 @@ RSpec.describe TournamentsController do
             'cut_deck_visibility' => 'cut_decks_private',
             'stage' => 'swiss',
             'user_id' => user.id,
-            'tournament_organizer' => 'test_user'
+            'tournament_organizer' => 'test_user',
+            'has_elimination_stage' => false
           }
         )
         expect(data['options'].except('time_zones')).to eq(

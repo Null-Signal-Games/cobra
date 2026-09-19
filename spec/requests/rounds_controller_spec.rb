@@ -159,7 +159,7 @@ RSpec.describe RoundsController do
         expect(compare_body(response))
           .to eq({
                    'policy' => { 'custom_table_numbering' => false, 'update' => false },
-                   'tournament' => default_tournament,
+                   'tournament' => default_tournament(has_elimination_stage: true),
                    'stages' => [
                      swiss_stage_with_rounds(
                        [
@@ -441,7 +441,7 @@ RSpec.describe RoundsController do
     body
   end
 
-  def default_tournament
+  def default_tournament(has_elimination_stage: false)
     {
       'abr_code' => nil,
       'active_player_count' => 3,
@@ -458,6 +458,7 @@ RSpec.describe RoundsController do
       'dropped_player_count' => 0,
       'event_link' => nil,
       'format_id' => nil,
+      'has_elimination_stage' => has_elimination_stage,
       'id' => tournament.id,
       'manual_seed' => nil,
       'name' => 'My Tournament',

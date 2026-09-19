@@ -27,6 +27,7 @@ module TournamentHelper # rubocop:disable Style/Documentation
       additional_prizes_description: tournament.additional_prizes_description,
       official_prize_kit_id: tournament.official_prize_kit_id,
       stage: tournament.stage,
+      has_elimination_stage: tournament.stages.any?(&:elimination?),
       manual_seed: tournament.manual_seed,
       self_registration: tournament.self_registration,
       nrdb_deck_registration: tournament.nrdb_deck_registration,
