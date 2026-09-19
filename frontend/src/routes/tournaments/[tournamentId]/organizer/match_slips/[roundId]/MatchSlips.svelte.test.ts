@@ -66,6 +66,7 @@ describe("MatchSlips", () => {
           paused: false,
         },
       },
+      weight: 0,
     };
   });
 

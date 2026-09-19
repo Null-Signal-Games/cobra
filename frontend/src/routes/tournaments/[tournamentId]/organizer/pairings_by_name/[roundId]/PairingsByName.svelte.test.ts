@@ -174,6 +174,7 @@ describe("PairingsByName Page Component", () => {
         paused: false,
       },
     },
+    weight: 0
   };
 
   it("renders heading and pairings table sorted by player name", () => {

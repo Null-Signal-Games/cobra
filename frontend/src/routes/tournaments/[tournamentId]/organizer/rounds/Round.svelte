@@ -76,7 +76,7 @@
         <!-- Admin controls -->
         <a
           class="btn btn-warning"
-          href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}`)}
+          href={resolve(`/tournaments/${tournament.id}/organizer/rounds/${round.id}`)}
         >
           <FontAwesomeIcon icon="pencil" /> Edit
         </a>

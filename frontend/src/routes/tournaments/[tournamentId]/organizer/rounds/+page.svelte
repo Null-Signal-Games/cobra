@@ -103,7 +103,6 @@
     }
 
     const success = await deletePairing(
-      data.tournamentData.csrf_token,
       data.tournamentData.tournament.id,
       roundId,
       pairingId);
@@ -150,7 +149,6 @@
 
   async function completeRoundCallback(roundId: number) {
     const success = await completeRound(
-      data.tournamentData.csrf_token,
       data.tournamentData.tournament.id,
       roundId,
       true

@@ -1,4 +1,6 @@
 import { COBRA_API_SERVER } from "$app/env/public";
+import type { NewPairing } from "$lib/model/Pairing";
+import type { Round } from "$lib/model/Round";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import type { Stage } from "$lib/model/Stage";
 import type { Stats, CutStats } from "$lib/model/Stats";
@@ -13,6 +15,14 @@ export class PairingsData {
   policy = new TournamentPolicies();
   stages: Stage[] = [];
   warnings?: string[] = [];
+}
+
+export interface RoundData {
+  tournament: Tournament;
+  stage: Stage;
+  round: Round;
+  policy?: TournamentPolicies;
+  warnings?: string[];
 }
 
 export async function loadPairings(
@@ -205,7 +215,6 @@ export async function setPlayerRegistrationStatus(
 }
 
 export async function completeRound(
-  csrfToken: string,
   tournamentId: number,
   roundId: number,
   completed: boolean,
@@ -218,7 +227,7 @@ export async function completeRound(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-CSRF-Token": csrfToken,
+        "X-CSRF-Token": csrfToken(),
       },
       body: JSON.stringify({ completed: completed }),
     },
@@ -337,8 +346,29 @@ export async function resetReports(
   }
 }
 
+export async function createPairing(
+  tournamentId: number,
+  roundId: number,
+  newPairing: NewPairing,
+): Promise<boolean> {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({ pairing: newPairing }),
+    },
+  );
+
+  return response.status === 200;
+}
+
 export async function deletePairing(
-  csrfToken: string,
   tournamentId: number,
   roundId: number,
   pairingId: number,
@@ -351,7 +381,7 @@ export async function deletePairing(
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-CSRF-Token": csrfToken,
+        "X-CSRF-Token": csrfToken(),
       },
     },
   );
@@ -373,6 +403,7 @@ export async function loadTournamentSettings(
   }
   return (await response.json()) as TournamentSettingsData;
 }
+
 export async function updateTournamentSettings(
   csrfToken: string,
   tournament: Tournament,
@@ -487,4 +518,85 @@ export async function deleteStage(
     globalMessages.errors.push(`Failed to delete stage: ${err.message}`);
     return false;
   }
+}
+
+export async function loadRound(
+  tournamentId: number,
+  roundId: number,
+  altFetch = fetch,
+): Promise<RoundData> {
+  const response = await altFetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/round_data`,
+    {
+      method: "GET",
+      credentials: "include",
+    },
+  );
+
+  const data = (await response.json()) as RoundData;
+  globalMessages.warnings = data.warnings ?? [];
+
+  return data;
+}
+
+export async function rePairRound(
+  tournamentId: number,
+  roundId: number,
+): Promise<boolean> {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/repair`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+    },
+  );
+
+  return response.status === 200;
+}
+
+export async function deleteRound(
+  tournamentId: number,
+  roundId: number,
+): Promise<boolean> {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+    },
+  );
+
+  return response.status === 200;
+}
+
+export async function saveSOSWeighting(
+  tournamentId: number,
+  roundId: number,
+  weight: number,
+): Promise<boolean> {
+  const response = await fetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({ weight: weight }),
+    },
+  );
+
+  return response.status === 200;
 }

@@ -5,6 +5,7 @@ export interface Round {
   id: number;
   number: number;
   completed: boolean;
+  weight: number;
   pairings: Pairing[];
   pairings_reported: number;
   unpaired_players?: Player[];

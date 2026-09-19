@@ -129,6 +129,7 @@ describe("ExportMarkdown Page Component", () => {
         paused: false,
       },
     },
+    weight: 0
   };
 
   it("renders export markdown heading, textarea, and copy button", () => {
