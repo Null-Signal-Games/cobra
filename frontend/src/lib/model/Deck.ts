@@ -1,3 +1,5 @@
+import type { Printing } from "$lib/utils/api_types";
+
 export interface Card {
   id: number;
   deck_id: number;
@@ -35,4 +37,42 @@ export class DeckDetails {
 export class Deck {
   details = new DeckDetails();
   cards: Card[] = [];
+}
+
+export interface NrdbCard {
+  id: string;
+  count: number;
+  printing?: Printing;
+}
+
+export interface NrdbDeck {
+  id: number;
+  uuid: string;
+  date_creation: string;
+  date_update: string;
+  name: string;
+  description: string;
+  mwl_code: string;
+  tags: string;
+  cards: NrdbCard[];
+}
+
+export interface Card {
+  id: number;
+  deck_id: number;
+  title: string;
+  quantity: number;
+  influence: number;
+  nrdb_card_id: string;
+  created_at: string;
+  updated_at: string;
+  nrdb_printing_id: string | null;
+  card_type_id: string;
+  faction_id: string;
+  influence_cost: number;
+}
+
+export interface CardSearchOption {
+  label: string;
+  value: Printing;
 }
