@@ -5,9 +5,9 @@ import { globalMessages } from "./GlobalMessageState.svelte";
 
 const printings = $state(new Map<string, Printing>());
 
-export async function getPrintings() {
+export async function getPrintings(altFetch = fetch) {
   if (printings.size === 0) {
-    const response = await loadPrintings("page[size]=10000");
+    const response = await loadPrintings("page[size]=10000", altFetch);
     if (response) {
       response.data.forEach((p) => printings.set(p.id, p));
     }
@@ -151,7 +151,7 @@ export function sortCards(cards: Card[]) {
   });
 }
 
-export async function loadPrintings(query?: string) {
+export async function loadPrintings(query?: string, altFetch = fetch) {
   let queryString =
     "fields[printings]=card_id,card_type_id,title,side_id,faction_id,minimum_deck_size,influence_limit,influence_cost";
   if (queryString) {
@@ -159,7 +159,7 @@ export async function loadPrintings(query?: string) {
   }
 
   try {
-    const response = await fetch(
+    const response = await altFetch(
       `https://api.netrunnerdb.com/api/v3/public/printings?${queryString}`,
       { method: "GET" },
     );

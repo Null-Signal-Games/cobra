@@ -4,7 +4,8 @@ module Beta
   class PlayersController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
     before_action :set_tournament
     before_action :set_player,
-                  only: %i[show update destroy registration lock_registration unlock_registration drop reinstate]
+                  only: %i[show update destroy registration lock_registration unlock_registration drop reinstate
+                           nrdb_decks]
 
     def index
       authorize @tournament, :update?
@@ -147,6 +148,38 @@ module Beta
       decks = decks.select { |d| d.user_id == current_user.id } if current_user != @tournament.user
 
       render json: decks.sort_by(&:side_id).map { |d| d.as_view(current_user) }
+    end
+
+    def nrdb_decks
+      authorize @tournament, :show?
+
+      decks = []
+
+      unless current_user.id == @player.user_id || current_user.id == @tournament.user_id
+        render json: decks, status: :unauthorized
+        return
+      end
+
+      begin
+        decks = Nrdb::Connection.new(current_user).decks.map do |deck|
+          {
+            id: deck[:id],
+            uuid: deck[:uuid],
+            date_creation: deck[:date_creation],
+            date_update: deck[:date_update],
+            name: deck[:name],
+            description: deck[:description],
+            mwl_code: deck[:mwl_code],
+            tags: deck[:tags],
+            cards: deck[:cards].map { |id, count| { id:, count: } }
+          }
+        end
+      rescue StandardError
+        render json: decks, status: :unauthorized
+        return
+      end
+
+      render json: decks
     end
 
     private

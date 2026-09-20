@@ -1,6 +1,6 @@
 import { COBRA_API_SERVER } from "$app/env/public";
 import type { BracketData } from "$lib/model/Bracket";
-import type { Card, Deck } from "$lib/model/Deck";
+import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
 import type { Player, PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
@@ -353,8 +353,8 @@ export async function setRegistrationStatus(
   return response.status === 200;
 }
 
-export async function loadDecks(tournamentId: number, playerId?: number) {
-  const response = await fetch(
+export async function loadDecks(tournamentId: number, playerId?: number, altFetch = fetch) {
+  const response = await altFetch(
     playerId === undefined
       ? `${apiServer}/beta/tournaments/${tournamentId}/players/decks`
       : `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}/decks`,
@@ -368,6 +368,21 @@ export async function loadDecks(tournamentId: number, playerId?: number) {
   );
 
   return (await response.json()) as Deck[];
+}
+
+export async function loadNrdbDecks(tournamentId: number, playerId: number, altFetch = fetch) {
+  const response = await altFetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}/nrdb_decks`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  return (await response.json()) as NrdbDeck[];
 }
 
 export async function saveTournament(tournament: Tournament): Promise<boolean> {
