@@ -85,7 +85,7 @@
         <h2>My Tournaments</h2>
         <p class="text-muted mb-0">Logged in as <strong>{user.nrdb_username}</strong></p>
       </div>
-      <a href={resolve("/tournaments/new")} rel="external" class="btn btn-success">
+      <a href={resolve("/tournaments/new")} class="btn btn-success">
         <FontAwesomeIcon icon="plus" /> New Tournament
       </a>
     </div>
@@ -111,15 +111,13 @@
             </div>
             <div>
               <a
-                href={`${serverOrigin}/tournaments/${t.id}/edit`}
-                rel="external"
+                href={resolve(`/tournaments/${t.id}/organizer/settings`)}
                 class="btn btn-sm btn-outline-primary mr-2"
               >
                 <FontAwesomeIcon icon="edit" /> Edit
               </a>
               <a
-                href={`${serverOrigin}/tournaments/${t.id}`}
-                rel="external"
+                href={resolve(`/tournaments/${t.id}`)}
                 class="btn btn-sm btn-primary"
               >
                 View

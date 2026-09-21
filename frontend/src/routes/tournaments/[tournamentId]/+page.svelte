@@ -211,27 +211,27 @@
             <!-- User is logged in and registered -->
             <RegistrationCard {userId} {tournament} player={data.player} csrfToken={data.tournamentData.csrf_token} />
           {:else}
-            <!-- User is logged in and registered but dropped -->
-            <h5 class="card-title">Rejoin this Event</h5>
+            <h5 class="card-title" /* User is the Tournament Organizer (TO) and is registered, but is currently dropped */>Rejoin this Event</h5>
             {#if userId === tournament.user_id}
               <p>
                 You can reinstate yourself on the
-                <a href={resolve(`/tournaments/${tournament.id}/players`)}>
+                <a href={resolve(`/tournaments/${tournament.id}/organizer/players`)}>
                   Players
                 </a>
                 tab.
               </p>
             {:else}
-              <p>Talk to a Tournament Organiser to rejoin the event.</p>
+              <p /* User is the Tournament Organizer (TO) and is registered, but is currently dropped */>
+                Talk to a Tournament Organiser to rejoin the event.
+              </p>
             {/if}
           {/if}
         {:else if !tournament.registration_closed && tournament.self_registration}
           {#if authStore.isAuthenticated && data.player}
-            <!-- User is logged in and not registered -->
-            <RegistrationCard {userId} {tournament} player={data.player} csrfToken={data.tournamentData.csrf_token} />
+            <RegistrationCard /* User is logged in and not registered */
+              {userId} {tournament} player={data.player} csrfToken={data.tournamentData.csrf_token} />
           {:else}
-            <!-- User is not logged in and not registered -->
-            <div class="card card-body alert alert-warning">
+            <div class="card card-body alert alert-warning" /* User is not logged in and not registered */>
               <h5 class="card-title">Register for this Event</h5>
 
               <p class="mb-1">
