@@ -6,6 +6,7 @@
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
 
   let tournaments: TournamentInfo[] = $state([]);
@@ -51,6 +52,15 @@
   onMount(() => {
     void loadTournaments();
   });
+
+  function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget as HTMLFormElement);
+    const cleanCode = (formData.get("shortcode") as string)?.trim().toUpperCase();
+    if (cleanCode) {
+      goto(resolve(`/${cleanCode}`));
+    }
+  }
 </script>
 
 <div>
@@ -74,10 +84,9 @@
 </div>
 
 <div class="mt-2">
-  <!-- TODO: Add route for shortcode lookup -->
-  <form action="/tournaments/shortlink" method="get" class="form-inline justify-content-center">
-    <label class="mx-2" for="slug">Got a shortcode?</label>
-    <input type="text" class="form-control mr-2" placeholder="SHRT" name="slug" id="slug" />
+  <form method="get" class="form-inline justify-content-center" onsubmit={handleSubmit}>
+    <label class="mx-2" for="shortcode">Got a shortcode?</label>
+    <input type="text" class="form-control mr-2" placeholder="SHRT" name="shortcode" id="shortcode" />
     <button type="submit" class="btn btn-primary mr-2">
       <i class="fa fa-arrow-right"></i>
       Go to tournament

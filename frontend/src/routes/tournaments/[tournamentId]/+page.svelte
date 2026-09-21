@@ -82,7 +82,7 @@
             <li class="list-group-item" aria-label="shortcode">
               <div class="small text-secondary">Shortcode:</div>
               {tournament.slug}
-              (<a href={resolve(`/tournaments/${tournament.slug}`)}>
+              (<a href={resolve(`/${tournament.slug}`)}>
                 {shortcodeUrl}
               </a>)
             </li>
