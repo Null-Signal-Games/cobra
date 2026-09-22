@@ -18,24 +18,25 @@
 
   // svelte-ignore state_referenced_locally
   let player = $state($state.snapshot(data.player));
-  let originalCorpDeck = $state(new Deck());
-  let corpDeck = $state(new Deck());
-  let originalRunnerDeck = $state(new Deck());
-  let runnerDeck = $state(new Deck());
+  // svelte-ignore state_referenced_locally
+  let originalCorpDeck = $state($state.snapshot(data.originalCorpDeck));
+  let corpDeck = $derived.by(() => {
+    const deck = $state.snapshot(originalCorpDeck);
+    sortCards(deck.cards);
+    return deck;
+  });
+  // svelte-ignore state_referenced_locally
+  let originalRunnerDeck = $state($state.snapshot(data.originalRunnerDeck));
+  let runnerDeck = $derived.by(() => {
+    const deck = $state.snapshot(originalRunnerDeck);
+    sortCards(deck.cards);
+    return deck;
+  });
   let editMode = $state(false); // TODO: Should this be removed in favor of splitting the page into separate routes?
   let editing = $state(false);
 
   function toggleEditing() {
     editing = !editing;
-    resetEditDecks();
-  }
-
-  // TODO: This can probably be turned into derived or effect runes
-  function resetEditDecks() {
-    corpDeck = $state.snapshot(originalCorpDeck);
-    sortCards(corpDeck.cards);
-    runnerDeck = $state.snapshot(originalRunnerDeck);
-    sortCards(runnerDeck.cards);
   }
 
   async function save() {
@@ -69,7 +70,6 @@
     );
 
     await invalidateAll();
-    resetEditDecks();
 
     if (editing) {
       toggleEditing();
@@ -90,7 +90,6 @@
           ? new Deck()
           : deck;
     }
-    resetEditDecks();
   }
 </script>
 

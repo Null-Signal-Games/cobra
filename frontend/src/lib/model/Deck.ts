@@ -57,21 +57,6 @@ export interface NrdbDeck {
   cards: NrdbCard[];
 }
 
-export interface Card {
-  id: number;
-  deck_id: number;
-  title: string;
-  quantity: number;
-  influence: number;
-  nrdb_card_id: string;
-  created_at: string;
-  updated_at: string;
-  nrdb_printing_id: string | null;
-  card_type_id: string;
-  faction_id: string;
-  influence_cost: number;
-}
-
 export interface CardSearchOption {
   label: string;
   value: Printing;

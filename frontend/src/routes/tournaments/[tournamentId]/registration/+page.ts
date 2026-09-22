@@ -25,10 +25,12 @@ export const load: PageLoad = async ({ params, fetch, parent }) => {
   const tournamentDecks = parentData.player
     ? await loadDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
     : [];
+  const corpDeck = tournamentDecks.find((d) => d.details.side_id === "corp") ?? new Deck();
+  const runnerDeck = tournamentDecks.find((d) => d.details.side_id === "runner") ?? new Deck();
 
   return {
     nrdbDecks: nrdbDecks,
-    originalCorpDeck: tournamentDecks.find((d) => d.details.side_id === "corp") ?? new Deck(),
-    originalRunnerDeck: tournamentDecks.find((d) => d.details.side_id === "runner") ?? new Deck(),
+    originalCorpDeck: corpDeck,
+    originalRunnerDeck: runnerDeck,
   };
 }
