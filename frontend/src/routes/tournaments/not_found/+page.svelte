@@ -5,12 +5,12 @@
 
   let { data }: PageProps = $props();
 
-  function handleSubmit(event: SubmitEvent) {
+  async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
-    const cleanCode = (formData.get("shortcode") as string)?.trim().toUpperCase();
+    const cleanCode = (formData.get("shortcode") as string).trim().toUpperCase();
     if (cleanCode) {
-      goto(resolve(`/${cleanCode}`));
+      await goto(resolve(`/${cleanCode}`));
     }
   }
 </script>
