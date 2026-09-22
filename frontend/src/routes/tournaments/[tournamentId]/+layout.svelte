@@ -157,9 +157,3 @@
 <div class="row py-3 main-content">
   {@render children()}
 </div>
-
-<style>
-  .stream-link {
-    font-size: 2rem;
-  }
-</style>

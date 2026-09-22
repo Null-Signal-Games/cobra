@@ -16,11 +16,13 @@
   const THE_CATALYST_NRDB_CODE = "30076";
   const THE_SYNDICATE_NRDB_CODE = "30077";
 
+  // svelte-ignore state_referenced_locally
+  let player = $state($state.snapshot(data.player));
   let originalCorpDeck = $state(new Deck());
   let corpDeck = $state(new Deck());
   let originalRunnerDeck = $state(new Deck());
   let runnerDeck = $state(new Deck());
-  let editMode = $state(true); // TODO: Should this be removed in favor of splitting the page in to separate routes?
+  let editMode = $state(false); // TODO: Should this be removed in favor of splitting the page into separate routes?
   let editing = $state(false);
 
   function toggleEditing() {
@@ -28,6 +30,7 @@
     resetEditDecks();
   }
 
+  // TODO: This can probably be turned into derived or effect runes
   function resetEditDecks() {
     corpDeck = $state.snapshot(originalCorpDeck);
     sortCards(corpDeck.cards);
@@ -36,32 +39,32 @@
   }
 
   async function save() {
-    if (!data.player) {
+    if (!player) {
       return true;
     }
 
-    data.player.corp_deck =
+    player.corp_deck =
       corpDeck.details.identity_title || corpDeck.cards.length > 0
         ? corpDeck
         : undefined;
-    data.player.corp_id = Object.assign(new Identity(), {
+    player.corp_id = Object.assign(new Identity(), {
       name: corpDeck.details.identity_title ?? "",
       faction: corpDeck.details.faction_id,
     });
-    data.player.runner_deck =
+    player.runner_deck =
       runnerDeck.details.identity_title || runnerDeck.cards.length > 0
         ? runnerDeck
         : undefined;
-    data.player.runner_id = Object.assign(new Identity(), {
+    player.runner_id = Object.assign(new Identity(), {
       name: runnerDeck.details.identity_title ?? "",
       faction: runnerDeck.details.faction_id,
     });
     Object.assign(
-      data.player,
+      player,
       await savePlayer(
         parseInt(params.tournamentId),
-        data.player,
-        data.player.user_id !== data.tournamentData.tournament.user_id,
+        player,
+        player.user_id !== data.tournamentData.tournament.user_id,
       ),
     );
 
@@ -115,7 +118,7 @@
     </button>
   {/snippet}
   
-  {#snippet decksList(isCorp: boolean, selectedDeck: Deck)}
+  {#snippet decksList(decks: Deck[], isCorp: boolean, selectedDeck: Deck)}
     <ul class="list-group list-group-flush" style="border-bottom: 0;">
       <li class="list-group-item selected-deck">
         {#if selectedDeck.details.nrdb_uuid}
@@ -148,14 +151,14 @@
       </li>
     </ul>
     <ul class="list-group list-group-flush overflow-auto" style="height: 24em;">
-      {#each data.nrdbDecks.filter((d) => d.details.side_id === (isCorp ? "corp" : "runner")) as deck (deck.details.nrdb_uuid)}
+      {#each decks.filter((d) => d.details.side_id === (isCorp ? "corp" : "runner")) as deck (deck.details.nrdb_uuid)}
         <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
         {@render deckListItem(deck, isCorp)}
       {/each}
     </ul>
   {/snippet}
   
-  {#if data.player && data.player.id !== 0}
+  {#if player && player.id !== 0}
     <!-- General registration information -->
     <div class="card mb-3" aria-label="registration information">
       <div class="card-header">
@@ -195,7 +198,7 @@
               type="text"
               class="form-control"
               placeholder="Enter player name"
-              bind:value={data.player.name}
+              bind:value={player.name}
             />
           </div>
   
@@ -207,7 +210,7 @@
               type="text"
               class="form-control"
               placeholder="Example: they/them"
-              bind:value={data.player.pronouns}
+              bind:value={player.pronouns}
             />
           </div>
         </div>
@@ -220,7 +223,7 @@
                 id="include_in_stream"
                 type="checkbox"
                 class="form-check-input"
-                bind:checked={data.player.include_in_stream}
+                bind:checked={player.include_in_stream}
               />
               <label for="include_in_stream" class="form-check-label">
                 Video coverage allowed
@@ -291,25 +294,29 @@
       </div>
   
       <div class="row mb-3 justify-content-center dontprint">
-        {#if data.nrdbDecks.length > 0}
-          <div class="col-md-6">
-            <div class="card" aria-label="NRDB corp decks">
-              <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-              {@render decksList(true, corpDeck)}
+        {#await data.nrdbDecks}
+          <div class="spinner-border m-auto"></div>
+        {:then nrdbDecks}
+          {#if nrdbDecks.length > 0}
+            <div class="col-md-6">
+              <div class="card" aria-label="NRDB corp decks">
+                <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
+                {@render decksList(nrdbDecks, true, corpDeck)}
+              </div>
             </div>
-          </div>
 
-          <div class="col-md-6">
-            <div class="card" aria-label="NRDB runner decks">
-              <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-              {@render decksList(false, runnerDeck)}
+            <div class="col-md-6">
+              <div class="card" aria-label="NRDB runner decks">
+                <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
+                {@render decksList(nrdbDecks, false, runnerDeck)}
+              </div>
             </div>
-          </div>
-        {:else}
-          <div class="alert alert-warning">
-            You have no decks saved in NRDB.
-          </div>
-        {/if}
+          {:else}
+            <div class="alert alert-warning">
+              You have no decks saved in NRDB.
+            </div>
+          {/if}
+        {/await}
       </div>
     {/if}
   
