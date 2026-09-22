@@ -211,9 +211,9 @@
             <!-- User is logged in and registered -->
             <RegistrationCard {userId} {tournament} player={data.player} csrfToken={data.tournamentData.csrf_token} />
           {:else}
-            <h5 class="card-title" /* User is the Tournament Organizer (TO) and is registered, but is currently dropped */>Rejoin this Event</h5>
+            <h5 class="card-title">Rejoin this Event</h5>
             {#if userId === tournament.user_id}
-              <p>
+              <p /* User is the Tournament Organizer (TO) and is registered, but is currently dropped */>
                 You can reinstate yourself on the
                 <a href={resolve(`/tournaments/${tournament.id}/organizer/players`)}>
                   Players
@@ -221,7 +221,7 @@
                 tab.
               </p>
             {:else}
-              <p /* User is the Tournament Organizer (TO) and is registered, but is currently dropped */>
+              <p /* User is not the Tournament Organizer (TO) and is registered, but is currently dropped */>
                 Talk to a Tournament Organiser to rejoin the event.
               </p>
             {/if}
