@@ -381,6 +381,9 @@ export async function loadNrdbDecks(tournamentId: number, playerId: number, altF
       },
     },
   );
+  if (response.status == 422) {
+    throw new Error();
+  }
 
   return (await response.json()) as NrdbDeck[];
 }

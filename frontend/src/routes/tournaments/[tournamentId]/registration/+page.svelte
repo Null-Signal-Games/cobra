@@ -10,6 +10,7 @@
   import type { PageProps } from "./$types";
   import { invalidateAll } from "$app/navigation";
   import { sortCards } from "$lib/utils/decks.svelte";
+  import { authStore } from "$lib/utils/auth.svelte";
 
   let { data, params }: PageProps = $props();
 
@@ -32,7 +33,7 @@
     sortCards(deck.cards);
     return deck;
   });
-  let editMode = $state(false); // TODO: Should this be removed in favor of splitting the page into separate routes?
+  let editMode = $state(false);
   let editing = $state(false);
 
   function toggleEditing() {
@@ -315,6 +316,20 @@
               You have no decks saved in NRDB.
             </div>
           {/if}
+        {:catch}
+          <div class="alert alert-warning">
+            <button
+              type="button"
+              onclick={() => {
+                authStore.invalidateAndLogIn(
+                  `/login?return_to=/tournaments/${params.tournamentId}/registration`);
+              }}
+              class="btn btn-link p-0 alert-link"
+            >
+              <FontAwesomeIcon icon="sign-in" /> Sign in
+            </button>
+            to NRDB to see your decks.
+          </div>
         {/await}
       </div>
     {/if}

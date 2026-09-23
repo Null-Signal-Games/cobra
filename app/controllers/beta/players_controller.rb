@@ -175,7 +175,7 @@ module Beta
           }
         end
       rescue StandardError
-        render json: decks, status: :unauthorized
+        render json: decks, status: :unprocessable_content
         return
       end
 

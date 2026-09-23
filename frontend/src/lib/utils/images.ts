@@ -12,25 +12,25 @@ import cardTypeUpgradeImage from "../assets/images/types/upgrade.png";
 export function getCardTypeImage(cardTypeId: string) {
   switch (cardTypeId) {
     case "agenda":
-      return cardTypeAgendaImage as string;
+      return cardTypeAgendaImage;
     case "asset":
-      return cardTypeAssetImage as string;
+      return cardTypeAssetImage;
     case "event":
-      return cardTypeEventImage as string;
+      return cardTypeEventImage;
     case "hardware":
-      return cardTypeHardwareImage as string;
+      return cardTypeHardwareImage;
     case "ice":
-      return cardTypeIceImage as string;
+      return cardTypeIceImage;
     case "identity":
-      return cardTypeIdentityImage as string;
+      return cardTypeIdentityImage;
     case "operation":
-      return cardTypeOperationImage as string;
+      return cardTypeOperationImage;
     case "program":
-      return cardTypeProgramImage as string;
+      return cardTypeProgramImage;
     case "resource":
-      return cardTypeResourceImage as string;
+      return cardTypeResourceImage;
     case "upgrade":
-      return cardTypeUpgradeImage as string;
+      return cardTypeUpgradeImage;
   }
 
   return "";
