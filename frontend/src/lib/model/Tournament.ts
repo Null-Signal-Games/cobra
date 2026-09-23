@@ -40,6 +40,7 @@ export class Tournament {
   dropped_player_count = 0;
   created_at = "";
   updated_at = "";
+  has_elimination_stage = false;
 
   constructor(init?: Partial<Tournament>) {
     Object.assign(this, init);

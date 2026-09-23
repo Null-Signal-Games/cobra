@@ -50,6 +50,7 @@ RSpec.describe TournamentsController do
             'date' => '2023-05-15',
             'decklist_required' => false,
             'dropped_player_count' => 0,
+            'has_elimination_stage' => false,
             'id' => tournament.id,
             'manual_seed' => true,
             'name' => 'Test Tournament',

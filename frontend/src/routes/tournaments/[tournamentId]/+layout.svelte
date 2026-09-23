@@ -107,7 +107,7 @@
       <FontAwesomeIcon icon="list-ol" /> Standings
     </a>
   </li>
-  <!-- TODO: Display if there is an elimination stage. -->
+  {#if tournament.has_elimination_stage }
   <li class="nav-item">
     <a
       href={resolve(`/tournaments/${tournament.id}/bracket`)}
@@ -117,6 +117,7 @@
       <FontAwesomeIcon icon="sitemap" /> Bracket
     </a>
   </li>
+  {/if}
   <li class="nav-item">
     <a
       href={resolve(`/tournaments/${tournament.id}/stats`)}

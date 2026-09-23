@@ -59,6 +59,30 @@ export async function loadTournament(tournamentId: number, altFetch = fetch) {
   return (await response.json()) as TournamentData;
 }
 
+export async function loadTournamentBySlug(slug: string, altFetch = fetch): Promise<TournamentsResponse> {
+  const url = `${apiServer}/api/v1/public/tournaments?filter[slug]=${slug}`;
+  try {
+    const response = await altFetch(url, {
+      headers: {
+        Accept: "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    return (await response.json()) as TournamentsResponse;
+  } catch (e) {
+    const err = e as Error;
+    globalMessages.errors.push(`Failed to load tournaments: ${err.message}`);
+  }
+
+  return {
+    data: [],
+  };
+}
+
 export async function loadTournaments(url: string, altFetch = fetch): Promise<TournamentsResponse> {
   try {
     const response = await altFetch(url, {
