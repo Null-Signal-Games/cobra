@@ -33,12 +33,6 @@
     sortCards(deck.cards);
     return deck;
   });
-  let editMode = $state(false);
-  let editing = $state(false);
-
-  function toggleEditing() {
-    editing = !editing;
-  }
 
   async function save() {
     if (!player) {
@@ -71,10 +65,6 @@
     );
 
     await invalidateAll();
-
-    if (editing) {
-      toggleEditing();
-    }
 
     return true;
   }
@@ -176,9 +166,7 @@
               <FontAwesomeIcon icon="print" />
             </button>
             <a
-              href={editMode
-                ? resolve(`/tournaments/${params.tournamentId}/rounds`)
-                : resolve(`/tournaments/${params.tournamentId}`)}
+              href={resolve(`/tournaments/${params.tournamentId}`)}
               class="btn btn-link p-0"
               title="Cancel"
             >
@@ -233,37 +221,6 @@
         </div>
   
         <div class="dontprint mt-sm-2">
-          {#if editMode}
-            <div class="float-left">
-              {#if editing}
-                <button
-                  type="button"
-                  class="btn btn-link"
-                  onclick={toggleEditing}
-                >
-                  <FontAwesomeIcon icon="undo" />
-                  Cancel edits
-                </button>
-              {:else}
-                <a
-                  href={resolve(`/tournaments/${params.tournamentId}/registration`)}
-                  class="btn btn-link"
-                >
-                  <FontAwesomeIcon icon="edit" />
-                  Choose decks from your NetrunnerDB account
-                </a>
-                <button
-                  type="button"
-                  class="btn btn-link"
-                  onclick={toggleEditing}
-                >
-                  <FontAwesomeIcon icon="edit" />
-                  Edit decks in place
-                </button>
-              {/if}
-            </div>
-          {/if}
-  
           <div class="float-right">
             <!-- Create/Save -->
             <ProgressButton
@@ -285,54 +242,52 @@
     </div>
   
     <!-- Deck selection -->
-    {#if !editMode}
-      <div class="alert alert-secondary dontprint">
-        Please select from your decks below. <a
-          href="https://netrunnerdb.com/en/decks"
-          target="_blank">See your decks in NetrunnerDB</a
-        >. Refresh the page to reload from NetrunnerDB.
-      </div>
-  
-      <div class="row mb-3 justify-content-center dontprint">
-        {#await data.nrdbDecks}
-          <div class="spinner-border m-auto"></div>
-        {:then nrdbDecks}
-          {#if nrdbDecks.length > 0}
-            <div class="col-md-6">
-              <div class="card" aria-label="NRDB corp decks">
-                <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-                {@render decksList(nrdbDecks, true, corpDeck)}
-              </div>
-            </div>
+    <div class="alert alert-secondary dontprint">
+      Please select from your decks below. <a
+        href="https://netrunnerdb.com/en/decks"
+        target="_blank">See your decks in NetrunnerDB</a
+      >. Refresh the page to reload from NetrunnerDB.
+    </div>
 
-            <div class="col-md-6">
-              <div class="card" aria-label="NRDB runner decks">
-                <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-                {@render decksList(nrdbDecks, false, runnerDeck)}
-              </div>
+    <div class="row mb-3 justify-content-center dontprint">
+      {#await data.nrdbDecks}
+        <div class="spinner-border m-auto"></div>
+      {:then nrdbDecks}
+        {#if nrdbDecks.length > 0}
+          <div class="col-md-6">
+            <div class="card" aria-label="NRDB corp decks">
+              <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
+              {@render decksList(nrdbDecks, true, corpDeck)}
             </div>
-          {:else}
-            <div class="alert alert-warning">
-              You have no decks saved in NRDB.
-            </div>
-          {/if}
-        {:catch}
-          <div class="alert alert-warning">
-            <button
-              type="button"
-              onclick={() => {
-                authStore.invalidateAndLogIn(
-                  `/login?return_to=/tournaments/${params.tournamentId}/registration`);
-              }}
-              class="btn btn-link p-0 alert-link"
-            >
-              <FontAwesomeIcon icon="sign-in" /> Sign in
-            </button>
-            to NRDB to see your decks.
           </div>
-        {/await}
-      </div>
-    {/if}
+
+          <div class="col-md-6">
+            <div class="card" aria-label="NRDB runner decks">
+              <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
+              {@render decksList(nrdbDecks, false, runnerDeck)}
+            </div>
+          </div>
+        {:else}
+          <div class="alert alert-warning">
+            You have no decks saved in NRDB.
+          </div>
+        {/if}
+      {:catch}
+        <div class="alert alert-warning">
+          <button
+            type="button"
+            onclick={() => {
+              authStore.invalidateAndLogIn(
+                `/login?return_to=/tournaments/${params.tournamentId}/registration`);
+            }}
+            class="btn btn-link p-0 alert-link"
+          >
+            <FontAwesomeIcon icon="sign-in" /> Sign in
+          </button>
+          to NRDB to see your decks.
+        </div>
+      {/await}
+    </div>
   
     <!-- Deck display -->
     <div class="row">
@@ -341,7 +296,7 @@
           bind:deck={corpDeck}
           originalDeck={originalCorpDeck}
           isCorp={true}
-          editMode={editing}
+          editMode={false}
         />
       </div>
   
@@ -350,22 +305,9 @@
           bind:deck={runnerDeck}
           originalDeck={originalRunnerDeck}
           isCorp={false}
-          editMode={editing}
+          editMode={false}
         />
       </div>
-  
-      {#if editing}
-        <div class="col-md-12">
-          <ProgressButton
-            css="btn btn-success float-right"
-            inProgressText="Saving"
-            completeText="Saved"
-            onclick={save}
-          >
-            <FontAwesomeIcon icon="floppy-o" /> Save
-          </ProgressButton>
-        </div>
-      {/if}
     </div>
   {:else}
     <div class="d-flex align-items-center m-2">
