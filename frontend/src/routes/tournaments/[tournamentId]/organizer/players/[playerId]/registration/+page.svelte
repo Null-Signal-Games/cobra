@@ -6,28 +6,18 @@
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { invalidateAll } from "$app/navigation";
-  import { sortCards } from "$lib/utils/decks.svelte";
   import { savePlayer } from "../../../../../api_helper";
   import DeckDisplay from "$lib/components/DeckDisplay.svelte";
+  import { sortCards } from "$lib/utils/decks.svelte";
 
   let { data, params }: PageProps = $props();
 
   // svelte-ignore state_referenced_locally
   let player = $state($state.snapshot(data.registrationPlayer));
   // svelte-ignore state_referenced_locally
-  let originalCorpDeck = $state($state.snapshot(data.originalCorpDeck));
-  let corpDeck = $derived.by(() => {
-    const deck = $state.snapshot(originalCorpDeck);
-    sortCards(deck.cards);
-    return deck;
-  });
+  let corpDeck = $state($state.snapshot(data.corpDeck));
   // svelte-ignore state_referenced_locally
-  let originalRunnerDeck = $state($state.snapshot(data.originalRunnerDeck));
-  let runnerDeck = $derived.by(() => {
-    const deck = $state.snapshot(originalRunnerDeck);
-    sortCards(deck.cards);
-    return deck;
-  });
+  let runnerDeck = $state($state.snapshot(data.runnerDeck));
   let editing = $state(false);
 
   function toggleEditing() {
@@ -65,6 +55,9 @@
     );
 
     await invalidateAll();
+
+    sortCards(corpDeck.cards);
+    sortCards(runnerDeck.cards);
 
     if (editing) {
       toggleEditing();
@@ -204,7 +197,7 @@
       <div class="col-md-6">
         <DeckDisplay
           bind:deck={corpDeck}
-          originalDeck={originalCorpDeck}
+          originalDeck={data.corpDeck}
           isCorp={true}
           editMode={editing}
         />
@@ -213,7 +206,7 @@
       <div class="col-md-6">
         <DeckDisplay
           bind:deck={runnerDeck}
-          originalDeck={originalRunnerDeck}
+          originalDeck={data.runnerDeck}
           isCorp={false}
           editMode={editing}
         />
