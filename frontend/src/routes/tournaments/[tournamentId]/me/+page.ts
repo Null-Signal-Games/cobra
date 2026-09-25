@@ -1,5 +1,5 @@
 import type { PageLoad } from "./$types";
-import { loadPairings } from "$lib/api/cobraBeta";
+import { loadPairings } from "$lib/api/beta";
 import { authStore } from "$lib/utils/auth.svelte";
 
 export const load: PageLoad = async ({ parent, fetch }) => {
