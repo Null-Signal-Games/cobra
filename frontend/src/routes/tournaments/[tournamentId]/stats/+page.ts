@@ -1,6 +1,5 @@
 import type { PageLoad } from "./$types";
-import { loadStats, loadCutStats } from "$lib/api/cobraBeta";
-import { loadPairings } from "$lib/api/cobraBeta";
+import { loadStats, loadCutStats, loadPairings } from "$lib/api/beta";
 
 export const load: PageLoad = async ({ params, fetch }) => {
   const tournamentId = parseInt(params.tournamentId);

@@ -6,6 +6,7 @@ import { Player, type PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
 import type { StandingsData } from "$lib/model/Standings";
 import { Tournament, type FeatureFlags, type TournamentOptions } from "$lib/model/Tournament";
+import type { TournamentsResponse } from "$lib/utils/api_types";
 import { ValidationError, type Errors } from "$lib/utils/errors";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
