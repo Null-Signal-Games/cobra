@@ -70,6 +70,11 @@ class AuthStore {
       window.location.href = `${serverOrigin}/login?return_to=${encodeURIComponent(fullReturnUrl)}`;
     }
   }
+
+  invalidateAndLogIn(returnTo?: string) {
+    this.user = null;
+    this.redirectToLogin(returnTo);
+  }
 }
 
 export const authStore = new AuthStore();

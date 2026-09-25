@@ -63,6 +63,7 @@ Rails.application.routes.draw do
         patch :reinstate, on: :member
         get :decks, on: :collection
         get :decks, on: :member
+        get :nrdb_decks, on: :member
       end
       get :info, on: :member
       get :qr, on: :member
