@@ -7,7 +7,7 @@ import {
   StageData,
   ValidationError,
   type Stage,
-} from "./StageSettings";
+} from "$lib/api/classicTypes";
 import { loadStage, saveStage } from "$lib/api/classic"
 
 vi.mock("$app/env/public", () => ({
