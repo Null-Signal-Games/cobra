@@ -1,5 +1,5 @@
 import type { Card, CardSearchOption, Deck, NrdbDeck } from "$lib/model/Deck";
-import type { Printing, PrintingsResponse } from "$lib/utils/api_types";
+import type { Printing, PrintingsResponse } from "$lib/api/v1ApiTypes";
 import { quoteCsvValue } from "./files";
 import { globalMessages } from "./GlobalMessageState.svelte";
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { COBRA_API_SERVER } from "$app/env/public";
   import { onMount } from "svelte";
-  import type { TournamentInfo, TournamentsResponse } from "$lib/utils/api_types";
+  import type { TournamentInfo, TournamentsResponse } from "$lib/api/v1ApiTypes";
   import TournamentRow from "$lib/components/TournamentRow.svelte";
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";

@@ -2,7 +2,7 @@
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import Identity from "$lib/components/identity/Identity.svelte";
   import type { Card, Deck } from "$lib/model/Deck";
-  import type { Printing } from "$lib/utils/api_types";
+  import type { Printing } from "$lib/api/v1ApiTypes";
   import { deckCsv, transformCardLookup } from "$lib/utils/decks.svelte";
   import { downloadBlob } from "$lib/utils/files";
   import Svelecte from "svelecte";

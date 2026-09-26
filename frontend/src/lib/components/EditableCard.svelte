@@ -1,7 +1,7 @@
 <script lang="ts">
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import type { CardSearchOption } from "$lib/model/Deck";
-  import type { Printing } from "$lib/utils/api_types";
+  import type { Printing } from "$lib/api/v1ApiTypes";
   import { transformCardLookup } from "$lib/utils/decks.svelte";
   import Svelecte from "svelecte";
   import type { Snippet } from "svelte";

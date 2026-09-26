@@ -6,7 +6,6 @@ import { Player, type PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
 import type { StandingsData } from "$lib/model/Standings";
 import { Tournament, type FeatureFlags, type TournamentOptions } from "$lib/model/Tournament";
-import type { TournamentsResponse } from "$lib/utils/api_types";
 import { ValidationError, type Errors } from "$lib/utils/errors";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
@@ -57,30 +56,6 @@ export async function loadTournament(tournamentId: number, altFetch = fetch) {
   );
 
   return (await response.json()) as TournamentData;
-}
-
-export async function loadTournamentBySlug(slug: string, altFetch = fetch): Promise<TournamentsResponse> {
-  const url = `${apiServer}/api/v1/public/tournaments?filter[slug]=${slug}`;
-  try {
-    const response = await altFetch(url, {
-      headers: {
-        Accept: "application/vnd.api+json",
-        "Content-Type": "application/vnd.api+json",
-      },
-    });
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
-    return (await response.json()) as TournamentsResponse;
-  } catch (e) {
-    const err = e as Error;
-    globalMessages.errors.push(`Failed to load tournaments: ${err.message}`);
-  }
-
-  return {
-    data: [],
-  };
 }
 
 export async function loadNewTournament(
