@@ -4,11 +4,11 @@ import userEvent from "@testing-library/user-event";
 import DangerZonePage from "./+page.svelte";
 import { Tournament } from "$lib/model/Tournament";
 import type { Stage } from "$lib/model/Stage";
-import { deleteStage, deleteTournament } from "../../api_helper";
+import { deleteStage, deleteTournament } from "$lib/api/beta";
 import { goto, invalidateAll } from "$app/navigation";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
-vi.mock("../../api_helper", () => ({
+vi.mock("$lib/api/beta", () => ({
   deleteTournament: vi.fn(),
   deleteStage: vi.fn(),
 }));

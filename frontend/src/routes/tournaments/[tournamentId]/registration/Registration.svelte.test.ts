@@ -26,11 +26,6 @@ vi.mock('$app/env/public', () => {
   };
 });
 
-vi.mock("../../api_helper", () => ({
-  loadDecks: vi.fn(() => true),
-  loadTournament: vi.fn(() => true),
-}));
-
 vi.mock("$lib/api/beta", () => ({
   savePlayer: vi.fn(() => true),
 }));

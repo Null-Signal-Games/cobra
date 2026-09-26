@@ -11,17 +11,15 @@
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidateAll } from "$app/navigation";
   import {
+    changePlayerSide,
     completeRound,
     createStage,
     deletePairing,
     pairRound,
-    updateRoundTimer,
-  } from "../../api_helper";
-  import {
-    changePlayerSide,
     reportScore,
     setPlayerRegistrationStatus as setPlayerRegistrationStatusRequest,
     setRegistrationStatus as setRegistrationStatusRequest,
+    updateRoundTimer,
   } from "$lib/api/beta";
 
   let { data, params }: PageProps = $props();
