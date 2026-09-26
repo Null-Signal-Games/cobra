@@ -5,7 +5,7 @@ export const load: PageLoad = async ({ params, fetch }) => {
   const tournamentId = parseInt(params.tournamentId);
   
   const statsPromise = loadStats(tournamentId, fetch);
-  const pairingsData = await loadPairings(tournamentId, null, fetch);
+  const pairingsData = await loadPairings(tournamentId, fetch);
 
   const hasCut =
     pairingsData.stages.length > 1 &&

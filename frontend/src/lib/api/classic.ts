@@ -6,7 +6,26 @@ import type { TournamentCreateErrorResponse, TournamentCreateResponse, Tournamen
 import { ValidationError, type Errors } from "$lib/utils/errors";
 import { ValidationError as StageValidationError, type SaveStageResponse, type Stage, type StageData } from "../../routes/tournaments/[tournamentId]/organizer/edit_stage/[stageId]/StageSettings";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+import type { PairingsData } from "./beta";
 const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
+
+export async function loadPairingsForUser(
+  tournamentId: number,
+  userId: number,
+  altFetch = fetch,
+) {
+  const url = `${apiServer}/tournaments/${tournamentId}/rounds/pairings_data/${userId}`;
+
+  const response = await altFetch(url, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const data = (await response.json()) as PairingsData;
+  globalMessages.warnings = data.warnings ?? [];
+
+  return data;
+}
 
 export async function loadStandings(tournamentId: number, altFetch = fetch): Promise<StandingsData> {
   const response = await altFetch(
