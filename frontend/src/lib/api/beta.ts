@@ -1,5 +1,6 @@
 import { COBRA_API_SERVER } from "$app/env/public";
-import type { PairingsData, RoundData, TournamentData } from "./betaTypes";
+import { csrfToken } from "$lib/csrf";
+import type { PairingsData, RoundData, TournamentData } from "$lib/api/betaTypes";
 import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
 import type { NewPairing } from "$lib/model/Pairing";
@@ -11,15 +12,6 @@ import { Tournament } from "$lib/model/Tournament";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
 const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
-
-// TODO(plural): move this to its own library
-export function csrfToken() {
-  return typeof document !== "undefined"
-    ? (document
-        .querySelector("meta[name='csrf-token']")
-        ?.getAttribute("content") ?? "")
-    : "";
-}
 
 export async function loadTournament(tournamentId: number, altFetch = fetch) {
   const response = await altFetch(

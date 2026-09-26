@@ -4,7 +4,7 @@
     StageData,
     ValidationError,
     type SaveStageResponse,
-  } from "./StageSettings";
+  } from "$lib/api/classicTypes";
   import { loadStage, saveStage } from "$lib/api/classic";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import TableRangeEdit from "./TableRangeEdit.svelte";

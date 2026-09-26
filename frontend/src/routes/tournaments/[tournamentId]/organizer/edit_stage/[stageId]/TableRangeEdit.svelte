@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Stage, type TableRange } from "./StageSettings";
+  import { type Stage, type TableRange } from "$lib/api/classicTypes";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
 
   interface Props {

@@ -1,12 +1,21 @@
 import { COBRA_API_SERVER } from "$app/env/public";
+import { csrfToken } from "$lib/csrf";
+import type { PairingsData } from "$lib/api/betaTypes";
+import type { 
+  TournamentCreateErrorResponse, 
+  TournamentCreateResponse, 
+  TournamentSettingsData,
+  SaveStageResponse, 
+  Stage,
+  StageData 
+} from "$lib/api/classicTypes";
+import { ValidationError as StageValidationError } from "$lib/api/classicTypes";
 import type { BracketData } from "$lib/model/Bracket";
 import type { StandingsData } from "$lib/model/Standings";
 import type { Tournament } from "$lib/model/Tournament";
-import type { TournamentCreateErrorResponse, TournamentCreateResponse, TournamentSettingsData } from "./classicTypes";
 import { ValidationError, type Errors } from "$lib/utils/errors";
-import { ValidationError as StageValidationError, type SaveStageResponse, type Stage, type StageData } from "../../routes/tournaments/[tournamentId]/organizer/edit_stage/[stageId]/StageSettings";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-import type { PairingsData } from "./betaTypes";
+
 const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
 
 export async function loadPairingsForUser(
@@ -160,15 +169,6 @@ export async function loadStage(
   globalMessages.warnings = data.warning ? [data.warning] : [];
 
   return data;
-}
-
-// TODO(plural): Put in its own library
-export function csrfToken() {
-  return typeof document !== "undefined"
-    ? (document
-        .querySelector("meta[name='csrf-token']")
-        ?.getAttribute("content") ?? "")
-    : "";
 }
 
 export async function saveStage(
