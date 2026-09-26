@@ -1,6 +1,6 @@
 import { Deck } from "$lib/model/Deck";
 import { convertNrdbDeck, getPrintings } from "$lib/utils/decks.svelte";
-import { loadDecks, loadNrdbDecks } from "../../api_helper";
+import { loadDecks, loadNrdbDecks } from "$lib/api/beta";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ params, fetch, parent }) => {

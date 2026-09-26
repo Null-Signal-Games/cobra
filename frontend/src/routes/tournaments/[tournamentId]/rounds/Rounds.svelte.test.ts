@@ -14,7 +14,7 @@ import {
 } from "@testing-library/svelte";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { reportScore } from "../api_helper";
+import { reportScore } from "$lib/api/beta";
 import RoundsPage from "./+page.svelte";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import { Player } from "$lib/model/Player";
@@ -29,6 +29,12 @@ import {
   MockTournament,
 } from "./RoundsTestData";
 import type { TournamentPolicies } from "$lib/model/Tournament";
+
+vi.mock('$app/env/public', () => {
+  return {
+    COBRA_API_SERVER: "http://localhost:3000"
+  };
+});
 
 const MockPolicy: TournamentPolicies = {
   update: false,
@@ -59,7 +65,7 @@ const MockPageData: PageProps["data"] = {
   stages: [MockSwissStage],
 };
 
-vi.mock("../api_helper", () => ({
+vi.mock("$lib/api/beta", () => ({
   loadPairings: vi.fn(() => { return { policy: MockPolicy, stages: [MockSwissStage] }; }),
   reportScore: vi.fn(() => true),
 }));

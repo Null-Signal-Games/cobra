@@ -8,17 +8,19 @@
   import { resolve } from '$app/paths';
   import type { ScoreReport } from '$lib/model/ScoreReport';
   import {
-    changePlayerSide,
     completeRound,
     createPairing as createPairingRequest,
     deletePairing,
     deleteRound as deleteRoundRequest,
     rePairRound,
-    reportScore,
     resetReports,
     saveSOSWeighting as saveSOSWeightingRequest,
   } from '../../../api_helper';
-    import ProgressButton from '$lib/components/ProgressButton.svelte';
+  import {
+    changePlayerSide,
+    reportScore,
+  } from "$lib/api/beta";
+  import ProgressButton from '$lib/components/ProgressButton.svelte';
 
   let { data, params }: PageProps = $props();
 

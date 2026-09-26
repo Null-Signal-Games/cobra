@@ -11,16 +11,18 @@
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidateAll } from "$app/navigation";
   import {
-    changePlayerSide,
     completeRound,
     createStage,
     deletePairing,
     pairRound,
+    updateRoundTimer,
+  } from "../../api_helper";
+  import {
+    changePlayerSide,
     reportScore,
     setPlayerRegistrationStatus as setPlayerRegistrationStatusRequest,
     setRegistrationStatus as setRegistrationStatusRequest,
-    updateRoundTimer,
-  } from "../../api_helper";
+  } from "$lib/api/beta";
 
   let { data, params }: PageProps = $props();
 
@@ -50,16 +52,14 @@
       data.tournamentData.tournament.self_registration &&
       (!data.tournamentData.tournament.registration_closed ||
         data.tournamentData.tournament.any_player_unlocked) &&
-      !confirm(
-        "Registration is still open or some players are unlocked. Pair new round anyway?",
-      )
+      !confirm("Registration is still open or some players are unlocked. Pair new round anyway?")
     ) {
       return;
     }
 
     const success = await pairRound(
       data.tournamentData.csrf_token,
-      data.tournamentData.tournament.id
+      data.tournamentData.tournament.id,
     );
     if (!success) {
       // TODO: Notify the user
@@ -70,11 +70,7 @@
   }
 
   async function setRegistrationStatus(open: boolean) {
-    const success = await setRegistrationStatusRequest(
-      data.tournamentData.csrf_token,
-      data.tournamentData.tournament.id,
-      open,
-    );
+    const success = await setRegistrationStatusRequest(data.tournamentData.tournament.id, open);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -85,7 +81,6 @@
 
   async function setPlayerRegistrationStatus(open: boolean) {
     const success = await setPlayerRegistrationStatusRequest(
-      data.tournamentData.csrf_token,
       data.tournamentData.tournament.id,
       open,
     );
@@ -102,10 +97,7 @@
       return;
     }
 
-    const success = await deletePairing(
-      data.tournamentData.tournament.id,
-      roundId,
-      pairingId);
+    const success = await deletePairing(data.tournamentData.tournament.id, roundId, pairingId);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -130,7 +122,12 @@
     await invalidateAll();
   }
 
-  async function reportScoreCallback(roundId: number, pairingId: number, report: ScoreReport, selfReport: boolean) {
+  async function reportScoreCallback(
+    roundId: number,
+    pairingId: number,
+    report: ScoreReport,
+    selfReport: boolean,
+  ) {
     const success = await reportScore(
       data.tournamentData.tournament.id,
       roundId,
@@ -148,11 +145,7 @@
   }
 
   async function completeRoundCallback(roundId: number) {
-    const success = await completeRound(
-      data.tournamentData.tournament.id,
-      roundId,
-      true
-    );
+    const success = await completeRound(data.tournamentData.tournament.id, roundId, true);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -230,28 +223,19 @@
         >
           <FontAwesomeIcon icon="eye-slash" /> Show/hide identities
         </button>
-        <button
-          type="button"
-          class="btn btn-info"
-          data-toggle="modal"
-          data-target="#faq"
-        >
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#faq">
           <FontAwesomeIcon icon="question" /> FAQ
         </button>
         {#if data.policy.update}
-          <button
-            type="button"
-            class="btn btn-primary float-right"
-            onclick={toggleForcePlayerView}
-          >
+          <button type="button" class="btn btn-primary float-right" onclick={toggleForcePlayerView}>
             <FontAwesomeIcon icon="users" /> See player pairings view
           </button>
         {/if}
 
         {#if !$showReportedPairings}
           <div class="alert alert-info mt-3">
-            Reported scores are currently hidden on this page. This will not
-            affect other users viewing this page.
+            Reported scores are currently hidden on this page. This will not affect other users
+            viewing this page.
           </div>
         {/if}
       {/if}
@@ -386,21 +370,19 @@
       <h5>How does self reporting work?</h5>
       <ul>
         <li>
-          For self reporting, a player needs to be logged in with the NRDB
-          account they used to register for the tournament to ensure they are
-          reporting only their games.
+          For self reporting, a player needs to be logged in with the NRDB account they used to
+          register for the tournament to ensure they are reporting only their games.
         </li>
         <li>
           Self reporting in Cobra works alongside the
-          <span class="font-weight-bold">two-eye principle</span>: both players
-          have to report the same result for Cobra to accept the answer and set
-          the scores.
+          <span class="font-weight-bold">two-eye principle</span>: both players have to report the
+          same result for Cobra to accept the answer and set the scores.
         </li>
       </ul>
       <h5>Does self reporting replace normal reports?</h5>
       <p>
-        No, it just allows players to report their own scores instead of handing
-        in manually. This should ease the overall reporting process.
+        No, it just allows players to report their own scores instead of handing in manually. This
+        should ease the overall reporting process.
       </p>
       <ul>
         <li>
@@ -408,9 +390,7 @@
           <span class="font-weight-bold">'Reports'</span>
           which shows the scores reported.
         </li>
-        <li>
-          The TO can accept a single report by clicking on the provided option.
-        </li>
+        <li>The TO can accept a single report by clicking on the provided option.</li>
         <li>As always, the TO can report games as normal.</li>
       </ul>
     </ModalDialog>

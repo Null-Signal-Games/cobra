@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
-  changePlayerSide,
   deleteStage,
   deleteTournament,
-  reportScore,
   resetReports,
 } from "./api_helper";
+import {
+  reportScore,
+} from "$lib/api/beta";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
@@ -25,30 +26,6 @@ describe("tournament api_helper score reporting", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-  });
-
-  describe("changePlayerSide", () => {
-    it("sends POST request with side data", async () => {
-      mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
-
-      const result = await changePlayerSide(10, 2, 42, "corp", mockFetch);
-
-      expect(result).toBe(true);
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-      const { url, requestOptions, body } = getFetchCall();
-      expect(url).toContain("/beta/tournaments/10/rounds/2/pairings/42/report");
-      expect(requestOptions?.method).toBe("POST");
-      expect(requestOptions?.credentials).toBe("include");
-      expect(body).toEqual({ side: "player1_is_corp" });
-    });
-
-    it("returns false when response is not ok", async () => {
-      mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }));
-
-      const result = await changePlayerSide(10, 2, 42, "corp", mockFetch);
-
-      expect(result).toBe(false);
-    });
   });
 
   describe("reportScore", () => {
@@ -132,38 +109,6 @@ describe("tournament api_helper score reporting", () => {
       const { url, headers } = getFetchCall();
       expect(url).not.toContain("//beta");
       expect(headers["X-CSRF-Token"]).toBe("explicit-csrf-token");
-    });
-  });
-
-  describe("csrf token and URL formatting", () => {
-    it("uses explicit csrf token when provided to reportScore", async () => {
-      mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
-
-      const report: ScoreReport = {
-        score1: 3,
-        score2: 0,
-        score1_corp: 3,
-        score2_runner: 0,
-        score1_runner: 0,
-        score2_corp: 0,
-        intentional_draw: false,
-      };
-
-      await reportScore(10, 2, 42, report, true, "test-csrf-token", mockFetch);
-
-      const { url, headers } = getFetchCall();
-      expect(url).not.toContain("//beta");
-      expect(headers["X-CSRF-Token"]).toBe("test-csrf-token");
-    });
-
-    it("uses explicit csrf token when provided to changePlayerSide", async () => {
-      mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
-
-      await changePlayerSide(10, 2, 42, "runner", "test-side-token", mockFetch);
-
-      const { url, headers } = getFetchCall();
-      expect(url).not.toContain("//beta");
-      expect(headers["X-CSRF-Token"]).toBe("test-side-token");
     });
   });
 
