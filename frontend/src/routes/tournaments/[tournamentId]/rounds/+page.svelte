@@ -9,7 +9,7 @@
   import type { PageProps } from "./$types";
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidateAll } from "$app/navigation";
-  import { reportScore } from "../api_helper";
+  import { reportScore } from "$lib/api/beta";
 
   let { data, params }: PageProps = $props();
 

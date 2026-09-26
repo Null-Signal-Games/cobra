@@ -19,11 +19,15 @@ import {
 import type { IdentityNames } from "$lib/model/Identity";
 import { invalidateAll } from "$app/navigation";
 import {
+  deletePlayer, 
+  dropPlayer, 
+  reinstatePlayer, 
+  savePlayer, 
   saveTournament,
   setPlayerRegistrationStatus,
-  setRegistrationStatus,
-} from "../../../api_helper";
-import { deletePlayer, dropPlayer, reinstatePlayer, savePlayer, togglePlayerLock } from "$lib/api/beta";
+  setRegistrationStatus, 
+  togglePlayerLock,
+} from "$lib/api/beta";
 
 const user = userEvent.setup();
 
@@ -60,7 +64,7 @@ vi.mock("$app/navigation", () => ({
   }),
 }));
 
-vi.mock("../../../api_helper", () => ({
+vi.mock("$lib/api/beta", () => ({
   saveTournament: vi.fn((tournament: Tournament) => {
       currentTournament.swiss_deck_visibility = tournament.swiss_deck_visibility;
       currentTournament.cut_deck_visibility = tournament.cut_deck_visibility;
@@ -75,10 +79,6 @@ vi.mock("../../../api_helper", () => ({
     currentTournament.registration_closed = !open;
     return Promise.resolve(true);
   }),
-  loadDecks: vi.fn(() => Promise.resolve([])),
-}));
-
-vi.mock("$lib/api/beta", () => ({
   dropPlayer: vi.fn(() => Promise.resolve(true)),
   togglePlayerLock: vi.fn(() => Promise.resolve(true)),
   reinstatePlayer: vi.fn(() => Promise.resolve(true)),
@@ -86,6 +86,7 @@ vi.mock("$lib/api/beta", () => ({
   savePlayer: vi.fn(() => true),
   loadPlayers: vi.fn(),
   loadIdentityNames: vi.fn(),
+  loadDecks: vi.fn(() => Promise.resolve([])),
 }));
 
 function createMockTournament(overrides?: Partial<Tournament>) {

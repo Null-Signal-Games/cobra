@@ -1,11 +1,12 @@
 import { COBRA_API_SERVER } from "$app/env/public";
-import type { Card, Deck } from "$lib/model/Deck";
+import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
 import type { Player, PlayersData } from "$lib/model/Player";
+import type { ScoreReport } from "$lib/model/ScoreReport";
+import type { Stats, CutStats } from "$lib/model/Stats";
 import type { RoundTimer } from "$lib/model/Round";
 import type { Stage } from "$lib/model/Stage";
-import type { CutStats, Stats } from "$lib/model/Stats";
-import { TournamentPolicies } from "$lib/model/Tournament";
+import { Tournament, TournamentPolicies } from "$lib/model/Tournament";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 import type { TournamentData } from "./betaTypes";
 const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
@@ -24,7 +25,6 @@ export function csrfToken() {
         ?.getAttribute("content") ?? "")
     : "";
 }
-
 
 export async function loadTournament(tournamentId: number, altFetch = fetch) {
   const response = await altFetch(
@@ -311,4 +311,206 @@ export async function loadPlayers(tournamentId: number, altFetch = fetch) {
     },
   );
   return (await response.json()) as PlayersData;
+}
+
+export async function setPlayerRegistrationStatus(
+  tournamentId: number,
+  locked: boolean,
+): Promise<boolean> {
+  const path = locked
+    ? `${apiServer}/beta/tournaments/${tournamentId}/lock_player_registrations`
+    : `${apiServer}/beta/tournaments/${tournamentId}/unlock_player_registrations`;
+
+  const response = await fetch(path, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken(),
+    },
+  });
+
+  return response.status === 200;
+}
+
+export async function setRegistrationStatus(
+  tournamentId: number,
+  open: boolean,
+): Promise<boolean> {
+  const path = open
+    ? `${apiServer}/beta/tournaments/${tournamentId}/open_registration`
+    : `${apiServer}/beta/tournaments/${tournamentId}/close_registration`;
+
+  const response = await fetch(path, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken(),
+    },
+  });
+
+  return response.status === 200;
+}
+
+export async function loadDecks(tournamentId: number, playerId?: number, altFetch = fetch) {
+  const response = await altFetch(
+    playerId === undefined
+      ? `${apiServer}/beta/tournaments/${tournamentId}/players/decks`
+      : `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}/decks`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+
+  return (await response.json()) as Deck[];
+}
+
+export async function loadNrdbDecks(tournamentId: number, playerId: number, altFetch = fetch) {
+  const response = await altFetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}/nrdb_decks`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
+  if (response.status == 422) {
+    throw new Error();
+  }
+
+  return (await response.json()) as NrdbDeck[];
+}
+
+export async function saveTournament(tournament: Tournament): Promise<boolean> {
+  const response = await fetch(`${apiServer}/beta/tournaments/${tournament.id}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken(),
+    },
+    body: JSON.stringify(tournament),
+  });
+
+  if (response.status !== 200) {
+    const data = (await response.json()) as { errors?: string[] };
+    globalMessages.errors = data.errors ?? [];
+  }
+
+  return response.status === 200;
+}
+
+function resolveCsrfAndFetch(
+  csrfOrFetch?: string | typeof fetch,
+  altFetch: typeof fetch = fetch,
+): { token: string; customFetch: typeof fetch } {
+  let token = "";
+  let customFetch = altFetch;
+
+  if (typeof csrfOrFetch === "function") {
+    customFetch = csrfOrFetch;
+  } else if (typeof csrfOrFetch === "string") {
+    token = csrfOrFetch;
+  }
+
+  if (!token) {
+    token = csrfToken();
+  }
+
+  return { token, customFetch };
+}
+
+export async function changePlayerSide(
+  tournamentId: number,
+  roundId: number,
+  pairingId: number,
+  side: string,
+  csrfOrFetch?: string | typeof fetch,
+  altFetch = fetch,
+): Promise<boolean> {
+  const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
+
+  try {
+    const response = await customFetch(
+      `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-CSRF-Token": token,
+        },
+        body: JSON.stringify({ side: `player1_is_${side}` }),
+      },
+    );
+
+    if (!response.ok) {
+      globalMessages.errors.push("Failed to change player side.");
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    const err = e as Error;
+    globalMessages.errors.push(`Failed to change player side: ${err.message}`);
+    return false;
+  }
+}
+
+export async function reportScore(
+  tournamentId: number,
+  roundId: number,
+  pairingId: number,
+  data: ScoreReport,
+  selfReport: boolean,
+  csrfOrFetch?: string | typeof fetch,
+  altFetch = fetch,
+): Promise<boolean> {
+  // Remove UI-specific data to prevent parameter errors on the server
+  const cleanData = { ...data };
+  delete cleanData.label;
+  delete cleanData.extra_self_report_label;
+
+  const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
+
+  try {
+    const response = await customFetch(
+      `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-CSRF-Token": token,
+        },
+        body: JSON.stringify({
+          pairing: cleanData,
+          self_report: selfReport,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      globalMessages.errors.push("Failed to report score.");
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    const err = e as Error;
+    globalMessages.errors.push(`Failed to report score: ${err.message}`);
+    return false;
+  }
 }

@@ -25,11 +25,13 @@ import {
   createStage,
   deletePairing,
   pairRound,
-  reportScore,
-  setPlayerRegistrationStatus,
-  setRegistrationStatus,
   updateRoundTimer,
 } from "../../api_helper";
+import {
+  setPlayerRegistrationStatus,
+  setRegistrationStatus,
+  reportScore,
+} from "$lib/api/beta";
 import RoundsPage from "./+page.svelte";
 import type { PageProps } from "./$types";
 import {
@@ -76,18 +78,20 @@ const MockPageData: PageProps["data"] = {
 };
 
 vi.mock("../../api_helper", () => ({
-  loadPairings: vi.fn(),
-  changePlayerSide: vi.fn(),
-  createStage: vi.fn(),
-  setRegistrationStatus: vi.fn(),
-  setPlayerRegistrationStatus: vi.fn(),
-  pairRound: vi.fn(),
   completeRound: vi.fn(),
+  createStage: vi.fn(),
   deletePairing: vi.fn(),
+  loadPairings: vi.fn(),
+  pairRound: vi.fn(),
   updateRoundTimer: vi.fn(),
-  reportScore: vi.fn(),
 }));
 
+vi.mock("$lib/api/beta", () => ({
+  changePlayerSide: vi.fn(),
+  reportScore: vi.fn(),
+  setPlayerRegistrationStatus: vi.fn(),
+  setRegistrationStatus: vi.fn(),
+}));
 vi.mock('$app/env/public', () => {
   return {
     COBRA_API_SERVER: "http://localhost:3000"
