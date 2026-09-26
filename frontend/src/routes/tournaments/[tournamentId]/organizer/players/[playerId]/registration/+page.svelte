@@ -161,14 +161,16 @@
                 <FontAwesomeIcon icon="edit" />
                 Choose decks from your NetrunnerDB account
               </a>
-              <button
-                type="button"
-                class="btn btn-link"
-                onclick={toggleEditing}
-              >
-                <FontAwesomeIcon icon="edit" />
-                Edit decks in place
-              </button>
+              {#if corpDeck.details.id !== 0 || runnerDeck.details.id !== 0}
+                <button
+                  type="button"
+                  class="btn btn-link"
+                  onclick={toggleEditing}
+                >
+                  <FontAwesomeIcon icon="edit" />
+                  Edit decks in place
+                </button>
+              {/if}
             {/if}
           </div>
   

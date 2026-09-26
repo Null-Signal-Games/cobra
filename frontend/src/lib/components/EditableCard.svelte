@@ -27,7 +27,7 @@
     return `https://api.netrunnerdb.com/api/v3/public/printings?fields[printings]=card_id,card_type_id,title,side_id,faction_id,minimum_deck_size,influence_limit,influence_cost&filter[side_id]=${sideId}&filter[distinct_cards]=true&filter[search]=${searchString}`;
   }
 
-  function sveleteOnChange(selection: CardSearchOption | null) {
+  function svelecteOnChange(selection: CardSearchOption | null) {
     if (!selection?.value.id) {
       return;
     }
@@ -47,7 +47,7 @@
       fetchCallback={transformCardLookup}
       labelField="label"
       valueField="value"
-      onChange={sveleteOnChange}
+      onChange={svelecteOnChange}
     />
     <button
       type="button"
