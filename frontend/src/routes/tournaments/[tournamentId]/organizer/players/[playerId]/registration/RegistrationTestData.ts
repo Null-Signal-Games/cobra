@@ -68,37 +68,6 @@ export const MockPlayerBob: Player = {
   fixed_table_number: null,
 };
 
-// export const MockPlayerBobNrdbDecks: NrdbDeck[] = [
-//   {
-//     id: 1,
-//     uuid: "11111111-1111-1111-1111-111111111111",
-//     date_creation: "2026-06-13T00:00:00+00:00",
-//     date_update: "2026-06-13T00:00:00+00:00",
-//     name: "Bob's BANGUN",
-//     description: "Bob's Bangun deck",
-//     mwl_code: "",
-//     tags: "",
-//     cards: [
-//       { id: "35068", count: 1 },
-//       { id: "30075", count: 3 },
-//     ],
-//   },
-//   {
-//     id: 2,
-//     uuid: "22222222-2222-2222-2222-222222222222",
-//     date_creation: "2026-06-13T00:00:00+00:00",
-//     date_update: "2026-06-13T00:00:00+00:00",
-//     name: "Bob's Baz",
-//     description: "Bob's Baz deck",
-//     mwl_code: "",
-//     tags: "",
-//     cards: [
-//       { id: "35012", count: 1 },
-//       { id: "30030", count: 3 },
-//     ],
-//   },
-// ];
-
 export const MockPlayerBobDecks: Deck[] = [
   {
     details: {
@@ -233,43 +202,3 @@ export const MockZahyaPrinting: Printing = {
     minimum_deck_size: 40,
   },
 };
-
-// export const MockPrintings = new Map<string, Printing>([
-//   [
-//     "35068",
-//     {
-//       id: "35068",
-//       type: "printings",
-//       attributes: {
-//         card_id: "bangun_when_disaster_strikes",
-//         title: "BANGUN: When Disaster Strikes",
-//         card_type_id: "corp_identity",
-//         side_id: "corp",
-//         faction_id: "weyland_consortium",
-//         influence_cost: null,
-//         influence_limit: 15,
-//         minimum_deck_size: 45,
-//       },
-//     },
-//   ],
-//   [
-//     "30075",
-//     {
-//       id: "30075",
-//       type: "printings",
-//       attributes: {
-//         card_id: "hedge_fund",
-//         title: "Hedge Fund",
-//         card_type_id: "operation",
-//         side_id: "corp",
-//         faction_id: "neutral_corp",
-//         influence_cost: 0,
-//         influence_limit: null,
-//         minimum_deck_size: null,
-//       },
-//     },
-//   ],
-//   [MockBazPrinting.id, MockBazPrinting],
-//   [MockSureGamblePrinting.id, MockSureGamblePrinting],
-//   [MockBetaBuildPrinting.id, MockBetaBuildPrinting],
-// ]);
