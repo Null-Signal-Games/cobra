@@ -25,12 +25,10 @@ import {
   createStage,
   deletePairing,
   pairRound,
-  updateRoundTimer,
-} from "../../api_helper";
-import {
+  reportScore,
   setPlayerRegistrationStatus,
   setRegistrationStatus,
-  reportScore,
+  updateRoundTimer,
 } from "$lib/api/beta";
 import RoundsPage from "./+page.svelte";
 import type { PageProps } from "./$types";
@@ -77,20 +75,17 @@ const MockPageData: PageProps["data"] = {
   stages: [MockSwissStage],
 };
 
-vi.mock("../../api_helper", () => ({
+vi.mock("$lib/api/beta", () => ({
+  changePlayerSide: vi.fn(),
   completeRound: vi.fn(),
   createStage: vi.fn(),
   deletePairing: vi.fn(),
   loadPairings: vi.fn(),
   pairRound: vi.fn(),
-  updateRoundTimer: vi.fn(),
-}));
-
-vi.mock("$lib/api/beta", () => ({
-  changePlayerSide: vi.fn(),
   reportScore: vi.fn(),
   setPlayerRegistrationStatus: vi.fn(),
   setRegistrationStatus: vi.fn(),
+  updateRoundTimer: vi.fn(),
 }));
 vi.mock('$app/env/public', () => {
   return {

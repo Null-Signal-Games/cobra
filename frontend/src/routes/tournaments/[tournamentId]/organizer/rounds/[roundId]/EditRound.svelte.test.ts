@@ -20,16 +20,14 @@ import {
   Pairing1,
 } from "./EditRoundTestData";
 import {
+  changePlayerSide,
   completeRound,
   createPairing,
   deletePairing,
   deleteRound,
   rePairRound,
-  resetReports,
-} from "../../../api_helper";
-import {
-  changePlayerSide,
   reportScore,
+  resetReports,
 } from "$lib/api/beta";
 import type { PageProps } from "./$types";
 import { Tournament } from "$lib/model/Tournament";
@@ -66,30 +64,19 @@ export const MockPageData: PageProps["data"] = {
   player: null
 };
 
-vi.mock("../../../api_helper", () => ({
-  loadRound: vi.fn(() => MockRoundData),
-  rePairRound: vi.fn(() => true),
+vi.mock("$lib/api/beta", () => ({
+  changePlayerSide: vi.fn(() => true),
   completeRound: vi.fn(() => true),
-  deleteRound: vi.fn(() => true),
   createPairing: vi.fn(() => true),
   deletePairing: vi.fn(() => true),
-  // changePlayerSide: vi.fn(() => true),
-  // reportScore: vi.fn(() => true),
+  deleteRound: vi.fn(() => true),
+  loadRound: vi.fn(() => MockRoundData),
+  rePairRound: vi.fn(() => true),
+  reportScore: vi.fn(() => true),
   resetReports: vi.fn(() => true),
   saveSOSWeighting: vi.fn(() => true),
 }));
-vi.mock("$lib/api/beta", () => ({
-  // loadRound: vi.fn(() => MockRoundData),
-  // rePairRound: vi.fn(() => true),
-  // completeRound: vi.fn(() => true),
-  // deleteRound: vi.fn(() => true),
-  // createPairing: vi.fn(() => true),
-  // deletePairing: vi.fn(() => true),
-  changePlayerSide: vi.fn(() => true),
-  reportScore: vi.fn(() => true),
-  // resetReports: vi.fn(() => true),
-  // saveSOSWeighting: vi.fn(() => true),
-}));
+
 vi.mock('$app/env/public', () => {
   return {
     COBRA_API_SERVER: "http://localhost:3000"

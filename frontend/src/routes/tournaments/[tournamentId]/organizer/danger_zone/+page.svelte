@@ -2,7 +2,7 @@
   import type { PageProps } from "./$types";
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import DangerActionCard from "./DangerActionCard.svelte";
-  import { deleteStage, deleteTournament } from "../../api_helper";
+  import { deleteStage, deleteTournament } from "$lib/api/beta";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
   import { goto, invalidateAll } from "$app/navigation";
   import { resolve } from "$app/paths";
