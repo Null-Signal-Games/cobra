@@ -24,27 +24,6 @@ export interface RoundData {
   warnings?: string[];
 }
 
-// TODO(plural): split this into two functions and put the check into the caller.
-export async function loadPairings(
-  tournamentId: number,
-  userId: number | null = null,
-  altFetch = fetch,
-) {
-  const url = userId
-    ? `${apiServer}/tournaments/${tournamentId}/rounds/pairings_data/${userId}`
-    : `${apiServer}/beta/tournaments/${tournamentId}/rounds/pairings_data`;
-
-  const response = await altFetch(url, {
-    method: "GET",
-    credentials: "include",
-  });
-
-  const data = (await response.json()) as PairingsData;
-  globalMessages.warnings = data.warnings ?? [];
-
-  return data;
-}
-
 export async function loadStats(tournamentId: number, altFetch = fetch): Promise<Stats> {
   const response = await altFetch(
     `${apiServer}/beta/tournaments/${tournamentId}/id_and_faction_data`,

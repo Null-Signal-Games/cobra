@@ -13,12 +13,9 @@ export class PairingsData {
 
 export async function loadPairings(
   tournamentId: number,
-  userId: number | null = null,
   altFetch = fetch,
 ) {
-  const url = userId
-    ? `${apiServer}/tournaments/${tournamentId}/rounds/pairings_data/${userId}`
-    : `${apiServer}/beta/tournaments/${tournamentId}/rounds/pairings_data`;
+  const url = `${apiServer}/beta/tournaments/${tournamentId}/rounds/pairings_data`;
 
   const response = await altFetch(url, {
     method: "GET",
