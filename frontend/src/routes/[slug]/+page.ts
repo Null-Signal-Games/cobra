@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
-import { loadTournamentBySlug } from "../tournaments/api_helper";
+import { loadTournamentBySlug } from "$lib/api/v1";
 
 export const load: PageLoad = async ({ params, fetch }) => {
   const res = await loadTournamentBySlug(params.slug, fetch);

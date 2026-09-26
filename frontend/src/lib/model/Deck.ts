@@ -1,4 +1,4 @@
-import type { Printing } from "$lib/utils/api_types";
+import type { Printing } from "$lib/api/v1ApiTypes";
 
 export interface Card {
   id: number;
