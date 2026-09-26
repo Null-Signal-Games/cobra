@@ -4,7 +4,7 @@ import type { Player } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import { Tournament } from "$lib/model/Tournament";
-import type { RoundData } from "$lib/api/beta";
+import type { RoundData } from "$lib/api/betaTypes";
 
 export const MockPlayerAlice: Player = {
   id: 1,

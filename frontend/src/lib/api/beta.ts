@@ -1,31 +1,16 @@
 import { COBRA_API_SERVER } from "$app/env/public";
+import type { PairingsData, RoundData, TournamentData } from "./betaTypes";
 import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
+import type { NewPairing } from "$lib/model/Pairing";
 import { Player, type PlayersData } from "$lib/model/Player";
+import type { RoundTimer } from "$lib/model/Round";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import type { Stats, CutStats } from "$lib/model/Stats";
-import type { Round, RoundTimer } from "$lib/model/Round";
-import type { Stage } from "$lib/model/Stage";
-import { Tournament, TournamentPolicies } from "$lib/model/Tournament";
+import { Tournament } from "$lib/model/Tournament";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-import type { TournamentData } from "./betaTypes";
-import type { NewPairing } from "$lib/model/Pairing";
 
 const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
-
-export class PairingsData {
-  policy = new TournamentPolicies();
-  stages: Stage[] = [];
-  warnings?: string[] = [];
-}
-
-export interface RoundData {
-  tournament: Tournament;
-  stage: Stage;
-  round: Round;
-  policy?: TournamentPolicies;
-  warnings?: string[];
-}
 
 // TODO(plural): move this to its own library
 export function csrfToken() {

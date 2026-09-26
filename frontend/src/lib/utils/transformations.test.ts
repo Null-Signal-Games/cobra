@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { CreateMyTournamentSummary } from "./transformations";
-import type { PairingsData } from "$lib/api/beta";
+import type { PairingsData } from "$lib/api/betaTypes";
 import type { Player } from "$lib/model/Player";
 import type { Round } from "$lib/model/Round";
 

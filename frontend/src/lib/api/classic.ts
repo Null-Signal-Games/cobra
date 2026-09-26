@@ -6,7 +6,7 @@ import type { TournamentCreateErrorResponse, TournamentCreateResponse, Tournamen
 import { ValidationError, type Errors } from "$lib/utils/errors";
 import { ValidationError as StageValidationError, type SaveStageResponse, type Stage, type StageData } from "../../routes/tournaments/[tournamentId]/organizer/edit_stage/[stageId]/StageSettings";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-import type { PairingsData } from "./beta";
+import type { PairingsData } from "./betaTypes";
 const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
 
 export async function loadPairingsForUser(
@@ -135,7 +135,6 @@ export async function updateTournamentSettings(
   }
   return true;
 }
-
 
 export async function loadStage(
   tournamentId: number,
