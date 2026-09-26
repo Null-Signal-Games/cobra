@@ -6,8 +6,8 @@
   import { deckCsv, transformCardLookup } from "$lib/utils/decks.svelte";
   import { downloadBlob } from "$lib/utils/files";
   import Svelecte from "svelecte";
-  import EditableCard from "./EditableCard.svelte";
   import { getCardTypeImage } from "$lib/utils/images";
+  import EditableCard from "./EditableCard.svelte";
 
   interface CardSearchOption {
     label: string;
