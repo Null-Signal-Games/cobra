@@ -13,7 +13,6 @@
     const success = await deleteTournament(
       data.tournamentData.tournament.id,
       confirmationName,
-      data.tournamentData.csrf_token,
     );
     if (success) {
       await goto(resolve("/tournaments"));
@@ -27,7 +26,6 @@
       data.tournamentData.tournament.id,
       stageId,
       confirmationName,
-      data.tournamentData.csrf_token,
     );
     if (success) {
       globalMessages.infos = ["Stage deleted."];

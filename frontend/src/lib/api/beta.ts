@@ -1,5 +1,4 @@
 import { api } from "$lib/api/apiBase";
-import { csrfToken } from "$lib/csrf";
 import type { PairingsData, RoundData, TournamentData } from "$lib/api/betaTypes";
 import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
@@ -190,40 +189,12 @@ export const loadNrdbDecks = (
   );
 
 export async function saveTournament(tournament: Tournament): Promise<boolean> {
-  const response = await api.rawRequest(`/beta/tournaments/${tournament.id}`, "PATCH", {
-    body: tournament,
-  });
-
-  if (response.status !== 200) {
-    try {
-      const data = (await response.json()) as { errors?: string[] };
-      globalMessages.errors = data.errors ?? [];
-    } catch {
-      // ignore json parse error
-    }
+  const res = await api.patch(`/beta/tournaments/${tournament.id}`, tournament);
+  if (!res.ok) {
+    globalMessages.errors = [res.error.message];
+    return false;
   }
-
-  return response.status === 200;
-}
-
-function resolveCsrfAndFetch(
-  csrfOrFetch?: string | typeof fetch,
-  altFetch: typeof fetch = fetch,
-): { token: string; customFetch: typeof fetch } {
-  let token = "";
-  let customFetch = altFetch;
-
-  if (typeof csrfOrFetch === "function") {
-    customFetch = csrfOrFetch;
-  } else if (typeof csrfOrFetch === "string") {
-    token = csrfOrFetch;
-  }
-
-  if (!token) {
-    token = csrfToken();
-  }
-
-  return { token, customFetch };
+  return true;
 }
 
 export async function changePlayerSide(
@@ -231,33 +202,20 @@ export async function changePlayerSide(
   roundId: number,
   pairingId: number,
   side: string,
-  csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
 ): Promise<boolean> {
-  const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
+  const res = await api.post(
+    `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+    { side: `player1_is_${side}` },
+    { altFetch },
+  );
 
-  try {
-    const response = await api.rawRequest(
-      `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
-      "POST",
-      {
-        altFetch: customFetch,
-        csrfToken: token,
-        body: { side: `player1_is_${side}` },
-      },
-    );
-
-    if (!response.ok) {
-      globalMessages.errors.push("Failed to change player side.");
-      return false;
-    }
-
-    return true;
-  } catch (e) {
-    const err = e as Error;
-    globalMessages.errors.push(`Failed to change player side: ${err.message}`);
+  if (!res.ok) {
+    globalMessages.errors.push("Failed to change player side.");
     return false;
   }
+
+  return true;
 }
 
 export async function reportScore(
@@ -266,7 +224,6 @@ export async function reportScore(
   pairingId: number,
   data: ScoreReport,
   selfReport: boolean,
-  csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
 ): Promise<boolean> {
   // Remove UI-specific data to prevent parameter errors on the server
@@ -274,33 +231,21 @@ export async function reportScore(
   delete cleanData.label;
   delete cleanData.extra_self_report_label;
 
-  const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
+  const res = await api.post(
+    `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+    {
+      pairing: cleanData,
+      self_report: selfReport,
+    },
+    { altFetch },
+  );
 
-  try {
-    const response = await api.rawRequest(
-      `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
-      "POST",
-      {
-        altFetch: customFetch,
-        csrfToken: token,
-        body: {
-          pairing: cleanData,
-          self_report: selfReport,
-        },
-      },
-    );
-
-    if (!response.ok) {
-      globalMessages.errors.push("Failed to report score.");
-      return false;
-    }
-
-    return true;
-  } catch (e) {
-    const err = e as Error;
-    globalMessages.errors.push(`Failed to report score: ${err.message}`);
+  if (!res.ok) {
+    globalMessages.errors.push("Failed to report score.");
     return false;
   }
+
+  return true;
 }
 
 export const completeRound = (
@@ -325,32 +270,20 @@ export async function resetReports(
   tournamentId: number,
   roundId: number,
   pairingId: number,
-  csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
 ): Promise<boolean> {
-  const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
+  const res = await api.delete(
+    `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/reset_self_report`,
+    undefined,
+    { altFetch },
+  );
 
-  try {
-    const response = await api.rawRequest(
-      `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/reset_self_report`,
-      "DELETE",
-      {
-        altFetch: customFetch,
-        csrfToken: token,
-      },
-    );
-
-    if (!response.ok) {
-      globalMessages.errors.push("Failed to reset self report.");
-      return false;
-    }
-
-    return true;
-  } catch (e) {
-    const err = e as Error;
-    globalMessages.errors.push(`Failed to reset self report: ${err.message}`);
+  if (!res.ok) {
+    globalMessages.errors.push("Failed to reset self report.");
     return false;
   }
+
+  return true;
 }
 
 export function createStage(
@@ -389,53 +322,33 @@ async function deleteWithConfirmation(
   path: string,
   confirmationName: string,
   entityName: string,
-  csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
 ): Promise<boolean> {
-  const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
+  const res = await api.delete(path, { confirmation_name: confirmationName }, { altFetch });
 
-  try {
-    const response = await api.rawRequest(path, "DELETE", {
-      altFetch: customFetch,
-      csrfToken: token,
-      body: { confirmation_name: confirmationName },
-    });
-
-    if (!response.ok) {
-      if (response.status === 422) {
-        try {
-          const errData = (await response.json()) as { error?: string };
-          if (errData.error) {
-            globalMessages.errors.push(errData.error);
-            return false;
-          }
-        } catch {
-          // ignore json parse error
-        }
-      }
+  if (!res.ok) {
+    if (res.status === 422) {
+      globalMessages.errors.push(res.error.message);
+    } else if (res.status === 0) {
+      globalMessages.errors.push(`Failed to delete ${entityName}: ${res.error.message}`);
+    } else {
       globalMessages.errors.push(`Failed to delete ${entityName}.`);
-      return false;
     }
-
-    return true;
-  } catch (e) {
-    const err = e as Error;
-    globalMessages.errors.push(`Failed to delete ${entityName}: ${err.message}`);
     return false;
   }
+
+  return true;
 }
 
 export const deleteTournament = (
   tournamentId: number,
   confirmationName: string,
-  csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
 ): Promise<boolean> =>
   deleteWithConfirmation(
     `/beta/tournaments/${tournamentId}`,
     confirmationName,
     "tournament",
-    csrfOrFetch,
     altFetch,
   );
 
@@ -443,14 +356,12 @@ export const deleteStage = (
   tournamentId: number,
   stageId: number,
   confirmationName: string,
-  csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
 ): Promise<boolean> =>
   deleteWithConfirmation(
     `/beta/tournaments/${tournamentId}/stages/${stageId}`,
     confirmationName,
     "stage",
-    csrfOrFetch,
     altFetch,
   );
 

@@ -57,16 +57,14 @@ export const loadBrackets = (tournamentId: number, altFetch = fetch): Promise<Br
     "Failed to load bracket",
   );
 
-export const loadNewTournament = (
-  fetch: typeof globalThis.fetch,
-): Promise<TournamentSettingsData> =>
-  api.getOrThrow<TournamentSettingsData>("/tournaments/new_form", fetch);
+export const loadNewTournament = (altFetch = fetch): Promise<TournamentSettingsData> =>
+  api.getOrThrow<TournamentSettingsData>("/tournaments/new_form", altFetch);
 
 export const loadTournamentSettings = (
   tournamentId: number,
-  fetch: typeof globalThis.fetch,
+  altFetch = fetch,
 ): Promise<TournamentSettingsData> =>
-  api.getOrThrow<TournamentSettingsData>(`/tournaments/${tournamentId}/edit_form`, fetch);
+  api.getOrThrow<TournamentSettingsData>(`/tournaments/${tournamentId}/edit_form`, altFetch);
 
 export async function loadStage(
   tournamentId: number,
@@ -109,14 +107,12 @@ export async function saveStage(
   tournamentId: number,
   stage: Stage,
   altFetch = fetch,
-  token?: string,
 ): Promise<SaveStageResponse> {
   const response = await api.rawRequest(
     `/tournaments/${tournamentId}/stages/${stage.id}`,
     "PATCH",
     {
       altFetch,
-      csrfToken: token,
       body: { stage },
     },
   );

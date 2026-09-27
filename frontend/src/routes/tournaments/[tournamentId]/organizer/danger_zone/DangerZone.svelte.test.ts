@@ -132,7 +132,7 @@ describe("Danger Zone Page", () => {
     await user.click(deleteTournamentBtn);
 
     expect(confirmSpy).toHaveBeenCalledWith("Are you absolutely sure? This cannot be reversed.");
-    expect(deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle", "test-csrf-token");
+    expect(deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle");
     expect(goto).toHaveBeenCalledWith("/tournaments");
   });
 
@@ -169,7 +169,7 @@ describe("Danger Zone Page", () => {
     await user.type(tournamentInput, "Danger Noodle");
     await user.click(deleteTournamentBtn);
 
-    expect(deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle", "test-csrf-token");
+    expect(deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle");
     expect(goto).not.toHaveBeenCalled();
   });
 
@@ -192,7 +192,7 @@ describe("Danger Zone Page", () => {
     await user.click(deleteSwissBtn);
 
     expect(confirmSpy).toHaveBeenCalledWith("Are you absolutely sure? This cannot be reversed.");
-    expect(deleteStage).toHaveBeenCalledWith(1, 101, "Danger Noodle", "test-csrf-token");
+    expect(deleteStage).toHaveBeenCalledWith(1, 101, "Danger Noodle");
     expect(invalidateAll).toHaveBeenCalledOnce();
     expect(globalMessages.infos).toContain("Stage deleted.");
   });
@@ -230,7 +230,7 @@ describe("Danger Zone Page", () => {
     await user.type(elimInput, "Danger Noodle");
     await user.click(deleteElimBtn);
 
-    expect(deleteStage).toHaveBeenCalledWith(1, 102, "Danger Noodle", "test-csrf-token");
+    expect(deleteStage).toHaveBeenCalledWith(1, 102, "Danger Noodle");
     expect(invalidateAll).not.toHaveBeenCalled();
     expect(globalMessages.infos).toHaveLength(0);
   });
