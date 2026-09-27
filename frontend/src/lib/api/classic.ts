@@ -7,22 +7,10 @@ import type {
   Stage,
   StageData,
 } from "$lib/api/classicTypes";
-import { ValidationError as StageValidationError } from "$lib/api/classicTypes";
 import type { BracketData } from "$lib/model/Bracket";
 import type { StandingsData } from "$lib/model/Standings";
 import type { Tournament } from "$lib/model/Tournament";
-import { ValidationError, type Errors } from "$lib/utils/errors";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-
-async function assertOkOrValidationError(response: Response): Promise<void> {
-  if (!response.ok) {
-    if (response.status === 422) {
-      const errorData = (await response.json()) as { errors: Errors };
-      throw new ValidationError(errorData.errors);
-    }
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
-}
 
 export async function loadPairingsForUser(
   tournamentId: number,
@@ -79,53 +67,22 @@ export async function loadStage(
   return data;
 }
 
-export async function createTournament(tournament: Tournament): Promise<TournamentCreateResponse> {
-  const response = await api.rawRequest("/tournaments", "POST", {
-    headers: {
-      Accept: "application/vnd.api+json",
-      "Content-Type": "application/vnd.api+json",
-    },
-    body: { tournament },
-  });
+export const createTournament = (tournament: Tournament): Promise<TournamentCreateResponse> =>
+  api.postOrThrow<TournamentCreateResponse>("/tournaments", { tournament });
 
-  await assertOkOrValidationError(response);
-
-  return (await response.json()) as TournamentCreateResponse;
-}
-
-export async function updateTournamentSettings(tournament: Tournament): Promise<boolean> {
-  const response = await api.rawRequest(`/tournaments/${tournament.id}`, "PATCH", {
-    body: { tournament },
-  });
-
-  await assertOkOrValidationError(response);
-
+export const updateTournamentSettings = async (tournament: Tournament): Promise<boolean> => {
+  await api.patchOrThrow(`/tournaments/${tournament.id}`, { tournament });
   return true;
-}
+};
 
-export async function saveStage(
+export const saveStage = (
   tournamentId: number,
   stage: Stage,
   altFetch = fetch,
-): Promise<SaveStageResponse> {
-  const response = await api.rawRequest(
+): Promise<SaveStageResponse> =>
+  api.patchOrThrow<SaveStageResponse>(
     `/tournaments/${tournamentId}/stages/${stage.id}`,
-    "PATCH",
-    {
-      altFetch,
-      body: { stage },
-    },
+    { stage },
+    { altFetch },
   );
 
-  const saveStageResponse = (await response.json()) as SaveStageResponse;
-
-  if (!response.ok) {
-    if (response.status === 422) {
-      throw new StageValidationError(saveStageResponse.error ?? "Stage could not be updated.");
-    }
-
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
-
-  return saveStageResponse;
-}

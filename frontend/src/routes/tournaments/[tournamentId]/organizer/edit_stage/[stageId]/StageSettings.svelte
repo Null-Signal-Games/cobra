@@ -2,10 +2,10 @@
   import { onMount } from "svelte";
   import {
     StageData,
-    ValidationError,
     type SaveStageResponse,
   } from "$lib/api/classicTypes";
   import { loadStage, saveStage } from "$lib/api/classic";
+  import { ValidationError } from "$lib/utils/errors";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import TableRangeEdit from "./TableRangeEdit.svelte";
   import ModalDialog from "$lib/components/ModalDialog.svelte";
@@ -64,7 +64,7 @@
     } catch (err) {
       error =
         err instanceof ValidationError
-          ? err.errors
+          ? err.message
           : "An unexpected error occurred. Please try again.";
     } finally {
       isSubmitting = false;
