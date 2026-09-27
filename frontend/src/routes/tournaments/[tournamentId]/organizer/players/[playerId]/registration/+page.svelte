@@ -6,7 +6,7 @@
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { invalidateAll } from "$app/navigation";
-  import { savePlayer } from "../../../../../api_helper";
+  import { savePlayer } from "$lib/api/beta";
   import DeckDisplay from "$lib/components/DeckDisplay.svelte";
   import { sortCards } from "$lib/utils/decks.svelte";
 
