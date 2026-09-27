@@ -4,7 +4,7 @@
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import type { Tournament } from "$lib/model/Tournament";
   import { type Errors, ValidationError } from "$lib/utils/errors";
-  import { updateTournamentSettings } from "../../api_helper";
+  import { updateTournamentSettings } from "$lib/api/classic";
   import { invalidateAll } from "$app/navigation";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
   let { data }: PageProps = $props();

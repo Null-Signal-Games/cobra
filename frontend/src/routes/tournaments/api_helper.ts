@@ -1,38 +1,12 @@
 import { COBRA_API_SERVER } from "$app/env/public";
-import type { BracketData } from "$lib/model/Bracket";
 import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
 import { Player, type PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
-import type { StandingsData } from "$lib/model/Standings";
-import { Tournament, type FeatureFlags, type TournamentOptions } from "$lib/model/Tournament";
-import { ValidationError, type Errors } from "$lib/utils/errors";
+import { Tournament } from "$lib/model/Tournament";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
 const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
-
-export interface TournamentData {
-  tournament: Tournament,
-  csrf_token: string,
-}
-
-export interface TournamentSettingsData {
-  tournament: Tournament;
-  options: TournamentOptions;
-  feature_flags: FeatureFlags;
-  can_change_swiss_format?: boolean;
-  csrf_token: string;
-}
-
-export interface TournamentCreateResponse {
-  id: number;
-  name: string;
-  url: string;
-}
-
-export interface TournamentCreateErrorResponse {
-  errors: Errors;
-}
 
 export function csrfToken() {
   return typeof document !== "undefined"
@@ -40,6 +14,12 @@ export function csrfToken() {
         .querySelector("meta[name='csrf-token']")
         ?.getAttribute("content") ?? "")
     : "";
+}
+
+
+export interface TournamentData {
+  tournament: Tournament,
+  csrf_token: string,
 }
 
 export async function loadTournament(tournamentId: number, altFetch = fetch) {
@@ -56,47 +36,6 @@ export async function loadTournament(tournamentId: number, altFetch = fetch) {
   );
 
   return (await response.json()) as TournamentData;
-}
-
-export async function loadNewTournament(
-  fetch: typeof globalThis.fetch,
-): Promise<TournamentSettingsData> {
-  const response = await fetch(`${apiServer}/tournaments/new_form`, {
-    credentials: "include",
-    headers: { Accept: "application/json" },
-    method: "GET",
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
-  }
-
-  return (await response.json()) as TournamentSettingsData;
-}
-
-export async function createTournament(
-  csrfToken: string,
-  tournament: Tournament,
-): Promise<TournamentCreateResponse> {
-  const response = await fetch(`${apiServer}/tournaments`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      Accept: "application/vnd.api+json",
-      "Content-Type": "application/vnd.api+json",
-      "X-CSRF-Token": csrfToken,
-    },
-    body: JSON.stringify({ tournament }),
-  });
-
-  if (!response.ok) {
-    if (response.status === 422) {
-      const errorData = (await response.json()) as TournamentCreateErrorResponse;
-      throw new ValidationError(errorData.errors);
-    }
-    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
-  }
-
-  return (await response.json()) as TournamentCreateResponse;
 }
 
 export async function loadPlayer(tournamentId: number, playerId: number, altFetch = fetch) {
@@ -444,33 +383,4 @@ function cardRequestObject(card: Card) {
   const { id, deck_id, created_at, updated_at, ...newCard } = card;
 
   return newCard;
-}
-
-export async function loadStandings(tournamentId: number, altFetch = fetch): Promise<StandingsData> {
-  const response = await altFetch(
-    `${apiServer}/tournaments/${tournamentId}/players/standings_data`,
-    {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    },
-  );
-  if (!response.ok) {
-    throw new Error(`Failed to load standings: ${response.statusText}`);
-  }
-  return (await response.json()) as StandingsData;
-}
-
-
-export async function loadBrackets(tournamentId: number, altFetch = fetch): Promise<BracketData> {
-  const response = await altFetch(
-    `${apiServer}/tournaments/${tournamentId}/rounds/brackets`,
-    {
-      method: "GET",
-    },
-  );
-
-  return (await response.json()) as BracketData;
 }

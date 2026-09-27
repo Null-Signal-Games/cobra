@@ -3,7 +3,7 @@
   import TournamentSettingsForm from "../TournamentSettingsForm.svelte";
   import type { Tournament } from "$lib/model/Tournament";
   import { type Errors, ValidationError } from "$lib/utils/errors";
-  import { createTournament } from "../api_helper";
+  import { createTournament } from "$lib/api/classic";
   import { navigateTo } from "$lib/utils/navigation";
 
   let { data }: PageProps = $props();
