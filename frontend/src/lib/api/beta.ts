@@ -1,4 +1,4 @@
-import { COBRA_API_SERVER } from "$app/env/public";
+import { api } from "$lib/api/apiBase";
 import { csrfToken } from "$lib/csrf";
 import type { PairingsData, RoundData, TournamentData } from "$lib/api/betaTypes";
 import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
@@ -8,64 +8,60 @@ import { Player, type PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import type { Stats, CutStats } from "$lib/model/Stats";
-import { Tournament } from "$lib/model/Tournament";
+import type { Tournament } from "$lib/model/Tournament";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
-const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
-
-export async function loadTournament(tournamentId: number, altFetch = fetch) {
-  const response = await altFetch(
-    `${apiServer}/beta/tournaments/${tournamentId}`,
-    {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    },
-  );
-
-  return (await response.json()) as TournamentData;
+async function getOrThrow<T>(
+  path: string,
+  altFetch = fetch,
+  prefix = "",
+  token?: string,
+): Promise<T> {
+  const res = await api.get<T>(path, { altFetch, csrfToken: token });
+  if (!res.ok) {
+    throw new Error(prefix ? `${prefix}: ${res.error.message}` : res.error.message);
+  }
+  return res.data;
 }
 
-export async function loadPlayer(tournamentId: number, playerId: number, altFetch = fetch) {
-  try {
-    const response = await altFetch(
-      `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}`,
-      {
-        method: "GET",
-        credentials: "include",
-      },
-    );
+export const loadTournament = (tournamentId: number, altFetch = fetch): Promise<TournamentData> =>
+  getOrThrow<TournamentData>(`/beta/tournaments/${tournamentId}`, altFetch);
 
+export async function loadPlayer(
+  tournamentId: number,
+  playerId: number,
+  altFetch = fetch,
+): Promise<Player | null> {
+  try {
+    const res = await api.get<Player>(`/beta/tournaments/${tournamentId}/players/${playerId}`, {
+      altFetch,
+    });
+    if (!res.ok) {
+      throw res.error;
+    }
     const player = new Player();
-    Object.assign(player, await response.json());
+    Object.assign(player, res.data);
     return player;
   } catch {
-    globalMessages.errors.push(
-      `Error loading player data for player ${playerId}.`,
-    );
+    globalMessages.errors.push(`Error loading player data for player ${playerId}.`);
     return null;
   }
 }
 
-export async function loadPlayerByUserId(tournamentId: number, userId: number, altFetch = fetch) {
+export async function loadPlayerByUserId(
+  tournamentId: number,
+  userId: number,
+  altFetch = fetch,
+): Promise<Player | null> {
   try {
-    const response = await altFetch(
-      `${apiServer}/beta/tournaments/${tournamentId}/players/by_user_id/${userId}`,
-      {
-        method: "GET",
-        credentials: "include",
-      },
+    return await getOrThrow<Player>(
+      `/beta/tournaments/${tournamentId}/players/by_user_id/${userId}`,
+      altFetch,
     );
-
-    return (await response.json()) as Player;
   } catch {
     globalMessages.errors.push(`Error loading player data for user ${userId}.`);
+    return null;
   }
-  
-  return null;
 }
 
 // TODO(plural): Find a new home for this.
@@ -79,26 +75,14 @@ function playerRequestObject(player: Player) {
     first_round_bye: player.first_round_bye,
     manual_seed: player.manual_seed,
     fixed_table_number: player.fixed_table_number,
-    corp_deck: player.corp_deck
-      ? deckRequestObject(player.corp_deck)
-      : undefined,
-    runner_deck: player.runner_deck
-      ? deckRequestObject(player.runner_deck)
-      : undefined,
+    corp_deck: player.corp_deck ? deckRequestObject(player.corp_deck) : undefined,
+    runner_deck: player.runner_deck ? deckRequestObject(player.runner_deck) : undefined,
   };
 }
 
 // TODO(plural): Find a new home for this.
 function deckRequestObject(deck: Deck) {
-  const {
-    id,
-    user_id,
-    player_id,
-    player_name,
-    created_at,
-    updated_at,
-    ...details
-  } = deck.details;
+  const { id, user_id, player_id, player_name, created_at, updated_at, ...details } = deck.details;
 
   return {
     details: details,
@@ -133,7 +117,7 @@ export async function savePlayer(
   let token = "";
   let tournamentId: number;
   let player: Player;
-  let organizerView : boolean;
+  let organizerView: boolean;
 
   if (typeof arg1 === "string") {
     token = arg1;
@@ -146,22 +130,16 @@ export async function savePlayer(
     organizerView = typeof arg3 === "boolean" ? arg3 : false;
   }
 
-  const route =
+  const path =
     player.id === 0
-      ? `${apiServer}/beta/tournaments/${tournamentId}/players`
-      : `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}`;
-  const response = await fetch(route, {
-    method: player.id === 0 ? "POST" : "PATCH",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-CSRF-Token": token || csrfToken(),
-    },
-    body: JSON.stringify({
+      ? `/beta/tournaments/${tournamentId}/players`
+      : `/beta/tournaments/${tournamentId}/players/${player.id}`;
+  const response = await api.rawRequest(path, player.id === 0 ? "POST" : "PATCH", {
+    csrfToken: token || undefined,
+    body: {
       player: playerRequestObject(player),
       organiser_view: organizerView,
-    }),
+    },
   });
 
   const result = (await response.json()) as {
@@ -173,246 +151,108 @@ export async function savePlayer(
   return result.player;
 }
 
-export async function reinstatePlayer(tournamentId: number, player: Player) {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}/reinstate`,
-    {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-      body: JSON.stringify({ player: playerRequestObject(player) }),
-    },
-  );
-
-  return response.status === 200;
-}
-
-export async function deletePlayer(tournamentId: number, player: Player) {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}`,
-    {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-      body: JSON.stringify({ player: playerRequestObject(player) }),
-    },
-  );
-
-  return response.status === 200;
-}
-
-export async function togglePlayerLock(tournamentId: number, player: Player) {
-  const route = player.registration_locked
-    ? `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}/unlock_registration`
-    : `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}/lock_registration`;
-  const response = await fetch(route, {
-    method: "PATCH",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-CSRF-Token": csrfToken(),
-    },
-    body: JSON.stringify({ player: playerRequestObject(player) }),
+export const reinstatePlayer = (tournamentId: number, player: Player): Promise<boolean> =>
+  api.patchAction(`/beta/tournaments/${tournamentId}/players/${player.id}/reinstate`, {
+    player: playerRequestObject(player),
   });
 
-  return response.status === 200;
-}
-
-export async function dropPlayer(tournamentId: number, player: Player) {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/players/${player.id}/drop`,
-    {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-      body: JSON.stringify({ player: playerRequestObject(player) }),
-    },
-  );
-
-  return response.status === 200;
-}
-
-export async function loadPairings(
-  tournamentId: number,
-  altFetch = fetch,
-) {
-  const url = `${apiServer}/beta/tournaments/${tournamentId}/rounds/pairings_data`;
-
-  const response = await altFetch(url, {
-    method: "GET",
-    credentials: "include",
+export const deletePlayer = (tournamentId: number, player: Player): Promise<boolean> =>
+  api.deleteAction(`/beta/tournaments/${tournamentId}/players/${player.id}`, {
+    player: playerRequestObject(player),
   });
 
-  const data = (await response.json()) as PairingsData;
+export function togglePlayerLock(tournamentId: number, player: Player): Promise<boolean> {
+  const action = player.registration_locked ? "unlock_registration" : "lock_registration";
+  return api.patchAction(`/beta/tournaments/${tournamentId}/players/${player.id}/${action}`, {
+    player: playerRequestObject(player),
+  });
+}
+
+export const dropPlayer = (tournamentId: number, player: Player): Promise<boolean> =>
+  api.patchAction(`/beta/tournaments/${tournamentId}/players/${player.id}/drop`, {
+    player: playerRequestObject(player),
+  });
+
+export async function loadPairings(tournamentId: number, altFetch = fetch): Promise<PairingsData> {
+  const data = await getOrThrow<PairingsData>(
+    `/beta/tournaments/${tournamentId}/rounds/pairings_data`,
+    altFetch,
+  );
   globalMessages.warnings = data.warnings ?? [];
-
   return data;
 }
 
-export async function loadStats(tournamentId: number, altFetch = fetch): Promise<Stats> {
-  const response = await altFetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/id_and_faction_data`,
-    {
-      method: "GET",
-    },
+export const loadStats = (tournamentId: number, altFetch = fetch): Promise<Stats> =>
+  getOrThrow<Stats>(`/beta/tournaments/${tournamentId}/id_and_faction_data`, altFetch);
+
+export const loadCutStats = (tournamentId: number, altFetch = fetch): Promise<CutStats> =>
+  getOrThrow<CutStats>(`/beta/tournaments/${tournamentId}/cut_conversion_rates`, altFetch);
+
+export const loadCurrentRoundTimer = (
+  tournamentId: number,
+  csrfToken?: string,
+  altFetch = fetch,
+): Promise<RoundTimer> =>
+  getOrThrow<RoundTimer>(
+    `/beta/tournaments/${tournamentId}/current_round_timer`,
+    altFetch,
+    "",
+    csrfToken,
   );
 
-  return (await response.json()) as Stats;
-}
+export const loadIdentityNames = (altFetch = fetch): Promise<IdentityNames> =>
+  getOrThrow<IdentityNames>("/beta/identities", altFetch);
 
-export async function loadCutStats(tournamentId: number, altFetch = fetch): Promise<CutStats> {
-  const response = await altFetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/cut_conversion_rates`,
-    {
-      method: "GET",
-    },
-  );
+export const loadPlayers = (tournamentId: number, altFetch = fetch): Promise<PlayersData> =>
+  getOrThrow<PlayersData>(`/beta/tournaments/${tournamentId}/players/players_data`, altFetch);
 
-  return (await response.json()) as CutStats;
-}
-
-export async function loadCurrentRoundTimer(tournamentId: number, csrfToken?: string, altFetch = fetch) {
-  const response = await altFetch(`${apiServer}/beta/tournaments/${tournamentId}/current_round_timer`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-CSRF-Token": csrfToken ?? "",
-    },
-  });
-
-  return (await response.json()) as RoundTimer;
-}
-
-export async function loadIdentityNames(altFetch = fetch) {
-  const response = await altFetch(`${apiServer}/beta/identities`, {
-    method: "GET",
-  });
-
-  return (await response.json()) as IdentityNames;
-}
-
-export async function loadPlayers(tournamentId: number, altFetch = fetch) {
-  const response = await altFetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/players/players_data`,
-    {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    },
-  );
-  return (await response.json()) as PlayersData;
-}
-
-export async function setPlayerRegistrationStatus(
+export function setPlayerRegistrationStatus(
   tournamentId: number,
   locked: boolean,
 ): Promise<boolean> {
-  const path = locked
-    ? `${apiServer}/beta/tournaments/${tournamentId}/lock_player_registrations`
-    : `${apiServer}/beta/tournaments/${tournamentId}/unlock_player_registrations`;
-
-  const response = await fetch(path, {
-    method: "PATCH",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-CSRF-Token": csrfToken(),
-    },
-  });
-
-  return response.status === 200;
+  const action = locked ? "lock_player_registrations" : "unlock_player_registrations";
+  return api.patchAction(`/beta/tournaments/${tournamentId}/${action}`);
 }
 
-export async function setRegistrationStatus(
+export function setRegistrationStatus(tournamentId: number, open: boolean): Promise<boolean> {
+  const action = open ? "open_registration" : "close_registration";
+  return api.patchAction(`/beta/tournaments/${tournamentId}/${action}`);
+}
+
+export function loadDecks(
   tournamentId: number,
-  open: boolean,
-): Promise<boolean> {
-  const path = open
-    ? `${apiServer}/beta/tournaments/${tournamentId}/open_registration`
-    : `${apiServer}/beta/tournaments/${tournamentId}/close_registration`;
-
-  const response = await fetch(path, {
-    method: "PATCH",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-CSRF-Token": csrfToken(),
-    },
-  });
-
-  return response.status === 200;
-}
-
-export async function loadDecks(tournamentId: number, playerId?: number, altFetch = fetch) {
-  const response = await altFetch(
+  playerId?: number,
+  altFetch = fetch,
+): Promise<Deck[]> {
+  const path =
     playerId === undefined
-      ? `${apiServer}/beta/tournaments/${tournamentId}/players/decks`
-      : `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}/decks`,
-    {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    },
-  );
-
-  return (await response.json()) as Deck[];
+      ? `/beta/tournaments/${tournamentId}/players/decks`
+      : `/beta/tournaments/${tournamentId}/players/${playerId}/decks`;
+  return getOrThrow<Deck[]>(path, altFetch);
 }
 
-export async function loadNrdbDecks(tournamentId: number, playerId: number, altFetch = fetch) {
-  const response = await altFetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}/nrdb_decks`,
-    {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    },
+export const loadNrdbDecks = (
+  tournamentId: number,
+  playerId: number,
+  altFetch = fetch,
+): Promise<NrdbDeck[]> =>
+  getOrThrow<NrdbDeck[]>(
+    `/beta/tournaments/${tournamentId}/players/${playerId}/nrdb_decks`,
+    altFetch,
   );
-  if (response.status == 422) {
-    throw new Error();
-  }
-
-  return (await response.json()) as NrdbDeck[];
-}
 
 export async function saveTournament(tournament: Tournament): Promise<boolean> {
-  const response = await fetch(`${apiServer}/beta/tournaments/${tournament.id}`, {
-    method: "PATCH",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-CSRF-Token": csrfToken(),
-    },
-    body: JSON.stringify(tournament),
+  const response = await api.rawRequest(`/beta/tournaments/${tournament.id}`, "PATCH", {
+    body: tournament,
   });
 
   if (response.status !== 200) {
-    const data = (await response.json()) as { errors?: string[] };
-    globalMessages.errors = data.errors ?? [];
+    try {
+      const data = (await response.json()) as { errors?: string[] };
+      globalMessages.errors = data.errors ?? [];
+    } catch {
+      // ignore json parse error
+    }
   }
 
   return response.status === 200;
@@ -449,17 +289,13 @@ export async function changePlayerSide(
   const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
 
   try {
-    const response = await customFetch(
-      `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+    const response = await api.rawRequest(
+      `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+      "POST",
       {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRF-Token": token,
-        },
-        body: JSON.stringify({ side: `player1_is_${side}` }),
+        altFetch: customFetch,
+        csrfToken: token,
+        body: { side: `player1_is_${side}` },
       },
     );
 
@@ -493,20 +329,16 @@ export async function reportScore(
   const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
 
   try {
-    const response = await customFetch(
-      `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+    const response = await api.rawRequest(
+      `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
+      "POST",
       {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRF-Token": token,
-        },
-        body: JSON.stringify({
+        altFetch: customFetch,
+        csrfToken: token,
+        body: {
           pairing: cleanData,
           self_report: selfReport,
-        }),
+        },
       },
     );
 
@@ -523,28 +355,12 @@ export async function reportScore(
   }
 }
 
-
-export async function completeRound(
+export const completeRound = (
   tournamentId: number,
   roundId: number,
   completed: boolean,
-): Promise<boolean> {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/complete`,
-    {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-      body: JSON.stringify({ completed: completed }),
-    },
-  );
-
-  return response.status === 200;
-}
+): Promise<boolean> =>
+  api.patchAction(`/beta/tournaments/${tournamentId}/rounds/${roundId}/complete`, { completed });
 
 export async function updateRoundTimer(
   csrfToken: string,
@@ -553,24 +369,14 @@ export async function updateRoundTimer(
   length_minutes: number,
   operation: string,
 ): Promise<boolean> {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/update_timer`,
+  return api.patchAction(
+    `/beta/tournaments/${tournamentId}/rounds/${roundId}/update_timer`,
     {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken,
-      },
-      body: JSON.stringify({
-        length_minutes: length_minutes,
-        operation: operation,
-      }),
+      length_minutes,
+      operation,
     },
+    { csrfToken: csrfToken || undefined },
   );
-
-  return response.status === 200;
 }
 
 export async function resetReports(
@@ -583,16 +389,12 @@ export async function resetReports(
   const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
 
   try {
-    const response = await customFetch(
-      `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/reset_self_report`,
+    const response = await api.rawRequest(
+      `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/reset_self_report`,
+      "DELETE",
       {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRF-Token": token,
-        },
+        altFetch: customFetch,
+        csrfToken: token,
       },
     );
 
@@ -614,90 +416,48 @@ export async function createStage(
   tournamentId: number,
   cutSingleElim?: boolean,
   cutCount?: number,
-) {
+): Promise<boolean> {
   const isCut = cutSingleElim !== undefined && cutCount !== undefined;
   const path = isCut
-    ? `${apiServer}/beta/tournaments/${tournamentId}/cut`
-    : `${apiServer}/beta/tournaments/${tournamentId}/stages`;
+    ? `/beta/tournaments/${tournamentId}/cut`
+    : `/beta/tournaments/${tournamentId}/stages`;
   const body = isCut
     ? { number: cutCount, ...(cutSingleElim && { elimination_type: "single" }) }
     : null;
 
-  const response = await fetch(path, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-CSRF-Token": csrfToken,
-    },
-    body: JSON.stringify(body),
-  });
-
-  return response.status === 200;
+  return api.postAction(path, body, { csrfToken: csrfToken || undefined });
 }
 
-export async function createPairing(
+export const createPairing = (
   tournamentId: number,
   roundId: number,
   newPairing: NewPairing,
-): Promise<boolean> {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings`,
-    {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-      body: JSON.stringify({ pairing: newPairing }),
-    },
-  );
+): Promise<boolean> =>
+  api.postAction(`/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings`, {
+    pairing: newPairing,
+  });
 
-  return response.status === 200;
-}
-
-export async function deletePairing(
+export const deletePairing = (
   tournamentId: number,
   roundId: number,
   pairingId: number,
-): Promise<boolean> {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}`,
-    {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-    },
-  );
+): Promise<boolean> =>
+  api.deleteAction(`/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}`);
 
-  return response.status === 200;
-}
-
-export async function deleteTournament(
-  tournamentId: number,
+async function deleteWithConfirmation(
+  path: string,
   confirmationName: string,
+  entityName: string,
   csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
 ): Promise<boolean> {
   const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
 
   try {
-    const response = await customFetch(`${apiServer}/beta/tournaments/${tournamentId}`, {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": token,
-      },
-      body: JSON.stringify({ confirmation_name: confirmationName }),
+    const response = await api.rawRequest(path, "DELETE", {
+      altFetch: customFetch,
+      csrfToken: token,
+      body: { confirmation_name: confirmationName },
     });
 
     if (!response.ok) {
@@ -712,160 +472,74 @@ export async function deleteTournament(
           // ignore json parse error
         }
       }
-      globalMessages.errors.push("Failed to delete tournament.");
+      globalMessages.errors.push(`Failed to delete ${entityName}.`);
       return false;
     }
 
     return true;
   } catch (e) {
     const err = e as Error;
-    globalMessages.errors.push(`Failed to delete tournament: ${err.message}`);
+    globalMessages.errors.push(`Failed to delete ${entityName}: ${err.message}`);
     return false;
   }
 }
 
-export async function deleteStage(
+export const deleteTournament = (
+  tournamentId: number,
+  confirmationName: string,
+  csrfOrFetch?: string | typeof fetch,
+  altFetch = fetch,
+): Promise<boolean> =>
+  deleteWithConfirmation(
+    `/beta/tournaments/${tournamentId}`,
+    confirmationName,
+    "tournament",
+    csrfOrFetch,
+    altFetch,
+  );
+
+export const deleteStage = (
   tournamentId: number,
   stageId: number,
   confirmationName: string,
   csrfOrFetch?: string | typeof fetch,
   altFetch = fetch,
-): Promise<boolean> {
-  const { token, customFetch } = resolveCsrfAndFetch(csrfOrFetch, altFetch);
-
-  try {
-    const response = await customFetch(
-      `${apiServer}/beta/tournaments/${tournamentId}/stages/${stageId}`,
-      {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-CSRF-Token": token,
-        },
-        body: JSON.stringify({ confirmation_name: confirmationName }),
-      },
-    );
-
-    if (!response.ok) {
-      if (response.status === 422) {
-        try {
-          const errData = (await response.json()) as { error?: string };
-          if (errData.error) {
-            globalMessages.errors.push(errData.error);
-            return false;
-          }
-        } catch {
-          // ignore json parse error
-        }
-      }
-      globalMessages.errors.push("Failed to delete stage.");
-      return false;
-    }
-
-    return true;
-  } catch (e) {
-    const err = e as Error;
-    globalMessages.errors.push(`Failed to delete stage: ${err.message}`);
-    return false;
-  }
-}
+): Promise<boolean> =>
+  deleteWithConfirmation(
+    `/beta/tournaments/${tournamentId}/stages/${stageId}`,
+    confirmationName,
+    "stage",
+    csrfOrFetch,
+    altFetch,
+  );
 
 export async function loadRound(
   tournamentId: number,
   roundId: number,
   altFetch = fetch,
 ): Promise<RoundData> {
-  const response = await altFetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/round_data`,
-    {
-      method: "GET",
-      credentials: "include",
-    },
+  const data = await getOrThrow<RoundData>(
+    `/beta/tournaments/${tournamentId}/rounds/${roundId}/round_data`,
+    altFetch,
   );
-
-  const data = (await response.json()) as RoundData;
   globalMessages.warnings = data.warnings ?? [];
-
   return data;
 }
 
-export async function pairRound(csrfToken: string, tournamentId: number) {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/rounds`,
-    {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken
-      },
-    },
-  );
+export const pairRound = (csrfToken: string, tournamentId: number): Promise<boolean> =>
+  api.postAction(`/beta/tournaments/${tournamentId}/rounds`, undefined, {
+    csrfToken: csrfToken || undefined,
+  });
 
-  return response.status === 200;
-}
+export const rePairRound = (tournamentId: number, roundId: number): Promise<boolean> =>
+  api.patchAction(`/beta/tournaments/${tournamentId}/rounds/${roundId}/repair`);
 
-export async function rePairRound(
-  tournamentId: number,
-  roundId: number,
-): Promise<boolean> {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}/repair`,
-    {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-    },
-  );
+export const deleteRound = (tournamentId: number, roundId: number): Promise<boolean> =>
+  api.deleteAction(`/beta/tournaments/${tournamentId}/rounds/${roundId}`);
 
-  return response.status === 200;
-}
-
-export async function deleteRound(
-  tournamentId: number,
-  roundId: number,
-): Promise<boolean> {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}`,
-    {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-    },
-  );
-
-  return response.status === 200;
-}
-
-export async function saveSOSWeighting(
+export const saveSOSWeighting = (
   tournamentId: number,
   roundId: number,
   weight: number,
-): Promise<boolean> {
-  const response = await fetch(
-    `${apiServer}/beta/tournaments/${tournamentId}/rounds/${roundId}`,
-    {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-      body: JSON.stringify({ weight: weight }),
-    },
-  );
-
-  return response.status === 200;
-}
+): Promise<boolean> =>
+  api.patchAction(`/beta/tournaments/${tournamentId}/rounds/${roundId}`, { weight });
