@@ -7,9 +7,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import TournamentCreation from "./+page.svelte";
 import { navigateTo } from "$lib/utils/navigation";
 
-// Mock the TournamentSettings module
-vi.mock("../api_helper", () => ({
-  loadNewTournament: vi.fn(),
+vi.mock("$app/env/public", () => ({
+  COBRA_API_SERVER: "http://localhost:3000",
+}));
+
+vi.mock("$lib/api/classic", () => ({
   createTournament: vi.fn(),
 }));
 
@@ -83,7 +85,7 @@ describe("TournamentCreation", () => {
   });
 
   it("successfully creates a tournament", async () => {
-    const { createTournament } = await import("../api_helper");
+    const { createTournament } = await import("$lib/api/classic");
     const mockResponse = {
       id: 123,
       name: "Test Tournament",
@@ -123,7 +125,7 @@ describe("TournamentCreation", () => {
   });
 
   it("handles validation errors", async () => {
-    const { createTournament } = await import("../api_helper");
+    const { createTournament } = await import("$lib/api/classic");
     const validationError = new ValidationError({
       name: ["Name is required"],
       date: ["Date must be in the future"],
@@ -144,14 +146,12 @@ describe("TournamentCreation", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Name is required")).toBeInTheDocument();
-      expect(
-        screen.getByText("Date must be in the future"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Date must be in the future")).toBeInTheDocument();
     });
   });
 
   it("handles unexpected errors", async () => {
-    const { createTournament } = await import("../api_helper");
+    const { createTournament } = await import("$lib/api/classic");
     vi.mocked(createTournament).mockRejectedValue(new Error("Network error"));
 
     render(TournamentCreation, { props: createProps() });
@@ -167,14 +167,12 @@ describe("TournamentCreation", () => {
     await fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/an unexpected error occurred/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/an unexpected error occurred/i)).toBeInTheDocument();
     });
   });
 
   it("disables submit button while submitting", async () => {
-    const { createTournament } = await import("../api_helper");
+    const { createTournament } = await import("$lib/api/classic");
     // Make createTournament hang to test loading state
     vi.mocked(createTournament).mockImplementation(
       () =>

@@ -1,5 +1,5 @@
 import type { PageLoad } from "./$types";
-import { loadStage } from "./StageSettings";
+import { loadStage } from "$lib/api/classic";
 
 export const load: PageLoad = async ({ params, fetch, parent }) => {
   await parent();

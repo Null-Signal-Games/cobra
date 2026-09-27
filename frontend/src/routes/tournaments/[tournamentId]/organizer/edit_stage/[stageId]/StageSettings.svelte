@@ -3,10 +3,9 @@
   import {
     StageData,
     ValidationError,
-    loadStage,
-    saveStage,
     type SaveStageResponse,
   } from "./StageSettings";
+  import { loadStage, saveStage } from "$lib/api/classic";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import TableRangeEdit from "./TableRangeEdit.svelte";
   import ModalDialog from "$lib/components/ModalDialog.svelte";

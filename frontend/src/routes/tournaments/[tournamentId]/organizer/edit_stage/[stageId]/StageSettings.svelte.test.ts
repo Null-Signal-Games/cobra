@@ -6,10 +6,9 @@ import TableRangeEdit from "./TableRangeEdit.svelte";
 import {
   StageData,
   ValidationError,
-  loadStage,
-  saveStage,
   type Stage,
 } from "./StageSettings";
+import { loadStage, saveStage } from "$lib/api/classic"
 
 vi.mock("$app/env/public", () => ({
   COBRA_API_SERVER: "http://localhost:3000",

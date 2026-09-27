@@ -1,5 +1,5 @@
 import type { PageLoad } from "./$types";
-import { loadTournamentSettings } from "../../api_helper";
+import { loadTournamentSettings } from "$lib/api/classic";
 
 export const load: PageLoad = async ({ params, fetch, parent }) => {
   await parent(); // Ensures organizer authorization in +layout.ts runs first
