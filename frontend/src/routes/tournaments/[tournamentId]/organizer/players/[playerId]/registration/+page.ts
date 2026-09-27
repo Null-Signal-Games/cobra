@@ -1,6 +1,6 @@
 import { Deck } from "$lib/model/Deck";
 import { sortCards } from "$lib/utils/decks.svelte";
-import { loadDecks, loadPlayer } from "../../../../../api_helper";
+import { loadDecks, loadPlayer } from "$lib/api/beta";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ params, fetch }) => {
