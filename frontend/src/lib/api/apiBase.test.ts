@@ -81,12 +81,12 @@ describe("URL resolution", () => {
     it("returns StatusOr with error on bad JSON data", async () => {
       mockFetch.mockResolvedValueOnce(new Response("i am not JSON", { status: 200 }));
 
-      const res: StatusOr<typeof data> = await api.get<typeof data>("/items/1");
+      const res = await api.get("/items/1");
 
       expect(res.ok).toBe(false);
       expect(res.status).toBe(200);
       expect(res.error).toBeDefined();
-      expect(res.error.message).toContain("is not valid JSON");
+      expect(res.error?.message).toContain("is not valid JSON");
       expect(res.data).toBeUndefined();
     });
 
@@ -99,7 +99,7 @@ describe("URL resolution", () => {
 
       expect(res.ok).toBe(false);
       expect(res.status).toBe(404);
-      expect(res.error.message).toContain("Item not found");
+      expect(res.error?.message).toContain("Item not found");
       expect(res.data).toBeUndefined();
     });
 
@@ -110,7 +110,7 @@ describe("URL resolution", () => {
 
       expect(res.ok).toBe(false);
       expect(res.status).toBe(0);
-      expect(res.error.message).toBe("Network failed");
+      expect(res.error?.message).toBe("Network failed");
     });
   });
 
@@ -146,7 +146,7 @@ describe("URL resolution", () => {
 
       expect(res.ok).toBe(false);
       expect(res.status).toBe(422);
-      expect(res.error.message).toBe("Confirmation name does not match the tournament name");
+      expect(res.error?.message).toBe("Confirmation name does not match the tournament name");
     });
 
     it("handles 204 No Content with undefined data", async () => {
