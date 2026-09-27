@@ -9,7 +9,7 @@ import {
 } from "@testing-library/svelte";
 import Registration from "./+page.svelte";
 import { Deck, type NrdbDeck } from "$lib/model/Deck";
-import { savePlayer } from "../../api_helper";
+import { savePlayer } from "$lib/api/beta";
 import { convertNrdbDeck } from "$lib/utils/decks.svelte";
 import type { PageProps } from "./$types";
 import {
@@ -29,6 +29,9 @@ vi.mock('$app/env/public', () => {
 vi.mock("../../api_helper", () => ({
   loadDecks: vi.fn(() => true),
   loadTournament: vi.fn(() => true),
+}));
+
+vi.mock("$lib/api/beta", () => ({
   savePlayer: vi.fn(() => true),
 }));
 

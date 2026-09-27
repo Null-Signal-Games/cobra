@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Deck } from "$lib/model/Deck";
   import { Identity } from "$lib/model/Identity";
-  import { savePlayer } from "../../api_helper";
+import { savePlayer } from "$lib/api/beta";
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import ProgressButton from "$lib/components/ProgressButton.svelte";

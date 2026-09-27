@@ -14,7 +14,7 @@ import { Player } from "$lib/model/Player";
 import type { ComponentProps } from "svelte";
 import { authStore } from "$lib/utils/auth.svelte";
 import { page } from "$app/state";
-import { savePlayer } from "../api_helper";
+import { savePlayer } from "$lib/api/beta";
 
 export const MockTournament = new Tournament({
   id: 1,
@@ -86,9 +86,12 @@ export const MockPlayerBob: Player = {
 };
 
 vi.mock("../api_helper", () => ({
-  loadTournament: vi.fn(),
-  loadPlayerByUserId: vi.fn(),
   loadIdentityNames: vi.fn(() => MockIdentityNames),
+}));
+
+vi.mock("$lib/api/beta", () => ({
+  loadPlayerByUserId: vi.fn(),
+  loadTournament: vi.fn(),
   savePlayer: vi.fn(),
 }));
 

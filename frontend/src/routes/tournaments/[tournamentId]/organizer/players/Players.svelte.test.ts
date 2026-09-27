@@ -19,15 +19,11 @@ import {
 import type { IdentityNames } from "$lib/model/Identity";
 import { invalidateAll } from "$app/navigation";
 import {
-  deletePlayer,
-  dropPlayer,
-  reinstatePlayer,
-  savePlayer,
   saveTournament,
   setPlayerRegistrationStatus,
   setRegistrationStatus,
-  togglePlayerLock,
 } from "../../../api_helper";
+import { deletePlayer, dropPlayer, reinstatePlayer, savePlayer, togglePlayerLock } from "$lib/api/beta";
 
 const user = userEvent.setup();
 
@@ -36,6 +32,10 @@ let mockAlice: Player;
 let mockBob: Player;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let rerenderFn: ((props: any) => Promise<void>) | null = null;
+
+vi.mock("$app/env/public", () => ({
+  COBRA_API_SERVER: "http://localhost:3000",
+}));
 
 vi.mock("$app/navigation", () => ({
   invalidateAll: vi.fn(async () => {
@@ -75,14 +75,17 @@ vi.mock("../../../api_helper", () => ({
     currentTournament.registration_closed = !open;
     return Promise.resolve(true);
   }),
-  reinstatePlayer: vi.fn(() => Promise.resolve(true)),
-  savePlayer: vi.fn(() => Promise.resolve(new Player())),
-  deletePlayer: vi.fn(() => Promise.resolve(true)),
-  togglePlayerLock: vi.fn(() => Promise.resolve(true)),
-  dropPlayer: vi.fn(() => Promise.resolve(true)),
   loadDecks: vi.fn(() => Promise.resolve([])),
   loadPlayers: vi.fn(),
   loadIdentityNames: vi.fn(),
+}));
+
+vi.mock("$lib/api/beta", () => ({
+  dropPlayer: vi.fn(() => Promise.resolve(true)),
+  togglePlayerLock: vi.fn(() => Promise.resolve(true)),
+  reinstatePlayer: vi.fn(() => Promise.resolve(true)),
+  deletePlayer: vi.fn(() => Promise.resolve(true)),
+  savePlayer: vi.fn(() => true),
 }));
 
 function createMockTournament(overrides?: Partial<Tournament>) {
