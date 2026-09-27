@@ -85,11 +85,8 @@ export const MockPlayerBob: Player = {
   fixed_table_number: null,
 };
 
-vi.mock("../api_helper", () => ({
-  loadIdentityNames: vi.fn(() => MockIdentityNames),
-}));
-
 vi.mock("$lib/api/beta", () => ({
+  loadIdentityNames: vi.fn(() => MockIdentityNames),
   loadPlayerByUserId: vi.fn(),
   loadTournament: vi.fn(),
   savePlayer: vi.fn(),

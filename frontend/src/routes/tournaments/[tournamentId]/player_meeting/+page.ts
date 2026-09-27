@@ -1,5 +1,5 @@
 import type { PageLoad } from "./$types";
-import { loadPlayers } from "../../api_helper";
+import { loadPlayers } from "$lib/api/beta";
 
 export const load: PageLoad = async ({ params, fetch, parent, url }) => {
   await parent();

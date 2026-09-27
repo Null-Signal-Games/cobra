@@ -8,8 +8,7 @@
   import ProgressButton from "$lib/components/ProgressButton.svelte";
   import Identity from "$lib/components/identity/Identity.svelte";
   import { onMount } from "svelte";
-  import { loadIdentityNames } from "../api_helper";
-  import { savePlayer as savePlayerRequest } from "$lib/api/beta";
+  import { loadIdentityNames, savePlayer as savePlayerRequest } from "$lib/api/beta";
   import { navigateTo } from "$lib/utils/navigation";
   import { authStore } from "$lib/utils/auth.svelte";
 

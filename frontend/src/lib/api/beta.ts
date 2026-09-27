@@ -1,6 +1,8 @@
 import { COBRA_API_SERVER } from "$app/env/public";
 import type { Card, Deck } from "$lib/model/Deck";
-import type { Player } from "$lib/model/Player";
+import type { IdentityNames } from "$lib/model/Identity";
+import type { Player, PlayersData } from "$lib/model/Player";
+import type { RoundTimer } from "$lib/model/Round";
 import type { Stage } from "$lib/model/Stage";
 import type { CutStats, Stats } from "$lib/model/Stats";
 import { TournamentPolicies } from "$lib/model/Tournament";
@@ -272,4 +274,41 @@ export async function loadCutStats(tournamentId: number, altFetch = fetch): Prom
   );
 
   return (await response.json()) as CutStats;
+}
+
+export async function loadCurrentRoundTimer(tournamentId: number, csrfToken?: string, altFetch = fetch) {
+  const response = await altFetch(`${apiServer}/beta/tournaments/${tournamentId}/current_round_timer`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": csrfToken ?? "",
+    },
+  });
+
+  return (await response.json()) as RoundTimer;
+}
+
+export async function loadIdentityNames(altFetch = fetch) {
+  const response = await altFetch(`${apiServer}/beta/identities`, {
+    method: "GET",
+  });
+
+  return (await response.json()) as IdentityNames;
+}
+
+export async function loadPlayers(tournamentId: number, altFetch = fetch) {
+  const response = await altFetch(
+    `${apiServer}/beta/tournaments/${tournamentId}/players/players_data`,
+    {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    },
+  );
+  return (await response.json()) as PlayersData;
 }
