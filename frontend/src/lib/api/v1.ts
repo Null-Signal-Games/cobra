@@ -41,24 +41,14 @@ export async function loadTournaments(
   return res.data;
 }
 
-export async function loadTournamentBySlug(
+export function loadTournamentBySlug(
   slug: string,
   altFetch = fetch,
 ): Promise<TournamentsResponse> {
-  const res = await api.get<TournamentsResponse>(
+  return loadTournaments(
     `/api/v1/public/tournaments?filter[slug]=${encodeURIComponent(slug)}`,
-    {
-      altFetch,
-      headers: JSON_API_HEADERS,
-    },
+    altFetch,
   );
-
-  if (!res.ok) {
-    globalMessages.errors.push(`Failed to load tournaments: ${res.error.message}`);
-    return { data: [] };
-  }
-
-  return res.data;
 }
 
 export async function loadTournamentTypes(altFetch = fetch): Promise<TournamentTypeInfo[]> {
