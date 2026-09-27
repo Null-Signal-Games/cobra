@@ -1,13 +1,14 @@
+import { api } from "$lib/api/apiBase";
 import { COBRA_API_SERVER } from "$app/env/public";
 import { csrfToken } from "$lib/csrf";
 import type { PairingsData } from "$lib/api/betaTypes";
-import type { 
-  TournamentCreateErrorResponse, 
-  TournamentCreateResponse, 
+import type {
+  TournamentCreateErrorResponse,
+  TournamentCreateResponse,
   TournamentSettingsData,
-  SaveStageResponse, 
+  SaveStageResponse,
   Stage,
-  StageData 
+  StageData,
 } from "$lib/api/classicTypes";
 import { ValidationError as StageValidationError } from "$lib/api/classicTypes";
 import type { BracketData } from "$lib/model/Bracket";
@@ -22,47 +23,48 @@ export async function loadPairingsForUser(
   tournamentId: number,
   userId: number,
   altFetch = fetch,
-) {
-  const url = `${apiServer}/tournaments/${tournamentId}/rounds/pairings_data/${userId}`;
-
-  const response = await altFetch(url, {
-    method: "GET",
-    credentials: "include",
-  });
-
-  const data = (await response.json()) as PairingsData;
-  globalMessages.warnings = data.warnings ?? [];
-
-  return data;
-}
-
-export async function loadStandings(tournamentId: number, altFetch = fetch): Promise<StandingsData> {
-  const response = await altFetch(
-    `${apiServer}/tournaments/${tournamentId}/players/standings_data`,
-    {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
-    },
+): Promise<PairingsData | null> {
+  const res = await api.get<PairingsData>(
+    `/tournaments/${tournamentId}/rounds/pairings_data/${userId}`,
+    { altFetch },
   );
-  if (!response.ok) {
-    throw new Error(`Failed to load standings: ${response.statusText}`);
+
+  if (!res.ok) {
+    globalMessages.errors.push(`Error loading pairings for user ${userId}.`);
+    return null;
   }
-  return (await response.json()) as StandingsData;
+
+  globalMessages.warnings = res.data.warnings ?? [];
+  return res.data;
 }
 
+export async function loadStandings(
+  tournamentId: number,
+  altFetch = fetch,
+): Promise<StandingsData> {
+
+  const res = await api.get<StandingsData>(
+    `/tournaments/${tournamentId}/players/standings_data`,
+    { altFetch },
+  );
+
+  if (!res.ok) {
+    throw new Error(`Failed to load standings: ${res.error.message}`);
+  }
+
+  return res.data;
+}
 
 export async function loadBrackets(tournamentId: number, altFetch = fetch): Promise<BracketData> {
-  const response = await altFetch(
-    `${apiServer}/tournaments/${tournamentId}/rounds/brackets`,
-    {
-      method: "GET",
-    },
+  const res = await api.get<BracketData>(
+    `/tournaments/${tournamentId}/rounds/brackets`, { altFetch }
   );
 
-  return (await response.json()) as BracketData;
+  if (!res.ok) {
+    throw new Error(`Failed to load bracket: ${res.error.message}`);
+  }
+  
+  return res.data;
 }
 
 export async function loadNewTournament(
@@ -160,9 +162,7 @@ export async function loadStage(
   );
 
   if (!response.ok) {
-    throw new Error(
-      `HTTP ${response.status.toString()}: ${response.statusText}`,
-    );
+    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
   }
 
   const data = (await response.json()) as StageData;
@@ -177,32 +177,25 @@ export async function saveStage(
   altFetch = fetch,
   token = csrfToken(),
 ): Promise<SaveStageResponse> {
-  const response = await altFetch(
-    `${apiServer}/tournaments/${tournamentId}/stages/${stage.id}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-CSRF-Token": token,
-      },
-      credentials: "include",
-      body: JSON.stringify({ stage }),
+  const response = await altFetch(`${apiServer}/tournaments/${tournamentId}/stages/${stage.id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-CSRF-Token": token,
     },
-  );
+    credentials: "include",
+    body: JSON.stringify({ stage }),
+  });
 
   const saveStageResponse = (await response.json()) as SaveStageResponse;
 
   if (!response.ok) {
     if (response.status === 422) {
-      throw new StageValidationError(
-        saveStageResponse.error ?? "Stage could not be updated.",
-      );
+      throw new StageValidationError(saveStageResponse.error ?? "Stage could not be updated.");
     }
 
-    throw new Error(
-      `HTTP ${response.status.toString()}: ${response.statusText}`,
-    );
+    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
   }
 
   return saveStageResponse;
