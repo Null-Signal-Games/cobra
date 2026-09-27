@@ -136,6 +136,20 @@ export class ApiBase {
     return this.request<T>(path, "GET", options);
   }
 
+  async getOrThrow<T>(
+    path: string,
+    optionsOrFetch?: RequestOptions | typeof fetch,
+    prefix = "",
+  ): Promise<T> {
+    const options =
+      typeof optionsOrFetch === "function" ? { altFetch: optionsOrFetch } : optionsOrFetch;
+    const res = await this.get<T>(path, options);
+    if (!res.ok) {
+      throw new Error(prefix ? `${prefix}: ${res.error.message}` : res.error.message);
+    }
+    return res.data;
+  }
+
   async post<T = void>(
     path: string,
     body?: unknown,
