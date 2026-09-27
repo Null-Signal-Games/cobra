@@ -14,15 +14,6 @@ import type { Tournament } from "$lib/model/Tournament";
 import { ValidationError, type Errors } from "$lib/utils/errors";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
-// Helper that fetches a resource and throws an error if the response is not ok.
-async function getOrThrow<T>(path: string, altFetch = fetch, prefix = ""): Promise<T> {
-  const res = await api.get<T>(path, { altFetch });
-  if (!res.ok) {
-    throw new Error(prefix ? `${prefix}: ${res.error.message}` : res.error.message);
-  }
-  return res.data;
-}
-
 function parseTournamentArgs(
   arg1: Tournament | string | undefined,
   arg2?: Tournament | string,
@@ -66,14 +57,14 @@ export async function loadPairingsForUser(
 }
 
 export const loadStandings = (tournamentId: number, altFetch = fetch): Promise<StandingsData> =>
-  getOrThrow<StandingsData>(
+  api.getOrThrow<StandingsData>(
     `/tournaments/${tournamentId}/players/standings_data`,
     altFetch,
     "Failed to load standings",
   );
 
 export const loadBrackets = (tournamentId: number, altFetch = fetch): Promise<BracketData> =>
-  getOrThrow<BracketData>(
+  api.getOrThrow<BracketData>(
     `/tournaments/${tournamentId}/rounds/brackets`,
     altFetch,
     "Failed to load bracket",
@@ -82,20 +73,20 @@ export const loadBrackets = (tournamentId: number, altFetch = fetch): Promise<Br
 export const loadNewTournament = (
   fetch: typeof globalThis.fetch,
 ): Promise<TournamentSettingsData> =>
-  getOrThrow<TournamentSettingsData>("/tournaments/new_form", fetch);
+  api.getOrThrow<TournamentSettingsData>("/tournaments/new_form", fetch);
 
 export const loadTournamentSettings = (
   tournamentId: number,
   fetch: typeof globalThis.fetch,
 ): Promise<TournamentSettingsData> =>
-  getOrThrow<TournamentSettingsData>(`/tournaments/${tournamentId}/edit_form`, fetch);
+  api.getOrThrow<TournamentSettingsData>(`/tournaments/${tournamentId}/edit_form`, fetch);
 
 export async function loadStage(
   tournamentId: number,
   stageId: number,
   altFetch = fetch,
 ): Promise<StageData> {
-  const data = await getOrThrow<StageData>(
+  const data = await api.getOrThrow<StageData>(
     `/tournaments/${tournamentId}/stages/${stageId}/settings`,
     altFetch,
   );
