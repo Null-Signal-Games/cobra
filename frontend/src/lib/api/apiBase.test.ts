@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ApiBase } from "$lib/api/apiBase";
 import { ok, err, type StatusOr } from "$lib/api/statusOr";
+import { ValidationError } from "$lib/utils/errors";
 import * as csrfModule from "$lib/csrf";
 
 describe("ApiBase with StatusOr", () => {
@@ -201,6 +202,38 @@ describe("ApiBase with StatusOr", () => {
       expect(res.ok).toBe(false);
       expect(res.status).toBe(422);
       expect(res.error?.message).toBe("Confirmation name does not match the tournament name");
+      expect(res.error).toBeInstanceOf(ValidationError);
+      expect((res.error as ValidationError).errors).toEqual({
+        base: ["Confirmation name does not match the tournament name"],
+      });
+    });
+
+    it("extracts structured validation errors on 422", async () => {
+      const validationPayload = {
+        errors: {
+          name: ["can't be blank"],
+          format: ["is invalid"],
+        },
+      };
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(validationPayload), {
+          status: 422,
+          statusText: "Unprocessable Entity",
+        }),
+      );
+
+      const res = await api.post("/tournaments", { tournament: {} });
+
+      expect(res.ok).toBe(false);
+      expect(res.status).toBe(422);
+      expect(res.error).toBeInstanceOf(ValidationError);
+      const valErr = res.error as ValidationError;
+      expect(valErr.errors).toEqual({
+        name: ["can't be blank"],
+        format: ["is invalid"],
+      });
+      expect(valErr.message).toContain("name can't be blank");
+      expect(valErr.message).toContain("format is invalid");
     });
 
     it("handles 204 No Content with undefined data", async () => {
@@ -263,6 +296,54 @@ describe("ApiBase with StatusOr", () => {
       expect(res.data).toEqual({ custom: true });
       expect(perRequestFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("mutation OrThrow methods", () => {
+    it("postOrThrow returns parsed data on success", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: 10, name: "New Tournament" }), { status: 201 }),
+      );
+
+      const data = await api.postOrThrow<{ id: number; name: string }>("/tournaments", {
+        name: "New Tournament",
+      });
+
+      expect(data).toEqual({ id: 10, name: "New Tournament" });
+    });
+
+    it("postOrThrow throws ValidationError on 422 with structured errors", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            errors: { name: ["can't be blank"] },
+          }),
+          { status: 422 },
+        ),
+      );
+
+      await expect(api.postOrThrow("/tournaments", {})).rejects.toThrow(ValidationError);
+    });
+
+    it("patchOrThrow throws ValidationError on 422 with structured errors", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            errors: { format: ["is invalid"] },
+          }),
+          { status: 422 },
+        ),
+      );
+
+      await expect(api.patchOrThrow("/tournaments/1", {})).rejects.toThrow(ValidationError);
+    });
+
+    it("deleteOrThrow throws generic Error on non-422 failure", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(null, { status: 500, statusText: "Server Error" }),
+      );
+
+      await expect(api.deleteOrThrow("/tournaments/1")).rejects.toThrow("HTTP 500: Server Error");
     });
   });
 });
