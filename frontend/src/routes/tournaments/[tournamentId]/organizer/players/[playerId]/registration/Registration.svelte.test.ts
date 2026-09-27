@@ -26,7 +26,7 @@ import {
   MockZahyaPrinting,
 } from "./RegistrationTestData";
 import { Identity } from "$lib/model/Identity";
-import { savePlayer } from "../../../../../api_helper";
+import { savePlayer } from "$lib/api/beta";
 
 vi.mock('$app/env/public', () => {
   return {
@@ -34,9 +34,7 @@ vi.mock('$app/env/public', () => {
   };
 });
 
-vi.mock("../../../../../api_helper", () => ({
-  loadDecks: vi.fn(),
-  loadTournament: vi.fn(),
+vi.mock("$lib/api/beta", () => ({
   savePlayer: vi.fn(),
 }));
 
