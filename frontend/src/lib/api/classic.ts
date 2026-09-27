@@ -14,19 +14,6 @@ import type { Tournament } from "$lib/model/Tournament";
 import { ValidationError, type Errors } from "$lib/utils/errors";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
-function parseTournamentArgs(
-  arg1: Tournament | string | undefined,
-  arg2?: Tournament | string,
-): { tournament: Tournament; csrfToken?: string } {
-  if (typeof arg1 === "object") {
-    return { tournament: arg1, csrfToken: typeof arg2 === "string" ? arg2 : undefined };
-  }
-  if (typeof arg2 !== "object") {
-    throw new Error("Tournament is required");
-  }
-  return { tournament: arg2, csrfToken: arg1 };
-}
-
 async function assertOkOrValidationError(response: Response): Promise<void> {
   if (!response.ok) {
     if (response.status === 422) {
@@ -94,25 +81,8 @@ export async function loadStage(
   return data;
 }
 
-// TODO: Add <meta name="csrf-token" content={data.tournamentSettings.csrf_token} /> to
-// /tournaments/new/+page.svelte so createTournament can drop the explicit csrfToken argument
-// and rely entirely on apiBase's automatic CSRF handling.
-export async function createTournament(
-  csrfToken: string | undefined,
-  tournament: Tournament,
-): Promise<TournamentCreateResponse>;
-export async function createTournament(
-  tournament: Tournament,
-  csrfToken?: string,
-): Promise<TournamentCreateResponse>;
-export async function createTournament(
-  arg1: string | Tournament | undefined,
-  arg2?: Tournament | string,
-): Promise<TournamentCreateResponse> {
-  const { tournament, csrfToken } = parseTournamentArgs(arg1, arg2);
-
+export async function createTournament(tournament: Tournament): Promise<TournamentCreateResponse> {
   const response = await api.rawRequest("/tournaments", "POST", {
-    csrfToken,
     headers: {
       Accept: "application/vnd.api+json",
       "Content-Type": "application/vnd.api+json",
@@ -125,22 +95,8 @@ export async function createTournament(
   return (await response.json()) as TournamentCreateResponse;
 }
 
-export async function updateTournamentSettings(
-  csrfToken: string | undefined,
-  tournament: Tournament,
-): Promise<boolean>;
-export async function updateTournamentSettings(
-  tournament: Tournament,
-  csrfToken?: string,
-): Promise<boolean>;
-export async function updateTournamentSettings(
-  arg1: string | Tournament | undefined,
-  arg2?: Tournament | string,
-): Promise<boolean> {
-  const { tournament, csrfToken } = parseTournamentArgs(arg1, arg2);
-
+export async function updateTournamentSettings(tournament: Tournament): Promise<boolean> {
   const response = await api.rawRequest(`/tournaments/${tournament.id}`, "PATCH", {
-    csrfToken,
     body: { tournament },
   });
 

@@ -111,7 +111,6 @@ describe("TournamentCreation", () => {
 
     await waitFor(() => {
       expect(createTournament).toHaveBeenCalledWith(
-        "fake-csrf-token",
         expect.objectContaining({
           name: "Test Tournament",
         }),

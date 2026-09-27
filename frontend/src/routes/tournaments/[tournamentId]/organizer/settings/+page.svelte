@@ -13,10 +13,7 @@
   async function handleSave(tournamentEdit: Tournament): Promise<boolean> {
     errors = {};
     try {
-      await updateTournamentSettings(
-        data.tournamentSettings.csrf_token,
-        tournamentEdit,
-      );
+      await updateTournamentSettings(tournamentEdit);
       globalMessages.infos = ["Tournament settings saved."];
       await invalidateAll();
       return true;
@@ -32,8 +29,8 @@
 </script>
 
 <div class="col-12">
-    <GlobalMessages />
-    
+  <GlobalMessages />
+
   {#if errors.base}
     <div class="alert alert-danger">{errors.base}</div>
   {/if}
