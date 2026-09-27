@@ -7,7 +7,6 @@ import type {
   Stage,
   StageData,
 } from "$lib/api/classicTypes";
-import { ValidationError as StageValidationError } from "$lib/api/classicTypes";
 import type { BracketData } from "$lib/model/Bracket";
 import type { StandingsData } from "$lib/model/Standings";
 import type { Tournament } from "$lib/model/Tournament";
@@ -76,23 +75,14 @@ export const updateTournamentSettings = async (tournament: Tournament): Promise<
   return true;
 };
 
-export async function saveStage(
+export const saveStage = (
   tournamentId: number,
   stage: Stage,
   altFetch = fetch,
-): Promise<SaveStageResponse> {
-  const res = await api.patch<SaveStageResponse>(
+): Promise<SaveStageResponse> =>
+  api.patchOrThrow<SaveStageResponse>(
     `/tournaments/${tournamentId}/stages/${stage.id}`,
     { stage },
     { altFetch },
   );
 
-  if (!res.ok) {
-    if (res.status === 422) {
-      throw new StageValidationError(res.error.message || "Stage could not be updated.");
-    }
-    throw res.error;
-  }
-
-  return res.data;
-}
