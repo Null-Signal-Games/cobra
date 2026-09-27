@@ -1,9 +1,6 @@
 import { api } from "$lib/api/apiBase";
-import { COBRA_API_SERVER } from "$app/env/public";
-import { csrfToken } from "$lib/csrf";
 import type { PairingsData } from "$lib/api/betaTypes";
 import type {
-  TournamentCreateErrorResponse,
   TournamentCreateResponse,
   TournamentSettingsData,
   SaveStageResponse,
@@ -17,7 +14,37 @@ import type { Tournament } from "$lib/model/Tournament";
 import { ValidationError, type Errors } from "$lib/utils/errors";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
-const apiServer = (COBRA_API_SERVER || "").replace(/\/$/, "");
+// Helper that fetches a resource and throws an error if the response is not ok.
+async function getOrThrow<T>(path: string, altFetch = fetch, prefix = ""): Promise<T> {
+  const res = await api.get<T>(path, { altFetch });
+  if (!res.ok) {
+    throw new Error(prefix ? `${prefix}: ${res.error.message}` : res.error.message);
+  }
+  return res.data;
+}
+
+function parseTournamentArgs(
+  arg1: Tournament | string | undefined,
+  arg2?: Tournament | string,
+): { tournament: Tournament; csrfToken?: string } {
+  if (typeof arg1 === "object") {
+    return { tournament: arg1, csrfToken: typeof arg2 === "string" ? arg2 : undefined };
+  }
+  if (typeof arg2 !== "object") {
+    throw new Error("Tournament is required");
+  }
+  return { tournament: arg2, csrfToken: arg1 };
+}
+
+async function assertOkOrValidationError(response: Response): Promise<void> {
+  if (!response.ok) {
+    if (response.status === 422) {
+      const errorData = (await response.json()) as { errors: Errors };
+      throw new ValidationError(errorData.errors);
+    }
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+}
 
 export async function loadPairingsForUser(
   tournamentId: number,
@@ -38,155 +65,114 @@ export async function loadPairingsForUser(
   return res.data;
 }
 
-export async function loadStandings(
-  tournamentId: number,
-  altFetch = fetch,
-): Promise<StandingsData> {
-
-  const res = await api.get<StandingsData>(
+export const loadStandings = (tournamentId: number, altFetch = fetch): Promise<StandingsData> =>
+  getOrThrow<StandingsData>(
     `/tournaments/${tournamentId}/players/standings_data`,
-    { altFetch },
+    altFetch,
+    "Failed to load standings",
   );
 
-  if (!res.ok) {
-    throw new Error(`Failed to load standings: ${res.error.message}`);
-  }
-
-  return res.data;
-}
-
-export async function loadBrackets(tournamentId: number, altFetch = fetch): Promise<BracketData> {
-  const res = await api.get<BracketData>(
-    `/tournaments/${tournamentId}/rounds/brackets`, { altFetch }
+export const loadBrackets = (tournamentId: number, altFetch = fetch): Promise<BracketData> =>
+  getOrThrow<BracketData>(
+    `/tournaments/${tournamentId}/rounds/brackets`,
+    altFetch,
+    "Failed to load bracket",
   );
 
-  if (!res.ok) {
-    throw new Error(`Failed to load bracket: ${res.error.message}`);
-  }
-  
-  return res.data;
-}
-
-export async function loadNewTournament(
+export const loadNewTournament = (
   fetch: typeof globalThis.fetch,
-): Promise<TournamentSettingsData> {
-  const response = await fetch(`${apiServer}/tournaments/new_form`, {
-    credentials: "include",
-    headers: { Accept: "application/json" },
-    method: "GET",
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
-  }
+): Promise<TournamentSettingsData> =>
+  getOrThrow<TournamentSettingsData>("/tournaments/new_form", fetch);
 
-  return (await response.json()) as TournamentSettingsData;
-}
-
-export async function createTournament(
-  csrfToken: string,
-  tournament: Tournament,
-): Promise<TournamentCreateResponse> {
-  const response = await fetch(`${apiServer}/tournaments`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      Accept: "application/vnd.api+json",
-      "Content-Type": "application/vnd.api+json",
-      "X-CSRF-Token": csrfToken,
-    },
-    body: JSON.stringify({ tournament }),
-  });
-
-  if (!response.ok) {
-    if (response.status === 422) {
-      const errorData = (await response.json()) as TournamentCreateErrorResponse;
-      throw new ValidationError(errorData.errors);
-    }
-    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
-  }
-
-  return (await response.json()) as TournamentCreateResponse;
-}
-
-export async function loadTournamentSettings(
+export const loadTournamentSettings = (
   tournamentId: number,
   fetch: typeof globalThis.fetch,
-): Promise<TournamentSettingsData> {
-  const response = await fetch(`${apiServer}/tournaments/${tournamentId}/edit_form`, {
-    credentials: "include",
-    headers: { Accept: "application/json" },
-    method: "GET",
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
-  return (await response.json()) as TournamentSettingsData;
-}
-
-export async function updateTournamentSettings(
-  csrfToken: string,
-  tournament: Tournament,
-): Promise<boolean> {
-  const response = await fetch(`${apiServer}/tournaments/${tournament.id}`, {
-    method: "PATCH",
-    credentials: "include",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      "X-CSRF-Token": csrfToken,
-    },
-    body: JSON.stringify({ tournament }),
-  });
-  if (!response.ok) {
-    if (response.status === 422) {
-      const errorData = (await response.json()) as { errors: Errors };
-      throw new ValidationError(errorData.errors);
-    }
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
-  return true;
-}
+): Promise<TournamentSettingsData> =>
+  getOrThrow<TournamentSettingsData>(`/tournaments/${tournamentId}/edit_form`, fetch);
 
 export async function loadStage(
   tournamentId: number,
   stageId: number,
   altFetch = fetch,
 ): Promise<StageData> {
-  const response = await altFetch(
-    `${apiServer}/tournaments/${tournamentId}/stages/${stageId}/settings`,
-    {
-      headers: { Accept: "application/json" },
-      method: "GET",
-      credentials: "include",
-    },
+  const data = await getOrThrow<StageData>(
+    `/tournaments/${tournamentId}/stages/${stageId}/settings`,
+    altFetch,
   );
-
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
-  }
-
-  const data = (await response.json()) as StageData;
   globalMessages.warnings = data.warning ? [data.warning] : [];
-
   return data;
+}
+
+// TODO: Add <meta name="csrf-token" content={data.tournamentSettings.csrf_token} /> to
+// /tournaments/new/+page.svelte so createTournament can drop the explicit csrfToken argument
+// and rely entirely on apiBase's automatic CSRF handling.
+export async function createTournament(
+  csrfToken: string | undefined,
+  tournament: Tournament,
+): Promise<TournamentCreateResponse>;
+export async function createTournament(
+  tournament: Tournament,
+  csrfToken?: string,
+): Promise<TournamentCreateResponse>;
+export async function createTournament(
+  arg1: string | Tournament | undefined,
+  arg2?: Tournament | string,
+): Promise<TournamentCreateResponse> {
+  const { tournament, csrfToken } = parseTournamentArgs(arg1, arg2);
+
+  const response = await api.rawRequest("/tournaments", "POST", {
+    csrfToken,
+    headers: {
+      Accept: "application/vnd.api+json",
+      "Content-Type": "application/vnd.api+json",
+    },
+    body: { tournament },
+  });
+
+  await assertOkOrValidationError(response);
+
+  return (await response.json()) as TournamentCreateResponse;
+}
+
+export async function updateTournamentSettings(
+  csrfToken: string | undefined,
+  tournament: Tournament,
+): Promise<boolean>;
+export async function updateTournamentSettings(
+  tournament: Tournament,
+  csrfToken?: string,
+): Promise<boolean>;
+export async function updateTournamentSettings(
+  arg1: string | Tournament | undefined,
+  arg2?: Tournament | string,
+): Promise<boolean> {
+  const { tournament, csrfToken } = parseTournamentArgs(arg1, arg2);
+
+  const response = await api.rawRequest(`/tournaments/${tournament.id}`, "PATCH", {
+    csrfToken,
+    body: { tournament },
+  });
+
+  await assertOkOrValidationError(response);
+
+  return true;
 }
 
 export async function saveStage(
   tournamentId: number,
   stage: Stage,
   altFetch = fetch,
-  token = csrfToken(),
+  token?: string,
 ): Promise<SaveStageResponse> {
-  const response = await altFetch(`${apiServer}/tournaments/${tournamentId}/stages/${stage.id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-CSRF-Token": token,
+  const response = await api.rawRequest(
+    `/tournaments/${tournamentId}/stages/${stage.id}`,
+    "PATCH",
+    {
+      altFetch,
+      csrfToken: token,
+      body: { stage },
     },
-    credentials: "include",
-    body: JSON.stringify({ stage }),
-  });
+  );
 
   const saveStageResponse = (await response.json()) as SaveStageResponse;
 
@@ -195,7 +181,7 @@ export async function saveStage(
       throw new StageValidationError(saveStageResponse.error ?? "Stage could not be updated.");
     }
 
-    throw new Error(`HTTP ${response.status.toString()}: ${response.statusText}`);
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
 
   return saveStageResponse;
