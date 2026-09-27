@@ -43,21 +43,21 @@ describe("ApiBase with StatusOr", () => {
     });
   });
 
-describe("URL resolution", () => {
-  it.each([
-    { baseUrl: "https://tournaments.nullsignal.games/", path: "/test/path" },
-    { baseUrl: "https://tournaments.nullsignal.games/", path: "test/path" },
-    { baseUrl: "https://tournaments.nullsignal.games",  path: "/test/path" },
-    { baseUrl: "https://tournaments.nullsignal.games",  path: "test/path" },
-  ])("resolves $baseUrl with $path correctly", async ({ baseUrl, path }) => {
-    mockFetch.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
-    const apiInstance = new ApiBase(baseUrl, mockFetch);
-    const res = await apiInstance.get(path);
-    expect(res.ok).toBe(true);
-    const { url } = getFetchCall(0);
-    expect(url).toBe("https://tournaments.nullsignal.games/test/path");
+  describe("URL resolution", () => {
+    it.each([
+      { baseUrl: "https://tournaments.nullsignal.games/", path: "/test/path" },
+      { baseUrl: "https://tournaments.nullsignal.games/", path: "test/path" },
+      { baseUrl: "https://tournaments.nullsignal.games", path: "/test/path" },
+      { baseUrl: "https://tournaments.nullsignal.games", path: "test/path" },
+    ])("resolves $baseUrl with $path correctly", async ({ baseUrl, path }) => {
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+      const apiInstance = new ApiBase(baseUrl, mockFetch);
+      const res = await apiInstance.get(path);
+      expect(res.ok).toBe(true);
+      const { url } = getFetchCall(0);
+      expect(url).toBe("https://tournaments.nullsignal.games/test/path");
+    });
   });
-});
 
   describe("get", () => {
     it("returns StatusOr with data on 200", async () => {
@@ -111,6 +111,47 @@ describe("URL resolution", () => {
       expect(res.ok).toBe(false);
       expect(res.status).toBe(0);
       expect(res.error?.message).toBe("Network failed");
+    });
+  });
+
+  describe("getOrThrow", () => {
+    it("returns parsed data directly on 200", async () => {
+      const data = { id: 1, name: "Test" };
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(data), { status: 200 }));
+
+      const result = await api.getOrThrow<typeof data>("/items/1");
+
+      expect(result).toEqual(data);
+    });
+
+    it("accepts an altFetch function directly", async () => {
+      const perRequestFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(new Response(JSON.stringify({ custom: true }), { status: 200 }));
+
+      const result = await api.getOrThrow<{ custom: boolean }>("/custom", perRequestFetch);
+
+      expect(result).toEqual({ custom: true });
+      expect(perRequestFetch).toHaveBeenCalledTimes(1);
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("throws Error on non-ok status", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response("Not found", { status: 404, statusText: "Not Found" }),
+      );
+
+      await expect(api.getOrThrow("/items/999")).rejects.toThrow("Not found");
+    });
+
+    it("throws Error with prefix when provided", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response("Server exploded", { status: 500, statusText: "Internal Server Error" }),
+      );
+
+      await expect(api.getOrThrow("/items/500", undefined, "Failed to load item")).rejects.toThrow(
+        "Failed to load item: Server exploded",
+      );
     });
   });
 
