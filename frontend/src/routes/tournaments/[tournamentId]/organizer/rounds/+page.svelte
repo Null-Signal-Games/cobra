@@ -102,7 +102,6 @@
       roundId,
       pairingId,
       side,
-      data.tournamentData.csrf_token,
     );
     if (!success) {
       // TODO: Notify the user
@@ -124,7 +123,6 @@
       pairingId,
       report,
       selfReport,
-      data.tournamentData.csrf_token,
     );
     if (!success) {
       // TODO: Notify the user
