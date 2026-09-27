@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { changePlayerSide, deleteStage, deleteTournament, reportScore, resetReports } from "./beta";
+import {
+  changePlayerSide,
+  deleteStage,
+  deleteTournament,
+  reportScore,
+  resetReports,
+  savePlayer,
+} from "./beta";
+import { Player } from "$lib/model/Player";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 import * as csrfModule from "$lib/csrf";
@@ -236,6 +244,70 @@ describe("tournament score reporting", () => {
       expect(globalMessages.errors).toContain(
         "Failed to delete stage: Stage deletion network failed",
       );
+    });
+  });
+
+  describe("savePlayer", () => {
+    it("creates a new player with POST when player id is 0", async () => {
+      const savedPlayer = new Player();
+      savedPlayer.id = 123;
+      savedPlayer.name = "Alice";
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ player: savedPlayer }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const newPlayer = new Player();
+      newPlayer.name = "Alice";
+      const result = await savePlayer(42, newPlayer, false, mockFetch);
+
+      expect(result.id).toBe(123);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const { url, requestOptions } = getFetchCall();
+      expect(url).toContain("/beta/tournaments/42/players");
+      expect(requestOptions?.method).toBe("POST");
+      expect(requestOptions?.credentials).toBe("include");
+    });
+
+    it("updates an existing player with PATCH when player id is non-zero", async () => {
+      const updatedPlayer = new Player();
+      updatedPlayer.id = 123;
+      updatedPlayer.name = "Alice Updated";
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ player: updatedPlayer }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const player = new Player();
+      player.id = 123;
+      player.name = "Alice Updated";
+      const result = await savePlayer(42, player, true, mockFetch);
+
+      expect(result.name).toBe("Alice Updated");
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const { url, requestOptions, body } = getFetchCall();
+      expect(url).toContain("/beta/tournaments/42/players/123");
+      expect(requestOptions?.method).toBe("PATCH");
+      expect(body).toMatchObject({ organiser_view: true });
+    });
+
+    it("captures errors from response when present", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ player: null, errors: ["Name already taken"] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const player = new Player();
+      player.name = "Duplicate";
+      await savePlayer(42, player, false, mockFetch);
+
+      expect(globalMessages.errors).toContain("Name already taken");
     });
   });
 });

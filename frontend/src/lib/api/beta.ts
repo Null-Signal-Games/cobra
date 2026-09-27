@@ -1,9 +1,9 @@
 import { api } from "$lib/api/apiBase";
 import type { PairingsData, RoundData, TournamentData } from "$lib/api/betaTypes";
-import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
+import type { Deck, NrdbDeck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
 import type { NewPairing } from "$lib/model/Pairing";
-import { Player, type PlayersData } from "$lib/model/Player";
+import { Player, playerRequestObject, type PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import type { Stats, CutStats } from "$lib/model/Stats";
@@ -46,62 +46,37 @@ export async function loadPlayerByUserId(
   }
 }
 
-// TODO(plural): Find a new home for this.
-function playerRequestObject(player: Player) {
-  return {
-    name: player.name,
-    pronouns: player.pronouns,
-    corp_identity: player.corp_id.name,
-    runner_identity: player.runner_id.name,
-    include_in_stream: player.include_in_stream,
-    first_round_bye: player.first_round_bye,
-    manual_seed: player.manual_seed,
-    fixed_table_number: player.fixed_table_number,
-    corp_deck: player.corp_deck ? deckRequestObject(player.corp_deck) : undefined,
-    runner_deck: player.runner_deck ? deckRequestObject(player.runner_deck) : undefined,
-  };
-}
-
-// TODO(plural): Find a new home for this.
-function deckRequestObject(deck: Deck) {
-  const { id, user_id, player_id, player_name, created_at, updated_at, ...details } = deck.details;
-
-  return {
-    details: details,
-    cards: deck.cards.map((c) => cardRequestObject(c)),
-  };
-}
-
-// TODO(plural): Find a new home for this.
-function cardRequestObject(card: Card) {
-  const { id, deck_id, created_at, updated_at, ...newCard } = card;
-
-  return newCard;
+interface SavePlayerResponse {
+  player: Player;
+  errors?: string[];
 }
 
 export async function savePlayer(
   tournamentId: number,
   player: Player,
   organizerView = false,
+  altFetch = fetch,
 ): Promise<Player> {
-  const path =
-    player.id === 0
-      ? `/beta/tournaments/${tournamentId}/players`
-      : `/beta/tournaments/${tournamentId}/players/${player.id}`;
-  const response = await api.rawRequest(path, player.id === 0 ? "POST" : "PATCH", {
-    body: {
-      player: playerRequestObject(player),
-      organiser_view: organizerView,
-    },
-  });
-
-  const result = (await response.json()) as {
-    player: Player;
-    errors?: string[];
+  const isCreate = player.id === 0;
+  const path = isCreate
+    ? `/beta/tournaments/${tournamentId}/players`
+    : `/beta/tournaments/${tournamentId}/players/${player.id}`;
+  const body = {
+    player: playerRequestObject(player),
+    organiser_view: organizerView,
   };
-  globalMessages.errors = result.errors ?? [];
 
-  return result.player;
+  const res = isCreate
+    ? await api.post<SavePlayerResponse>(path, body, { altFetch })
+    : await api.patch<SavePlayerResponse>(path, body, { altFetch });
+
+  if (!res.ok) {
+    globalMessages.errors = [res.error.message];
+    return player;
+  }
+
+  globalMessages.errors = res.data.errors ?? [];
+  return res.data.player;
 }
 
 export const reinstatePlayer = (tournamentId: number, player: Player): Promise<boolean> =>
