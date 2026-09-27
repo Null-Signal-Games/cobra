@@ -2,7 +2,7 @@ import { COBRA_API_SERVER } from "$app/env/public";
 import type { BracketData } from "$lib/model/Bracket";
 import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
-import type { Player, PlayersData } from "$lib/model/Player";
+import { Player, type PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
 import type { StandingsData } from "$lib/model/Standings";
 import { Tournament, type FeatureFlags, type TournamentOptions } from "$lib/model/Tournament";
@@ -159,6 +159,27 @@ export async function createTournament(
   }
 
   return (await response.json()) as TournamentCreateResponse;
+}
+
+export async function loadPlayer(tournamentId: number, playerId: number, altFetch = fetch) {
+  try {
+    const response = await altFetch(
+      `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const player = new Player();
+    Object.assign(player, await response.json());
+    return player;
+  } catch {
+    globalMessages.errors.push(
+      `Error loading player data for player ${playerId}.`,
+    );
+    return null;
+  }
 }
 
 export async function loadPlayerByUserId(tournamentId: number, userId: number, altFetch = fetch) {

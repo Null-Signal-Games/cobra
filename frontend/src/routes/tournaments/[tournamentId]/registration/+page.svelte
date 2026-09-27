@@ -5,12 +5,12 @@
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import ProgressButton from "$lib/components/ProgressButton.svelte";
-  import DeckDisplay from "./DeckDisplay.svelte";
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { invalidateAll } from "$app/navigation";
   import { sortCards } from "$lib/utils/decks.svelte";
   import { authStore } from "$lib/utils/auth.svelte";
+  import DeckDisplay from "$lib/components/DeckDisplay.svelte";
 
   let { data, params }: PageProps = $props();
 
