@@ -31,12 +31,7 @@
   }
 
   async function addStage(cutSingleElim?: boolean, cutCount?: number) {
-    const success = await createStage(
-      data.tournamentData.csrf_token,
-      data.tournamentData.tournament.id,
-      cutSingleElim,
-      cutCount,
-    );
+    const success = await createStage(data.tournamentData.tournament.id, cutSingleElim, cutCount);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -55,10 +50,7 @@
       return;
     }
 
-    const success = await pairRound(
-      data.tournamentData.csrf_token,
-      data.tournamentData.tournament.id,
-    );
+    const success = await pairRound(data.tournamentData.tournament.id);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -161,7 +153,6 @@
     }
 
     const success = await updateRoundTimer(
-      data.tournamentData.csrf_token,
       data.tournamentData.tournament.id,
       roundId,
       length_minutes,

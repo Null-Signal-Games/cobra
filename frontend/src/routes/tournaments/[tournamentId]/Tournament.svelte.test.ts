@@ -300,7 +300,7 @@ describe("Tournament", () => {
           getByRole(registrationCard, "button", { name: "Register" }),
         );
 
-        expect(savePlayer).toHaveBeenCalledExactlyOnceWith("", 1, bobEdit);
+        expect(savePlayer).toHaveBeenCalledExactlyOnceWith(1, bobEdit);
       });
     });
 

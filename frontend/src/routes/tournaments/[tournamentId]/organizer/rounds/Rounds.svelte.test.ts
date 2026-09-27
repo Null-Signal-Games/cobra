@@ -517,7 +517,7 @@ describe("Rounds", () => {
           getByRole(roundTimerForm, "button", { name: /start/i }),
         );
 
-        expect(updateRoundTimer).toHaveBeenCalledWith("", 1, 1, 65, "start");
+        expect(updateRoundTimer).toHaveBeenCalledWith(1, 1, 65, "start");
       });
 
       it("resets the round timer", async () => {
@@ -532,7 +532,7 @@ describe("Rounds", () => {
           getByRole(roundTimerForm, "button", { name: /reset/i }),
         );
 
-        expect(updateRoundTimer).toHaveBeenCalledWith("", 1, 1, 65, "reset");
+        expect(updateRoundTimer).toHaveBeenCalledWith(1, 1, 65, "reset");
       });
     });
 
@@ -552,7 +552,7 @@ describe("Rounds", () => {
           getByRole(roundTimerForm, "button", { name: /pause/i }),
         );
 
-        expect(updateRoundTimer).toHaveBeenCalledWith("", 1, 1, 65, "stop");
+        expect(updateRoundTimer).toHaveBeenCalledWith(1, 1, 65, "stop");
       });
     });
 
@@ -573,7 +573,7 @@ describe("Rounds", () => {
           getByRole(roundTimerForm, "button", { name: /resume/i }),
         );
 
-        expect(updateRoundTimer).toHaveBeenCalledWith("", 1, 1, 65, "start");
+        expect(updateRoundTimer).toHaveBeenCalledWith(1, 1, 65, "start");
       });
     });
 

@@ -11,21 +11,8 @@ import type { Stats, CutStats } from "$lib/model/Stats";
 import type { Tournament } from "$lib/model/Tournament";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
-async function getOrThrow<T>(
-  path: string,
-  altFetch = fetch,
-  prefix = "",
-  token?: string,
-): Promise<T> {
-  const res = await api.get<T>(path, { altFetch, csrfToken: token });
-  if (!res.ok) {
-    throw new Error(prefix ? `${prefix}: ${res.error.message}` : res.error.message);
-  }
-  return res.data;
-}
-
 export const loadTournament = (tournamentId: number, altFetch = fetch): Promise<TournamentData> =>
-  getOrThrow<TournamentData>(`/beta/tournaments/${tournamentId}`, altFetch);
+  api.getOrThrow<TournamentData>(`/beta/tournaments/${tournamentId}`, altFetch);
 
 export async function loadPlayer(
   tournamentId: number,
@@ -33,15 +20,11 @@ export async function loadPlayer(
   altFetch = fetch,
 ): Promise<Player | null> {
   try {
-    const res = await api.get<Player>(`/beta/tournaments/${tournamentId}/players/${playerId}`, {
+    const data = await api.getOrThrow<Player>(
+      `/beta/tournaments/${tournamentId}/players/${playerId}`,
       altFetch,
-    });
-    if (!res.ok) {
-      throw res.error;
-    }
-    const player = new Player();
-    Object.assign(player, res.data);
-    return player;
+    );
+    return Object.assign(new Player(), data);
   } catch {
     globalMessages.errors.push(`Error loading player data for player ${playerId}.`);
     return null;
@@ -54,7 +37,7 @@ export async function loadPlayerByUserId(
   altFetch = fetch,
 ): Promise<Player | null> {
   try {
-    return await getOrThrow<Player>(
+    return await api.getOrThrow<Player>(
       `/beta/tournaments/${tournamentId}/players/by_user_id/${userId}`,
       altFetch,
     );
@@ -98,44 +81,15 @@ function cardRequestObject(card: Card) {
 }
 
 export async function savePlayer(
-  csrfToken: string,
   tournamentId: number,
   player: Player,
-  organizerView?: boolean,
-): Promise<Player>;
-export async function savePlayer(
-  tournamentId: number,
-  player: Player,
-  organizerView?: boolean,
-): Promise<Player>;
-export async function savePlayer(
-  arg1: string | number,
-  arg2: number | Player,
-  arg3?: Player | boolean,
-  arg4 = false,
+  organizerView = false,
 ): Promise<Player> {
-  let token = "";
-  let tournamentId: number;
-  let player: Player;
-  let organizerView: boolean;
-
-  if (typeof arg1 === "string") {
-    token = arg1;
-    tournamentId = arg2 as number;
-    player = arg3 as Player;
-    organizerView = arg4;
-  } else {
-    tournamentId = arg1;
-    player = arg2 as Player;
-    organizerView = typeof arg3 === "boolean" ? arg3 : false;
-  }
-
   const path =
     player.id === 0
       ? `/beta/tournaments/${tournamentId}/players`
       : `/beta/tournaments/${tournamentId}/players/${player.id}`;
   const response = await api.rawRequest(path, player.id === 0 ? "POST" : "PATCH", {
-    csrfToken: token || undefined,
     body: {
       player: playerRequestObject(player),
       organiser_view: organizerView,
@@ -174,7 +128,7 @@ export const dropPlayer = (tournamentId: number, player: Player): Promise<boolea
   });
 
 export async function loadPairings(tournamentId: number, altFetch = fetch): Promise<PairingsData> {
-  const data = await getOrThrow<PairingsData>(
+  const data = await api.getOrThrow<PairingsData>(
     `/beta/tournaments/${tournamentId}/rounds/pairings_data`,
     altFetch,
   );
@@ -183,28 +137,22 @@ export async function loadPairings(tournamentId: number, altFetch = fetch): Prom
 }
 
 export const loadStats = (tournamentId: number, altFetch = fetch): Promise<Stats> =>
-  getOrThrow<Stats>(`/beta/tournaments/${tournamentId}/id_and_faction_data`, altFetch);
+  api.getOrThrow<Stats>(`/beta/tournaments/${tournamentId}/id_and_faction_data`, altFetch);
 
 export const loadCutStats = (tournamentId: number, altFetch = fetch): Promise<CutStats> =>
-  getOrThrow<CutStats>(`/beta/tournaments/${tournamentId}/cut_conversion_rates`, altFetch);
+  api.getOrThrow<CutStats>(`/beta/tournaments/${tournamentId}/cut_conversion_rates`, altFetch);
 
 export const loadCurrentRoundTimer = (
   tournamentId: number,
-  csrfToken?: string,
   altFetch = fetch,
 ): Promise<RoundTimer> =>
-  getOrThrow<RoundTimer>(
-    `/beta/tournaments/${tournamentId}/current_round_timer`,
-    altFetch,
-    "",
-    csrfToken,
-  );
+  api.getOrThrow<RoundTimer>(`/beta/tournaments/${tournamentId}/current_round_timer`, altFetch, "");
 
 export const loadIdentityNames = (altFetch = fetch): Promise<IdentityNames> =>
-  getOrThrow<IdentityNames>("/beta/identities", altFetch);
+  api.getOrThrow<IdentityNames>("/beta/identities", altFetch);
 
 export const loadPlayers = (tournamentId: number, altFetch = fetch): Promise<PlayersData> =>
-  getOrThrow<PlayersData>(`/beta/tournaments/${tournamentId}/players/players_data`, altFetch);
+  api.getOrThrow<PlayersData>(`/beta/tournaments/${tournamentId}/players/players_data`, altFetch);
 
 export function setPlayerRegistrationStatus(
   tournamentId: number,
@@ -228,7 +176,7 @@ export function loadDecks(
     playerId === undefined
       ? `/beta/tournaments/${tournamentId}/players/decks`
       : `/beta/tournaments/${tournamentId}/players/${playerId}/decks`;
-  return getOrThrow<Deck[]>(path, altFetch);
+  return api.getOrThrow<Deck[]>(path, altFetch);
 }
 
 export const loadNrdbDecks = (
@@ -236,7 +184,7 @@ export const loadNrdbDecks = (
   playerId: number,
   altFetch = fetch,
 ): Promise<NrdbDeck[]> =>
-  getOrThrow<NrdbDeck[]>(
+  api.getOrThrow<NrdbDeck[]>(
     `/beta/tournaments/${tournamentId}/players/${playerId}/nrdb_decks`,
     altFetch,
   );
@@ -362,22 +310,16 @@ export const completeRound = (
 ): Promise<boolean> =>
   api.patchAction(`/beta/tournaments/${tournamentId}/rounds/${roundId}/complete`, { completed });
 
-export async function updateRoundTimer(
-  csrfToken: string,
+export const updateRoundTimer = (
   tournamentId: number,
   roundId: number,
   length_minutes: number,
   operation: string,
-): Promise<boolean> {
-  return api.patchAction(
-    `/beta/tournaments/${tournamentId}/rounds/${roundId}/update_timer`,
-    {
-      length_minutes,
-      operation,
-    },
-    { csrfToken: csrfToken || undefined },
-  );
-}
+): Promise<boolean> =>
+  api.patchAction(`/beta/tournaments/${tournamentId}/rounds/${roundId}/update_timer`, {
+    length_minutes,
+    operation,
+  });
 
 export async function resetReports(
   tournamentId: number,
@@ -411,8 +353,7 @@ export async function resetReports(
   }
 }
 
-export async function createStage(
-  csrfToken: string,
+export function createStage(
   tournamentId: number,
   cutSingleElim?: boolean,
   cutCount?: number,
@@ -422,10 +363,10 @@ export async function createStage(
     ? `/beta/tournaments/${tournamentId}/cut`
     : `/beta/tournaments/${tournamentId}/stages`;
   const body = isCut
-    ? { number: cutCount, ...(cutSingleElim && { elimination_type: "single" }) }
+    ? { number: cutCount, ...(cutSingleElim ? { elimination_type: "single" } : {}) }
     : null;
 
-  return api.postAction(path, body, { csrfToken: csrfToken || undefined });
+  return api.postAction(path, body);
 }
 
 export const createPairing = (
@@ -518,7 +459,7 @@ export async function loadRound(
   roundId: number,
   altFetch = fetch,
 ): Promise<RoundData> {
-  const data = await getOrThrow<RoundData>(
+  const data = await api.getOrThrow<RoundData>(
     `/beta/tournaments/${tournamentId}/rounds/${roundId}/round_data`,
     altFetch,
   );
@@ -526,10 +467,8 @@ export async function loadRound(
   return data;
 }
 
-export const pairRound = (csrfToken: string, tournamentId: number): Promise<boolean> =>
-  api.postAction(`/beta/tournaments/${tournamentId}/rounds`, undefined, {
-    csrfToken: csrfToken || undefined,
-  });
+export const pairRound = (tournamentId: number): Promise<boolean> =>
+  api.postAction(`/beta/tournaments/${tournamentId}/rounds`);
 
 export const rePairRound = (tournamentId: number, roundId: number): Promise<boolean> =>
   api.patchAction(`/beta/tournaments/${tournamentId}/rounds/${roundId}/repair`);

@@ -16,12 +16,10 @@
     userId,
     tournament,
     player,
-    csrfToken,
   }: {
     userId: number;
     tournament: Tournament;
     player: Player;
-    csrfToken: string;
   } = $props();
 
   let identityNames: IdentityNames | undefined = $state();
@@ -38,7 +36,7 @@
   });
 
   async function savePlayer() {
-    playerEdit = await savePlayerRequest(csrfToken, tournament.id, playerEdit);
+    playerEdit = await savePlayerRequest(tournament.id, playerEdit);
     readOnly = true;
 
     if (tournament.nrdb_deck_registration) {
