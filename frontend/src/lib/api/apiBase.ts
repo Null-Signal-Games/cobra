@@ -21,6 +21,9 @@ export class ApiBase {
   }
 
   buildUrl(path: string): string {
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      return path;
+    }
     if (!path.startsWith("/")) {
       return `${this.baseUrl}/${path}`;
     }

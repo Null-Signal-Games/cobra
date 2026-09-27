@@ -57,6 +57,19 @@ describe("ApiBase with StatusOr", () => {
       const { url } = getFetchCall(0);
       expect(url).toBe("https://tournaments.nullsignal.games/test/path");
     });
+
+    it.each(["http://example.com/api/test", "https://example.com/api/test"])(
+      "preserves absolute URL %s",
+      async (absoluteUrl) => {
+        mockFetch.mockResolvedValueOnce(
+          new Response(JSON.stringify({ ok: true }), { status: 200 }),
+        );
+        const res = await api.get(absoluteUrl);
+        expect(res.ok).toBe(true);
+        const { url } = getFetchCall(0);
+        expect(url).toBe(absoluteUrl);
+      },
+    );
   });
 
   describe("get", () => {
