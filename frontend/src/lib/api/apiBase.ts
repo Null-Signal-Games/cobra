@@ -1,6 +1,7 @@
 import { COBRA_API_SERVER } from "$app/env/public";
 import { csrfToken } from "$lib/csrf";
 import type { StatusOr } from "$lib/api/statusOr";
+import { ValidationError, type Errors } from "$lib/utils/errors";
 
 export interface RequestOptions {
   altFetch?: typeof fetch;
@@ -89,13 +90,33 @@ export class ApiBase {
 
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      let validationError: ValidationError | undefined;
+
       if (text.length > 0) {
         try {
           const parsed = JSON.parse(text) as { error?: string; errors?: unknown };
           if (typeof parsed.error === "string") {
             errorMessage = parsed.error;
+            if (response.status === 422) {
+              validationError = new ValidationError({ base: [parsed.error] }, parsed.error);
+            }
           } else if (Array.isArray(parsed.errors)) {
             errorMessage = parsed.errors.join(", ");
+            if (response.status === 422) {
+              validationError = new ValidationError(
+                { base: parsed.errors.map(String) },
+                errorMessage,
+              );
+            }
+          } else if (typeof parsed.errors === "object" && parsed.errors !== null) {
+            const errorsObj = parsed.errors as Errors;
+            errorMessage = Object.entries(errorsObj)
+              .map(
+                ([field, msgs]) =>
+                  `${field} ${Array.isArray(msgs) ? msgs.join(", ") : String(msgs)}`,
+              )
+              .join("; ");
+            validationError = new ValidationError(errorsObj, errorMessage);
           } else {
             errorMessage = text;
           }
@@ -103,10 +124,11 @@ export class ApiBase {
           errorMessage = text;
         }
       }
+
       return {
         ok: false,
         status: response.status,
-        error: new Error(errorMessage),
+        error: validationError ?? new Error(errorMessage),
       };
     }
 
@@ -148,7 +170,38 @@ export class ApiBase {
       typeof optionsOrFetch === "function" ? { altFetch: optionsOrFetch } : optionsOrFetch;
     const res = await this.get<T>(path, options);
     if (!res.ok) {
-      throw new Error(prefix ? `${prefix}: ${res.error.message}` : res.error.message);
+      if (prefix) {
+        throw new Error(`${prefix}: ${res.error.message}`);
+      }
+      throw res.error;
+    }
+    return res.data;
+  }
+
+  async postOrThrow<T = void>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    const res = await this.post<T>(path, body, options);
+    if (!res.ok) {
+      throw res.error;
+    }
+    return res.data;
+  }
+
+  async patchOrThrow<T = void>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
+    const res = await this.patch<T>(path, body, options);
+    if (!res.ok) {
+      throw res.error;
+    }
+    return res.data;
+  }
+
+  async deleteOrThrow<T = void>(
+    path: string,
+    body?: unknown,
+    options?: RequestOptions,
+  ): Promise<T> {
+    const res = await this.delete<T>(path, body, options);
+    if (!res.ok) {
+      throw res.error;
     }
     return res.data;
   }
