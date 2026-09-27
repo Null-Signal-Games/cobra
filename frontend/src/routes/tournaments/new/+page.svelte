@@ -14,7 +14,7 @@
     errors = {};
 
     try {
-      const response = await createTournament(data.tournamentSettings.csrf_token, tournament);
+      const response = await createTournament(tournament);
       navigateTo(response.url);
     } catch (error) {
       if (error instanceof ValidationError) {
