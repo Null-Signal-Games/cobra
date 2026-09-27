@@ -3,7 +3,7 @@ import type { PairingsData, RoundData, TournamentData } from "./betaTypes";
 import type { Card, Deck, NrdbDeck } from "$lib/model/Deck";
 import type { IdentityNames } from "$lib/model/Identity";
 import type { NewPairing } from "$lib/model/Pairing";
-import type { Player, PlayersData } from "$lib/model/Player";
+import { Player, type PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import type { Stats, CutStats } from "$lib/model/Stats";
@@ -35,6 +35,27 @@ export async function loadTournament(tournamentId: number, altFetch = fetch) {
   );
 
   return (await response.json()) as TournamentData;
+}
+
+export async function loadPlayer(tournamentId: number, playerId: number, altFetch = fetch) {
+  try {
+    const response = await altFetch(
+      `${apiServer}/beta/tournaments/${tournamentId}/players/${playerId}`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const player = new Player();
+    Object.assign(player, await response.json());
+    return player;
+  } catch {
+    globalMessages.errors.push(
+      `Error loading player data for player ${playerId}.`,
+    );
+    return null;
+  }
 }
 
 export async function loadPlayerByUserId(tournamentId: number, userId: number, altFetch = fetch) {
