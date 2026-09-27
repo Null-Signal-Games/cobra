@@ -16,7 +16,8 @@
   import { downloadBlob, quoteCsvValue } from "$lib/utils/files";
   import { deckCsv } from "$lib/utils/decks.svelte";
   import { loadDecks, saveTournament, setPlayerRegistrationStatus as setPlayerRegistrationStatusRequest ,
-    setRegistrationStatus as setRegistrationStatusRequest, reinstatePlayer as reinstatePlayerRequest,} from "../../../api_helper"
+    setRegistrationStatus as setRegistrationStatusRequest} from "../../../api_helper"
+  import { reinstatePlayer as reinstatePlayerRequest} from "$lib/api/beta";
 
   let { data, params }: PageProps = $props();
 

@@ -7,12 +7,11 @@
   import {
     Player,
   } from "$lib/model/Player";
-  import {
-    savePlayer,
-    deletePlayer as deletePlayerRequest,
+  import { 
     togglePlayerLock as togglePlayerLockRequest,
     dropPlayer as dropPlayerRequest,
-  } from "../../../api_helper";
+    savePlayer,
+    deletePlayer as deletePlayerRequest,} from "$lib/api/beta";
   import IdentitySelect from "$lib/components/IdentitySelect.svelte";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
