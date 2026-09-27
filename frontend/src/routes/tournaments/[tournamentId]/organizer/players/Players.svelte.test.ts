@@ -76,8 +76,6 @@ vi.mock("../../../api_helper", () => ({
     return Promise.resolve(true);
   }),
   loadDecks: vi.fn(() => Promise.resolve([])),
-  loadPlayers: vi.fn(),
-  loadIdentityNames: vi.fn(),
 }));
 
 vi.mock("$lib/api/beta", () => ({
@@ -86,6 +84,8 @@ vi.mock("$lib/api/beta", () => ({
   reinstatePlayer: vi.fn(() => Promise.resolve(true)),
   deletePlayer: vi.fn(() => Promise.resolve(true)),
   savePlayer: vi.fn(() => true),
+  loadPlayers: vi.fn(),
+  loadIdentityNames: vi.fn(),
 }));
 
 function createMockTournament(overrides?: Partial<Tournament>) {

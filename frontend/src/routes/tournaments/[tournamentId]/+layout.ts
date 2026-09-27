@@ -1,6 +1,5 @@
 import { authStore } from "$lib/utils/auth.svelte";
-import { loadCurrentRoundTimer } from "../api_helper";
-import { loadPlayerByUserId, loadTournament } from "$lib/api/beta";
+import { loadCurrentRoundTimer, loadPlayerByUserId, loadTournament } from "$lib/api/beta";
 import type { LayoutLoad } from "./$types";
 
 export const load: LayoutLoad = async ({ params, fetch }) => {
