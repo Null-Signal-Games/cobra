@@ -3,8 +3,9 @@ import { cleanup, render, screen } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
 import StageSettings from "./StageSettings.svelte";
 import TableRangeEdit from "./TableRangeEdit.svelte";
-import { StageData, ValidationError, type Stage } from "$lib/api/classicTypes";
+import { StageData, type Stage } from "$lib/api/classicTypes";
 import { loadStage, saveStage } from "$lib/api/classic";
+import { ValidationError } from "$lib/utils/errors";
 
 vi.mock("$app/env/public", () => ({
   COBRA_API_SERVER: "http://localhost:3000",
