@@ -2,6 +2,7 @@ import { COBRA_API_SERVER } from "$app/env/public";
 import { csrfToken } from "$lib/csrf";
 import type { StatusOr } from "$lib/api/statusOr";
 import { ValidationError, type Errors } from "$lib/utils/errors";
+import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
 export interface RequestOptions {
   altFetch?: typeof fetch;
@@ -142,6 +143,15 @@ export class ApiBase {
 
     try {
       const data = JSON.parse(text) as T;
+      // There is an endpoint with a singular warning instead of warnings, so we will normalize that here in this layer.
+      if (typeof data === "object" && data !== null) {
+        const payload = data as { warnings?: unknown; warning?: unknown };
+        if (Array.isArray(payload.warnings)) {
+          globalMessages.warnings = payload.warnings as string[];
+        } else if (typeof payload.warning === "string") {
+          globalMessages.warnings = payload.warning ? [payload.warning] : [];
+        }
+      }
       return {
         ok: true,
         status: response.status,
