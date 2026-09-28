@@ -82,6 +82,8 @@ Lint/AmbiguousOperatorPrecedence: # new in 1.21
   Enabled: true
 Lint/AmbiguousRange: # new in 1.19
   Enabled: true
+Lint/ArgumentMismatch: # new in 1.90
+  Enabled: true
 Lint/ArrayLiteralInRegexp: # new in 1.71
   Enabled: true
 Lint/ConstantOverwrittenInRescue: # new in 1.31
@@ -122,6 +124,8 @@ Lint/LambdaWithoutLiteralBlock: # new in 1.8
   Enabled: true
 Lint/LiteralAssignmentInCondition: # new in 1.58
   Enabled: true
+Lint/MisplacedMagicComment: # new in 1.91
+  Enabled: true
 Lint/MixedCaseRange: # new in 1.53
   Enabled: true
 Lint/NameTypo: # new in 1.89
@@ -149,6 +153,8 @@ Lint/RequireRangeParentheses: # new in 1.32
 Lint/RequireRelativeSelfPath: # new in 1.22
   Enabled: true
 Lint/SharedMutableDefault: # new in 1.70
+  Enabled: true
+Lint/SuperArgumentMismatch: # new in 1.90
   Enabled: true
 Lint/SuppressedExceptionInNumberConversion: # new in 1.72
   Enabled: true
@@ -404,6 +410,8 @@ Style/DigChain: # new in 1.69
   Enabled: true
 Style/DirEmpty: # new in 1.48
   Enabled: true
+Style/DirectiveScope: # new in 1.90
+  Enabled: true
 Style/DocumentDynamicEvalDefinition: # new in 1.1
   Enabled: true
 Style/EmptyClassDefinition: # new in 1.84
@@ -557,6 +565,8 @@ Style/SuperWithArgsParentheses: # new in 1.58
 Style/SwapValues: # new in 1.1
   Enabled: true
 Style/TallyMethod: # new in 1.85
+  Enabled: true
+Style/TimeNow: # new in 1.90
   Enabled: true
 Style/YAMLFileRead: # new in 1.53
   Enabled: true
