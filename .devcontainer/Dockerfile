@@ -1,5 +1,5 @@
 # Pull official Playwright image matching your playwright version with all 3 browsers (chromium, webkit, firefox)
-FROM mcr.microsoft.com/playwright:v1.62.0-noble AS playwright-browsers
+FROM mcr.microsoft.com/playwright:v1.63.0-noble AS playwright-browsers
 
 FROM mcr.microsoft.com/devcontainers/ruby:3.4-bookworm
 
