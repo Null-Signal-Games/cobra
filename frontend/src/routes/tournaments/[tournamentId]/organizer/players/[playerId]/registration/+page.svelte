@@ -25,10 +25,6 @@
   }
 
   async function save() {
-    if (!player) {
-      return true;
-    }
-
     player.corp_deck =
       corpDeck.details.identity_title || corpDeck.cards.length > 0
         ? corpDeck
@@ -70,7 +66,7 @@
 <div class="col-12">
   <GlobalMessages />
   
-  {#if player && player.id !== 0}
+  {#if player.id !== 0}
     <!-- General registration information -->
     <div class="card mb-3" aria-label="registration information">
       <div class="card-header">
