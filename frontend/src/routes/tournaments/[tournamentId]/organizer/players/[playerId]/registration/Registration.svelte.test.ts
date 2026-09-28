@@ -26,7 +26,7 @@ import {
   MockZahyaPrinting,
 } from "./RegistrationTestData";
 import { Identity } from "$lib/model/Identity";
-import { savePlayer } from "$lib/api/beta";
+import { betaApi } from "$lib/api/beta";
 
 vi.mock('$app/env/public', () => {
   return {
@@ -35,7 +35,9 @@ vi.mock('$app/env/public', () => {
 });
 
 vi.mock("$lib/api/beta", () => ({
-  savePlayer: vi.fn(),
+  betaApi: {
+    savePlayer: vi.fn(),
+  },
 }));
 
 const MockPageData: PageProps["data"] = {
@@ -151,7 +153,7 @@ describe("Registration", () => {
       bobEdit.corp_id = new Identity();
       bobEdit.runner_id = new Identity();
 
-      expect(savePlayer).toHaveBeenCalledExactlyOnceWith(
+      expect(betaApi.savePlayer).toHaveBeenCalledExactlyOnceWith(
         MockTournament.id,
         bobEdit,
         true,

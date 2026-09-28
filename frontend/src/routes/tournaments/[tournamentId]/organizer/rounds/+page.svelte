@@ -10,17 +10,7 @@
   import { showReportedPairings } from "$lib/utils/ShowReportedPairings";
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidateAll } from "$app/navigation";
-  import {
-    changePlayerSide,
-    completeRound,
-    createStage,
-    deletePairing,
-    pairRound,
-    reportScore,
-    setPlayerRegistrationStatus as setPlayerRegistrationStatusRequest,
-    setRegistrationStatus as setRegistrationStatusRequest,
-    updateRoundTimer,
-  } from "$lib/api/beta";
+  import { betaApi } from "$lib/api/beta";
 
   let { data, params }: PageProps = $props();
 
@@ -31,7 +21,7 @@
   }
 
   async function addStage(cutSingleElim?: boolean, cutCount?: number) {
-    const success = await createStage(data.tournamentData.tournament.id, cutSingleElim, cutCount);
+    const success = await betaApi.createStage(data.tournamentData.tournament.id, cutSingleElim, cutCount);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -50,7 +40,7 @@
       return;
     }
 
-    const success = await pairRound(data.tournamentData.tournament.id);
+    const success = await betaApi.pairRound(data.tournamentData.tournament.id);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -60,7 +50,7 @@
   }
 
   async function setRegistrationStatus(open: boolean) {
-    const success = await setRegistrationStatusRequest(data.tournamentData.tournament.id, open);
+    const success = await betaApi.setRegistrationStatus(data.tournamentData.tournament.id, open);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -70,7 +60,7 @@
   }
 
   async function setPlayerRegistrationStatus(open: boolean) {
-    const success = await setPlayerRegistrationStatusRequest(
+    const success = await betaApi.setPlayerRegistrationStatus(
       data.tournamentData.tournament.id,
       open,
     );
@@ -87,7 +77,7 @@
       return;
     }
 
-    const success = await deletePairing(data.tournamentData.tournament.id, roundId, pairingId);
+    const success = await betaApi.deletePairing(data.tournamentData.tournament.id, roundId, pairingId);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -97,7 +87,7 @@
   }
 
   async function changePlayerSideCallback(roundId: number, pairingId: number, side: string) {
-    const success = await changePlayerSide(
+    const success = await betaApi.changePlayerSide(
       data.tournamentData.tournament.id,
       roundId,
       pairingId,
@@ -117,7 +107,7 @@
     report: ScoreReport,
     selfReport: boolean,
   ) {
-    const success = await reportScore(
+    const success = await betaApi.reportScore(
       data.tournamentData.tournament.id,
       roundId,
       pairingId,
@@ -133,7 +123,7 @@
   }
 
   async function completeRoundCallback(roundId: number) {
-    const success = await completeRound(data.tournamentData.tournament.id, roundId, true);
+    const success = await betaApi.completeRound(data.tournamentData.tournament.id, roundId, true);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -150,7 +140,7 @@
       return;
     }
 
-    const success = await updateRoundTimer(
+    const success = await betaApi.updateRoundTimer(
       data.tournamentData.tournament.id,
       roundId,
       length_minutes,

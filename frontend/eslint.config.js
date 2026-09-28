@@ -52,4 +52,11 @@ export default defineConfig(
     files: ["**/*.js", "**/*.mjs", "**/*.cjs"],
     ...ts.configs.disableTypeChecked,
   },
+  // Added with the api class refactoring, to follow advice to exclude this check for tests.
+  {
+    files: ["**/*.test.ts", "**/*.spec.ts"],
+    rules: {
+      "@typescript-eslint/unbound-method": "off",
+    },
+  },
 );

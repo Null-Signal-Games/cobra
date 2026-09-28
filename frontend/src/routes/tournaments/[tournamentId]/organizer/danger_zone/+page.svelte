@@ -2,7 +2,7 @@
   import type { PageProps } from "./$types";
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import DangerActionCard from "./DangerActionCard.svelte";
-  import { deleteStage, deleteTournament } from "$lib/api/beta";
+  import { betaApi } from "$lib/api/beta";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
   import { goto, invalidateAll } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -10,7 +10,7 @@
   let { data }: PageProps = $props();
 
   async function handleDeleteTournament(confirmationName: string): Promise<boolean> {
-    const success = await deleteTournament(
+    const success = await betaApi.deleteTournament(
       data.tournamentData.tournament.id,
       confirmationName,
     );
@@ -22,7 +22,7 @@
   }
 
   async function handleDeleteStage(stageId: number, confirmationName: string): Promise<boolean> {
-    const success = await deleteStage(
+    const success = await betaApi.deleteStage(
       data.tournamentData.tournament.id,
       stageId,
       confirmationName,

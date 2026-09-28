@@ -15,13 +15,7 @@
   } from "$lib/model/Tournament";
   import { downloadBlob, quoteCsvValue } from "$lib/utils/files";
   import { deckCsv } from "$lib/utils/decks.svelte";
-  import { 
-    loadDecks, 
-    reinstatePlayer as reinstatePlayerRequest,
-    saveTournament, 
-    setPlayerRegistrationStatus as setPlayerRegistrationStatusRequest ,
-    setRegistrationStatus as setRegistrationStatusRequest,
-} from "$lib/api/beta";
+  import { betaApi } from "$lib/api/beta";
 
   let { data, params }: PageProps = $props();
 
@@ -59,7 +53,7 @@
   }
 
   async function setPlayerRegistrationStatus(locked: boolean) {
-    const success = await setPlayerRegistrationStatusRequest(
+    const success = await betaApi.setPlayerRegistrationStatus(
       tournamentId,
       locked,
     );
@@ -71,7 +65,7 @@
   }
 
   async function setRegistrationStatus(open: boolean) {
-    const success = await setRegistrationStatusRequest(tournamentId, open);
+    const success = await betaApi.setRegistrationStatus(tournamentId, open);
     if (!success) {
       return;
     }
@@ -102,7 +96,7 @@
 
     tournamentEdit.cut_deck_visibility = visibility;
 
-    const success = await saveTournament(tournamentEdit);
+    const success = await betaApi.saveTournament(tournamentEdit);
     if (!success) {
       return;
     }
@@ -133,7 +127,7 @@
 
     tournamentEdit.swiss_deck_visibility = visibility;
 
-    const success = await saveTournament(tournamentEdit);
+    const success = await betaApi.saveTournament(tournamentEdit);
     if (!success) {
       return;
     }
@@ -142,7 +136,7 @@
   }
 
   async function downloadDecksSpreadsheet() {
-    const decks = await loadDecks(tournamentId);
+    const decks = await betaApi.loadDecks(tournamentId);
     downloadBlob(
       `Decks for ${tournament.name}.csv`,
       new Blob([deckCsv(decks)], { type: "text/csv" }),
@@ -165,7 +159,7 @@
   }
 
   async function reinstatePlayer(player: Player) {
-    const success = await reinstatePlayerRequest(tournamentId, player);
+    const success = await betaApi.reinstatePlayer(tournamentId, player);
     if (!success) {
       return;
     }

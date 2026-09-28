@@ -1,6 +1,6 @@
 import { Deck } from "$lib/model/Deck";
 import { convertNrdbDeck, getPrintings } from "$lib/utils/decks.svelte";
-import { loadDecks, loadNrdbDecks } from "$lib/api/beta";
+import { betaApi } from "$lib/api/beta";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ params, fetch, parent }) => {
@@ -8,7 +8,7 @@ export const load: PageLoad = async ({ params, fetch, parent }) => {
 
   // Load decks from NRDB
   const nrdbDecks = parentData.player
-    ? loadNrdbDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
+    ? betaApi.loadNrdbDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
       .then(async (nrdbDecks) => {
         let decks: Deck[] = [];
         if (nrdbDecks.length > 0) {
@@ -23,7 +23,7 @@ export const load: PageLoad = async ({ params, fetch, parent }) => {
   
   // Load decks for current tournament
   const tournamentDecks = parentData.player
-    ? await loadDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
+    ? await betaApi.loadDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
     : [];
   const corpDeck = tournamentDecks.find((d) => d.details.side_id === "corp") ?? new Deck();
   const runnerDeck = tournamentDecks.find((d) => d.details.side_id === "runner") ?? new Deck();

@@ -1,8 +1,8 @@
 import type { PageLoad } from "./$types";
-import { loadRound } from "$lib/api/beta";
+import { betaApi } from "$lib/api/beta";
 
 export const load: PageLoad = async ({ params, fetch }) => {
-  const roundData = await loadRound(parseInt(params.tournamentId), parseInt(params.roundId), fetch);
+  const roundData = await betaApi.loadRound(parseInt(params.tournamentId), parseInt(params.roundId), fetch);
 
   return {
     stage: roundData.stage,

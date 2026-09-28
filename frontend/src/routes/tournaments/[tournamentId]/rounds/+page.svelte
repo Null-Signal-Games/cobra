@@ -9,7 +9,7 @@
   import type { PageProps } from "./$types";
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidateAll } from "$app/navigation";
-  import { reportScore } from "$lib/api/beta";
+  import { betaApi } from "$lib/api/beta";
 
   let { data, params }: PageProps = $props();
 
@@ -20,7 +20,7 @@
   }
 
   async function reportScoreCallback(roundId: number, pairingId: number, report: ScoreReport, selfReport: boolean) {
-    const success = await reportScore(
+    const success = await betaApi.reportScore(
       data.tournamentData.tournament.id,
       roundId,
       pairingId,

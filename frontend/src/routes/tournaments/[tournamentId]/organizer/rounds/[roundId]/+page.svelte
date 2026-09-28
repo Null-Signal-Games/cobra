@@ -7,17 +7,7 @@
   import { goto, invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
   import type { ScoreReport } from '$lib/model/ScoreReport';
-  import {
-    changePlayerSide,
-    completeRound,
-    createPairing as createPairingRequest,
-    deletePairing,
-    deleteRound as deleteRoundRequest,
-    rePairRound,
-    reportScore,
-    resetReports,
-    saveSOSWeighting as saveSOSWeightingRequest,
-  } from "$lib/api/beta";
+  import { betaApi } from "$lib/api/beta";
   import ProgressButton from '$lib/components/ProgressButton.svelte';
 
   let { data, params }: PageProps = $props();
@@ -36,7 +26,7 @@
       return;
     }
 
-    const success = await rePairRound(parseInt(params.tournamentId), parseInt(params.roundId));
+    const success = await betaApi.rePairRound(parseInt(params.tournamentId), parseInt(params.roundId));
     if (!success) {
       // TODO: Notify the user
       return;
@@ -54,7 +44,7 @@
       return;
     }
 
-    const success = await completeRound(parseInt(params.tournamentId), parseInt(params.roundId), completed);
+    const success = await betaApi.completeRound(parseInt(params.tournamentId), parseInt(params.roundId), completed);
     if (!success) {
       // TODO: Notify the user
       return;
@@ -68,7 +58,7 @@
       return;
     }
 
-    const success = await deleteRoundRequest(parseInt(params.tournamentId), parseInt(params.roundId));
+    const success = await betaApi.deleteRound(parseInt(params.tournamentId), parseInt(params.roundId));
     if (!success) {
       // TODO: Notify the user
       return;
@@ -85,7 +75,7 @@
       return;
     }
 
-    const success = await createPairingRequest(
+    const success = await betaApi.createPairing(
       parseInt(params.tournamentId),
       parseInt(params.roundId),
       newPairing,
@@ -108,7 +98,7 @@
       return;
     }
 
-    const success = await deletePairing(
+    const success = await betaApi.deletePairing(
       parseInt(params.tournamentId),
       parseInt(params.roundId),
       pairingId,
@@ -122,7 +112,7 @@
   }
 
   async function changePlayerSideCallback(pairingId: number, side: string) {
-    const success = await changePlayerSide(
+    const success = await betaApi.changePlayerSide(
       parseInt(params.tournamentId),
       parseInt(params.roundId),
       pairingId,
@@ -137,7 +127,7 @@
   }
 
   async function reportScoreCallback(pairingId: number, report: ScoreReport) {
-    const success = await reportScore(
+    const success = await betaApi.reportScore(
       parseInt(params.tournamentId),
       parseInt(params.roundId),
       pairingId,
@@ -153,7 +143,7 @@
   }
 
   async function resetReportsCallback(pairingId: number) {
-    const success = await resetReports(
+    const success = await betaApi.resetReports(
       parseInt(params.tournamentId),
       parseInt(params.roundId),
       pairingId);
@@ -166,7 +156,7 @@
   }
 
   async function saveSOSWeighting() {
-    const success = await saveSOSWeightingRequest(
+    const success = await betaApi.saveSOSWeighting(
       parseInt(params.tournamentId),
       parseInt(params.roundId),
       sosWeight);

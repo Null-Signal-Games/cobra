@@ -5,7 +5,7 @@
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import PlayerDisplay from "$lib/components/PlayerDisplay.svelte";
   import SelfReportOptions from "$lib/components/SelfReportOptions.svelte";
-  import { reportScore } from "$lib/api/beta";
+  import { betaApi } from "$lib/api/beta";
   import type { ScoreReport } from "$lib/model/ScoreReport";
   import Identity from "$lib/components/identity/Identity.svelte";
   import {
@@ -84,7 +84,7 @@
     report: ScoreReport,
     selfReport: boolean,
   ) {
-    const success = await reportScore(
+    const success = await betaApi.reportScore(
       tournamentId,
       roundId,
       pairingId,

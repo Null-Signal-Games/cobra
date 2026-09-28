@@ -1,21 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  changePlayerSide,
-  deleteStage,
-  deleteTournament,
-  loadPlayer,
-  loadPlayerByUserId,
-  reportScore,
-  resetReports,
-  savePlayer,
-} from "./beta";
+import { BetaApi, betaApi } from "./beta";
+import { ApiBase } from "./apiBase";
 import { Player } from "$lib/model/Player";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 import * as csrfModule from "$lib/csrf";
 
-describe("tournament score reporting", () => {
+describe("BetaApi", () => {
   const mockFetch = vi.fn<typeof fetch>();
+  let api: BetaApi;
 
   function getFetchCall(callIndex = 0) {
     const [input, requestOptions] = mockFetch.mock.calls[callIndex];
@@ -30,14 +23,23 @@ describe("tournament score reporting", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    globalMessages.errors = [];
+    globalMessages.warnings = [];
+    globalMessages.infos = [];
     vi.spyOn(csrfModule, "csrfToken").mockReturnValue("mock-csrf-token");
+    const apiBase = new ApiBase("https://tournaments.nullsignal.games", mockFetch);
+    api = new BetaApi(apiBase);
+  });
+
+  it("exports a default singleton instance of BetaApi", () => {
+    expect(betaApi).toBeInstanceOf(BetaApi);
   });
 
   describe("changePlayerSide", () => {
     it("sends POST request with side data", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await changePlayerSide(10, 2, 42, "corp", mockFetch);
+      const result = await api.changePlayerSide(10, 2, 42, "corp", mockFetch);
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -51,7 +53,7 @@ describe("tournament score reporting", () => {
     it("returns false when response is not ok", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }));
 
-      const result = await changePlayerSide(10, 2, 42, "corp", mockFetch);
+      const result = await api.changePlayerSide(10, 2, 42, "corp", mockFetch);
 
       expect(result).toBe(false);
     });
@@ -71,7 +73,7 @@ describe("tournament score reporting", () => {
         intentional_draw: false,
       };
 
-      await reportScore(10, 2, 42, report, true, mockFetch);
+      await api.reportScore(10, 2, 42, report, true, mockFetch);
 
       const { url, headers } = getFetchCall();
       expect(url).not.toContain("//beta");
@@ -95,7 +97,7 @@ describe("tournament score reporting", () => {
         extra_self_report_label: "Player 1 wins",
       };
 
-      const result = await reportScore(10, 2, 42, report, true, mockFetch);
+      const result = await api.reportScore(10, 2, 42, report, true, mockFetch);
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -130,7 +132,7 @@ describe("tournament score reporting", () => {
         intentional_draw: false,
       };
 
-      const result = await reportScore(10, 2, 42, report, false, mockFetch);
+      const result = await api.reportScore(10, 2, 42, report, false, mockFetch);
 
       expect(result).toBe(false);
     });
@@ -140,7 +142,7 @@ describe("tournament score reporting", () => {
     it("sends DELETE request to reset_self_report endpoint", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await resetReports(10, 2, 42, mockFetch);
+      const result = await api.resetReports(10, 2, 42, mockFetch);
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -155,7 +157,7 @@ describe("tournament score reporting", () => {
     it("makes a DELETE request to /beta/tournaments/:id with confirmation_name and returns true on 200", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await deleteTournament(42, "Danger Noodle", mockFetch);
+      const result = await api.deleteTournament(42, "Danger Noodle", mockFetch);
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const { url, requestOptions, headers } = getFetchCall();
@@ -175,7 +177,7 @@ describe("tournament score reporting", () => {
         ),
       );
 
-      const result = await deleteTournament(42, "Wrong Name", mockFetch);
+      const result = await api.deleteTournament(42, "Wrong Name", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain(
         "Confirmation name does not match the tournament name",
@@ -185,7 +187,7 @@ describe("tournament score reporting", () => {
     it("returns false and logs fallback error on failure", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }));
 
-      const result = await deleteTournament(42, "Danger Noodle", mockFetch);
+      const result = await api.deleteTournament(42, "Danger Noodle", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain("Failed to delete tournament.");
     });
@@ -193,7 +195,7 @@ describe("tournament score reporting", () => {
     it("returns false and logs error on network exception", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Network failed"));
 
-      const result = await deleteTournament(42, "Danger Noodle", mockFetch);
+      const result = await api.deleteTournament(42, "Danger Noodle", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain("Failed to delete tournament: Network failed");
     });
@@ -203,7 +205,7 @@ describe("tournament score reporting", () => {
     it("makes a DELETE request to /beta/tournaments/:tournamentId/stages/:stageId with confirmation_name and returns true on 200", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await deleteStage(42, 7, "Danger Noodle", mockFetch);
+      const result = await api.deleteStage(42, 7, "Danger Noodle", mockFetch);
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const { url, requestOptions, headers } = getFetchCall();
@@ -223,7 +225,7 @@ describe("tournament score reporting", () => {
         ),
       );
 
-      const result = await deleteStage(42, 7, "Wrong Name", mockFetch);
+      const result = await api.deleteStage(42, 7, "Wrong Name", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain(
         "Confirmation name does not match the tournament name",
@@ -233,7 +235,7 @@ describe("tournament score reporting", () => {
     it("returns false and logs fallback error on failure", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }));
 
-      const result = await deleteStage(42, 7, "Danger Noodle", mockFetch);
+      const result = await api.deleteStage(42, 7, "Danger Noodle", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain("Failed to delete stage.");
     });
@@ -241,7 +243,7 @@ describe("tournament score reporting", () => {
     it("returns false and logs error on network exception", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Stage deletion network failed"));
 
-      const result = await deleteStage(42, 7, "Danger Noodle", mockFetch);
+      const result = await api.deleteStage(42, 7, "Danger Noodle", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain(
         "Failed to delete stage: Stage deletion network failed",
@@ -263,7 +265,7 @@ describe("tournament score reporting", () => {
 
       const newPlayer = new Player();
       newPlayer.name = "Alice";
-      const result = await savePlayer(42, newPlayer, false, mockFetch);
+      const result = await api.savePlayer(42, newPlayer, false, mockFetch);
 
       expect(result.id).toBe(123);
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -287,7 +289,7 @@ describe("tournament score reporting", () => {
       const player = new Player();
       player.id = 123;
       player.name = "Alice Updated";
-      const result = await savePlayer(42, player, true, mockFetch);
+      const result = await api.savePlayer(42, player, true, mockFetch);
 
       expect(result.name).toBe("Alice Updated");
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -307,7 +309,7 @@ describe("tournament score reporting", () => {
 
       const player = new Player();
       player.name = "Duplicate";
-      await savePlayer(42, player, false, mockFetch);
+      await api.savePlayer(42, player, false, mockFetch);
 
       expect(globalMessages.errors).toContain("Name already taken");
     });
@@ -323,7 +325,7 @@ describe("tournament score reporting", () => {
         }),
       );
 
-      const result = await loadPlayer(42, 5, mockFetch);
+      const result = await api.loadPlayer(42, 5, mockFetch);
 
       expect(result).toEqual(mockPlayer);
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -343,7 +345,7 @@ describe("tournament score reporting", () => {
         }),
       );
 
-      const result = await loadPlayerByUserId(42, 10, mockFetch);
+      const result = await api.loadPlayerByUserId(42, 10, mockFetch);
 
       expect(result).toEqual(mockPlayer);
       expect(mockFetch).toHaveBeenCalledTimes(1);

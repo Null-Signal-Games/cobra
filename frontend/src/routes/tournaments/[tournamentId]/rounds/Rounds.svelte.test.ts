@@ -14,7 +14,7 @@ import {
 } from "@testing-library/svelte";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { reportScore } from "$lib/api/beta";
+import { betaApi } from "$lib/api/beta";
 import RoundsPage from "./+page.svelte";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import { Player } from "$lib/model/Player";
@@ -66,8 +66,10 @@ const MockPageData: PageProps["data"] = {
 };
 
 vi.mock("$lib/api/beta", () => ({
-  loadPairings: vi.fn(() => { return { policy: MockPolicy, stages: [MockSwissStage] }; }),
-  reportScore: vi.fn(() => true),
+  betaApi: {
+    loadPairings: vi.fn(() => { return { policy: MockPolicy, stages: [MockSwissStage] }; }),
+    reportScore: vi.fn(() => true),
+  },
 }));
 
 const user = userEvent.setup();
@@ -213,7 +215,7 @@ describe("Rounds", () => {
 
             await rerender({ data: structuredClone(MockPageData) });
 
-            expect(reportScore).toHaveBeenCalledOnce();
+            expect(betaApi.reportScore).toHaveBeenCalledOnce();
             expect(
               queryByRole(table1Row, "button", { name: /report pairing/i }),
             ).toBeNull();
