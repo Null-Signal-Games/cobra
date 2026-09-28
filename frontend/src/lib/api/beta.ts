@@ -85,14 +85,8 @@ export const dropPlayer = (tournamentId: number, player: Player): Promise<boolea
     player: playerRequestObject(player),
   });
 
-export async function loadPairings(tournamentId: number, altFetch = fetch): Promise<PairingsData> {
-  const data = await api.getOrThrow<PairingsData>(
-    `/beta/tournaments/${tournamentId}/rounds/pairings_data`,
-    altFetch,
-  );
-  globalMessages.warnings = data.warnings ?? [];
-  return data;
-}
+export const loadPairings = (tournamentId: number, altFetch = fetch): Promise<PairingsData> =>
+  api.getOrThrow<PairingsData>(`/beta/tournaments/${tournamentId}/rounds/pairings_data`, altFetch);
 
 export const loadStats = (tournamentId: number, altFetch = fetch): Promise<Stats> =>
   api.getOrThrow<Stats>(`/beta/tournaments/${tournamentId}/id_and_faction_data`, altFetch);
@@ -308,18 +302,12 @@ export const deleteStage = (
     altFetch,
   );
 
-export async function loadRound(
-  tournamentId: number,
-  roundId: number,
-  altFetch = fetch,
-): Promise<RoundData> {
-  const data = await api.getOrThrow<RoundData>(
-    `/beta/tournaments/${tournamentId}/rounds/${roundId}/round_data`,
-    altFetch,
-  );
-  globalMessages.warnings = data.warnings ?? [];
-  return data;
-}
+export const loadRound = (
+   tournamentId: number,
+   roundId: number,
+   altFetch = fetch,
+): Promise<RoundData> =>
+  api.getOrThrow<RoundData>(`/beta/tournaments/${tournamentId}/rounds/${roundId}/round_data`, altFetch);
 
 export const pairRound = (tournamentId: number): Promise<boolean> =>
   api.postAction(`/beta/tournaments/${tournamentId}/rounds`);

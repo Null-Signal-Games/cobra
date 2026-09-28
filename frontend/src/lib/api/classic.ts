@@ -27,7 +27,6 @@ export async function loadPairingsForUser(
     return null;
   }
 
-  globalMessages.warnings = res.data.warnings ?? [];
   return res.data;
 }
 
@@ -54,18 +53,12 @@ export const loadTournamentSettings = (
 ): Promise<TournamentSettingsData> =>
   api.getOrThrow<TournamentSettingsData>(`/tournaments/${tournamentId}/edit_form`, altFetch);
 
-export async function loadStage(
+export const loadStage = (
   tournamentId: number,
   stageId: number,
   altFetch = fetch,
-): Promise<StageData> {
-  const data = await api.getOrThrow<StageData>(
-    `/tournaments/${tournamentId}/stages/${stageId}/settings`,
-    altFetch,
-  );
-  globalMessages.warnings = data.warning ? [data.warning] : [];
-  return data;
-}
+): Promise<StageData> =>
+  api.getOrThrow<StageData>(`/tournaments/${tournamentId}/stages/${stageId}/settings`, altFetch);
 
 export const createTournament = (tournament: Tournament): Promise<TournamentCreateResponse> =>
   api.postOrThrow<TournamentCreateResponse>("/tournaments", { tournament });
