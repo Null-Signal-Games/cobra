@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import * as csrfModule from "$lib/csrf";
 import { ApiBase } from "$lib/api/apiBase";
 import { ok, err, type StatusOr } from "$lib/api/statusOr";
 import { ValidationError } from "$lib/utils/errors";
-import * as csrfModule from "$lib/csrf";
+import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
 describe("ApiBase with StatusOr", () => {
   const mockFetch = vi.fn<typeof fetch>();
@@ -22,6 +23,7 @@ describe("ApiBase with StatusOr", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.spyOn(csrfModule, "csrfToken").mockReturnValue("mock-csrf-token");
+    globalMessages.warnings = [];
     api = new ApiBase("https://tournaments.nullsignal.games", mockFetch);
   });
 
@@ -344,6 +346,31 @@ describe("ApiBase with StatusOr", () => {
       );
 
       await expect(api.deleteOrThrow("/tournaments/1")).rejects.toThrow("HTTP 500: Server Error");
+    });
+  });
+
+  describe("warning normalization and synchronization", () => {
+    it("synchronizes plural warnings array to globalMessages.warnings", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ warnings: ["Warning 1", "Warning 2"] }), { status: 200 }),
+      );
+      await api.get("/test");
+      expect(globalMessages.warnings).toEqual(["Warning 1", "Warning 2"]);
+    });
+
+    it("normalizes singular warning string to globalMessages.warnings array", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ warning: "Single warning" }), { status: 200 }),
+      );
+      await api.get("/test");
+      expect(globalMessages.warnings).toEqual(["Single warning"]);
+    });
+
+    it("does not overwrite warnings when neither warning nor warnings is present", async () => {
+      globalMessages.warnings = ["Preserved warning"];
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify({ id: 1 }), { status: 200 }));
+      await api.get("/test");
+      expect(globalMessages.warnings).toEqual(["Preserved warning"]);
     });
   });
 });
