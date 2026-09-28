@@ -1,10 +1,10 @@
 import type { PageLoad } from "./$types";
-import { loadTournamentSettings } from "$lib/api/classic";
+import { classicApi } from "$lib/api/classic";
 
 export const load: PageLoad = async ({ params, fetch, parent }) => {
   await parent(); // Ensures organizer authorization in +layout.ts runs first
   const tournamentId = parseInt(params.tournamentId);
-  const settings = await loadTournamentSettings(tournamentId, fetch);
+  const settings = await classicApi.loadTournamentSettings(tournamentId, fetch);
   return {
     tournamentSettings: settings,
   };

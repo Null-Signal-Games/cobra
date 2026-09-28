@@ -3,7 +3,7 @@
   import TournamentSettingsForm from "../TournamentSettingsForm.svelte";
   import type { Tournament } from "$lib/model/Tournament";
   import { type Errors, ValidationError } from "$lib/utils/errors";
-  import { createTournament } from "$lib/api/classic";
+  import { classicApi } from "$lib/api/classic";
   import { navigateTo } from "$lib/utils/navigation";
 
   let { data }: PageProps = $props();
@@ -14,7 +14,7 @@
     errors = {};
 
     try {
-      const response = await createTournament(tournament);
+      const response = await classicApi.createTournament(tournament);
       navigateTo(response.url);
     } catch (error) {
       if (error instanceof ValidationError) {

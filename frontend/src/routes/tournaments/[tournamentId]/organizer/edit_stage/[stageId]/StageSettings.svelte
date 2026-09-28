@@ -4,7 +4,7 @@
     StageData,
     type SaveStageResponse,
   } from "$lib/api/classicTypes";
-  import { loadStage, saveStage } from "$lib/api/classic";
+  import { classicApi } from "$lib/api/classic";
   import { ValidationError } from "$lib/utils/errors";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import TableRangeEdit from "./TableRangeEdit.svelte";
@@ -40,7 +40,7 @@
 
   onMount(async () => {
     if (!initialData) {
-      data = await loadStage(tournamentId, stageId);
+      data = await classicApi.loadStage(tournamentId, stageId);
     }
     dataBackup = structuredClone($state.snapshot(data));
   });
@@ -54,7 +54,7 @@
     newTableRangeEdit?.addRange();
 
     try {
-      const response = await saveStage(tournamentId, data.stage);
+      const response = await classicApi.saveStage(tournamentId, data.stage);
       globalMessages.infos = ["Stage saved."];
       if (onSaveCallback) {
         onSaveCallback(response);
