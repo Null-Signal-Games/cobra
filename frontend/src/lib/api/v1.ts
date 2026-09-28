@@ -11,17 +11,17 @@ const JSON_API_HEADERS = {
 };
 
 export function tournamentsApiUrl(tournamentTypeId?: string): string {
-  const query = [
-    "/api/v1/public/tournaments?page[size]=10",
-    "include=tournament_type",
-    "sort=-date,name",
-  ];
+  const params = new URLSearchParams({
+    "page[size]": "10",
+    include: "tournament_type",
+    sort: "-date,name",
+  });
 
-  if (tournamentTypeId && tournamentTypeId.length > 0) {
-    query.push(`filter[tournament_type_id]=${encodeURIComponent(tournamentTypeId)}`);
+  if (tournamentTypeId) {
+    params.set("filter[tournament_type_id]", tournamentTypeId);
   }
 
-  return query.join("&");
+  return `/api/v1/public/tournaments?${params.toString()}`;
 }
 
 export async function loadTournaments(
@@ -45,8 +45,12 @@ export function loadTournamentBySlug(
   slug: string,
   altFetch = fetch,
 ): Promise<TournamentsResponse> {
+  const params = new URLSearchParams({
+    "filter[slug]": slug,
+  });
+
   return loadTournaments(
-    `/api/v1/public/tournaments?filter[slug]=${encodeURIComponent(slug)}`,
+    `/api/v1/public/tournaments?${params.toString()}`,
     altFetch,
   );
 }
@@ -57,5 +61,10 @@ export async function loadTournamentTypes(altFetch = fetch): Promise<TournamentT
     headers: JSON_API_HEADERS,
   });
 
-  return res.ok ? res.data.data : [];
+  if (!res.ok) {
+    globalMessages.errors.push(`Failed to load tournament types: ${res.error.message}`);
+    return [];
+  }
+
+  return res.data.data;
 }
