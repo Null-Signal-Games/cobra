@@ -6,7 +6,7 @@
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { loadTournaments } from "$lib/api/v1";
+  import { v1Api } from "$lib/api/v1";
 
   let tournaments: TournamentInfo[] = $state([]);
   let tournamentTypes: Record<string, string> = $state({});
@@ -19,7 +19,7 @@
     const url = `/api/v1/public/tournaments?page[size]=100&include=tournament_type&filter[date]=${dateString}&sort=name`;
 
     try {
-      const data = await loadTournaments(url);
+      const data = await v1Api.loadTournaments(url);
       tournaments = data.data;
 
       if (data.included) {

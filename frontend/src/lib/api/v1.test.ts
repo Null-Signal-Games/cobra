@@ -1,14 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  tournamentsApiUrl,
-  loadTournaments,
-  loadTournamentBySlug,
-  loadTournamentTypes,
-} from "./v1";
+import { V1Api, v1Api } from "$lib/api/v1";
+import { ApiBase } from "$lib/api/apiBase";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
-describe("v1 API", () => {
+describe("V1Api", () => {
   const mockFetch = vi.fn<typeof fetch>();
+  let api: V1Api;
 
   function getFetchCall(callIndex = 0) {
     const [input, requestOptions] = mockFetch.mock.calls[callIndex];
@@ -20,11 +17,17 @@ describe("v1 API", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     globalMessages.errors = [];
+    const apiBase = new ApiBase("https://tournaments.nullsignal.games", mockFetch);
+    api = new V1Api(apiBase);
+  });
+
+  it("exports a default singleton instance of V1Api", () => {
+    expect(v1Api).toBeInstanceOf(V1Api);
   });
 
   describe("tournamentsApiUrl", () => {
     it("builds query with standard pagination and sorting when no type is provided", () => {
-      const url = tournamentsApiUrl();
+      const url = api.tournamentsApiUrl();
       const [path, queryString] = url.split("?");
       expect(path).toBe("/api/v1/public/tournaments");
 
@@ -36,7 +39,7 @@ describe("v1 API", () => {
     });
 
     it("includes tournament type filter when specified", () => {
-      const url = tournamentsApiUrl("42");
+      const url = api.tournamentsApiUrl("42");
       const [path, queryString] = url.split("?");
       expect(path).toBe("/api/v1/public/tournaments");
 
@@ -57,7 +60,7 @@ describe("v1 API", () => {
         }),
       );
 
-      const result = await loadTournaments("/api/v1/public/tournaments", mockFetch);
+      const result = await api.loadTournaments("/api/v1/public/tournaments", mockFetch);
 
       expect(result).toEqual(mockResponse);
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -70,7 +73,7 @@ describe("v1 API", () => {
         new Response(null, { status: 500, statusText: "Internal Server Error" }),
       );
 
-      const result = await loadTournaments("/api/v1/public/tournaments", mockFetch);
+      const result = await api.loadTournaments("/api/v1/public/tournaments", mockFetch);
 
       expect(result).toEqual({ data: [] });
       expect(globalMessages.errors).toHaveLength(1);
@@ -90,7 +93,7 @@ describe("v1 API", () => {
         }),
       );
 
-      const result = await loadTournamentBySlug("test-slug", mockFetch);
+      const result = await api.loadTournamentBySlug("test-slug", mockFetch);
 
       expect(result).toEqual(mockResponse);
       const { url } = getFetchCall();
@@ -112,7 +115,7 @@ describe("v1 API", () => {
         }),
       );
 
-      const result = await loadTournamentTypes(mockFetch);
+      const result = await api.loadTournamentTypes(mockFetch);
 
       expect(result).toEqual(mockTypes);
       const { headers } = getFetchCall();
@@ -124,7 +127,7 @@ describe("v1 API", () => {
         new Response(null, { status: 500, statusText: "Internal Server Error" }),
       );
 
-      const result = await loadTournamentTypes(mockFetch);
+      const result = await api.loadTournamentTypes(mockFetch);
 
       expect(result).toEqual([]);
       expect(globalMessages.errors).toHaveLength(1);

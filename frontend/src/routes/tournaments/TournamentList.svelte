@@ -3,7 +3,7 @@
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import PagingRow from "$lib/components/PagingRow.svelte";
   import TournamentRow from "$lib/components/TournamentRow.svelte";
-  import { loadTournaments } from "$lib/api/v1";
+  import { v1Api } from "$lib/api/v1";
 
   let {
     typeId = null,
@@ -29,7 +29,7 @@
     }
 
     loading = true;
-    tournamentsResponse = await loadTournaments(tournamentsResponse.links.prev);
+    tournamentsResponse = await v1Api.loadTournaments(tournamentsResponse.links.prev);
     loading = false;
   }
 
@@ -39,7 +39,7 @@
     }
 
     loading = true;
-    tournamentsResponse = await loadTournaments(tournamentsResponse.links.next);
+    tournamentsResponse = await v1Api.loadTournaments(tournamentsResponse.links.next);
     loading = false;
   }
 </script>
