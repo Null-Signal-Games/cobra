@@ -13,38 +13,22 @@ import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 export const loadTournament = (tournamentId: number, altFetch = fetch): Promise<TournamentData> =>
   api.getOrThrow<TournamentData>(`/beta/tournaments/${tournamentId}`, altFetch);
 
-export async function loadPlayer(
+export const loadPlayer = (
   tournamentId: number,
   playerId: number,
   altFetch = fetch,
-): Promise<Player | null> {
-  try {
-    const data = await api.getOrThrow<Player>(
-      `/beta/tournaments/${tournamentId}/players/${playerId}`,
-      altFetch,
-    );
-    return Object.assign(new Player(), data);
-  } catch {
-    globalMessages.errors.push(`Error loading player data for player ${playerId}.`);
-    return null;
-  }
-}
+): Promise<Player> =>
+  api.getOrThrow<Player>(`/beta/tournaments/${tournamentId}/players/${playerId}`, altFetch);
 
-export async function loadPlayerByUserId(
+export const loadPlayerByUserId = (
   tournamentId: number,
   userId: number,
   altFetch = fetch,
-): Promise<Player | null> {
-  try {
-    return await api.getOrThrow<Player>(
-      `/beta/tournaments/${tournamentId}/players/by_user_id/${userId}`,
-      altFetch,
-    );
-  } catch {
-    globalMessages.errors.push(`Error loading player data for user ${userId}.`);
-    return null;
-  }
-}
+): Promise<Player> =>
+  api.getOrThrow<Player>(
+    `/beta/tournaments/${tournamentId}/players/by_user_id/${userId}`,
+    altFetch,
+  );
 
 interface SavePlayerResponse {
   player: Player;
@@ -172,26 +156,18 @@ export async function saveTournament(tournament: Tournament): Promise<boolean> {
   return true;
 }
 
-export async function changePlayerSide(
+export const changePlayerSide = (
   tournamentId: number,
   roundId: number,
   pairingId: number,
   side: string,
   altFetch = fetch,
-): Promise<boolean> {
-  const res = await api.post(
+): Promise<boolean> =>
+  api.postAction(
     `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/report`,
     { side: `player1_is_${side}` },
     { altFetch },
   );
-
-  if (!res.ok) {
-    globalMessages.errors.push("Failed to change player side.");
-    return false;
-  }
-
-  return true;
-}
 
 export async function reportScore(
   tournamentId: number,
@@ -241,25 +217,17 @@ export const updateRoundTimer = (
     operation,
   });
 
-export async function resetReports(
+export const resetReports = (
   tournamentId: number,
   roundId: number,
   pairingId: number,
   altFetch = fetch,
-): Promise<boolean> {
-  const res = await api.delete(
+): Promise<boolean> =>
+  api.deleteAction(
     `/beta/tournaments/${tournamentId}/rounds/${roundId}/pairings/${pairingId}/reset_self_report`,
     undefined,
     { altFetch },
   );
-
-  if (!res.ok) {
-    globalMessages.errors.push("Failed to reset self report.");
-    return false;
-  }
-
-  return true;
-}
 
 export function createStage(
   tournamentId: number,

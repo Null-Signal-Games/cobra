@@ -3,6 +3,8 @@ import {
   changePlayerSide,
   deleteStage,
   deleteTournament,
+  loadPlayer,
+  loadPlayerByUserId,
   reportScore,
   resetReports,
   savePlayer,
@@ -310,4 +312,45 @@ describe("tournament score reporting", () => {
       expect(globalMessages.errors).toContain("Name already taken");
     });
   });
+
+  describe("loadPlayer", () => {
+    it("fetches player data from /beta/tournaments/:tournamentId/players/:playerId", async () => {
+      const mockPlayer = { id: 5, name: "Alice" };
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockPlayer), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const result = await loadPlayer(42, 5, mockFetch);
+
+      expect(result).toEqual(mockPlayer);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const { url, requestOptions } = getFetchCall();
+      expect(url).toContain("/beta/tournaments/42/players/5");
+      expect(requestOptions?.method).toBe("GET");
+    });
+  });
+
+  describe("loadPlayerByUserId", () => {
+    it("fetches player data from /beta/tournaments/:tournamentId/players/by_user_id/:userId", async () => {
+      const mockPlayer = { id: 5, user_id: 10, name: "Alice" };
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockPlayer), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const result = await loadPlayerByUserId(42, 10, mockFetch);
+
+      expect(result).toEqual(mockPlayer);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const { url, requestOptions } = getFetchCall();
+      expect(url).toContain("/beta/tournaments/42/players/by_user_id/10");
+      expect(requestOptions?.method).toBe("GET");
+    });
+  });
 });
+
