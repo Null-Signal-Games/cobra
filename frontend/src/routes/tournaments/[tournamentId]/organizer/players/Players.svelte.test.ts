@@ -20,7 +20,7 @@ import type { IdentityNames } from "$lib/model/Identity";
 import { invalidateAll } from "$app/navigation";
 import { betaApi } from "$lib/api/beta";
 
-const user = userEvent.setup();
+let user = userEvent.setup();
 
 let currentTournament: Tournament;
 let mockAlice: Player;
@@ -237,6 +237,7 @@ describe("Players", () => {
     }
 
     beforeEach(() => {
+      user = userEvent.setup({ delay: null });
       renderComponent();
     });
 
@@ -545,6 +546,8 @@ describe("Players", () => {
     let mockBob: Player;
 
     beforeEach(() => {
+      user = userEvent.setup({ delay: null });
+      
       const tournament = $state(createMockTournament());
       currentTournament = tournament;
       const mockAlice = createMockAlice();
