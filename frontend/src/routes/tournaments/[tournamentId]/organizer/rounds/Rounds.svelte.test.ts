@@ -20,16 +20,7 @@ import {
 } from "@testing-library/svelte";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  completeRound,
-  createStage,
-  deletePairing,
-  pairRound,
-  reportScore,
-  setPlayerRegistrationStatus,
-  setRegistrationStatus,
-  updateRoundTimer,
-} from "../../api_helper";
+import { betaApi } from "$lib/api/beta";
 import RoundsPage from "./+page.svelte";
 import type { PageProps } from "./$types";
 import {
@@ -75,19 +66,20 @@ const MockPageData: PageProps["data"] = {
   stages: [MockSwissStage],
 };
 
-vi.mock("../../api_helper", () => ({
-  loadPairings: vi.fn(),
-  changePlayerSide: vi.fn(),
-  createStage: vi.fn(),
-  setRegistrationStatus: vi.fn(),
-  setPlayerRegistrationStatus: vi.fn(),
-  pairRound: vi.fn(),
-  completeRound: vi.fn(),
-  deletePairing: vi.fn(),
-  updateRoundTimer: vi.fn(),
-  reportScore: vi.fn(),
+vi.mock("$lib/api/beta", () => ({
+  betaApi: {
+    changePlayerSide: vi.fn(),
+    completeRound: vi.fn(),
+    createStage: vi.fn(),
+    deletePairing: vi.fn(),
+    loadPairings: vi.fn(),
+    pairRound: vi.fn(),
+    reportScore: vi.fn(),
+    setPlayerRegistrationStatus: vi.fn(),
+    setRegistrationStatus: vi.fn(),
+    updateRoundTimer: vi.fn(),
+  },
 }));
-
 vi.mock('$app/env/public', () => {
   return {
     COBRA_API_SERVER: "http://localhost:3000"
@@ -144,7 +136,7 @@ describe("Rounds", () => {
 
         await rerender({ data: structuredClone(MockPageData) });
 
-        expect(createStage).toHaveBeenCalledOnce();
+        expect(betaApi.createStage).toHaveBeenCalledOnce();
         expect(screen.queryByText(/^swiss$/i)).not.toBeNull();
       });
     });
@@ -179,7 +171,7 @@ describe("Rounds", () => {
 
           await rerender({ data: structuredClone(MockPageData) });
 
-          expect(setRegistrationStatus).toHaveBeenCalledOnce();
+          expect(betaApi.setRegistrationStatus).toHaveBeenCalledOnce();
           expect(screen.queryByText(/open registration/i)).not.toBeNull();
           expect(screen.queryByText(/unlock all players/i)).not.toBeNull();
         });
@@ -214,7 +206,7 @@ describe("Rounds", () => {
 
             await rerender({ data: structuredClone(MockPageData) });
 
-            expect(setPlayerRegistrationStatus).toHaveBeenCalledOnce();
+            expect(betaApi.setPlayerRegistrationStatus).toHaveBeenCalledOnce();
             expect(screen.queryByText(/unlock all players/i)).not.toBeNull();
           });
         });
@@ -247,7 +239,7 @@ describe("Rounds", () => {
 
             await rerender({ data: structuredClone(MockPageData) });
 
-            expect(setRegistrationStatus).toHaveBeenCalledOnce();
+            expect(betaApi.setRegistrationStatus).toHaveBeenCalledOnce();
             expect(screen.queryByText(/close registration/i)).not.toBeNull();
             expect(screen.queryByText(/lock all players/i)).toBeNull();
           });
@@ -271,7 +263,7 @@ describe("Rounds", () => {
 
             await rerender({ data: structuredClone(MockPageData) });
 
-            expect(setPlayerRegistrationStatus).toHaveBeenCalledOnce();
+            expect(betaApi.setPlayerRegistrationStatus).toHaveBeenCalledOnce();
             expect(screen.queryByText(/lock all players/i)).not.toBeNull();
           });
         });
@@ -297,7 +289,7 @@ describe("Rounds", () => {
 
           await rerender({ data: structuredClone(MockPageData) });
 
-          expect(completeRound).toHaveBeenCalledOnce();
+          expect(betaApi.completeRound).toHaveBeenCalledOnce();
           expect(
             screen.queryByRole("button", { name: /complete/i }),
           ).not.toBeInTheDocument();
@@ -310,7 +302,7 @@ describe("Rounds", () => {
 
           await user.click(screen.getByRole("button", { name: /complete/i }));
 
-          expect(completeRound).not.toHaveBeenCalled();
+          expect(betaApi.completeRound).not.toHaveBeenCalled();
           expect(
             screen.getByRole("button", { name: /complete/i }),
           ).toBeInTheDocument();
@@ -336,7 +328,7 @@ describe("Rounds", () => {
 
         await rerender({ data: structuredClone(MockPageData) });
 
-        expect(deletePairing).toHaveBeenCalledOnce();
+        expect(betaApi.deletePairing).toHaveBeenCalledOnce();
         expect(table1Row).not.toBeInTheDocument();
       });
 
@@ -351,7 +343,7 @@ describe("Rounds", () => {
         await user.click(
           within(table1Row).getByRole("button", { name: /delete/i }),
         );
-        expect(deletePairing).not.toHaveBeenCalled();
+        expect(betaApi.deletePairing).not.toHaveBeenCalled();
         expect(table1Row).toBeInTheDocument();
       });
 
@@ -379,7 +371,7 @@ describe("Rounds", () => {
 
             await rerender({ data: structuredClone(MockPageData) });
 
-            expect(reportScore).toHaveBeenCalledOnce();
+            expect(betaApi.reportScore).toHaveBeenCalledOnce();
             expect(
               within(table1Row).getByRole("textbox", { name: /corp-score/i }),
             ).toHaveValue(score1.toString());
@@ -462,7 +454,7 @@ describe("Rounds", () => {
 
           await rerender({ data: structuredClone(MockPageData) });
 
-          expect(reportScore).toHaveBeenCalledOnce();
+          expect(betaApi.reportScore).toHaveBeenCalledOnce();
           expect(
             within(table1Row).getByRole("textbox", { name: /corp-score/i }),
           ).toHaveValue(score1.toString());
@@ -518,7 +510,7 @@ describe("Rounds", () => {
           getByRole(roundTimerForm, "button", { name: /start/i }),
         );
 
-        expect(updateRoundTimer).toHaveBeenCalledWith("", 1, 1, 65, "start");
+        expect(betaApi.updateRoundTimer).toHaveBeenCalledWith(1, 1, 65, "start");
       });
 
       it("resets the round timer", async () => {
@@ -533,7 +525,7 @@ describe("Rounds", () => {
           getByRole(roundTimerForm, "button", { name: /reset/i }),
         );
 
-        expect(updateRoundTimer).toHaveBeenCalledWith("", 1, 1, 65, "reset");
+        expect(betaApi.updateRoundTimer).toHaveBeenCalledWith(1, 1, 65, "reset");
       });
     });
 
@@ -553,7 +545,7 @@ describe("Rounds", () => {
           getByRole(roundTimerForm, "button", { name: /pause/i }),
         );
 
-        expect(updateRoundTimer).toHaveBeenCalledWith("", 1, 1, 65, "stop");
+        expect(betaApi.updateRoundTimer).toHaveBeenCalledWith(1, 1, 65, "stop");
       });
     });
 
@@ -574,7 +566,7 @@ describe("Rounds", () => {
           getByRole(roundTimerForm, "button", { name: /resume/i }),
         );
 
-        expect(updateRoundTimer).toHaveBeenCalledWith("", 1, 1, 65, "start");
+        expect(betaApi.updateRoundTimer).toHaveBeenCalledWith(1, 1, 65, "start");
       });
     });
 
@@ -600,7 +592,7 @@ describe("Rounds", () => {
 
         await rerender({ data: structuredClone(MockPageData) });
 
-        expect(pairRound).toHaveBeenCalledOnce();
+        expect(betaApi.pairRound).toHaveBeenCalledOnce();
         expect(screen.queryByText(/round 2/i)).not.toBeNull();
       });
 
@@ -621,7 +613,7 @@ describe("Rounds", () => {
 
         await rerender({ data: structuredClone(MockPageData) });
 
-        expect(createStage).toHaveBeenCalledOnce();
+        expect(betaApi.createStage).toHaveBeenCalledOnce();
         expect(screen.queryByText(/^single elim$/i)).not.toBeNull();
       });
 
@@ -642,7 +634,7 @@ describe("Rounds", () => {
 
         await rerender({ data: structuredClone(MockPageData) });
 
-        expect(createStage).toHaveBeenCalledOnce();
+        expect(betaApi.createStage).toHaveBeenCalledOnce();
         expect(screen.queryByText(/^double elim$/i)).not.toBeNull();
       });
     });

@@ -4,7 +4,7 @@
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import type { Tournament } from "$lib/model/Tournament";
   import { type Errors, ValidationError } from "$lib/utils/errors";
-  import { updateTournamentSettings } from "../../api_helper";
+  import { classicApi } from "$lib/api/classic";
   import { invalidateAll } from "$app/navigation";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
   let { data }: PageProps = $props();
@@ -13,10 +13,7 @@
   async function handleSave(tournamentEdit: Tournament): Promise<boolean> {
     errors = {};
     try {
-      await updateTournamentSettings(
-        data.tournamentSettings.csrf_token,
-        tournamentEdit,
-      );
+      await classicApi.updateTournamentSettings(tournamentEdit);
       globalMessages.infos = ["Tournament settings saved."];
       await invalidateAll();
       return true;
@@ -32,8 +29,8 @@
 </script>
 
 <div class="col-12">
-    <GlobalMessages />
-    
+  <GlobalMessages />
+
   {#if errors.base}
     <div class="alert alert-danger">{errors.base}</div>
   {/if}

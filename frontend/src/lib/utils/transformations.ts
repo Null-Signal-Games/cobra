@@ -1,7 +1,7 @@
 // Types and transformation code to transform data between the implicit API and data structures needed by varioius pages.
 
 import type { Identity as IdentityType } from "$lib/model/Identity";
-import type { PairingsData } from "../../routes/tournaments/[tournamentId]/api_helper";
+import type { PairingsData } from "$lib/api/betaTypes";
 import type { Pairing } from "$lib/model/Pairing";
 import type { Round } from "$lib/model/Round";
 import type { Stage } from "$lib/model/Stage";

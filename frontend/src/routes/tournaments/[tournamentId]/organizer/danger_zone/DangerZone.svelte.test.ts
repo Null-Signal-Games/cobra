@@ -4,13 +4,15 @@ import userEvent from "@testing-library/user-event";
 import DangerZonePage from "./+page.svelte";
 import { Tournament } from "$lib/model/Tournament";
 import type { Stage } from "$lib/model/Stage";
-import { deleteStage, deleteTournament } from "../../api_helper";
+import { betaApi } from "$lib/api/beta";
 import { goto, invalidateAll } from "$app/navigation";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
-vi.mock("../../api_helper", () => ({
-  deleteTournament: vi.fn(),
-  deleteStage: vi.fn(),
+vi.mock("$lib/api/beta", () => ({
+  betaApi: {
+    deleteTournament: vi.fn(),
+    deleteStage: vi.fn(),
+  },
 }));
 
 vi.mock("$app/navigation", () => ({
@@ -118,7 +120,7 @@ describe("Danger Zone Page", () => {
   });
 
   it("prompts for confirmation and deletes tournament on confirm", async () => {
-    vi.mocked(deleteTournament).mockResolvedValue(true);
+    vi.mocked(betaApi.deleteTournament).mockResolvedValue(true);
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
 
     renderPage();
@@ -132,12 +134,12 @@ describe("Danger Zone Page", () => {
     await user.click(deleteTournamentBtn);
 
     expect(confirmSpy).toHaveBeenCalledWith("Are you absolutely sure? This cannot be reversed.");
-    expect(deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle", "test-csrf-token");
+    expect(betaApi.deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle");
     expect(goto).toHaveBeenCalledWith("/tournaments");
   });
 
   it("does not delete tournament if confirmation is cancelled", async () => {
-    vi.mocked(deleteTournament).mockResolvedValue(true);
+    vi.mocked(betaApi.deleteTournament).mockResolvedValue(true);
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
 
     renderPage();
@@ -151,12 +153,12 @@ describe("Danger Zone Page", () => {
     await user.click(deleteTournamentBtn);
 
     expect(confirmSpy).toHaveBeenCalled();
-    expect(deleteTournament).not.toHaveBeenCalled();
+    expect(betaApi.deleteTournament).not.toHaveBeenCalled();
     expect(goto).not.toHaveBeenCalled();
   });
 
   it("does not redirect if deleteTournament returns false", async () => {
-    vi.mocked(deleteTournament).mockResolvedValue(false);
+    vi.mocked(betaApi.deleteTournament).mockResolvedValue(false);
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
     renderPage();
@@ -169,12 +171,12 @@ describe("Danger Zone Page", () => {
     await user.type(tournamentInput, "Danger Noodle");
     await user.click(deleteTournamentBtn);
 
-    expect(deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle", "test-csrf-token");
+    expect(betaApi.deleteTournament).toHaveBeenCalledWith(1, "Danger Noodle");
     expect(goto).not.toHaveBeenCalled();
   });
 
   it("deletes stage on confirmation, invalidates data, and shows success message", async () => {
-    vi.mocked(deleteStage).mockResolvedValue(true);
+    vi.mocked(betaApi.deleteStage).mockResolvedValue(true);
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
 
     renderPage();
@@ -192,13 +194,13 @@ describe("Danger Zone Page", () => {
     await user.click(deleteSwissBtn);
 
     expect(confirmSpy).toHaveBeenCalledWith("Are you absolutely sure? This cannot be reversed.");
-    expect(deleteStage).toHaveBeenCalledWith(1, 101, "Danger Noodle", "test-csrf-token");
+    expect(betaApi.deleteStage).toHaveBeenCalledWith(1, 101, "Danger Noodle");
     expect(invalidateAll).toHaveBeenCalledOnce();
     expect(globalMessages.infos).toContain("Stage deleted.");
   });
 
   it("does not delete stage if confirmation is cancelled", async () => {
-    vi.mocked(deleteStage).mockResolvedValue(true);
+    vi.mocked(betaApi.deleteStage).mockResolvedValue(true);
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
 
     renderPage();
@@ -212,12 +214,12 @@ describe("Danger Zone Page", () => {
     await user.click(deleteSwissBtn);
 
     expect(confirmSpy).toHaveBeenCalled();
-    expect(deleteStage).not.toHaveBeenCalled();
+    expect(betaApi.deleteStage).not.toHaveBeenCalled();
     expect(invalidateAll).not.toHaveBeenCalled();
   });
 
   it("does not invalidate or show info message if deleteStage returns false", async () => {
-    vi.mocked(deleteStage).mockResolvedValue(false);
+    vi.mocked(betaApi.deleteStage).mockResolvedValue(false);
     vi.spyOn(window, "confirm").mockReturnValue(true);
 
     renderPage();
@@ -230,7 +232,7 @@ describe("Danger Zone Page", () => {
     await user.type(elimInput, "Danger Noodle");
     await user.click(deleteElimBtn);
 
-    expect(deleteStage).toHaveBeenCalledWith(1, 102, "Danger Noodle", "test-csrf-token");
+    expect(betaApi.deleteStage).toHaveBeenCalledWith(1, 102, "Danger Noodle");
     expect(invalidateAll).not.toHaveBeenCalled();
     expect(globalMessages.infos).toHaveLength(0);
   });

@@ -7,10 +7,16 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import TournamentCreation from "./+page.svelte";
 import { navigateTo } from "$lib/utils/navigation";
 
-// Mock the TournamentSettings module
-vi.mock("../api_helper", () => ({
-  loadNewTournament: vi.fn(),
-  createTournament: vi.fn(),
+import { classicApi } from "$lib/api/classic";
+
+vi.mock("$app/env/public", () => ({
+  COBRA_API_SERVER: "http://localhost:3000",
+}));
+
+vi.mock("$lib/api/classic", () => ({
+  classicApi: {
+    createTournament: vi.fn(),
+  },
 }));
 
 vi.mock("$lib/utils/navigation", () => ({
@@ -83,13 +89,12 @@ describe("TournamentCreation", () => {
   });
 
   it("successfully creates a tournament", async () => {
-    const { createTournament } = await import("../api_helper");
     const mockResponse = {
       id: 123,
       name: "Test Tournament",
       url: "/tournaments/123",
     };
-    vi.mocked(createTournament).mockResolvedValue(mockResponse);
+    vi.mocked(classicApi.createTournament).mockResolvedValue(mockResponse);
 
     render(TournamentCreation, { props: createProps() });
 
@@ -108,8 +113,7 @@ describe("TournamentCreation", () => {
     await fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(createTournament).toHaveBeenCalledWith(
-        "fake-csrf-token",
+      expect(classicApi.createTournament).toHaveBeenCalledWith(
         expect.objectContaining({
           name: "Test Tournament",
         }),
@@ -123,12 +127,11 @@ describe("TournamentCreation", () => {
   });
 
   it("handles validation errors", async () => {
-    const { createTournament } = await import("../api_helper");
     const validationError = new ValidationError({
       name: ["Name is required"],
       date: ["Date must be in the future"],
     });
-    vi.mocked(createTournament).mockRejectedValue(validationError);
+    vi.mocked(classicApi.createTournament).mockRejectedValue(validationError);
 
     render(TournamentCreation, { props: createProps() });
 
@@ -144,15 +147,12 @@ describe("TournamentCreation", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Name is required")).toBeInTheDocument();
-      expect(
-        screen.getByText("Date must be in the future"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Date must be in the future")).toBeInTheDocument();
     });
   });
 
   it("handles unexpected errors", async () => {
-    const { createTournament } = await import("../api_helper");
-    vi.mocked(createTournament).mockRejectedValue(new Error("Network error"));
+    vi.mocked(classicApi.createTournament).mockRejectedValue(new Error("Network error"));
 
     render(TournamentCreation, { props: createProps() });
 
@@ -167,16 +167,13 @@ describe("TournamentCreation", () => {
     await fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/an unexpected error occurred/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/an unexpected error occurred/i)).toBeInTheDocument();
     });
   });
 
   it("disables submit button while submitting", async () => {
-    const { createTournament } = await import("../api_helper");
     // Make createTournament hang to test loading state
-    vi.mocked(createTournament).mockImplementation(
+    vi.mocked(classicApi.createTournament).mockImplementation(
       () =>
         new Promise(() => {
           // This promise intentionally never resolves to test loading state

@@ -1,5 +1,5 @@
 import type { PageLoad } from "./$types";
-import { loadPairings } from "../api_helper";
+import { classicApi } from "$lib/api/classic";
 import { authStore } from "$lib/utils/auth.svelte";
 
 export const load: PageLoad = async ({ parent, fetch }) => {
@@ -12,6 +12,6 @@ export const load: PageLoad = async ({ parent, fetch }) => {
     pairings:
       !player || !user
         ? null
-        : await loadPairings(tournamentData.tournament.id, user.id, fetch),
+        : await classicApi.loadPairingsForUser(tournamentData.tournament.id, user.id, fetch),
   };
 };

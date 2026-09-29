@@ -1,35 +1,25 @@
 <script lang="ts">
-  import { COBRA_API_SERVER } from "$app/env/public";
   import { onMount } from "svelte";
-  import type { TournamentInfo, TournamentsResponse } from "$lib/utils/api_types";
+  import type { TournamentInfo } from "$lib/api/v1ApiTypes";
   import TournamentRow from "$lib/components/TournamentRow.svelte";
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
-  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { v1Api } from "$lib/api/v1";
 
   let tournaments: TournamentInfo[] = $state([]);
   let tournamentTypes: Record<string, string> = $state({});
   let loading = $state(true);
 
-  async function loadTournaments(): Promise<void> {
+  async function fetchTodayTournaments(): Promise<void> {
     loading = true;
     const today = new Date();
     const dateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-    const url = `${COBRA_API_SERVER}/api/v1/public/tournaments?page[size]=100&include=tournament_type&filter[date]=${dateString}&sort=name`;
+    const url = `/api/v1/public/tournaments?page[size]=100&include=tournament_type&filter[date]=${dateString}&sort=name`;
 
     try {
-      const response = await fetch(url, {
-        headers: {
-          Accept: "application/vnd.api+json",
-          "Content-Type": "application/vnd.api+json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = (await response.json()) as TournamentsResponse;
+      const data = await v1Api.loadTournaments(url);
       tournaments = data.data;
 
       if (data.included) {
@@ -41,16 +31,13 @@
         }
         tournamentTypes = newTypes;
       }
-    } catch (e) {
-      const err = e as Error;
-      globalMessages.errors.push(`Failed to load tournaments: ${err.message}`);
     } finally {
       loading = false;
     }
   }
 
   onMount(() => {
-    void loadTournaments();
+    void fetchTodayTournaments();
   });
 
   async function handleSubmit(event: SubmitEvent) {
@@ -86,7 +73,13 @@
 <div class="mt-2">
   <form method="get" class="form-inline justify-content-center" onsubmit={handleSubmit}>
     <label class="mx-2" for="shortcode">Got a shortcode?</label>
-    <input type="text" class="form-control mr-2" placeholder="SHRT" name="shortcode" id="shortcode" />
+    <input
+      type="text"
+      class="form-control mr-2"
+      placeholder="SHRT"
+      name="shortcode"
+      id="shortcode"
+    />
     <button type="submit" class="btn btn-primary mr-2">
       <i class="fa fa-arrow-right"></i>
       Go to tournament

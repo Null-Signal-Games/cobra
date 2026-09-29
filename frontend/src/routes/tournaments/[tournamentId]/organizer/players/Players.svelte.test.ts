@@ -18,24 +18,19 @@ import {
 } from "$lib/model/Tournament";
 import type { IdentityNames } from "$lib/model/Identity";
 import { invalidateAll } from "$app/navigation";
-import {
-  deletePlayer,
-  dropPlayer,
-  reinstatePlayer,
-  savePlayer,
-  saveTournament,
-  setPlayerRegistrationStatus,
-  setRegistrationStatus,
-  togglePlayerLock,
-} from "../../../api_helper";
+import { betaApi } from "$lib/api/beta";
 
-const user = userEvent.setup();
+let user = userEvent.setup();
 
 let currentTournament: Tournament;
 let mockAlice: Player;
 let mockBob: Player;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let rerenderFn: ((props: any) => Promise<void>) | null = null;
+
+vi.mock("$app/env/public", () => ({
+  COBRA_API_SERVER: "http://localhost:3000",
+}));
 
 vi.mock("$app/navigation", () => ({
   invalidateAll: vi.fn(async () => {
@@ -60,29 +55,31 @@ vi.mock("$app/navigation", () => ({
   }),
 }));
 
-vi.mock("../../../api_helper", () => ({
-  saveTournament: vi.fn((tournament: Tournament) => {
+vi.mock("$lib/api/beta", () => ({
+  betaApi: {
+    saveTournament: vi.fn((tournament: Tournament) => {
       currentTournament.swiss_deck_visibility = tournament.swiss_deck_visibility;
       currentTournament.cut_deck_visibility = tournament.cut_deck_visibility;
-    return Promise.resolve(true);
-  }),
-  setPlayerRegistrationStatus: vi.fn((_id: number, locked: boolean) => {
-    currentTournament.all_players_unlocked = !locked;
-    currentTournament.any_player_unlocked = !locked;
-    return Promise.resolve(true);
-  }),
-  setRegistrationStatus: vi.fn((_id: number, open: boolean) => {
-    currentTournament.registration_closed = !open;
-    return Promise.resolve(true);
-  }),
-  reinstatePlayer: vi.fn(() => Promise.resolve(true)),
-  savePlayer: vi.fn(() => Promise.resolve(new Player())),
-  deletePlayer: vi.fn(() => Promise.resolve(true)),
-  togglePlayerLock: vi.fn(() => Promise.resolve(true)),
-  dropPlayer: vi.fn(() => Promise.resolve(true)),
-  loadDecks: vi.fn(() => Promise.resolve([])),
-  loadPlayers: vi.fn(),
-  loadIdentityNames: vi.fn(),
+      return Promise.resolve(true);
+    }),
+    setPlayerRegistrationStatus: vi.fn((_id: number, locked: boolean) => {
+      currentTournament.all_players_unlocked = !locked;
+      currentTournament.any_player_unlocked = !locked;
+      return Promise.resolve(true);
+    }),
+    setRegistrationStatus: vi.fn((_id: number, open: boolean) => {
+      currentTournament.registration_closed = !open;
+      return Promise.resolve(true);
+    }),
+    dropPlayer: vi.fn(() => Promise.resolve(true)),
+    togglePlayerLock: vi.fn(() => Promise.resolve(true)),
+    reinstatePlayer: vi.fn(() => Promise.resolve(true)),
+    deletePlayer: vi.fn(() => Promise.resolve(true)),
+    savePlayer: vi.fn(() => true),
+    loadPlayers: vi.fn(),
+    loadIdentityNames: vi.fn(),
+    loadDecks: vi.fn(() => Promise.resolve([])),
+  },
 }));
 
 function createMockTournament(overrides?: Partial<Tournament>) {
@@ -240,6 +237,7 @@ describe("Players", () => {
     }
 
     beforeEach(() => {
+      user = userEvent.setup({ delay: null });
       renderComponent();
     });
 
@@ -297,7 +295,7 @@ describe("Players", () => {
       const aliceEdit = structuredClone(mockAlice);
       aliceEdit.registration_locked = true;
 
-      expect(togglePlayerLock).toHaveBeenCalledExactlyOnceWith(1, aliceEdit);
+      expect(betaApi.togglePlayerLock).toHaveBeenCalledExactlyOnceWith(1, aliceEdit);
       expect(invalidateAll).toHaveBeenCalledOnce();
     });
 
@@ -311,7 +309,7 @@ describe("Players", () => {
       const bobEdit = structuredClone(mockBob);
       bobEdit.registration_locked = false;
 
-      expect(togglePlayerLock).toHaveBeenCalledExactlyOnceWith(1, bobEdit);
+      expect(betaApi.togglePlayerLock).toHaveBeenCalledExactlyOnceWith(1, bobEdit);
       expect(invalidateAll).toHaveBeenCalledOnce();
     });
 
@@ -345,7 +343,7 @@ describe("Players", () => {
       aliceEdit.first_round_bye = true;
       aliceEdit.fixed_table_number = 1;
 
-      expect(savePlayer).toHaveBeenCalledExactlyOnceWith(1, aliceEdit, true);
+      expect(betaApi.savePlayer).toHaveBeenCalledExactlyOnceWith(1, aliceEdit, true);
       expect(invalidateAll).toHaveBeenCalledOnce();
     });
 
@@ -354,7 +352,7 @@ describe("Players", () => {
 
       await user.click(getByRole(playerItems[0], "button", { name: "Drop" }));
 
-      expect(dropPlayer).toHaveBeenCalledExactlyOnceWith(1, mockAlice);
+      expect(betaApi.dropPlayer).toHaveBeenCalledExactlyOnceWith(1, mockAlice);
       expect(invalidateAll).toHaveBeenCalledOnce();
     });
 
@@ -364,7 +362,7 @@ describe("Players", () => {
       vi.spyOn(window, "confirm").mockReturnValue(true);
       await user.click(getByRole(playerItems[0], "button", { name: "Delete" }));
 
-      expect(deletePlayer).toHaveBeenCalledExactlyOnceWith(1, mockAlice);
+      expect(betaApi.deletePlayer).toHaveBeenCalledExactlyOnceWith(1, mockAlice);
       expect(invalidateAll).toHaveBeenCalledOnce();
     });
 
@@ -386,7 +384,7 @@ describe("Players", () => {
         if (!lockOption.classList.contains("disabled")) {
           await user.click(lockOption);
           invalidateCount++;
-          expect(setPlayerRegistrationStatus).toHaveBeenCalledExactlyOnceWith(
+          expect(betaApi.setPlayerRegistrationStatus).toHaveBeenCalledExactlyOnceWith(
             1,
             !unlock,
           );
@@ -398,7 +396,7 @@ describe("Players", () => {
         if (!registrationOption.classList.contains("disabled")) {
           await user.click(registrationOption);
           invalidateCount++;
-          expect(setRegistrationStatus).toHaveBeenCalledExactlyOnceWith(
+          expect(betaApi.setRegistrationStatus).toHaveBeenCalledExactlyOnceWith(
             1,
             open,
           );
@@ -477,7 +475,7 @@ describe("Players", () => {
             invalidateCount++;
 
             tournamentEdit.swiss_deck_visibility = swissVisibility;
-            expect(saveTournament).toHaveBeenCalledWith(tournamentEdit);
+            expect(betaApi.saveTournament).toHaveBeenCalledWith(tournamentEdit);
           }
 
           const cutOption = screen.getByText(
@@ -490,7 +488,7 @@ describe("Players", () => {
             invalidateCount++;
 
             tournamentEdit.cut_deck_visibility = cutVisibility;
-            expect(saveTournament).toHaveBeenCalledWith(tournamentEdit);
+            expect(betaApi.saveTournament).toHaveBeenCalledWith(tournamentEdit);
           }
 
           expect(invalidateAll).toHaveBeenCalledTimes(invalidateCount);
@@ -539,7 +537,7 @@ describe("Players", () => {
       charlieEdit.first_round_bye = true;
       charlieEdit.fixed_table_number = 1;
 
-      expect(savePlayer).toHaveBeenCalledExactlyOnceWith(1, charlieEdit, true);
+      expect(betaApi.savePlayer).toHaveBeenCalledExactlyOnceWith(1, charlieEdit, true);
       expect(invalidateAll).toHaveBeenCalledOnce();
     });
   });
@@ -548,6 +546,8 @@ describe("Players", () => {
     let mockBob: Player;
 
     beforeEach(() => {
+      user = userEvent.setup({ delay: null });
+      
       const tournament = $state(createMockTournament());
       currentTournament = tournament;
       const mockAlice = createMockAlice();
@@ -584,7 +584,7 @@ describe("Players", () => {
         getByRole(droppedPlayerRows[0], "button", { name: "Reinstate" }),
       );
 
-      expect(reinstatePlayer).toHaveBeenCalledExactlyOnceWith(1, mockBob);
+      expect(betaApi.reinstatePlayer).toHaveBeenCalledExactlyOnceWith(1, mockBob);
       expect(invalidateAll).toHaveBeenCalledOnce();
     });
   });

@@ -19,16 +19,7 @@ import {
   MockSelfReport2,
   Pairing1,
 } from "./EditRoundTestData";
-import {
-  changePlayerSide,
-  completeRound,
-  createPairing,
-  deletePairing,
-  deleteRound,
-  rePairRound,
-  reportScore,
-  resetReports,
-} from "../../../api_helper";
+import { betaApi } from "$lib/api/beta";
 import type { PageProps } from "./$types";
 import { Tournament } from "$lib/model/Tournament";
 import { goto } from "$app/navigation";
@@ -64,18 +55,26 @@ export const MockPageData: PageProps["data"] = {
   player: null
 };
 
-vi.mock("../../../api_helper", () => ({
-  loadRound: vi.fn(() => MockRoundData),
-  rePairRound: vi.fn(() => true),
-  completeRound: vi.fn(() => true),
-  deleteRound: vi.fn(() => true),
-  createPairing: vi.fn(() => true),
-  deletePairing: vi.fn(() => true),
-  changePlayerSide: vi.fn(() => true),
-  reportScore: vi.fn(() => true),
-  resetReports: vi.fn(() => true),
-  saveSOSWeighting: vi.fn(() => true),
+vi.mock("$lib/api/beta", () => ({
+  betaApi: {
+    changePlayerSide: vi.fn(() => true),
+    completeRound: vi.fn(() => true),
+    createPairing: vi.fn(() => true),
+    deletePairing: vi.fn(() => true),
+    deleteRound: vi.fn(() => true),
+    loadRound: vi.fn(() => MockRoundData),
+    rePairRound: vi.fn(() => true),
+    reportScore: vi.fn(() => true),
+    resetReports: vi.fn(() => true),
+    saveSOSWeighting: vi.fn(() => true),
+  },
 }));
+
+vi.mock('$app/env/public', () => {
+  return {
+    COBRA_API_SERVER: "http://localhost:3000"
+  };
+});
 
 vi.mock("$app/navigation", async () => {
   return {
@@ -118,7 +117,7 @@ describe("EditRound", () => {
 
       await user.click(screen.getByRole("button", { name: /re-pair/i }));
 
-      expect(rePairRound).toHaveBeenCalledOnce();
+      expect(betaApi.rePairRound).toHaveBeenCalledOnce();
     });
 
     it("does not re-pair the round if cancelled", async () => {
@@ -126,7 +125,7 @@ describe("EditRound", () => {
 
       await user.click(screen.getByRole("button", { name: /re-pair/i }));
 
-      expect(rePairRound).not.toHaveBeenCalled();
+      expect(betaApi.rePairRound).not.toHaveBeenCalled();
     });
   });
 
@@ -140,7 +139,7 @@ describe("EditRound", () => {
 
       await rerender({ data: structuredClone(MockPageData) });
 
-      expect(completeRound).toHaveBeenCalledOnce();
+      expect(betaApi.completeRound).toHaveBeenCalledOnce();
       expect(
         screen.getByRole("button", { name: /uncomplete/i }),
       ).toBeInTheDocument();
@@ -153,7 +152,7 @@ describe("EditRound", () => {
 
       await user.click(screen.getByRole("button", { name: /complete/i }));
 
-      expect(completeRound).not.toHaveBeenCalled();
+      expect(betaApi.completeRound).not.toHaveBeenCalled();
       expect(
         screen.queryByRole("button", { name: /uncomplete/i }),
       ).not.toBeInTheDocument();
@@ -170,7 +169,7 @@ describe("EditRound", () => {
 
       await user.click(screen.getByRole("button", { name: /delete round/i }));
 
-      expect(deleteRound).toHaveBeenCalledOnce();
+      expect(betaApi.deleteRound).toHaveBeenCalledOnce();
       expect(goto).toHaveBeenCalledExactlyOnceWith("/tournaments/0/organizer/rounds");
     });
 
@@ -179,7 +178,7 @@ describe("EditRound", () => {
 
       await user.click(screen.getByRole("button", { name: /delete round/i }));
 
-      expect(deleteRound).not.toHaveBeenCalled();
+      expect(betaApi.deleteRound).not.toHaveBeenCalled();
     });
   });
 
@@ -241,7 +240,7 @@ describe("EditRound", () => {
 
       await rerender({ data: structuredClone(MockPageData) });
 
-      expect(createPairing).toHaveBeenCalledOnce();
+      expect(betaApi.createPairing).toHaveBeenCalledOnce();
       expect(
         document.getElementsByClassName("table_11")[0],
       ).toBeInTheDocument();
@@ -268,7 +267,7 @@ describe("EditRound", () => {
 
       await rerender({ data: structuredClone(MockPageData) });
 
-      expect(deletePairing).toHaveBeenCalledOnce();
+      expect(betaApi.deletePairing).toHaveBeenCalledOnce();
       expect(table1Row).not.toBeInTheDocument();
     });
 
@@ -284,7 +283,7 @@ describe("EditRound", () => {
         within(table1Row).getByRole("button", { name: /delete/i }),
       );
 
-      expect(deletePairing).not.toHaveBeenCalled();
+      expect(betaApi.deletePairing).not.toHaveBeenCalled();
       expect(table1Row).toBeInTheDocument();
     });
   });
@@ -311,7 +310,7 @@ describe("EditRound", () => {
 
       await rerender({ data: structuredClone(MockPageData) });
 
-      expect(changePlayerSide).toHaveBeenCalled();
+      expect(betaApi.changePlayerSide).toHaveBeenCalled();
 
       const aliceRunnerButton2 = getByRole(table1Row, "button", {
         name: /change alice to runner/i,
@@ -344,7 +343,7 @@ describe("EditRound", () => {
 
       await rerender({ data: structuredClone(MockPageData) });
 
-      expect(reportScore).toHaveBeenCalledOnce();
+      expect(betaApi.reportScore).toHaveBeenCalledOnce();
       expect(
         within(table1Row).getByRole("textbox", { name: /corp-score/i }),
       ).toHaveValue(score1.toString());
@@ -387,7 +386,7 @@ describe("EditRound", () => {
 
       await rerender({ data: structuredClone(MockPageData) });
 
-      expect(reportScore).toHaveBeenCalledOnce();
+      expect(betaApi.reportScore).toHaveBeenCalledOnce();
       expect(
         within(table1Row).getByRole("textbox", { name: /corp-score/i }),
       ).toHaveValue("1");
@@ -431,7 +430,7 @@ describe("EditRound", () => {
 
       await rerender({ data: structuredClone(MockPageData) });
 
-      expect(reportScore).toHaveBeenCalledOnce();
+      expect(betaApi.reportScore).toHaveBeenCalledOnce();
       expect(
         within(table1Row).getByRole("checkbox", {
           name: /intentional draw/i,
@@ -481,7 +480,7 @@ describe("EditRound", () => {
 
         await rerender({ data: structuredClone(MockPageData) });
 
-        expect(reportScore).toHaveBeenCalledOnce();
+        expect(betaApi.reportScore).toHaveBeenCalledOnce();
         expect(
           within(table1Row).getByRole("textbox", { name: /corp-score/i }),
         ).toHaveValue("6");
@@ -546,7 +545,7 @@ describe("EditRound", () => {
 
         await rerender({ data: structuredClone(MockPageData) });
 
-        expect(reportScore).toHaveBeenCalledOnce();
+        expect(betaApi.reportScore).toHaveBeenCalledOnce();
         expect(
           within(table1Row).getByRole("textbox", { name: /corp-score/i }),
         ).toHaveValue("6");
@@ -583,7 +582,7 @@ describe("EditRound", () => {
         vi.spyOn(Pairing1, "score1", "get").mockReturnValue(0);
         vi.spyOn(Pairing1, "score2", "get").mockReturnValue(0);
         await user.click(getByText(reportDialog, /reset/i));
-        expect(resetReports).toHaveBeenCalledOnce();
+        expect(betaApi.resetReports).toHaveBeenCalledOnce();
 
         await rerender({ data: structuredClone(MockPageData) });
 

@@ -7,12 +7,7 @@
   import {
     Player,
   } from "$lib/model/Player";
-  import {
-    savePlayer,
-    deletePlayer as deletePlayerRequest,
-    togglePlayerLock as togglePlayerLockRequest,
-    dropPlayer as dropPlayerRequest,
-  } from "../../../api_helper";
+  import { betaApi } from "$lib/api/beta";
   import IdentitySelect from "$lib/components/IdentitySelect.svelte";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
@@ -40,7 +35,7 @@
   let playerEdit = $state($state.snapshot(player));
 
   async function togglePlayerLock() {
-    const success = await togglePlayerLockRequest(tournament.id, playerEdit);
+    const success = await betaApi.togglePlayerLock(tournament.id, playerEdit);
     if (!success) {
       return false;
     }
@@ -60,14 +55,14 @@
   }
 
   async function save() {
-    await savePlayer(tournament.id, playerEdit, organizerView);
+    await betaApi.savePlayer(tournament.id, playerEdit, organizerView);
     savedCallback?.(playerEdit);
 
     return globalMessages.errors.length === 0;
   }
 
   async function dropPlayer() {
-    const success = await dropPlayerRequest(tournament.id, playerEdit);
+    const success = await betaApi.dropPlayer(tournament.id, playerEdit);
     if (!success) {
       return false;
     }
@@ -84,7 +79,7 @@
   }
 
   async function deletePlayer() {
-    const success = await deletePlayerRequest(tournament.id, playerEdit);
+    const success = await betaApi.deletePlayer(tournament.id, playerEdit);
     if (!success) {
       return false;
     }

@@ -14,7 +14,7 @@ import { Player } from "$lib/model/Player";
 import type { ComponentProps } from "svelte";
 import { authStore } from "$lib/utils/auth.svelte";
 import { page } from "$app/state";
-import { savePlayer } from "../api_helper";
+import { betaApi } from "$lib/api/beta";
 
 export const MockTournament = new Tournament({
   id: 1,
@@ -85,11 +85,13 @@ export const MockPlayerBob: Player = {
   fixed_table_number: null,
 };
 
-vi.mock("../api_helper", () => ({
-  loadTournament: vi.fn(),
-  loadPlayerByUserId: vi.fn(),
-  loadIdentityNames: vi.fn(() => MockIdentityNames),
-  savePlayer: vi.fn(),
+vi.mock("$lib/api/beta", () => ({
+  betaApi: {
+    loadIdentityNames: vi.fn(() => MockIdentityNames),
+    loadPlayerByUserId: vi.fn(),
+    loadTournament: vi.fn(),
+    savePlayer: vi.fn(),
+  },
 }));
 
 vi.mock('$app/env/public', () => {
@@ -289,7 +291,7 @@ describe("Tournament", () => {
         };
         bobEdit.include_in_stream = true;
 
-        vi.mocked(savePlayer).mockImplementation(() =>
+        vi.mocked(betaApi.savePlayer).mockImplementation(() =>
           Promise.resolve(bobEdit),
         );
 
@@ -300,7 +302,7 @@ describe("Tournament", () => {
           getByRole(registrationCard, "button", { name: "Register" }),
         );
 
-        expect(savePlayer).toHaveBeenCalledExactlyOnceWith("", 1, bobEdit);
+        expect(betaApi.savePlayer).toHaveBeenCalledExactlyOnceWith(1, bobEdit);
       });
     });
 

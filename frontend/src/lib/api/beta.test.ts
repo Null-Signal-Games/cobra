@@ -1,16 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  changePlayerSide,
-  deleteStage,
-  deleteTournament,
-  reportScore,
-  resetReports,
-} from "./api_helper";
+import { BetaApi, betaApi } from "./beta";
+import { ApiBase } from "./apiBase";
+import { Player } from "$lib/model/Player";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+import * as csrfModule from "$lib/csrf";
 
-describe("tournament api_helper score reporting", () => {
+describe("BetaApi", () => {
   const mockFetch = vi.fn<typeof fetch>();
+  let api: BetaApi;
 
   function getFetchCall(callIndex = 0) {
     const [input, requestOptions] = mockFetch.mock.calls[callIndex];
@@ -25,13 +23,23 @@ describe("tournament api_helper score reporting", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    globalMessages.errors = [];
+    globalMessages.warnings = [];
+    globalMessages.infos = [];
+    vi.spyOn(csrfModule, "csrfToken").mockReturnValue("mock-csrf-token");
+    const apiBase = new ApiBase("https://tournaments.nullsignal.games", mockFetch);
+    api = new BetaApi(apiBase);
+  });
+
+  it("exports a default singleton instance of BetaApi", () => {
+    expect(betaApi).toBeInstanceOf(BetaApi);
   });
 
   describe("changePlayerSide", () => {
     it("sends POST request with side data", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await changePlayerSide(10, 2, 42, "corp", mockFetch);
+      const result = await api.changePlayerSide(10, 2, 42, "corp", mockFetch);
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -45,9 +53,31 @@ describe("tournament api_helper score reporting", () => {
     it("returns false when response is not ok", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }));
 
-      const result = await changePlayerSide(10, 2, 42, "corp", mockFetch);
+      const result = await api.changePlayerSide(10, 2, 42, "corp", mockFetch);
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe("csrf token and URL formatting", () => {
+    it("automatically injects csrf token into mutating requests", async () => {
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
+
+      const report: ScoreReport = {
+        score1: 3,
+        score2: 0,
+        score1_corp: 3,
+        score2_runner: 0,
+        score1_runner: 0,
+        score2_corp: 0,
+        intentional_draw: false,
+      };
+
+      await api.reportScore(10, 2, 42, report, true, mockFetch);
+
+      const { url, headers } = getFetchCall();
+      expect(url).not.toContain("//beta");
+      expect(headers["X-CSRF-Token"]).toBe("mock-csrf-token");
     });
   });
 
@@ -67,7 +97,7 @@ describe("tournament api_helper score reporting", () => {
         extra_self_report_label: "Player 1 wins",
       };
 
-      const result = await reportScore(10, 2, 42, report, true, mockFetch);
+      const result = await api.reportScore(10, 2, 42, report, true, mockFetch);
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -102,7 +132,7 @@ describe("tournament api_helper score reporting", () => {
         intentional_draw: false,
       };
 
-      const result = await reportScore(10, 2, 42, report, false, mockFetch);
+      const result = await api.reportScore(10, 2, 42, report, false, mockFetch);
 
       expect(result).toBe(false);
     });
@@ -112,7 +142,7 @@ describe("tournament api_helper score reporting", () => {
     it("sends DELETE request to reset_self_report endpoint", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await resetReports(10, 2, 42, mockFetch);
+      const result = await api.resetReports(10, 2, 42, mockFetch);
 
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -121,73 +151,22 @@ describe("tournament api_helper score reporting", () => {
       expect(requestOptions?.method).toBe("DELETE");
       expect(requestOptions?.credentials).toBe("include");
     });
-
-    it("sends explicit csrf token in headers", async () => {
-      mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
-
-      const result = await resetReports(10, 2, 42, "explicit-csrf-token", mockFetch);
-
-      expect(result).toBe(true);
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-      const { url, headers } = getFetchCall();
-      expect(url).not.toContain("//beta");
-      expect(headers["X-CSRF-Token"]).toBe("explicit-csrf-token");
-    });
-  });
-
-  describe("csrf token and URL formatting", () => {
-    it("uses explicit csrf token when provided to reportScore", async () => {
-      mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
-
-      const report: ScoreReport = {
-        score1: 3,
-        score2: 0,
-        score1_corp: 3,
-        score2_runner: 0,
-        score1_runner: 0,
-        score2_corp: 0,
-        intentional_draw: false,
-      };
-
-      await reportScore(10, 2, 42, report, true, "test-csrf-token", mockFetch);
-
-      const { url, headers } = getFetchCall();
-      expect(url).not.toContain("//beta");
-      expect(headers["X-CSRF-Token"]).toBe("test-csrf-token");
-    });
-
-    it("uses explicit csrf token when provided to changePlayerSide", async () => {
-      mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
-
-      await changePlayerSide(10, 2, 42, "runner", "test-side-token", mockFetch);
-
-      const { url, headers } = getFetchCall();
-      expect(url).not.toContain("//beta");
-      expect(headers["X-CSRF-Token"]).toBe("test-side-token");
-    });
   });
 
   describe("deleteTournament", () => {
     it("makes a DELETE request to /beta/tournaments/:id with confirmation_name and returns true on 200", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await deleteTournament(
-        42,
-        "Danger Noodle",
-        "csrf-test-token",
-        mockFetch,
-      );
+      const result = await api.deleteTournament(42, "Danger Noodle", mockFetch);
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const { url, requestOptions, headers } = getFetchCall();
       expect(url).toContain("/beta/tournaments/42");
       expect(requestOptions?.method).toBe("DELETE");
       expect(requestOptions?.credentials).toBe("include");
-      expect(headers["X-CSRF-Token"]).toBe("csrf-test-token");
+      expect(headers["X-CSRF-Token"]).toBe("mock-csrf-token");
       expect(headers["Content-Type"]).toBe("application/json");
-      expect(requestOptions?.body).toBe(
-        JSON.stringify({ confirmation_name: "Danger Noodle" }),
-      );
+      expect(requestOptions?.body).toBe(JSON.stringify({ confirmation_name: "Danger Noodle" }));
     });
 
     it("returns false and logs server error message on 422", async () => {
@@ -198,7 +177,7 @@ describe("tournament api_helper score reporting", () => {
         ),
       );
 
-      const result = await deleteTournament(42, "Wrong Name", "csrf-test-token", mockFetch);
+      const result = await api.deleteTournament(42, "Wrong Name", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain(
         "Confirmation name does not match the tournament name",
@@ -208,12 +187,7 @@ describe("tournament api_helper score reporting", () => {
     it("returns false and logs fallback error on failure", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }));
 
-      const result = await deleteTournament(
-        42,
-        "Danger Noodle",
-        "csrf-test-token",
-        mockFetch,
-      );
+      const result = await api.deleteTournament(42, "Danger Noodle", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain("Failed to delete tournament.");
     });
@@ -221,12 +195,7 @@ describe("tournament api_helper score reporting", () => {
     it("returns false and logs error on network exception", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Network failed"));
 
-      const result = await deleteTournament(
-        42,
-        "Danger Noodle",
-        "csrf-test-token",
-        mockFetch,
-      );
+      const result = await api.deleteTournament(42, "Danger Noodle", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain("Failed to delete tournament: Network failed");
     });
@@ -236,24 +205,16 @@ describe("tournament api_helper score reporting", () => {
     it("makes a DELETE request to /beta/tournaments/:tournamentId/stages/:stageId with confirmation_name and returns true on 200", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await deleteStage(
-        42,
-        7,
-        "Danger Noodle",
-        "csrf-test-token",
-        mockFetch,
-      );
+      const result = await api.deleteStage(42, 7, "Danger Noodle", mockFetch);
       expect(result).toBe(true);
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const { url, requestOptions, headers } = getFetchCall();
       expect(url).toContain("/beta/tournaments/42/stages/7");
       expect(requestOptions?.method).toBe("DELETE");
       expect(requestOptions?.credentials).toBe("include");
-      expect(headers["X-CSRF-Token"]).toBe("csrf-test-token");
+      expect(headers["X-CSRF-Token"]).toBe("mock-csrf-token");
       expect(headers["Content-Type"]).toBe("application/json");
-      expect(requestOptions?.body).toBe(
-        JSON.stringify({ confirmation_name: "Danger Noodle" }),
-      );
+      expect(requestOptions?.body).toBe(JSON.stringify({ confirmation_name: "Danger Noodle" }));
     });
 
     it("returns false and logs server error message on 422", async () => {
@@ -264,7 +225,7 @@ describe("tournament api_helper score reporting", () => {
         ),
       );
 
-      const result = await deleteStage(42, 7, "Wrong Name", "csrf-test-token", mockFetch);
+      const result = await api.deleteStage(42, 7, "Wrong Name", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain(
         "Confirmation name does not match the tournament name",
@@ -274,13 +235,7 @@ describe("tournament api_helper score reporting", () => {
     it("returns false and logs fallback error on failure", async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }));
 
-      const result = await deleteStage(
-        42,
-        7,
-        "Danger Noodle",
-        "csrf-test-token",
-        mockFetch,
-      );
+      const result = await api.deleteStage(42, 7, "Danger Noodle", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain("Failed to delete stage.");
     });
@@ -288,17 +243,116 @@ describe("tournament api_helper score reporting", () => {
     it("returns false and logs error on network exception", async () => {
       mockFetch.mockRejectedValueOnce(new Error("Stage deletion network failed"));
 
-      const result = await deleteStage(
-        42,
-        7,
-        "Danger Noodle",
-        "csrf-test-token",
-        mockFetch,
-      );
+      const result = await api.deleteStage(42, 7, "Danger Noodle", mockFetch);
       expect(result).toBe(false);
       expect(globalMessages.errors).toContain(
         "Failed to delete stage: Stage deletion network failed",
       );
     });
   });
+
+  describe("savePlayer", () => {
+    it("creates a new player with POST when player id is 0", async () => {
+      const savedPlayer = new Player();
+      savedPlayer.id = 123;
+      savedPlayer.name = "Alice";
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ player: savedPlayer }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const newPlayer = new Player();
+      newPlayer.name = "Alice";
+      const result = await api.savePlayer(42, newPlayer, false, mockFetch);
+
+      expect(result.id).toBe(123);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const { url, requestOptions } = getFetchCall();
+      expect(url).toContain("/beta/tournaments/42/players");
+      expect(requestOptions?.method).toBe("POST");
+      expect(requestOptions?.credentials).toBe("include");
+    });
+
+    it("updates an existing player with PATCH when player id is non-zero", async () => {
+      const updatedPlayer = new Player();
+      updatedPlayer.id = 123;
+      updatedPlayer.name = "Alice Updated";
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ player: updatedPlayer }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const player = new Player();
+      player.id = 123;
+      player.name = "Alice Updated";
+      const result = await api.savePlayer(42, player, true, mockFetch);
+
+      expect(result.name).toBe("Alice Updated");
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const { url, requestOptions, body } = getFetchCall();
+      expect(url).toContain("/beta/tournaments/42/players/123");
+      expect(requestOptions?.method).toBe("PATCH");
+      expect(body).toMatchObject({ organiser_view: true });
+    });
+
+    it("captures errors from response when present", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ player: null, errors: ["Name already taken"] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const player = new Player();
+      player.name = "Duplicate";
+      await api.savePlayer(42, player, false, mockFetch);
+
+      expect(globalMessages.errors).toContain("Name already taken");
+    });
+  });
+
+  describe("loadPlayer", () => {
+    it("fetches player data from /beta/tournaments/:tournamentId/players/:playerId", async () => {
+      const mockPlayer = { id: 5, name: "Alice" };
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockPlayer), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const result = await api.loadPlayer(42, 5, mockFetch);
+
+      expect(result).toEqual(mockPlayer);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const { url, requestOptions } = getFetchCall();
+      expect(url).toContain("/beta/tournaments/42/players/5");
+      expect(requestOptions?.method).toBe("GET");
+    });
+  });
+
+  describe("loadPlayerByUserId", () => {
+    it("fetches player data from /beta/tournaments/:tournamentId/players/by_user_id/:userId", async () => {
+      const mockPlayer = { id: 5, user_id: 10, name: "Alice" };
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockPlayer), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+
+      const result = await api.loadPlayerByUserId(42, 10, mockFetch);
+
+      expect(result).toEqual(mockPlayer);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const { url, requestOptions } = getFetchCall();
+      expect(url).toContain("/beta/tournaments/42/players/by_user_id/10");
+      expect(requestOptions?.method).toBe("GET");
+    });
+  });
 });
+

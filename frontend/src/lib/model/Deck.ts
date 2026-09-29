@@ -1,4 +1,4 @@
-import type { Printing } from "$lib/utils/api_types";
+import type { Printing } from "$lib/api/v1ApiTypes";
 
 export interface Card {
   id: number;
@@ -60,4 +60,19 @@ export interface NrdbDeck {
 export interface CardSearchOption {
   label: string;
   value: Printing;
+}
+
+export function cardRequestObject(card: Card) {
+  const { id, deck_id, created_at, updated_at, ...newCard } = card;
+
+  return newCard;
+}
+
+export function deckRequestObject(deck: Deck) {
+  const { id, user_id, player_id, player_name, created_at, updated_at, ...details } = deck.details;
+
+  return {
+    details,
+    cards: deck.cards.map((c) => cardRequestObject(c)),
+  };
 }

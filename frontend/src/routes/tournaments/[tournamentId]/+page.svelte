@@ -209,7 +209,7 @@
         {#if data.player && data.player.id !== 0}
           {#if data.player.active}
             <!-- User is logged in and registered -->
-            <RegistrationCard {userId} {tournament} player={data.player} csrfToken={data.tournamentData.csrf_token} />
+            <RegistrationCard {userId} {tournament} player={data.player} />
           {:else}
             <h5 class="card-title">Rejoin this Event</h5>
             {#if userId === tournament.user_id}
@@ -229,7 +229,7 @@
         {:else if !tournament.registration_closed && tournament.self_registration}
           {#if authStore.isAuthenticated && data.player}
             <RegistrationCard /* User is logged in and not registered */
-              {userId} {tournament} player={data.player} csrfToken={data.tournamentData.csrf_token} />
+              {userId} {tournament} player={data.player} />
           {:else}
             <div class="card card-body alert alert-warning" /* User is not logged in and not registered */>
               <h5 class="card-title">Register for this Event</h5>

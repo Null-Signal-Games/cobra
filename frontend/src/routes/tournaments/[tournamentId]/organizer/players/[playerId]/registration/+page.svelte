@@ -6,7 +6,7 @@
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { invalidateAll } from "$app/navigation";
-  import { savePlayer } from "../../../../../api_helper";
+  import { betaApi } from "$lib/api/beta";
   import DeckDisplay from "$lib/components/DeckDisplay.svelte";
   import { sortCards } from "$lib/utils/decks.svelte";
 
@@ -25,10 +25,6 @@
   }
 
   async function save() {
-    if (!player) {
-      return true;
-    }
-
     player.corp_deck =
       corpDeck.details.identity_title || corpDeck.cards.length > 0
         ? corpDeck
@@ -47,7 +43,7 @@
     });
     Object.assign(
       player,
-      await savePlayer(
+      await betaApi.savePlayer(
         parseInt(params.tournamentId),
         player,
         player.user_id !== data.tournamentData.tournament.user_id,
@@ -70,7 +66,7 @@
 <div class="col-12">
   <GlobalMessages />
   
-  {#if player && player.id !== 0}
+  {#if player.id !== 0}
     <!-- General registration information -->
     <div class="card mb-3" aria-label="registration information">
       <div class="card-header">

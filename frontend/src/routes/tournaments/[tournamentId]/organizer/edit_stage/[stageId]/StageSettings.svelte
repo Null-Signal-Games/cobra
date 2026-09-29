@@ -2,11 +2,10 @@
   import { onMount } from "svelte";
   import {
     StageData,
-    ValidationError,
-    loadStage,
-    saveStage,
     type SaveStageResponse,
-  } from "./StageSettings";
+  } from "$lib/api/classicTypes";
+  import { classicApi } from "$lib/api/classic";
+  import { ValidationError } from "$lib/utils/errors";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import TableRangeEdit from "./TableRangeEdit.svelte";
   import ModalDialog from "$lib/components/ModalDialog.svelte";
@@ -41,7 +40,7 @@
 
   onMount(async () => {
     if (!initialData) {
-      data = await loadStage(tournamentId, stageId);
+      data = await classicApi.loadStage(tournamentId, stageId);
     }
     dataBackup = structuredClone($state.snapshot(data));
   });
@@ -55,7 +54,7 @@
     newTableRangeEdit?.addRange();
 
     try {
-      const response = await saveStage(tournamentId, data.stage);
+      const response = await classicApi.saveStage(tournamentId, data.stage);
       globalMessages.infos = ["Stage saved."];
       if (onSaveCallback) {
         onSaveCallback(response);
@@ -65,7 +64,7 @@
     } catch (err) {
       error =
         err instanceof ValidationError
-          ? err.errors
+          ? err.message
           : "An unexpected error occurred. Please try again.";
     } finally {
       isSubmitting = false;

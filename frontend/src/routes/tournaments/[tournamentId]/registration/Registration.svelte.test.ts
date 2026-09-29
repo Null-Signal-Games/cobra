@@ -9,7 +9,7 @@ import {
 } from "@testing-library/svelte";
 import Registration from "./+page.svelte";
 import { Deck, type NrdbDeck } from "$lib/model/Deck";
-import { savePlayer } from "../../api_helper";
+import { betaApi } from "$lib/api/beta";
 import { convertNrdbDeck } from "$lib/utils/decks.svelte";
 import type { PageProps } from "./$types";
 import {
@@ -26,10 +26,10 @@ vi.mock('$app/env/public', () => {
   };
 });
 
-vi.mock("../../api_helper", () => ({
-  loadDecks: vi.fn(() => true),
-  loadTournament: vi.fn(() => true),
-  savePlayer: vi.fn(() => true),
+vi.mock("$lib/api/beta", () => ({
+  betaApi: {
+    savePlayer: vi.fn(() => true),
+  },
 }));
 
 const MockPageData: PageProps["data"] = {
@@ -159,7 +159,7 @@ describe("Registration", () => {
       bobEdit.corp_id = new Identity();
       bobEdit.runner_id = new Identity();
 
-      expect(savePlayer).toHaveBeenCalledExactlyOnceWith(
+      expect(betaApi.savePlayer).toHaveBeenCalledExactlyOnceWith(
         MockTournament.id,
         bobEdit,
         true,

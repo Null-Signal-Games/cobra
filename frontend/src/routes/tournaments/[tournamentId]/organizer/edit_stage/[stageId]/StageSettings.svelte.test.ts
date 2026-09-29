@@ -3,20 +3,19 @@ import { cleanup, render, screen } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
 import StageSettings from "./StageSettings.svelte";
 import TableRangeEdit from "./TableRangeEdit.svelte";
-import {
-  StageData,
-  ValidationError,
-  loadStage,
-  saveStage,
-  type Stage,
-} from "./StageSettings";
+import { StageData, type Stage } from "$lib/api/classicTypes";
+import { classicApi } from "$lib/api/classic";
+import { ValidationError } from "$lib/utils/errors";
 
 vi.mock("$app/env/public", () => ({
   COBRA_API_SERVER: "http://localhost:3000",
 }));
 
 function getFetchCall(mock: { mock: { calls: unknown[][] } }, callIndex = 0) {
-  const [input, requestOptions] = mock.mock.calls[callIndex] as [RequestInfo | URL, RequestInit | undefined];
+  const [input, requestOptions] = mock.mock.calls[callIndex] as [
+    RequestInfo | URL,
+    RequestInit | undefined,
+  ];
   const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
   const headers = (requestOptions?.headers ?? {}) as Record<string, string>;
   const body =
@@ -44,18 +43,14 @@ describe("StageSettings API helpers", () => {
         tournament_id: 10,
         number: 1,
         format: "Swiss",
-        table_ranges: [
-          { id: 5, stage_id: 1, first_table: 1, last_table: 10 },
-        ],
+        table_ranges: [{ id: 5, stage_id: 1, first_table: 1, last_table: 10 }],
       },
       warning: "Table count warning",
     };
 
-    mockFetch.mockResolvedValueOnce(
-      new Response(JSON.stringify(mockData), { status: 200 }),
-    );
+    mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockData), { status: 200 }));
 
-    const result = await loadStage(10, 1, mockFetch);
+    const result = await classicApi.loadStage(10, 1, mockFetch);
     expect(result.stage.format).toBe("Swiss");
     expect(result.stage.table_ranges).toHaveLength(1);
     expect(result.warning).toBe("Table count warning");
@@ -70,7 +65,7 @@ describe("StageSettings API helpers", () => {
       new Response(null, { status: 500, statusText: "Internal Server Error" }),
     );
 
-    await expect(loadStage(10, 1, mockFetch)).rejects.toThrow(
+    await expect(classicApi.loadStage(10, 1, mockFetch)).rejects.toThrow(
       "HTTP 500: Internal Server Error",
     );
   });
@@ -90,13 +85,12 @@ describe("StageSettings API helpers", () => {
       }),
     );
 
-    const result = await saveStage(10, stage, mockFetch, "test-token");
+    const result = await classicApi.saveStage(10, stage, mockFetch);
     expect(result.url).toBe("/tournaments/10/stages/1");
 
-    const { url, requestOptions, headers, body } = getFetchCall(mockFetch);
+    const { url, requestOptions, body } = getFetchCall(mockFetch);
     expect(url).toContain("/tournaments/10/stages/1");
     expect(requestOptions?.method).toBe("PATCH");
-    expect(headers["X-CSRF-Token"]).toBe("test-token");
     expect(body).toEqual({ stage });
   });
 
@@ -118,9 +112,7 @@ describe("StageSettings API helpers", () => {
       ),
     );
 
-    await expect(
-      saveStage(10, stage, mockFetch, "test-token"),
-    ).rejects.toThrow(ValidationError);
+    await expect(classicApi.saveStage(10, stage, mockFetch)).rejects.toThrow(ValidationError);
   });
 });
 
@@ -209,9 +201,7 @@ describe("StageSettings Page Component", () => {
       tournament_id: 10,
       number: 1,
       format: "Swiss",
-      table_ranges: [
-        { id: 1, stage_id: 1, first_table: 1, last_table: 5 },
-      ],
+      table_ranges: [{ id: 1, stage_id: 1, first_table: 1, last_table: 5 }],
     };
     data.warning = "Custom warning message";
     return data;

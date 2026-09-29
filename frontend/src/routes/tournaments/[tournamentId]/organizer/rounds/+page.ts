@@ -1,8 +1,8 @@
 import type { PageLoad } from "./$types";
-import { loadPairings } from "../../api_helper";
+import { betaApi } from "$lib/api/beta";
 
 export const load: PageLoad = async ({ params, fetch }) => {
-  const pairingsData = await loadPairings(parseInt(params.tournamentId), null, fetch);
+  const pairingsData = await betaApi.loadPairings(parseInt(params.tournamentId), fetch);
 
   return {
     policy: pairingsData.policy,

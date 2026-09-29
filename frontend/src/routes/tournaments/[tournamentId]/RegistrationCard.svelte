@@ -8,7 +8,7 @@
   import ProgressButton from "$lib/components/ProgressButton.svelte";
   import Identity from "$lib/components/identity/Identity.svelte";
   import { onMount } from "svelte";
-  import { loadIdentityNames, savePlayer as savePlayerRequest } from "../api_helper";
+  import { betaApi } from "$lib/api/beta";
   import { navigateTo } from "$lib/utils/navigation";
   import { authStore } from "$lib/utils/auth.svelte";
 
@@ -16,12 +16,10 @@
     userId,
     tournament,
     player,
-    csrfToken,
   }: {
     userId: number;
     tournament: Tournament;
     player: Player;
-    csrfToken: string;
   } = $props();
 
   let identityNames: IdentityNames | undefined = $state();
@@ -31,14 +29,14 @@
   let readOnly = $derived(playerEdit.id !== 0);
 
   onMount(async () => {
-    identityNames = await loadIdentityNames();
+    identityNames = await betaApi.loadIdentityNames();
     if (playerEdit.id === 0) {
       playerEdit.name = authStore.user?.nrdb_username ?? "";
     }
   });
 
   async function savePlayer() {
-    playerEdit = await savePlayerRequest(csrfToken, tournament.id, playerEdit);
+    playerEdit = await betaApi.savePlayer(tournament.id, playerEdit);
     readOnly = true;
 
     if (tournament.nrdb_deck_registration) {
