@@ -71,6 +71,20 @@ export class V1Api {
 
     return res.data.data;
   }
+
+  async loadUserTournaments(altFetch = fetch): Promise<TournamentsResponse> {
+    const res = await this.api.get<TournamentsResponse>("/api/v1/private/user/tournaments", {
+      altFetch,
+      headers: JSON_API_HEADERS,
+    });
+
+    if (!res.ok) {
+      globalMessages.errors.push(`Failed to load user tournaments: ${res.error.message}`);
+      return { data: [] };
+    }
+
+    return res.data;
+  }
 }
 
 export const v1Api = new V1Api();
