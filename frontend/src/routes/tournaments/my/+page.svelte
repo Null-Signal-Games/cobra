@@ -1,39 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { authStore, type AuthUser } from "$lib/utils/auth.svelte";
-  import { COBRA_API_SERVER } from "$app/env/public";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import { resolve } from "$app/paths";
+  import { v1Api } from "$lib/api/v1";
+  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import type { Tournament } from "$lib/model/Tournament";
+  import { v1Adapter } from "$lib/model/v1Adapter";
+  import { authStore, type AuthUser } from "$lib/utils/auth.svelte";
 
-  interface Tournament {
-    id: number;
-    name: string;
-    date: string;
-    slug?: string;
-    private: boolean;
-    active_player_count: number;
-    dropped_player_count: number;
-    stage?: string;
-  }
-
-  interface JsonApiTournamentItem {
-    id: string | number;
-    attributes: {
-      name: string;
-      date: string;
-      slug?: string;
-      private: boolean;
-      active_player_count?: number;
-      dropped_player_count?: number;
-      stage?: string;
-    };
-  }
-
-  interface JsonApiTournamentsResponse {
-    data: JsonApiTournamentItem[];
-  }
-
-  const serverOrigin = (COBRA_API_SERVER || "").replace(/\/$/, "");
   let user = $state<AuthUser | null>(null);
   let tournaments = $state<Tournament[]>([]);
   let isLoading = $state<boolean>(true);
@@ -47,22 +20,12 @@
     }
 
     try {
-      const response = await fetch(`${serverOrigin}/api/v1/private/user/tournaments`, {
-        credentials: "include",
-        headers: { Accept: "application/vnd.api+json" },
-      });
-      if (response.ok) {
-        const json = (await response.json()) as JsonApiTournamentsResponse;
-        tournaments = json.data.map((item) => ({
-          id: Number(item.id),
-          name: item.attributes.name,
-          date: item.attributes.date,
-          slug: item.attributes.slug,
-          private: item.attributes.private,
-          active_player_count: item.attributes.active_player_count ?? 0,
-          dropped_player_count: item.attributes.dropped_player_count ?? 0,
-          stage: item.attributes.stage,
-        }));
+      const response = await v1Api.loadUserTournaments();
+      if (response.data.length > 0) {
+        tournaments = [];
+        response.data.forEach((t) => {
+          tournaments.push(v1Adapter.adaptTournament(t));
+        });
       }
     } catch {
       // Ignore load error
