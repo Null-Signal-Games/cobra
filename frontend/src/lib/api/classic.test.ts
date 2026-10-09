@@ -2,9 +2,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ClassicApi, classicApi } from "./classic";
 import { ApiBase } from "./apiBase";
 import { Tournament } from "$lib/model/Tournament";
-import type { Stage } from "$lib/api/classicTypes";
+import type { DemoTournamentSettings, Stage } from "$lib/api/classicTypes";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 import * as csrfModule from "$lib/csrf";
+import { ValidationError } from "$lib/utils/errors";
 
 describe("ClassicApi", () => {
   const mockFetch = vi.fn<typeof fetch>();
@@ -113,6 +114,33 @@ describe("ClassicApi", () => {
     });
   });
 
+  describe("loadNewDemoTournament", () => {
+    it("fetches new demo tournament form data", async () => {
+      const mockFormData = {
+        tournament: {
+          swiss_format: "single_sided",
+          assign_ids: false,
+        },
+        csrf_token: "mock-csrf-token",
+      };
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockFormData), { status: 200 }));
+
+      const result = await api.loadNewDemoTournament(mockFetch);
+
+      expect(result).toEqual(mockFormData);
+      const { url } = getFetchCall();
+      expect(url).toContain("/tournaments/new_demo_form");
+    });
+
+    it("handles failure", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(null, { status: 500, statusText: "Internal Server Error" }),
+      );
+
+      await expect(api.loadNewDemoTournament(mockFetch)).rejects.toThrow();
+    });
+  });
+
   describe("loadTournamentSettings", () => {
     it("loads tournament settings edit form data", async () => {
       const mockFormData = { tournament: { id: 10 }, options: {} };
@@ -160,6 +188,74 @@ describe("ClassicApi", () => {
       expect(url).toContain("/tournaments");
       expect(requestOptions?.method).toBe("POST");
       expect(body).toEqual({ tournament });
+    });
+  });
+
+  describe("createDemoTournament", () => {
+    const demoTournament: DemoTournamentSettings = {
+      name: "Demo Tourney",
+      swiss_format: "single_sided",
+      num_players: 8,
+      num_first_round_byes: 0,
+      assign_ids: false,
+    };
+    const mockDemoResponse = {
+      id: 123,
+      name: "Demo Tourney",
+      url: "/tournaments/123/rounds",
+    };
+
+    it("creates a demo tournament with tournament object and csrf token", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockDemoResponse), { status: 201 }),
+      );
+
+      const result = await api.createDemoTournament(demoTournament, "custom-csrf-token");
+
+      expect(result).toEqual(mockDemoResponse);
+      const { url, requestOptions, headers, body } = getFetchCall();
+      expect(url).toContain("/tournaments/create_demo");
+      expect(requestOptions?.method).toBe("POST");
+      expect(headers["X-CSRF-Token"]).toBe("custom-csrf-token");
+      expect(body).toEqual({ tournament: demoTournament });
+    });
+
+    it("creates a demo tournament with csrf token as first argument", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockDemoResponse), { status: 201 }),
+      );
+
+      const result = await api.createDemoTournament("custom-csrf-token", demoTournament);
+
+      expect(result).toEqual(mockDemoResponse);
+      const { url, requestOptions, headers, body } = getFetchCall();
+      expect(url).toContain("/tournaments/create_demo");
+      expect(requestOptions?.method).toBe("POST");
+      expect(headers["X-CSRF-Token"]).toBe("custom-csrf-token");
+      expect(body).toEqual({ tournament: demoTournament });
+    });
+
+    it("creates a demo tournament using default csrf token when not provided", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockDemoResponse), { status: 201 }),
+      );
+
+      const result = await api.createDemoTournament(demoTournament);
+
+      expect(result).toEqual(mockDemoResponse);
+      const { headers } = getFetchCall();
+      expect(headers["X-CSRF-Token"]).toBe("mock-csrf-token");
+    });
+
+    it("handles validation errors", async () => {
+      const mockErrors = {
+        errors: {
+          name: ["Name is required"],
+        },
+      };
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockErrors), { status: 422 }));
+
+      await expect(api.createDemoTournament(demoTournament)).rejects.toThrow(ValidationError);
     });
   });
 
