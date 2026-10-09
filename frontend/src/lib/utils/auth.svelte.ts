@@ -1,19 +1,10 @@
 import { COBRA_API_SERVER } from "$app/env/public";
+import { v1Api } from "$lib/api/v1";
 
 export interface AuthUser {
   id: number;
   nrdb_id: number;
   nrdb_username: string;
-}
-
-interface JsonApiUserResponse {
-  data: {
-    id: string | number;
-    attributes: {
-      nrdb_id: number;
-      nrdb_username: string;
-    };
-  };
 }
 
 const serverOrigin = (COBRA_API_SERVER || "").replace(/\/$/, "");
@@ -33,19 +24,13 @@ class AuthStore {
 
     this.isLoading = true;
     try {
-      const response = await altFetch(`${serverOrigin}/api/v1/private/user`, {
-        credentials: "include",
-        headers: {
-          Accept: "application/vnd.api+json",
-        },
-      });
+      const response = await v1Api.loadCurrentUser(altFetch);
 
-      if (response.ok) {
-        const json = (await response.json()) as JsonApiUserResponse;
+      if (response) {
         this.user = {
-          id: Number(json.data.id),
-          nrdb_id: json.data.attributes.nrdb_id,
-          nrdb_username: json.data.attributes.nrdb_username,
+          id: Number(response.data.id),
+          nrdb_id: response.data.attributes.nrdb_id,
+          nrdb_username: response.data.attributes.nrdb_username,
         };
       } else {
         this.user = null;

@@ -1,5 +1,6 @@
 import { api as defaultApi, type ApiBase } from "$lib/api/apiBase";
 import type {
+  CurrentUserResponse,
   TournamentsResponse,
   TournamentTypeInfo,
   TournamentTypesResponse,
@@ -81,6 +82,19 @@ export class V1Api {
     if (!res.ok) {
       globalMessages.errors.push(`Failed to load user tournaments: ${res.error.message}`);
       return { data: [] };
+    }
+
+    return res.data;
+  }
+
+  async loadCurrentUser(altFetch = fetch): Promise<CurrentUserResponse | null> {
+    const res = await this.api.get<CurrentUserResponse>("/api/v1/private/user", {
+      altFetch,
+      headers: JSON_API_HEADERS,
+    });
+
+    if (!res.ok) {
+      return null;
     }
 
     return res.data;

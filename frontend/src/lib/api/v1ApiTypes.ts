@@ -53,3 +53,16 @@ export interface Printing {
 export type TournamentsResponse = ApiResponse<TournamentInfo, TournamentTypeInfo>;
 export type TournamentTypesResponse = ApiResponse<TournamentTypeInfo>;
 export type PrintingsResponse = ApiResponse<Printing>;
+
+export interface UserInfo {
+  id: string;
+  type?: string;
+  attributes: {
+    nrdb_id: number;
+    nrdb_username: string;
+  };
+}
+
+export interface CurrentUserResponse {
+  data: UserInfo;
+}

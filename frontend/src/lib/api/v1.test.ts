@@ -134,4 +134,46 @@ describe("V1Api", () => {
       expect(globalMessages.errors[0]).toContain("Failed to load tournament types");
     });
   });
+
+  describe("loadCurrentUser", () => {
+    it("fetches current user with JSON:API headers and returns data on 200", async () => {
+      const mockResponse = {
+        data: {
+          id: "42",
+          type: "users",
+          attributes: {
+            nrdb_id: 12345,
+            nrdb_username: "runner_one",
+          },
+        },
+      };
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { "Content-Type": "application/vnd.api+json" },
+        }),
+      );
+
+      const result = await api.loadCurrentUser(mockFetch);
+
+      expect(result).toEqual(mockResponse);
+      const { url, headers } = getFetchCall();
+      expect(url).toBe("https://tournaments.nullsignal.games/api/v1/private/user");
+      expect(headers.Accept).toBe("application/vnd.api+json");
+    });
+
+    it("returns null on 401 or failure without pushing global error", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ errors: [{ status: "401" }] }), {
+          status: 401,
+          statusText: "Unauthorized",
+        }),
+      );
+
+      const result = await api.loadCurrentUser(mockFetch);
+
+      expect(result).toBeNull();
+      expect(globalMessages.errors).toHaveLength(0);
+    });
+  });
 });
