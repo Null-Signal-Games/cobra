@@ -1,21 +1,17 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import {
-    createDemoTournament,
-    type Errors,
-    loadNewDemoTournament,
-    type DemoTournamentSettings,
-  } from "./DemoTournamentSettings";
+  import { classicApi } from "$lib/api/classic";
+  import type { DemoTournamentSettings } from "$lib/api/classicTypes";
+  import { type Errors, ValidationError } from "$lib/utils/errors";
   import { navigateTo } from "$lib/utils/navigation";
   import DemoTournamentSettingsForm from "./DemoTournamentSettingsForm.svelte";
-  import { ValidationError } from "$lib/utils/errors";
 
   let tournament = $state<DemoTournamentSettings | undefined>(undefined);
   let csrfToken = "";
   let errors = $state<Errors>({});
 
   onMount(async () => {
-    const data = await loadNewDemoTournament();
+    const data = await classicApi.loadNewDemoTournament();
     tournament = data.tournament;
     csrfToken = data.csrf_token;
   });
@@ -24,7 +20,7 @@
     errors = {};
 
     try {
-      const response = await createDemoTournament(csrfToken, tournament);
+      const response = await classicApi.createDemoTournament(csrfToken, tournament);
       navigateTo(response.url);
     } catch (error) {
       if (error instanceof ValidationError) {
