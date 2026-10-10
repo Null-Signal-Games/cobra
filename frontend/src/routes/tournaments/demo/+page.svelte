@@ -20,7 +20,7 @@
     errors = {};
 
     try {
-      const response = await classicApi.createDemoTournament(csrfToken, tournament);
+      const response = await classicApi.createDemoTournament(tournament, csrfToken);
       navigateTo(response.url);
     } catch (error) {
       if (error instanceof ValidationError) {
