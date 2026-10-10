@@ -19,6 +19,30 @@ export interface TournamentCreateErrorResponse {
   errors: Errors;
 }
 
+export interface DemoTournamentSettings {
+  id?: number;
+  name?: string;
+  swiss_format?: string;
+  num_players?: number;
+  num_first_round_byes?: number;
+  assign_ids?: boolean;
+}
+
+export interface DemoTournamentSettingsData {
+  tournament: DemoTournamentSettings;
+  csrf_token: string;
+}
+
+export interface TournamentDemoCreateResponse {
+  id: number;
+  name: string;
+  url: string;
+}
+
+export interface TournamentDemoCreateErrorResponse {
+  errors: Errors;
+}
+
 export interface Stage {
   id: number;
   tournament_id: number;

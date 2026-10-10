@@ -53,3 +53,54 @@ export interface Printing {
 export type TournamentsResponse = ApiResponse<TournamentInfo, TournamentTypeInfo>;
 export type TournamentTypesResponse = ApiResponse<TournamentTypeInfo>;
 export type PrintingsResponse = ApiResponse<Printing>;
+
+export interface UserInfo {
+  id: string;
+  type?: string;
+  attributes: {
+    nrdb_id: number;
+    nrdb_username: string;
+  };
+}
+
+export interface CurrentUserResponse {
+  data: UserInfo;
+}
+
+export interface IdentityInfo {
+  id: string;
+  type?: string;
+  attributes: {
+    name: string;
+    autocomplete: string;
+    faction: string;
+    nrdb_code: string;
+    side: string;
+  };
+}
+
+export type IdentitiesResponse = ApiResponse<IdentityInfo>;
+
+export interface PlayerAttributes {
+  tournament_id: number;
+  user_id: number;
+  name: string;
+  pronouns?: string | null;
+  active: boolean | null;
+  seed?: number | null;
+  fixed_table_number?: number | null;
+  manual_seed?: number | null;
+  first_round_bye?: boolean;
+  include_in_stream?: boolean;
+  registration_locked?: boolean;
+  corp_identity_id?: number | null;
+  runner_identity_id?: number | null;
+}
+
+export interface PlayerInfo {
+  id: string;
+  type?: string;
+  attributes: PlayerAttributes;
+}
+
+export type PlayersResponse = ApiResponse<PlayerInfo, IdentityInfo>;

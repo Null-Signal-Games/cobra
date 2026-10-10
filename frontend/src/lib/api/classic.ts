@@ -1,7 +1,10 @@
 import { api as defaultApi, type ApiBase } from "$lib/api/apiBase";
 import type { PairingsData } from "$lib/api/betaTypes";
 import type {
+  DemoTournamentSettings,
+  DemoTournamentSettingsData,
   TournamentCreateResponse,
+  TournamentDemoCreateResponse,
   TournamentSettingsData,
   SaveStageResponse,
   Stage,
@@ -53,6 +56,10 @@ export class ClassicApi {
     return this.api.getOrThrow<TournamentSettingsData>("/tournaments/new_form", altFetch);
   }
 
+  loadNewDemoTournament(altFetch = fetch): Promise<DemoTournamentSettingsData> {
+    return this.api.getOrThrow<DemoTournamentSettingsData>("/tournaments/new_demo_form", altFetch);
+  }
+
   loadTournamentSettings(
     tournamentId: number,
     altFetch = fetch,
@@ -76,6 +83,17 @@ export class ClassicApi {
 
   createTournament(tournament: Tournament): Promise<TournamentCreateResponse> {
     return this.api.postOrThrow<TournamentCreateResponse>("/tournaments", { tournament });
+  }
+
+  createDemoTournament(
+    tournament: DemoTournamentSettings,
+    csrfToken?: string
+  ): Promise<TournamentDemoCreateResponse> {
+    return this.api.postOrThrow<TournamentDemoCreateResponse>(
+      "/tournaments/create_demo",
+      { tournament },
+      csrfToken ? { csrfToken } : undefined,
+    );
   }
 
   async updateTournamentSettings(tournament: Tournament): Promise<boolean> {

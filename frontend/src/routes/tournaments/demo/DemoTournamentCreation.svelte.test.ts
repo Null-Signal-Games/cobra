@@ -1,26 +1,20 @@
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/svelte";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import DemoTournamentCreation from "./+page.svelte";
-import {
-  loadNewDemoTournament,
-  createDemoTournament,
-} from "./DemoTournamentSettings";
+import { classicApi } from "$lib/api/classic";
 import { navigateTo } from "$lib/utils/navigation";
 import { ValidationError } from "$lib/utils/errors";
 
-// Mock the DemoTournamentSettings module
-vi.mock("./DemoTournamentSettings", () => {
-  return {
+vi.mock("$app/env/public", () => ({
+  COBRA_API_SERVER: "http://localhost:3000",
+}));
+
+vi.mock("$lib/api/classic", () => ({
+  classicApi: {
     loadNewDemoTournament: vi.fn(),
     createDemoTournament: vi.fn(),
-    ValidationError: class ValidationError extends Error {
-      constructor(public errors: Record<string, string[]>) {
-        super("Validation failed");
-        this.name = "ValidationError";
-      }
-    },
-  };
-});
+  },
+}));
 
 vi.mock("$lib/utils/navigation", () => ({
   navigateTo: vi.fn(),
@@ -41,7 +35,7 @@ describe("DemoTournamentCreation", () => {
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
-    vi.mocked(loadNewDemoTournament).mockResolvedValue(mockTournamentData);
+    vi.mocked(classicApi.loadNewDemoTournament).mockResolvedValue(mockTournamentData);
   });
 
   it("renders the demo tournament creation form", async () => {
@@ -67,12 +61,12 @@ describe("DemoTournamentCreation", () => {
     render(DemoTournamentCreation);
 
     await waitFor(() => {
-      expect(loadNewDemoTournament).toHaveBeenCalledOnce();
+      expect(classicApi.loadNewDemoTournament).toHaveBeenCalledOnce();
     });
   });
 
   it("shows a loading spinner", async () => {
-    vi.mocked(loadNewDemoTournament).mockImplementation(
+    vi.mocked(classicApi.loadNewDemoTournament).mockImplementation(
       () =>
         new Promise(() => {
           // This promise intentionally never resolves to test loading state
@@ -94,7 +88,7 @@ describe("DemoTournamentCreation", () => {
       url: "/tournaments/123/rounds",
     };
 
-    vi.mocked(createDemoTournament).mockResolvedValue(mockResponse);
+    vi.mocked(classicApi.createDemoTournament).mockResolvedValue(mockResponse);
 
     render(DemoTournamentCreation);
 
@@ -125,11 +119,11 @@ describe("DemoTournamentCreation", () => {
     await fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(createDemoTournament).toHaveBeenCalledWith(
-        "fake-csrf-token",
+      expect(classicApi.createDemoTournament).toHaveBeenCalledWith(
         expect.objectContaining({
           name: "Test Demo Tournament",
         }),
+        "fake-csrf-token"
       );
     });
 
@@ -145,7 +139,7 @@ describe("DemoTournamentCreation", () => {
       num_players: ["Number of players is required"],
       num_first_round_byes: ["Number of byes must be a number"],
     });
-    vi.mocked(createDemoTournament).mockRejectedValue(validationError);
+    vi.mocked(classicApi.createDemoTournament).mockRejectedValue(validationError);
 
     render(DemoTournamentCreation);
 
@@ -178,9 +172,7 @@ describe("DemoTournamentCreation", () => {
   });
 
   it("handles unexpected errors", async () => {
-    vi.mocked(createDemoTournament).mockRejectedValue(
-      new Error("Network error"),
-    );
+    vi.mocked(classicApi.createDemoTournament).mockRejectedValue(new Error("Network error"));
 
     render(DemoTournamentCreation);
 

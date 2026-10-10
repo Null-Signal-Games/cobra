@@ -1,7 +1,6 @@
 import { api as defaultApi, type ApiBase } from "$lib/api/apiBase";
 import type { PairingsData, RoundData, TournamentData } from "$lib/api/betaTypes";
 import type { Deck, NrdbDeck } from "$lib/model/Deck";
-import type { IdentityNames } from "$lib/model/Identity";
 import type { NewPairing } from "$lib/model/Pairing";
 import { type Player, playerRequestObject, type PlayersData } from "$lib/model/Player";
 import type { RoundTimer } from "$lib/model/Round";
@@ -24,13 +23,6 @@ export class BetaApi {
 
   loadPlayer(tournamentId: number, playerId: number, altFetch = fetch): Promise<Player> {
     return this.api.getOrThrow<Player>(`/beta/tournaments/${tournamentId}/players/${playerId}`, altFetch);
-  }
-
-  loadPlayerByUserId(tournamentId: number, userId: number, altFetch = fetch): Promise<Player> {
-    return this.api.getOrThrow<Player>(
-      `/beta/tournaments/${tournamentId}/players/by_user_id/${userId}`,
-      altFetch,
-    );
   }
 
   async savePlayer(
@@ -100,10 +92,6 @@ export class BetaApi {
 
   loadCurrentRoundTimer(tournamentId: number, altFetch = fetch): Promise<RoundTimer> {
     return this.api.getOrThrow<RoundTimer>(`/beta/tournaments/${tournamentId}/current_round_timer`, altFetch, "");
-  }
-
-  loadIdentityNames(altFetch = fetch): Promise<IdentityNames> {
-    return this.api.getOrThrow<IdentityNames>("/beta/identities", altFetch);
   }
 
   loadPlayers(tournamentId: number, altFetch = fetch): Promise<PlayersData> {
