@@ -9,6 +9,7 @@
   import Identity from "$lib/components/identity/Identity.svelte";
   import { onMount } from "svelte";
   import { betaApi } from "$lib/api/beta";
+  import { v1Api } from "$lib/api/v1";
   import { navigateTo } from "$lib/utils/navigation";
   import { authStore } from "$lib/utils/auth.svelte";
 
@@ -29,7 +30,7 @@
   let readOnly = $derived(playerEdit.id !== 0);
 
   onMount(async () => {
-    identityNames = await betaApi.loadIdentityNames();
+    identityNames = await v1Api.loadIdentityNames();
     if (playerEdit.id === 0) {
       playerEdit.name = authStore.user?.nrdb_username ?? "";
     }

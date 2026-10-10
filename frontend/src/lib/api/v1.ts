@@ -1,10 +1,14 @@
 import { api as defaultApi, type ApiBase } from "$lib/api/apiBase";
 import type {
   CurrentUserResponse,
+  IdentitiesResponse,
+  IdentityInfo,
   TournamentsResponse,
   TournamentTypeInfo,
   TournamentTypesResponse,
 } from "$lib/api/v1ApiTypes";
+import type { IdentityNames } from "$lib/model/Identity";
+import { v1Adapter } from "$lib/model/v1Adapter";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
 const JSON_API_HEADERS = {
@@ -98,6 +102,25 @@ export class V1Api {
     }
 
     return res.data;
+  }
+
+  async loadIdentities(altFetch = fetch): Promise<IdentityInfo[]> {
+    const res = await this.api.get<IdentitiesResponse>("/api/v1/public/identities", {
+      altFetch,
+      headers: JSON_API_HEADERS,
+    });
+
+    if (!res.ok) {
+      globalMessages.errors.push(`Failed to load identities: ${res.error.message}`);
+      return [];
+    }
+
+    return res.data.data;
+  }
+
+  async loadIdentityNames(altFetch = fetch): Promise<IdentityNames> {
+    const identities = await this.loadIdentities(altFetch);
+    return v1Adapter.adaptIdentityNames(identities);
   }
 }
 

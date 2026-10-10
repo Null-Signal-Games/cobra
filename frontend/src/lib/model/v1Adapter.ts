@@ -1,4 +1,5 @@
-import type { TournamentInfo } from "$lib/api/v1ApiTypes";
+import type { IdentityInfo, TournamentInfo } from "$lib/api/v1ApiTypes";
+import type { IdentityName, IdentityNames } from "$lib/model/Identity";
 import type { Tournament } from "$lib/model/Tournament";
 
 export class V1Adapter {
@@ -53,6 +54,28 @@ export class V1Adapter {
         updated_at: t.attributes.updated_at,
         user_id: t.attributes.user_id,
       }
+    }
+
+    adaptIdentityNames(identities: IdentityInfo[]): IdentityNames {
+      const corp: IdentityName[] = [];
+      const runner: IdentityName[] = [];
+
+      for (const item of identities) {
+        const entry: IdentityName = {
+          label: item.attributes.autocomplete,
+          value: item.attributes.name,
+        };
+        if (item.attributes.side === "corp") {
+          corp.push(entry);
+        } else if (item.attributes.side === "runner") {
+          runner.push(entry);
+        }
+      }
+
+      corp.sort((a, b) => a.label.localeCompare(b.label));
+      runner.sort((a, b) => a.label.localeCompare(b.label));
+
+      return { corp, runner };
     }
 }
 

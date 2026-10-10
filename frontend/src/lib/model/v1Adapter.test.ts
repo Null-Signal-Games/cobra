@@ -58,4 +58,68 @@ describe('v1Adapter', () => {
       organizer_contact: null,
     });
   });
+
+  describe('adaptIdentityNames', () => {
+    it('sorts and partitions identities into corp and runner identity names', () => {
+      const identities = [
+        {
+          id: '1',
+          type: 'identities',
+          attributes: {
+            name: 'Jinteki: Personal Evolution',
+            autocomplete: 'Jinteki: Restoring Humanity',
+            faction: 'jinteki',
+            nrdb_code: '01067',
+            side: 'corp',
+          },
+        },
+        {
+          id: '2',
+          type: 'identities',
+          attributes: {
+            name: 'Haas-Bioroid: Precision Design',
+            autocomplete: 'Haas-Bioroid: Precision Design',
+            faction: 'haas-bioroid',
+            nrdb_code: '30030',
+            side: 'corp',
+          },
+        },
+        {
+          id: '3',
+          type: 'identities',
+          attributes: {
+            name: 'Zahya Sadeghi: Versatile Smuggler',
+            autocomplete: 'Zahya Sadeghi: Versatile Smuggler',
+            faction: 'shaper',
+            nrdb_code: '34001',
+            side: 'runner',
+          },
+        },
+        {
+          id: '4',
+          type: 'identities',
+          attributes: {
+            name: 'Topan: Ormas Leader',
+            autocomplete: 'Topan: Ormas Leader',
+            faction: 'anarch',
+            nrdb_code: '34002',
+            side: 'runner',
+          },
+        },
+      ];
+
+      const result = v1Adapter.adaptIdentityNames(identities);
+
+      expect(result).toEqual({
+        corp: [
+          { label: 'Haas-Bioroid: Precision Design', value: 'Haas-Bioroid: Precision Design' },
+          { label: 'Jinteki: Restoring Humanity', value: 'Jinteki: Personal Evolution' },
+        ],
+        runner: [
+          { label: 'Topan: Ormas Leader', value: 'Topan: Ormas Leader' },
+          { label: 'Zahya Sadeghi: Versatile Smuggler', value: 'Zahya Sadeghi: Versatile Smuggler' },
+        ],
+      });
+    });
+  });
 });

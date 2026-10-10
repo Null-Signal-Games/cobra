@@ -77,7 +77,6 @@ vi.mock("$lib/api/beta", () => ({
     deletePlayer: vi.fn(() => Promise.resolve(true)),
     savePlayer: vi.fn(() => true),
     loadPlayers: vi.fn(),
-    loadIdentityNames: vi.fn(),
     loadDecks: vi.fn(() => Promise.resolve([])),
   },
 }));

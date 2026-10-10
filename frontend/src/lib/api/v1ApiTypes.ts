@@ -66,3 +66,17 @@ export interface UserInfo {
 export interface CurrentUserResponse {
   data: UserInfo;
 }
+
+export interface IdentityInfo {
+  id: string;
+  type?: string;
+  attributes: {
+    name: string;
+    autocomplete: string;
+    faction: string;
+    nrdb_code: string;
+    side: string;
+  };
+}
+
+export type IdentitiesResponse = ApiResponse<IdentityInfo>;

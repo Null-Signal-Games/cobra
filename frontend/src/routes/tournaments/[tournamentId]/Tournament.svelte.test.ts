@@ -87,10 +87,15 @@ export const MockPlayerBob: Player = {
 
 vi.mock("$lib/api/beta", () => ({
   betaApi: {
-    loadIdentityNames: vi.fn(() => MockIdentityNames),
     loadPlayerByUserId: vi.fn(),
     loadTournament: vi.fn(),
     savePlayer: vi.fn(),
+  },
+}));
+
+vi.mock("$lib/api/v1", () => ({
+  v1Api: {
+    loadIdentityNames: vi.fn(() => Promise.resolve(MockIdentityNames)),
   },
 }));
 

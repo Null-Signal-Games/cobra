@@ -176,4 +176,78 @@ describe("V1Api", () => {
       expect(globalMessages.errors).toHaveLength(0);
     });
   });
+
+  describe("loadIdentities", () => {
+    it("fetches identities and returns data array on 200", async () => {
+      const mockIdentities = [
+        {
+          id: "1",
+          type: "identities",
+          attributes: {
+            name: "Haas-Bioroid: Precision Design",
+            autocomplete: "Haas-Bioroid: Precision Design",
+            faction: "haas-bioroid",
+            nrdb_code: "30030",
+            side: "corp",
+          },
+        },
+      ];
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: mockIdentities }), {
+          status: 200,
+          headers: { "Content-Type": "application/vnd.api+json" },
+        }),
+      );
+
+      const result = await api.loadIdentities(mockFetch);
+
+      expect(result).toEqual(mockIdentities);
+      const { url, headers } = getFetchCall();
+      expect(url).toBe("https://tournaments.nullsignal.games/api/v1/public/identities");
+      expect(headers.Accept).toBe("application/vnd.api+json");
+    });
+
+    it("pushes error to globalMessages and returns empty array on failure", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(null, { status: 500, statusText: "Internal Server Error" }),
+      );
+
+      const result = await api.loadIdentities(mockFetch);
+
+      expect(result).toEqual([]);
+      expect(globalMessages.errors).toHaveLength(1);
+      expect(globalMessages.errors[0]).toContain("Failed to load identities");
+    });
+  });
+
+  describe("loadIdentityNames", () => {
+    it("fetches identities and adapts them to IdentityNames", async () => {
+      const mockIdentities = [
+        {
+          id: "1",
+          type: "identities",
+          attributes: {
+            name: "Haas-Bioroid: Precision Design",
+            autocomplete: "Haas-Bioroid: Precision Design",
+            faction: "haas-bioroid",
+            nrdb_code: "30030",
+            side: "corp",
+          },
+        },
+      ];
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: mockIdentities }), {
+          status: 200,
+          headers: { "Content-Type": "application/vnd.api+json" },
+        }),
+      );
+
+      const result = await api.loadIdentityNames(mockFetch);
+
+      expect(result).toEqual({
+        corp: [{ label: "Haas-Bioroid: Precision Design", value: "Haas-Bioroid: Precision Design" }],
+        runner: [],
+      });
+    });
+  });
 });
