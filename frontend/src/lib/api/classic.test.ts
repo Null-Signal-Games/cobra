@@ -220,33 +220,6 @@ describe("ClassicApi", () => {
       expect(body).toEqual({ tournament: demoTournament });
     });
 
-    it("creates a demo tournament with csrf token as first argument", async () => {
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockDemoResponse), { status: 201 }),
-      );
-
-      const result = await api.createDemoTournament("custom-csrf-token", demoTournament);
-
-      expect(result).toEqual(mockDemoResponse);
-      const { url, requestOptions, headers, body } = getFetchCall();
-      expect(url).toContain("/tournaments/create_demo");
-      expect(requestOptions?.method).toBe("POST");
-      expect(headers["X-CSRF-Token"]).toBe("custom-csrf-token");
-      expect(body).toEqual({ tournament: demoTournament });
-    });
-
-    it("creates a demo tournament using default csrf token when not provided", async () => {
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockDemoResponse), { status: 201 }),
-      );
-
-      const result = await api.createDemoTournament(demoTournament);
-
-      expect(result).toEqual(mockDemoResponse);
-      const { headers } = getFetchCall();
-      expect(headers["X-CSRF-Token"]).toBe("mock-csrf-token");
-    });
-
     it("handles validation errors", async () => {
       const mockErrors = {
         errors: {

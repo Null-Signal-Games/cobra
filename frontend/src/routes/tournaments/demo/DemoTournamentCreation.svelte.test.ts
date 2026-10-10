@@ -120,10 +120,10 @@ describe("DemoTournamentCreation", () => {
 
     await waitFor(() => {
       expect(classicApi.createDemoTournament).toHaveBeenCalledWith(
-        "fake-csrf-token",
         expect.objectContaining({
           name: "Test Demo Tournament",
         }),
+        "fake-csrf-token"
       );
     });
 
