@@ -104,14 +104,14 @@ export class V1Adapter {
           const corp = included.find((item) => item.id === String(p.attributes.corp_identity_id));
           if (corp) {
             player.corp_id.name = corp.attributes.name;
-            player.corp_id.faction = corp.attributes.faction ?? null;
+            player.corp_id.faction = corp.attributes.faction;
           }
         }
         if (p.attributes.runner_identity_id) {
           const runner = included.find((item) => item.id === String(p.attributes.runner_identity_id));
           if (runner) {
             player.runner_id.name = runner.attributes.name;
-            player.runner_id.faction = runner.attributes.faction ?? null;
+            player.runner_id.faction = runner.attributes.faction;
           }
         }
       }
