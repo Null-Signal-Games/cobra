@@ -87,27 +87,8 @@ export class ClassicApi {
 
   createDemoTournament(
     tournament: DemoTournamentSettings,
-    csrfToken?: string,
-  ): Promise<TournamentDemoCreateResponse>;
-  createDemoTournament(
-    csrfToken: string,
-    tournament: DemoTournamentSettings,
-  ): Promise<TournamentDemoCreateResponse>;
-  createDemoTournament(
-    arg1: DemoTournamentSettings | string,
-    arg2?: DemoTournamentSettings | string,
+    csrfToken?: string
   ): Promise<TournamentDemoCreateResponse> {
-    let tournament: DemoTournamentSettings;
-    let csrfToken: string | undefined;
-
-    if (typeof arg1 === "string") {
-      csrfToken = arg1;
-      tournament = arg2 as DemoTournamentSettings;
-    } else {
-      tournament = arg1;
-      csrfToken = arg2 as string | undefined;
-    }
-
     return this.api.postOrThrow<TournamentDemoCreateResponse>(
       "/tournaments/create_demo",
       { tournament },
