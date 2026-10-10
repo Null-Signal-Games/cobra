@@ -1,5 +1,6 @@
-import type { IdentityInfo, TournamentInfo } from "$lib/api/v1ApiTypes";
+import type { IdentityInfo, PlayerInfo, TournamentInfo } from "$lib/api/v1ApiTypes";
 import type { IdentityName, IdentityNames } from "$lib/model/Identity";
+import { Player } from "$lib/model/Player";
 import type { Tournament } from "$lib/model/Tournament";
 
 export class V1Adapter {
@@ -76,6 +77,46 @@ export class V1Adapter {
       runner.sort((a, b) => a.label.localeCompare(b.label));
 
       return { corp, runner };
+    }
+
+    adaptPlayer(p: PlayerInfo, included: IdentityInfo[] = []): Player {
+      const id = Number.parseInt(p.id, 10);
+
+      if (Number.isNaN(id)) {
+        throw new Error(`Invalid player id: ${p.id}`);
+      }
+
+      const player = new Player();
+      player.id = id;
+      player.name = p.attributes.name;
+      player.pronouns = p.attributes.pronouns ?? "";
+      player.name_with_pronouns = player.pronouns ? `${player.name} (${player.pronouns})` : player.name;
+      player.user_id = p.attributes.user_id;
+      player.active = p.attributes.active;
+      player.fixed_table_number = p.attributes.fixed_table_number ?? null;
+      player.include_in_stream = p.attributes.include_in_stream ?? false;
+      player.first_round_bye = p.attributes.first_round_bye ?? false;
+      player.manual_seed = p.attributes.manual_seed ?? null;
+      player.registration_locked = p.attributes.registration_locked ?? false;
+
+      if (included.length > 0) {
+        if (p.attributes.corp_identity_id) {
+          const corp = included.find((item) => item.id === String(p.attributes.corp_identity_id));
+          if (corp) {
+            player.corp_id.name = corp.attributes.name;
+            player.corp_id.faction = corp.attributes.faction ?? null;
+          }
+        }
+        if (p.attributes.runner_identity_id) {
+          const runner = included.find((item) => item.id === String(p.attributes.runner_identity_id));
+          if (runner) {
+            player.runner_id.name = runner.attributes.name;
+            player.runner_id.faction = runner.attributes.faction ?? null;
+          }
+        }
+      }
+
+      return player;
     }
 }
 

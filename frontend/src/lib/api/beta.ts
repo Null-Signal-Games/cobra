@@ -25,13 +25,6 @@ export class BetaApi {
     return this.api.getOrThrow<Player>(`/beta/tournaments/${tournamentId}/players/${playerId}`, altFetch);
   }
 
-  loadPlayerByUserId(tournamentId: number, userId: number, altFetch = fetch): Promise<Player> {
-    return this.api.getOrThrow<Player>(
-      `/beta/tournaments/${tournamentId}/players/by_user_id/${userId}`,
-      altFetch,
-    );
-  }
-
   async savePlayer(
     tournamentId: number,
     player: Player,

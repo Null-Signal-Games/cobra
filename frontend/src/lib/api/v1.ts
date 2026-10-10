@@ -3,11 +3,13 @@ import type {
   CurrentUserResponse,
   IdentitiesResponse,
   IdentityInfo,
+  PlayersResponse,
   TournamentsResponse,
   TournamentTypeInfo,
   TournamentTypesResponse,
 } from "$lib/api/v1ApiTypes";
 import type { IdentityNames } from "$lib/model/Identity";
+import { Player } from "$lib/model/Player";
 import { v1Adapter } from "$lib/model/v1Adapter";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
@@ -122,6 +124,52 @@ export class V1Api {
     const identities = await this.loadIdentities(altFetch);
     return v1Adapter.adaptIdentityNames(identities);
   }
+
+  playersApiUrl(tournamentId: number, options?: { userId?: number }): string {
+    const params = new URLSearchParams({
+      include: "corp_identity,runner_identity",
+    });
+
+    if (options?.userId !== undefined) {
+      params.set("filter[user_id]", String(options.userId));
+    }
+
+    return `/api/v1/public/tournaments/${tournamentId}/players?${params.toString()}`;
+  }
+
+  async loadPlayers(
+    tournamentId: number,
+    options?: { userId?: number },
+    altFetch = fetch,
+  ): Promise<PlayersResponse> {
+    const url = this.playersApiUrl(tournamentId, options);
+    const res = await this.api.get<PlayersResponse>(url, {
+      altFetch,
+      headers: JSON_API_HEADERS,
+    });
+
+    if (!res.ok) {
+      globalMessages.errors.push(`Failed to load players: ${res.error.message}`);
+      return { data: [] };
+    }
+
+    return res.data;
+  }
+
+  async loadPlayerByUserId(
+    tournamentId: number,
+    userId: number,
+    altFetch = fetch,
+  ): Promise<Player> {
+    const res = await this.loadPlayers(tournamentId, { userId }, altFetch);
+    if (res.data.length > 0) {
+      return v1Adapter.adaptPlayer(res.data[0], res.included);
+    }
+    const player = new Player();
+    player.user_id = userId;
+    return player;
+  }
 }
 
 export const v1Api = new V1Api();
+

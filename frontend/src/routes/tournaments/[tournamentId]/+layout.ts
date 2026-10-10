@@ -1,5 +1,6 @@
 import { authStore } from "$lib/utils/auth.svelte";
 import { betaApi } from "$lib/api/beta";
+import { v1Api } from "$lib/api/v1";
 import type { LayoutLoad } from "./$types";
 
 export const load: LayoutLoad = async ({ params, fetch }) => {
@@ -11,6 +12,6 @@ export const load: LayoutLoad = async ({ params, fetch }) => {
   return {
     tournamentData: tournament,
     timer: await betaApi.loadCurrentRoundTimer(tournamentId, fetch),
-    player: user ? await betaApi.loadPlayerByUserId(tournamentId, user.id, fetch) : null,
+    player: user ? await v1Api.loadPlayerByUserId(tournamentId, user.id, fetch) : null,
   };
 };

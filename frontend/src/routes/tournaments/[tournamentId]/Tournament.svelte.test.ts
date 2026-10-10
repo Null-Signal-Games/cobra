@@ -87,7 +87,6 @@ export const MockPlayerBob: Player = {
 
 vi.mock("$lib/api/beta", () => ({
   betaApi: {
-    loadPlayerByUserId: vi.fn(),
     loadTournament: vi.fn(),
     savePlayer: vi.fn(),
   },

@@ -80,3 +80,27 @@ export interface IdentityInfo {
 }
 
 export type IdentitiesResponse = ApiResponse<IdentityInfo>;
+
+export interface PlayerAttributes {
+  tournament_id: number;
+  user_id: number;
+  name: string;
+  pronouns?: string | null;
+  active: boolean | null;
+  seed?: number | null;
+  fixed_table_number?: number | null;
+  manual_seed?: number | null;
+  first_round_bye?: boolean;
+  include_in_stream?: boolean;
+  registration_locked?: boolean;
+  corp_identity_id?: number | null;
+  runner_identity_id?: number | null;
+}
+
+export interface PlayerInfo {
+  id: string;
+  type?: string;
+  attributes: PlayerAttributes;
+}
+
+export type PlayersResponse = ApiResponse<PlayerInfo, IdentityInfo>;

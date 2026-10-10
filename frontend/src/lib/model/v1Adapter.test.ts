@@ -122,4 +122,115 @@ describe('v1Adapter', () => {
       });
     });
   });
+
+  describe('adaptPlayer', () => {
+    it('throws error for an invalid ID', () => {
+      const playerInfo = {
+        id: 'bad-id',
+        type: 'players',
+        attributes: {
+          tournament_id: 1,
+          user_id: 10,
+          name: 'Evie',
+          pronouns: null,
+          active: true,
+          seed: null,
+          fixed_table_number: null,
+          manual_seed: null,
+          first_round_bye: false,
+          include_in_stream: false,
+          registration_locked: false,
+        },
+      };
+
+      expect(() => v1Adapter.adaptPlayer(playerInfo)).toThrow();
+    });
+
+    it('adapts a player and formats name with pronouns', () => {
+      const playerInfo = {
+        id: '42',
+        type: 'players',
+        attributes: {
+          tournament_id: 1,
+          user_id: 10,
+          name: 'Evie',
+          pronouns: 'she/her',
+          active: true,
+          seed: null,
+          fixed_table_number: 5,
+          manual_seed: null,
+          first_round_bye: false,
+          include_in_stream: true,
+          registration_locked: true,
+        },
+      };
+
+      const player = v1Adapter.adaptPlayer(playerInfo);
+
+      expect(player.id).toBe(42);
+      expect(player.name).toBe('Evie');
+      expect(player.pronouns).toBe('she/her');
+      expect(player.name_with_pronouns).toBe('Evie (she/her)');
+      expect(player.user_id).toBe(10);
+      expect(player.fixed_table_number).toBe(5);
+      expect(player.include_in_stream).toBe(true);
+      expect(player.registration_locked).toBe(true);
+      expect(player.active).toBe(true);
+    });
+
+    it('resolves corp and runner identities from included resources', () => {
+      const playerInfo = {
+        id: '42',
+        type: 'players',
+        attributes: {
+          tournament_id: 1,
+          user_id: 10,
+          name: 'plural',
+          pronouns: null,
+          active: true,
+          seed: null,
+          fixed_table_number: null,
+          manual_seed: null,
+          first_round_bye: false,
+          include_in_stream: false,
+          registration_locked: false,
+          corp_identity_id: 101,
+          runner_identity_id: 102,
+        },
+      };
+
+      const included = [
+        {
+          id: '101',
+          type: 'identities',
+          attributes: {
+            name: 'Haas-Bioroid: Precision Design',
+            autocomplete: 'Haas-Bioroid: Precision Design',
+            faction: 'haas-bioroid',
+            nrdb_code: '30030',
+            side: 'corp',
+          },
+        },
+        {
+          id: '102',
+          type: 'identities',
+          attributes: {
+            name: 'Zahya Sadeghi: Versatile Smuggler',
+            autocomplete: 'Zahya Sadeghi: Versatile Smuggler',
+            faction: 'criminal',
+            nrdb_code: '34001',
+            side: 'runner',
+          },
+        },
+      ];
+
+      const player = v1Adapter.adaptPlayer(playerInfo, included);
+
+      expect(player.corp_id.name).toBe('Haas-Bioroid: Precision Design');
+      expect(player.corp_id.faction).toBe('haas-bioroid');
+      expect(player.runner_id.name).toBe('Zahya Sadeghi: Versatile Smuggler');
+      expect(player.runner_id.faction).toBe('criminal');
+      expect(player.name_with_pronouns).toBe('plural');
+    });
+  });
 });
