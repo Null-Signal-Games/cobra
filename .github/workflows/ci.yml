@@ -11,7 +11,8 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGENAME: registry.digitalocean.com/nsgcr/cobra
+  RAILS_IMAGENAME: registry.digitalocean.com/nsgcr/cobra
+  SVELTE_IMAGENAME: registry.digitalocean.com/nsgcr/cobra-frontend
 
 jobs:
   ci:
@@ -113,6 +114,36 @@ jobs:
         env:
           IMAGETAG: ${{ github.ref == 'refs/heads/main' && 'latest' || github.ref_name }}
         run: |
-          docker build -t $IMAGENAME:$IMAGETAG .
-          docker tag $IMAGENAME:$IMAGETAG $IMAGENAME:${{ github.run_id }}
-          docker push -a $IMAGENAME
+          docker build -t $RAILS_IMAGENAME:$IMAGETAG .
+          docker tag $RAILS_IMAGENAME:$IMAGETAG $RAILS_IMAGENAME:${{ github.run_id }}
+          docker push -a $RAILS_IMAGENAME
+
+  build_and_push_frontend:
+    name: Build frontend docker image
+    if: (github.repository_owner == 'Null-Signal-Games' &&  (github.ref == 'refs/heads/main' || github.event_name == 'release'))
+
+    needs: [ci]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout the repo
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DO Container Registry
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Build, tag, and publish image
+        env:
+          IMAGETAG: ${{ github.ref == 'refs/heads/main' && 'latest' || github.ref_name }}
+        run: |
+          docker build -f deploy/Dockerfile.frontend -t $SVELTE_IMAGENAME:$IMAGETAG frontend
+          docker tag $SVELTE_IMAGENAME:$IMAGETAG $SVELTE_IMAGENAME:${{ github.run_id }}
+          docker push -a $SVELTE_IMAGENAME

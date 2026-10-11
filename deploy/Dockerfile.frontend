@@ -1,0 +1,34 @@
+# Stage 1: Build the SvelteKit frontend
+FROM node:24-alpine AS builder
+WORKDIR /app
+
+COPY . .
+
+# Clean any host artifacts that may have been copied over from the build context
+RUN rm -rf node_modules .svelte-kit build
+
+# Install dependencies
+RUN npm ci
+
+# Ensure adapter-node is used for building the container image
+RUN if grep -q "@sveltejs/adapter-auto" vite.config.ts; then \
+      sed -i 's/@sveltejs\/adapter-auto/@sveltejs\/adapter-node/g' vite.config.ts; \
+    fi
+
+RUN npm run build
+RUN npm prune --production
+
+# Stage 2: Minimal Node.js production runner
+FROM node:24-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/build ./build
+
+EXPOSE 3000
+
+CMD ["node", "build"]
