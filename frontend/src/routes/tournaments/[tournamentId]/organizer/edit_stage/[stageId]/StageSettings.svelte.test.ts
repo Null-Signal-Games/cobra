@@ -8,7 +8,7 @@ import { classicApi } from "$lib/api/classic";
 import { ValidationError } from "$lib/utils/errors";
 
 vi.mock("$app/env/public", () => ({
-  COBRA_API_SERVER: "http://localhost:3000",
+  CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000",
 }));
 
 function getFetchCall(mock: { mock: { calls: unknown[][] } }, callIndex = 0) {

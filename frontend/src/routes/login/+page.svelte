@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { authStore } from "$lib/utils/auth.svelte";
-  import { COBRA_API_SERVER } from "$app/env/public";
+  import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
 
-  const serverOrigin = (COBRA_API_SERVER || "").replace(/\/$/, "");
+  const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
   let returnTo = $state("/tournaments/my");
 
   onMount(async () => {
@@ -20,11 +20,11 @@
   });
 
   function getLoginUrl() {
-    if (typeof window === "undefined") return `${serverOrigin}/login`;
+    if (typeof window === "undefined") return `${serverOrigin}/oauth/login`;
     const fullReturnUrl = returnTo.startsWith("http")
       ? returnTo
       : window.location.origin + returnTo;
-    return `${serverOrigin}/login?return_to=${encodeURIComponent(fullReturnUrl)}`;
+    return `${serverOrigin}/oauth/login?return_to=${encodeURIComponent(fullReturnUrl)}`;
   }
 </script>
 

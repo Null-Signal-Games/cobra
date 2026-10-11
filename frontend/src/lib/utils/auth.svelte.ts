@@ -1,4 +1,4 @@
-import { COBRA_API_SERVER } from "$app/env/public";
+import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
 import { v1Api } from "$lib/api/v1";
 
 export interface AuthUser {
@@ -7,7 +7,7 @@ export interface AuthUser {
   nrdb_username: string;
 }
 
-const serverOrigin = (COBRA_API_SERVER || "").replace(/\/$/, "");
+const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
 
 class AuthStore {
   user = $state<AuthUser | null>(null);
@@ -52,7 +52,7 @@ class AuthStore {
         ? targetPath
         : window.location.origin + targetPath;
 
-      window.location.href = `${serverOrigin}/login?return_to=${encodeURIComponent(fullReturnUrl)}`;
+      window.location.href = `${serverOrigin}/oauth/login?return_to=${encodeURIComponent(fullReturnUrl)}`;
     }
   }
 

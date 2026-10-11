@@ -5,7 +5,7 @@ import { Tournament } from "$lib/model/Tournament";
 import { createRawSnippet } from "svelte";
 
 vi.mock("$app/env/public", () => ({
-  COBRA_API_SERVER: "http://localhost:3000",
+  CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000",
 }));
 
 describe("Tournament navigation tab strip", () => {
