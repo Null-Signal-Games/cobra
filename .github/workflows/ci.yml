@@ -81,6 +81,10 @@ jobs:
         working-directory: ./frontend
         run: npm run check
 
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
