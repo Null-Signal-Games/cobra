@@ -93,7 +93,7 @@ jobs:
           retention-days: 30
 
   build_and_push:
-    name: Build docker image
+    name: Build Rails docker image
     if: (github.repository_owner == 'Null-Signal-Games' &&  (github.ref == 'refs/heads/main' || github.event_name == 'release'))
 
     needs: [ci]
@@ -114,7 +114,7 @@ jobs:
       - name: Log in to DO Container Registry
         run: doctl registry login --expiry-seconds 600
 
-      - name: Build, tag, and publish image
+      - name: Build, tag, and publish Rails image
         env:
           IMAGETAG: ${{ github.ref == 'refs/heads/main' && 'latest' || github.ref_name }}
         run: |
@@ -123,7 +123,7 @@ jobs:
           docker push -a $RAILS_IMAGENAME
 
   build_and_push_frontend:
-    name: Build frontend docker image
+    name: Build Svelte frontend docker image
     if: (github.repository_owner == 'Null-Signal-Games' &&  (github.ref == 'refs/heads/main' || github.event_name == 'release'))
 
     needs: [ci]
@@ -144,7 +144,7 @@ jobs:
       - name: Log in to DO Container Registry
         run: doctl registry login --expiry-seconds 600
 
-      - name: Build, tag, and publish image
+      - name: Build, tag, and publish Svelte frontend image
         env:
           IMAGETAG: ${{ github.ref == 'refs/heads/main' && 'latest' || github.ref_name }}
         run: |
