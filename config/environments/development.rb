@@ -89,6 +89,10 @@ Rails.application.configure do
   # Disable to allow full Svelte app access to the backend for dev.
   config.action_controller.forgery_protection_origin_check = false
 
+  # Allow requests from the docker gateway and svelte hosts
+  config.hosts << 'gateway'
+  config.hosts << 'svelte'
+
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 

@@ -1,12 +1,18 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # Health check endpoint used by docker.
+  get 'up' => 'rails/health#show', as: :rails_health_check
+
   root 'home#home'
 
   get :login, to: 'oauth#auth'
   get :logout, to: 'oauth#logout'
 
   namespace :oauth do
+    # Add aliases for login / logout to avoid collisions with the new Svelte frontend app.
+    get :login, to: 'auth'
+    get :logout, to: 'logout'
     get :callback
   end
 
@@ -31,6 +37,30 @@ Rails.application.routes.draw do
       namespace :private do
         get :user, to: 'users#show'
         get 'user/tournaments', to: 'user_tournaments#index'
+      end
+    end
+  end
+
+  # Add /api/classic route to support the new Svelte frontend and deployment.
+  scope path: 'api/classic', as: :api_classic do
+    resources :tournaments, only: %i[create update] do
+      collection do
+        get :new_form
+        get :new_demo_form
+        post :create_demo
+      end
+      member do
+        get :edit_form
+      end
+      resources :players, only: [] do
+        get :standings_data, on: :collection
+      end
+      resources :rounds, only: [] do
+        get :brackets, on: :collection
+        get 'pairings_data(/:user_id)', on: :collection, action: 'pairings_data'
+      end
+      resources :stages, only: %i[update] do
+        get :settings, on: :member
       end
     end
   end
