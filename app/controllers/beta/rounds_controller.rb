@@ -172,7 +172,7 @@ module Beta
       id, table_number, player1_id, player2_id, side, intentional_draw,
         two_for_one, score1, score1_corp, score1_runner, score2, score2_corp, score2_runner|
         pairings_reported += score1.nil? && score2.nil? ? 0 : 1
-        self_reports = self_reports_by_pairing_id[id]
+        self_reports = current_user ? self_reports_by_pairing_id[id] : nil
 
         # Restrict non-TOs to only their own reports
         if self_reports && current_user != @tournament.user
