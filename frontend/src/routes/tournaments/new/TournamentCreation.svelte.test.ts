@@ -10,7 +10,7 @@ import { navigateTo } from "$lib/utils/navigation";
 import { classicApi } from "$lib/api/classic";
 
 vi.mock("$app/env/public", () => ({
-  COBRA_API_SERVER: "http://localhost:3000",
+  CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000",
 }));
 
 vi.mock("$lib/api/classic", () => ({

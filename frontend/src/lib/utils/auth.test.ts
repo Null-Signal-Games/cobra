@@ -43,4 +43,23 @@ describe("authStore (SvelteKit frontend)", () => {
     expect(user).toBeNull();
     expect(authStore.isAuthenticated).toBe(false);
   });
+
+  it("should redirect to /oauth/login with return_to", () => {
+    const mockWindow = {
+      location: {
+        origin: "http://localhost:3000",
+        pathname: "/tournaments/1",
+        href: "",
+      },
+    };
+    vi.stubGlobal("window", mockWindow);
+
+    authStore.redirectToLogin();
+
+    expect(mockWindow.location.href).toBe(
+      "/oauth/login?return_to=http%3A%2F%2Flocalhost%3A3000%2Ftournaments%2F1",
+    );
+
+    vi.unstubAllGlobals();
+  });
 });

@@ -1,10 +1,12 @@
 <script lang="ts">
+  import "@fortawesome/fontawesome-free/css/all.min.css";
+  import "@fortawesome/fontawesome-free/css/v4-shims.min.css";
   import "$lib/assets/css/application.scss";
   import favicon from "$lib/assets/favicon.ico";
   import { resolve } from "$app/paths";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import ThemeToggle from "$lib/components/ThemeToggle.svelte";
-  import { COBRA_API_SERVER } from "$app/env/public";
+  import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
   import { authStore } from "$lib/utils/auth.svelte";
   import { onMount } from "svelte";
   import type { Snippet } from "svelte";
@@ -27,11 +29,11 @@
     void authStore.checkAuth();
   });
 
-  const serverOrigin = (COBRA_API_SERVER || "").replace(/\/$/, "");
+  const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
 
   function getLogoutUrl() {
     const returnUrl = typeof window !== "undefined" ? window.location.origin : "/";
-    return `${serverOrigin}/logout?return_to=${encodeURIComponent(returnUrl)}`;
+    return `${serverOrigin}/oauth/logout?return_to=${encodeURIComponent(returnUrl)}`;
   }
 </script>
 
@@ -44,7 +46,6 @@
     integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
     crossorigin="anonymous"
   />
-  <link rel="stylesheet" href="/node_modules/@fortawesome/fontawesome-free/css/all.min.css" />
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"

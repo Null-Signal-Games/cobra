@@ -1,4 +1,4 @@
-import { COBRA_API_SERVER } from "$app/env/public";
+import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
 import { csrfToken } from "$lib/csrf";
 import type { StatusOr } from "$lib/api/statusOr";
 import { ValidationError, type Errors } from "$lib/utils/errors";
@@ -17,7 +17,7 @@ export class ApiBase {
   readonly defaultFetch: typeof fetch;
 
   constructor(baseUrl?: string, defaultFetch: typeof fetch = fetch) {
-    const rawUrl = baseUrl ?? (typeof COBRA_API_SERVER === "string" ? COBRA_API_SERVER : "");
+    const rawUrl = baseUrl ?? (typeof CLIENT_COBRA_API_ENDPOINT === "string" ? CLIENT_COBRA_API_ENDPOINT : "");
     this.baseUrl = rawUrl.replace(/\/$/, "");
     this.defaultFetch = defaultFetch;
   }

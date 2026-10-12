@@ -72,7 +72,7 @@ vi.mock("$lib/api/beta", () => ({
 
 vi.mock('$app/env/public', () => {
   return {
-    COBRA_API_SERVER: "http://localhost:3000"
+    CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000"
   };
 });
 

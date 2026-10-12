@@ -12,8 +12,14 @@ const optionalString: StandardSchemaV1<string | undefined, string> = {
 };
 
 export const variables = defineEnvVars({
-  COBRA_API_SERVER: {
+  // Used for client-side requests.
+  CLIENT_COBRA_API_ENDPOINT: {
     public: true,
+    schema: optionalString,
+  },
+  // Used for server-side requests.
+  SERVER_COBRA_API_ENDPOINT: {
+    public: false,
     schema: optionalString,
   },
 });

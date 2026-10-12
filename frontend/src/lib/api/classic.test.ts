@@ -44,16 +44,14 @@ describe("ClassicApi", () => {
         round_number: 1,
         table_number: 2,
       };
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockPairings), { status: 200 }),
-      );
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockPairings), { status: 200 }));
 
       const result = await api.loadPairingsForUser(10, 5, mockFetch);
 
       expect(result).toEqual(mockPairings);
       expect(mockFetch).toHaveBeenCalledTimes(1);
       const { url } = getFetchCall();
-      expect(url).toContain("/tournaments/10/rounds/pairings_data/5");
+      expect(url).toContain("/api/classic/tournaments/10/rounds/pairings_data/5");
     });
 
     it("returns null and pushes global error on failure", async () => {
@@ -72,45 +70,39 @@ describe("ClassicApi", () => {
         standings: [],
         swiss_format: "double_sided",
       };
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockStandings), { status: 200 }),
-      );
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockStandings), { status: 200 }));
 
       const result = await api.loadStandings(10, mockFetch);
 
       expect(result).toEqual(mockStandings);
       const { url } = getFetchCall();
-      expect(url).toContain("/tournaments/10/players/standings_data");
+      expect(url).toContain("/api/classic/tournaments/10/players/standings_data");
     });
   });
 
   describe("loadBrackets", () => {
     it("loads bracket data via getOrThrow", async () => {
       const mockBracket = { stages: [] };
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockBracket), { status: 200 }),
-      );
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockBracket), { status: 200 }));
 
       const result = await api.loadBrackets(10, mockFetch);
 
       expect(result).toEqual(mockBracket);
       const { url } = getFetchCall();
-      expect(url).toContain("/tournaments/10/rounds/brackets");
+      expect(url).toContain("/api/classic/tournaments/10/rounds/brackets");
     });
   });
 
   describe("loadNewTournament", () => {
     it("loads new tournament form data", async () => {
       const mockFormData = { tournament: {}, options: {} };
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockFormData), { status: 200 }),
-      );
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockFormData), { status: 200 }));
 
       const result = await api.loadNewTournament(mockFetch);
 
       expect(result).toEqual(mockFormData);
       const { url } = getFetchCall();
-      expect(url).toContain("/tournaments/new_form");
+      expect(url).toContain("/api/classic/tournaments/new_form");
     });
   });
 
@@ -129,7 +121,7 @@ describe("ClassicApi", () => {
 
       expect(result).toEqual(mockFormData);
       const { url } = getFetchCall();
-      expect(url).toContain("/tournaments/new_demo_form");
+      expect(url).toContain("/api/classic/tournaments/new_demo_form");
     });
 
     it("handles failure", async () => {
@@ -144,15 +136,13 @@ describe("ClassicApi", () => {
   describe("loadTournamentSettings", () => {
     it("loads tournament settings edit form data", async () => {
       const mockFormData = { tournament: { id: 10 }, options: {} };
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockFormData), { status: 200 }),
-      );
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockFormData), { status: 200 }));
 
       const result = await api.loadTournamentSettings(10, mockFetch);
 
       expect(result).toEqual(mockFormData);
       const { url } = getFetchCall();
-      expect(url).toContain("/tournaments/10/edit_form");
+      expect(url).toContain("/api/classic/tournaments/10/edit_form");
     });
   });
 
@@ -161,15 +151,13 @@ describe("ClassicApi", () => {
       const mockStage = {
         stage: { id: 1, tournament_id: 10, format: "Swiss" },
       };
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockStage), { status: 200 }),
-      );
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockStage), { status: 200 }));
 
       const result = await api.loadStage(10, 1, mockFetch);
 
       expect(result).toEqual(mockStage);
       const { url } = getFetchCall();
-      expect(url).toContain("/tournaments/10/stages/1/settings");
+      expect(url).toContain("/api/classic/tournaments/10/stages/1/settings");
     });
   });
 
@@ -177,15 +165,13 @@ describe("ClassicApi", () => {
     it("posts new tournament data", async () => {
       const tournament = new Tournament({ name: "New Tourney" });
       const mockResponse = { id: 123, name: "New Tourney", url: "/tournaments/123" };
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockResponse), { status: 201 }),
-      );
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockResponse), { status: 201 }));
 
       const result = await api.createTournament(tournament);
 
       expect(result).toEqual(mockResponse);
       const { url, requestOptions, body } = getFetchCall();
-      expect(url).toContain("/tournaments");
+      expect(url).toContain("/api/classic/tournaments");
       expect(requestOptions?.method).toBe("POST");
       expect(body).toEqual({ tournament });
     });
@@ -214,7 +200,7 @@ describe("ClassicApi", () => {
 
       expect(result).toEqual(mockDemoResponse);
       const { url, requestOptions, headers, body } = getFetchCall();
-      expect(url).toContain("/tournaments/create_demo");
+      expect(url).toContain("/api/classic/tournaments/create_demo");
       expect(requestOptions?.method).toBe("POST");
       expect(headers["X-CSRF-Token"]).toBe("custom-csrf-token");
       expect(body).toEqual({ tournament: demoTournament });
@@ -241,7 +227,7 @@ describe("ClassicApi", () => {
 
       expect(result).toBe(true);
       const { url, requestOptions, body } = getFetchCall();
-      expect(url).toContain("/tournaments/10");
+      expect(url).toContain("/api/classic/tournaments/10");
       expect(requestOptions?.method).toBe("PATCH");
       expect(body).toEqual({ tournament });
     });
@@ -257,15 +243,13 @@ describe("ClassicApi", () => {
         table_ranges: [{ id: 5, stage_id: 1, first_table: 1, last_table: 10 }],
       };
       const mockResponse = { url: "/tournaments/10/stages/1" };
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify(mockResponse), { status: 200 }),
-      );
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockResponse), { status: 200 }));
 
       const result = await api.saveStage(10, stage, mockFetch);
 
       expect(result).toEqual(mockResponse);
       const { url, requestOptions, body } = getFetchCall();
-      expect(url).toContain("/tournaments/10/stages/1");
+      expect(url).toContain("/api/classic/tournaments/10/stages/1");
       expect(requestOptions?.method).toBe("PATCH");
       expect(body).toEqual({ stage });
     });
