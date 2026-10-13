@@ -14,14 +14,20 @@
   import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
   import type { LayoutData } from "./$types";
-  import { beforeNavigate } from "$app/navigation";
+  import { beforeNavigate, afterNavigate } from "$app/navigation";
 
   let { children, data }: { children: Snippet; data: LayoutData; } = $props();
+
+  let isNavOpen = $state(false);
 
   beforeNavigate(() => {
     globalMessages.infos = [];
     globalMessages.warnings = [];
     globalMessages.errors = [];
+  });
+
+  afterNavigate(() => {
+    isNavOpen = false;
   });
 
   onMount(() => {
@@ -57,85 +63,98 @@
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark dontprint">
   <div class="container">
     <a href={resolve("/")} class="navbar-brand">Cobra (SPA)</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      aria-controls="navbarNav"
+      aria-expanded={isNavOpen}
+      aria-label="Toggle navigation"
+      onclick={() => {
+        isNavOpen = !isNavOpen;
+      }}
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse {isNavOpen ? 'show' : ''}" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a href={resolve("/help")} class="nav-link text-light">
+            <FontAwesomeIcon icon="life-ring" />
+            How to
+          </a>
+        </li>
 
-    <ul class="navbar-nav ml-auto">
-      <li class="nav-item">
-        <a href={resolve("/help")} class="nav-link text-light">
-          <FontAwesomeIcon icon="life-ring" />
-          How to
-        </a>
-      </li>
-
-      <li class="nav-item dropdown">
-        <button
-          type="button"
-          class="nav-link dropdown-toggle text-light"
-          data-toggle="dropdown"
-        >
-          <FontAwesomeIcon icon="trophy" />
-          Tournament types
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-          {#each data.tournamentTypes as type (type.id)}
-            <a href={resolve(`/tournaments/type/${type.id}`)} class="dropdown-item">
-              {#if type.attributes.nsg_format}
-                <FontAwesomeIcon icon="nsg" />
-              {:else}
-                <FontAwesomeIcon icon="missing" />
-              {/if}
-              {type.attributes.name}
-            </a>
-          {/each}
-        </div>
-      </li>
-
-      {#if authStore.isAuthenticated}
         <li class="nav-item dropdown">
           <button
             type="button"
             class="nav-link dropdown-toggle text-light"
             data-toggle="dropdown"
           >
-            <FontAwesomeIcon icon="user" />
-            {#if authStore.user}
-              {authStore.user.nrdb_username}
-            {/if}
+            <FontAwesomeIcon icon="trophy" />
+            Tournament types
           </button>
           <div class="dropdown-menu dropdown-menu-right">
-            <a href={resolve("/tournaments/new")} class="dropdown-item">
-              <FontAwesomeIcon icon="plus" />
-              Create tournament
-            </a>
-            <a href={resolve("/tournaments/demo")} class="dropdown-item">
-              <FontAwesomeIcon icon="plus" />
-              Create demo tournament
-            </a>
-            <a href={resolve("/tournaments/my")} class="dropdown-item">
-              <FontAwesomeIcon icon="trophy" />
-              My Tournaments
-            </a>
-            <a href={resolve("/profile")} class="dropdown-item">
-              <FontAwesomeIcon icon="user" />
-              Profile
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href={getLogoutUrl()} rel="external" class="dropdown-item">
-              <FontAwesomeIcon icon="sign-out" />
-              Jack Out
-            </a>
+            {#each data.tournamentTypes as type (type.id)}
+              <a href={resolve(`/tournaments/type/${type.id}`)} class="dropdown-item">
+                {#if type.attributes.nsg_format}
+                  <FontAwesomeIcon icon="nsg" />
+                {:else}
+                  <FontAwesomeIcon icon="missing" />
+                {/if}
+                {type.attributes.name}
+              </a>
+            {/each}
           </div>
         </li>
-      {:else}
-        <li class="nav-item">
-          <a href={resolve("/login")} id="signIn" class="nav-link text-light">
-            <FontAwesomeIcon icon="sign-in" />
-            Sign in
-          </a>
-        </li>
-      {/if}
 
-      <ThemeToggle />
-    </ul>
+        {#if authStore.isAuthenticated}
+          <li class="nav-item dropdown">
+            <button
+              type="button"
+              class="nav-link dropdown-toggle text-light"
+              data-toggle="dropdown"
+            >
+              <FontAwesomeIcon icon="user" />
+              {#if authStore.user}
+                {authStore.user.nrdb_username}
+              {/if}
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+              <a href={resolve("/tournaments/new")} class="dropdown-item">
+                <FontAwesomeIcon icon="plus" />
+                Create tournament
+              </a>
+              <a href={resolve("/tournaments/demo")} class="dropdown-item">
+                <FontAwesomeIcon icon="plus" />
+                Create demo tournament
+              </a>
+              <a href={resolve("/tournaments/my")} class="dropdown-item">
+                <FontAwesomeIcon icon="trophy" />
+                My Tournaments
+              </a>
+              <a href={resolve("/profile")} class="dropdown-item">
+                <FontAwesomeIcon icon="user" />
+                Profile
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href={getLogoutUrl()} rel="external" class="dropdown-item">
+                <FontAwesomeIcon icon="sign-out" />
+                Jack Out
+              </a>
+            </div>
+          </li>
+        {:else}
+          <li class="nav-item">
+            <a href={resolve("/login")} id="signIn" class="nav-link text-light">
+              <FontAwesomeIcon icon="sign-in" />
+              Sign in
+            </a>
+          </li>
+        {/if}
+
+        <ThemeToggle />
+      </ul>
+    </div>
   </div>
 </nav>
 
