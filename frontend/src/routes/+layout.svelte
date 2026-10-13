@@ -18,6 +18,8 @@
 
   let { children, data }: { children: Snippet; data: LayoutData; } = $props();
 
+  let isNavOpen = $state(false);
+
   beforeNavigate(() => {
     globalMessages.infos = [];
     globalMessages.warnings = [];
@@ -25,18 +27,7 @@
   });
 
   afterNavigate(() => {
-    if (typeof window !== "undefined") {
-      const nav = document.getElementById("navbarNav");
-      if (nav?.classList.contains("show")) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const jq = (window as any).$;
-        if (jq) {
-          jq("#navbarNav").collapse("hide");
-        } else {
-          nav.classList.remove("show");
-        }
-      }
-    }
+    isNavOpen = false;
   });
 
   onMount(() => {
@@ -75,15 +66,16 @@
     <button
       class="navbar-toggler"
       type="button"
-      data-toggle="collapse"
-      data-target="#navbarNav"
       aria-controls="navbarNav"
-      aria-expanded="false"
+      aria-expanded={isNavOpen}
       aria-label="Toggle navigation"
+      onclick={() => {
+        isNavOpen = !isNavOpen;
+      }}
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="collapse navbar-collapse {isNavOpen ? 'show' : ''}" id="navbarNav">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
           <a href={resolve("/help")} class="nav-link text-light">
