@@ -13,12 +13,6 @@
 
   let { data, params }: PageProps = $props();
 
-  let forcePlayerView = $state(false);
-
-  function toggleForcePlayerView() {
-    forcePlayerView = !forcePlayerView;
-  }
-
   async function reportScoreCallback(roundId: number, pairingId: number, report: ScoreReport, selfReport: boolean) {
     const success = await betaApi.reportScore(
       data.tournamentData.tournament.id,
@@ -70,13 +64,12 @@
           <FontAwesomeIcon icon="question" /> FAQ
         </button>
         {#if data.policy.update}
-          <button
-            type="button"
+          <a
+            href={resolve(`/tournaments/${params.tournamentId}/organizer/rounds`)}
             class="btn btn-primary float-right"
-            onclick={toggleForcePlayerView}
           >
             <FontAwesomeIcon icon="user" /> See organizer pairings view
-          </button>
+          </a>
         {/if}
       {/if}
     </div>

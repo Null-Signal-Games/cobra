@@ -14,12 +14,6 @@
 
   let { data, params }: PageProps = $props();
 
-  let forcePlayerView = $state(false);
-
-  function toggleForcePlayerView() {
-    forcePlayerView = !forcePlayerView;
-  }
-
   async function addStage(cutSingleElim?: boolean, cutCount?: number) {
     const success = await betaApi.createStage(data.tournamentData.tournament.id, cutSingleElim, cutCount);
     if (!success) {
@@ -204,9 +198,12 @@
           <FontAwesomeIcon icon="question" /> FAQ
         </button>
         {#if data.policy.update}
-          <button type="button" class="btn btn-primary float-right" onclick={toggleForcePlayerView}>
+          <a
+            href={resolve(`/tournaments/${params.tournamentId}/rounds`)}
+            class="btn btn-primary float-right"
+          >
             <FontAwesomeIcon icon="users" /> See player pairings view
-          </button>
+          </a>
         {/if}
 
         {#if !$showReportedPairings}
