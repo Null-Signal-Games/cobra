@@ -26,7 +26,7 @@
     editMode,
   }: {
     deck?: Deck;
-    originalDeck: Deck;
+    originalDeck?: Deck;
     isCorp: boolean;
     editMode: boolean;
   } = $props();
@@ -68,8 +68,8 @@
     }
 
     // Identity
-    if (originalDeck.details.identity_title !== deck.details.identity_title) {
-      if (originalDeck.details.identity_title) {
+    if (originalDeck?.details.identity_title !== deck.details.identity_title) {
+      if (originalDeck?.details.identity_title) {
         cardDiffs.push({
           title: originalDeck.details.identity_title,
           delta: -1,
@@ -84,7 +84,7 @@
     }
 
     // Removed cards and quantity changes
-    originalDeck.cards.forEach((originalCard) => {
+    originalDeck?.cards.forEach((originalCard) => {
       const card = deck.cards.find(
         (c) => c.nrdb_card_id === originalCard.nrdb_card_id,
       );
@@ -105,7 +105,7 @@
 
     // Added cards
     deck.cards.forEach((card) => {
-      const originalCard = originalDeck.cards.find(
+      const originalCard = originalDeck?.cards.find(
         (c) => c.nrdb_card_id === card.nrdb_card_id,
       );
       if (!originalCard) {
@@ -215,8 +215,6 @@
     diffDecks();
   }
 
-
-
   function changeQuantity(card: Card, delta: number) {
     if (!deck) {
       return;
@@ -237,7 +235,7 @@
 
 <!-- Deck summary -->
 <table
-  class="table table-bordered table-striped"
+  class="table table-bordered table-striped text-left"
   aria-label={isCorp ? "corp deck" : "runner deck"}
 >
   <thead class="thead-dark">
@@ -308,7 +306,7 @@
 {#if deck?.details.nrdb_uuid}
   <!-- Identity -->
   <table
-    class="table table-bordered table-striped"
+    class="table table-bordered table-striped text-left"
     aria-label={isCorp ? "corp deck ID" : "runner deck ID"}
   >
     <thead class="thead-dark">
@@ -343,7 +341,7 @@
 
   <!-- Deck list -->
   <table
-    class="table table-bordered table-striped"
+    class="table table-bordered table-striped text-left"
     aria-label={isCorp ? "corp deck list" : "runner deck list"}
   >
     <thead class="thead-dark">
@@ -448,7 +446,7 @@
   <!-- Editing diffs -->
   {#if editMode}
     <table
-      class="table table-bordered table-striped"
+      class="table table-bordered table-striped text-left"
       aria-label={isCorp ? "corp deck changes" : "runner deck changes"}
     >
       <thead class="thead-dark">
