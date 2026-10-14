@@ -26,7 +26,9 @@ export const load: PageLoad = async ({ params, fetch, parent }) => {
     ? await betaApi.loadDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
     : [];
   const corpDeck = tournamentDecks.find((d) => d.details.side_id === "corp") ?? new Deck();
+  corpDeck.details.side_id = "corp";
   const runnerDeck = tournamentDecks.find((d) => d.details.side_id === "runner") ?? new Deck();
+  runnerDeck.details.side_id = "runner";
 
   return {
     nrdbDecks: nrdbDecks,

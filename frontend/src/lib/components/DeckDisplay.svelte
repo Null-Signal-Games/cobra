@@ -22,12 +22,12 @@
   let {
     deck = $bindable(),
     originalDeck,
-    isCorp,
+    title,
     editMode,
   }: {
     deck?: Deck;
     originalDeck?: Deck;
-    isCorp: boolean;
+    title: string;
     editMode: boolean;
   } = $props();
 
@@ -235,13 +235,13 @@
 
 <!-- Deck summary -->
 <table
-  class="table table-bordered table-striped text-left"
-  aria-label={isCorp ? "corp deck" : "runner deck"}
+  class="table table-bordered table-striped"
+  aria-label={deck?.details.side_id === "corp" ? "corp deck" : "runner deck"}
 >
   <thead class="thead-dark">
     <tr>
       <th class="text-center deck-name-header">
-        {isCorp ? "Corp Deck" : "Runner Deck"}
+        {title}
       </th>
     </tr>
   </thead>
@@ -306,8 +306,8 @@
 {#if deck?.details.nrdb_uuid}
   <!-- Identity -->
   <table
-    class="table table-bordered table-striped text-left"
-    aria-label={isCorp ? "corp deck ID" : "runner deck ID"}
+    class="table table-bordered table-striped"
+    aria-label={deck.details.side_id === "corp" ? "corp deck ID" : "runner deck ID"}
   >
     <thead class="thead-dark">
       <tr>
@@ -341,8 +341,8 @@
 
   <!-- Deck list -->
   <table
-    class="table table-bordered table-striped text-left"
-    aria-label={isCorp ? "corp deck list" : "runner deck list"}
+    class="table table-bordered table-striped"
+    aria-label={deck.details.side_id === "corp" ? "corp deck list" : "runner deck list"}
   >
     <thead class="thead-dark">
       <tr>
@@ -446,8 +446,8 @@
   <!-- Editing diffs -->
   {#if editMode}
     <table
-      class="table table-bordered table-striped text-left"
-      aria-label={isCorp ? "corp deck changes" : "runner deck changes"}
+      class="table table-bordered table-striped"
+      aria-label={deck.details.side_id === "corp" ? "corp deck changes" : "runner deck changes"}
     >
       <thead class="thead-dark">
         <tr>
