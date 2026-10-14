@@ -1,6 +1,8 @@
 import type { PageLoad } from "./$types";
 import { betaApi } from "$lib/api/beta";
-import type { Pairing } from "$lib/model/Pairing";
+import { Player } from "$lib/model/Player";
+import { Deck } from "$lib/model/Deck";
+import { sortCards } from "$lib/utils/decks.svelte";
 
 export const load: PageLoad = async ({ parent, params, fetch }) => {
   const { stages } = await parent();
@@ -8,25 +10,43 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
   const roundId = parseInt(params.roundId);
   const pairingId = parseInt(params.pairingId);
 
-  let stageName = "";
-  let pairing: Pairing | undefined;
-  stages.forEach((s) => {
-    const round = s.rounds.find((r) => r.id === roundId);
+  const props = {
+    stageName: "",
+    tableLabel: "",
+    corpPlayer: new Player(),
+    corpPlayerDeck: new Deck(),
+    runnerPlayer: new Player(),
+    runnerPlayerDeck: new Deck(),
+  };
+  for (const stage of stages) {
+    const round = stage.rounds.find((r) => r.id === roundId);
     if (!round) {
-      return;
+      continue;
     }
 
-    pairing = round.pairings.find((p) => p.id === pairingId);
-    if (pairing) {
-      stageName = s.name;
-      return;
+    const pairing = round.pairings.find((p) => p.id === pairingId);
+    if (!pairing) {
+      continue;
     }
-  });
 
-  return {
-    stageName: stageName,
-    pairing: pairing,
-    player1Decks: await betaApi.loadDecks(tournamentId, pairing?.player1.id, fetch),
-    player2Decks: await betaApi.loadDecks(tournamentId, pairing?.player2.id, fetch),
+    props.stageName = stage.name;
+    props.tableLabel = pairing.table_label;
+
+    if (pairing.player1.side === "corp") {
+      props.corpPlayer = pairing.player1;
+      props.runnerPlayer = pairing.player2;
+    } else {
+      props.corpPlayer = pairing.player2;
+      props.runnerPlayer = pairing.player1;
+    }
+
+    props.corpPlayerDeck = (await betaApi.loadDecks(tournamentId, props.corpPlayer.id, fetch))
+      .find((d) => d.details.side_id === "corp") ?? new Deck();
+    sortCards(props.corpPlayerDeck.cards);
+    props.runnerPlayerDeck = (await betaApi.loadDecks(tournamentId, props.runnerPlayer.id, fetch))
+      .find((d) => d.details.side_id === "runner") ?? new Deck();
+    sortCards(props.runnerPlayerDeck.cards);
   }
+
+  return props;
 }
