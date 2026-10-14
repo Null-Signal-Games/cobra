@@ -79,7 +79,9 @@ describe("Registration", () => {
       data: MockPageData,
     };
     MockPageData.corpDeck = corpDeck;
+    MockPageData.corpDeck.details.side_id = "corp";
     MockPageData.runnerDeck = runnerDeck;
+    MockPageData.runnerDeck.details.side_id = "runner";
 
     return render(Registration, { props: props });
   }

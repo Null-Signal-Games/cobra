@@ -71,14 +71,17 @@ describe("Registration", () => {
       },
       data: MockPageData,
     };
+
     const convertedDecks = decks.map((d) => convertNrdbDeck(d, MockPrintings));
     MockPageData.nrdbDecks = Promise.resolve(convertedDecks);
     if (selectedCorpDeckIndex !== undefined) {
       MockPageData.originalCorpDeck = convertedDecks[0];
     }
+    MockPageData.originalCorpDeck.details.side_id = "corp";
     if (selectedRunnerDeckIndex !== undefined) {
       MockPageData.originalRunnerDeck = convertedDecks[1];
     }
+    MockPageData.originalRunnerDeck.details.side_id = "runner";
 
     await MockPageData.nrdbDecks;
 
