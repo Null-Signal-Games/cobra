@@ -41,7 +41,7 @@
     readOnly = true;
 
     if (tournament.nrdb_deck_registration) {
-      navigateTo(`/beta/tournaments/${tournament.id}/registration`);
+      navigateTo(`/tournaments/${tournament.id}/registration`);
     }
 
     return true;
