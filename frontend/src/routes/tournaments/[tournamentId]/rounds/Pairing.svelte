@@ -63,11 +63,9 @@
         <FontAwesomeIcon icon="eye" /> View decks
       </a>
     {:else}
-      <!-- TODO: Implement once players pages exist -->
-      <!-- <a href={resolve(`/players/${pairing.player1.id}/view_decks?back_to=pairings`)}>
+      <a href={resolve(`/tournaments/${tournament.id}/players/${pairing.player1.id}/view_decks?back_to=pairings`)}>
         <FontAwesomeIcon icon="eye" /> View decks
-      </a> -->
-      <span><FontAwesomeIcon icon="eye" /> View decks</span>
+      </a>
     {/if}
   {/if}
   <PlayerDisplay
@@ -99,11 +97,9 @@
     show_ids={!stage.is_single_sided || pairing.player2.side !== null}
   />
   {#if stage.view_decks && !pairing.player1.side && pairing.player2.id}
-    <!-- TODO: Implement once players pages exist -->
-    <!-- <a href={resolve(`/players/{pairing.player2.id}/view_decks?back_to=pairings`)}>
+    <a href={resolve(`/tournaments/${tournament.id}/players/${pairing.player2.id}/view_decks?back_to=pairings`)}>
       <FontAwesomeIcon icon="eye" /> View decks
-    </a> -->
-    <FontAwesomeIcon icon="eye" /> View decks
+    </a>
   {/if}
 
   <!-- Self-reporting -->
