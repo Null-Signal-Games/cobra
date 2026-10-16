@@ -158,13 +158,13 @@
   </div>
 </nav>
 
-<div class="container">
+<main class="container flex-grow-1">
   <GlobalMessages />
 
   {@render children()}
-</div>
+</main>
 
-<div class="footer dontprint">
+<footer class="footer dontprint">
   <div class="container">
     <div class="row">
       <div class="col-3 nav-item">
@@ -184,4 +184,4 @@
       </div>
     </div>
   </div>
-</div>
+</footer>
