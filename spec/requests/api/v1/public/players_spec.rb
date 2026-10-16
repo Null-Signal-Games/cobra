@@ -13,6 +13,8 @@ RSpec.describe 'Public API Players' do
       tournament: tournament,
       user: user,
       name: 'Alice',
+      corp_identity: corp_identity.name,
+      runner_identity: runner_identity.name,
       corp_identity_ref: corp_identity,
       runner_identity_ref: runner_identity
     )
@@ -22,6 +24,12 @@ RSpec.describe 'Public API Players' do
     it 'succeeds and lists players for the tournament' do
       json = api_num_results("/api/v1/public/tournaments/#{tournament.id}/players", 1)
       expect(json['data'].first['id']).to eq(player.id.to_s)
+    end
+
+    it 'succeeds with included identities' do
+      path = "/api/v1/public/tournaments/#{tournament.id}/players?include=corp_identity,runner_identity"
+      json = api_num_results(path, 1)
+      expect(json['included'].pluck('type')).to include('identities')
     end
 
     it 'returns the correct self link containing the actual tournament ID' do

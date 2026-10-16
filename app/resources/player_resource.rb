@@ -34,6 +34,7 @@ class PlayerResource < ApplicationResource
   belongs_to :user
 
   belongs_to :corp_identity,
+             as: :corp_identity_ref,
              resource: IdentityResource,
              foreign_key: :corp_identity_ref_id do
     scope do |assoc_ids|
@@ -42,6 +43,7 @@ class PlayerResource < ApplicationResource
   end
 
   belongs_to :runner_identity,
+             as: :runner_identity_ref,
              resource: IdentityResource,
              foreign_key: :runner_identity_ref_id do
     scope do |assoc_ids|
