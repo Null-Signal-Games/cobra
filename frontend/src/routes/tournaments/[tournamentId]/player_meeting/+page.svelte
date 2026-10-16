@@ -3,7 +3,8 @@
   import { page } from "$app/state";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import type { PageProps } from "./$types";
-  import { createPlayerMeetingPairings, getBackDetails } from "./pairings";
+  import { createPlayerMeetingPairings } from "./pairings";
+  import { getBackDetails } from "$lib/utils/navigation";
 
   let { data, params }: PageProps = $props();
 
@@ -11,15 +12,13 @@
 
   let backTo = $derived(data.back_to ?? page.url.searchParams.get("back_to"));
   let backDetails = $derived(getBackDetails(backTo, params.tournamentId));
-  let backHref = $derived(resolve(backDetails.path));
-  let backLabel = $derived(backDetails.label);
 </script>
 
 <div class="col-12">
   <p class="dontprint">
-    <a href={backHref} class="btn btn-primary">
+    <a href={resolve(backDetails.path)} class="btn btn-primary">
       <FontAwesomeIcon icon="arrow-left" />
-      {backLabel}
+      {backDetails.label}
     </a>
   </p>
 
