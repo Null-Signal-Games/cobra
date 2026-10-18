@@ -1,7 +1,7 @@
 <script lang="ts">
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import Identity from "$lib/components/identity/Identity.svelte";
-  import type { Card, Deck } from "$lib/model/Deck";
+  import { Deck, type Card } from "$lib/model/Deck";
   import type { Printing } from "$lib/api/v1ApiTypes";
   import { deckCsv, transformCardLookup } from "$lib/utils/decks.svelte";
   import { downloadBlob } from "$lib/utils/files";
@@ -21,7 +21,7 @@
 
   let {
     deck = $bindable(),
-    originalDeck,
+    originalDeck = new Deck(),
     title,
     editMode,
   }: {
@@ -68,8 +68,8 @@
     }
 
     // Identity
-    if (originalDeck?.details.identity_title !== deck.details.identity_title) {
-      if (originalDeck?.details.identity_title) {
+    if (originalDeck.details.identity_title !== deck.details.identity_title) {
+      if (originalDeck.details.identity_title) {
         cardDiffs.push({
           title: originalDeck.details.identity_title,
           delta: -1,
@@ -84,7 +84,7 @@
     }
 
     // Removed cards and quantity changes
-    originalDeck?.cards.forEach((originalCard) => {
+    originalDeck.cards.forEach((originalCard) => {
       const card = deck.cards.find(
         (c) => c.nrdb_card_id === originalCard.nrdb_card_id,
       );
@@ -105,7 +105,7 @@
 
     // Added cards
     deck.cards.forEach((card) => {
-      const originalCard = originalDeck?.cards.find(
+      const originalCard = originalDeck.cards.find(
         (c) => c.nrdb_card_id === card.nrdb_card_id,
       );
       if (!originalCard) {
