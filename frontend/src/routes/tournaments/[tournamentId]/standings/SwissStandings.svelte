@@ -3,7 +3,7 @@
   import Identity from "$lib/components/identity/Identity.svelte";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import Tooltip from "./Tooltip.svelte";
-    import { resolve } from "$app/paths";
+  import { resolve } from "$app/paths";
 
   let {
     tournamentId,

@@ -73,12 +73,12 @@
     if (isCorp) {
       originalCorpDeck =
         deck.details.nrdb_uuid === originalCorpDeck.details.nrdb_uuid
-          ? new Deck()
+          ? new Deck("corp")
           : deck;
     } else {
       originalRunnerDeck =
         deck.details.nrdb_uuid === originalRunnerDeck.details.nrdb_uuid
-          ? new Deck()
+          ? new Deck("runner")
           : deck;
     }
   }
@@ -118,7 +118,7 @@
               title="Deselect"
               class="btn btn-link p-0"
               onclick={() => {
-                selectDeck(new Deck(), isCorp);
+                selectDeck(new Deck(isCorp ? "corp" : "runner"), isCorp);
               }}
             >
               <FontAwesomeIcon icon="close" />

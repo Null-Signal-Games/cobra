@@ -14,9 +14,9 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
     stageName: "",
     tableLabel: "",
     corpPlayer: new Player(),
-    corpPlayerDeck: new Deck(),
+    corpPlayerDeck: new Deck("corp"),
     runnerPlayer: new Player(),
-    runnerPlayerDeck: new Deck(),
+    runnerPlayerDeck: new Deck("runner"),
   };
   for (const stage of stages) {
     const round = stage.rounds.find((r) => r.id === roundId);
@@ -40,12 +40,19 @@ export const load: PageLoad = async ({ parent, params, fetch }) => {
       props.runnerPlayer = pairing.player1;
     }
 
-    props.corpPlayerDeck = (await betaApi.loadDecks(tournamentId, props.corpPlayer.id, fetch))
-      .find((d) => d.details.side_id === "corp") ?? new Deck();
-    sortCards(props.corpPlayerDeck.cards);
-    props.runnerPlayerDeck = (await betaApi.loadDecks(tournamentId, props.runnerPlayer.id, fetch))
-      .find((d) => d.details.side_id === "runner") ?? new Deck();
-    sortCards(props.runnerPlayerDeck.cards);
+    const corpDeck = (await betaApi.loadDecks(tournamentId, props.corpPlayer.id, fetch))
+      .find((d) => d.details.side_id === "corp");
+    if (corpDeck) {
+      props.corpPlayerDeck = corpDeck;
+      sortCards(props.corpPlayerDeck.cards);
+    }
+
+    const runnerDeck = (await betaApi.loadDecks(tournamentId, props.runnerPlayer.id, fetch))
+      .find((d) => d.details.side_id === "runner");
+    if (runnerDeck) {
+      props.runnerPlayerDeck = runnerDeck;
+      sortCards(props.runnerPlayerDeck.cards);
+    }
   }
 
   return props;

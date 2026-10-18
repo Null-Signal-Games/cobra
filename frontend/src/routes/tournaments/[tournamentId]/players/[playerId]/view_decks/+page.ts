@@ -10,9 +10,9 @@ export const load: PageLoad = async ({ params, fetch }) => {
   const player = await betaApi.loadPlayer(tournamentId, playerId, fetch);
   const decks = await betaApi.loadDecks(tournamentId, playerId, fetch);
 
-  const corpDeck = decks.find((d) => d.details.side_id === "corp") ?? new Deck();
+  const corpDeck = decks.find((d) => d.details.side_id === "corp") ?? new Deck("corp");
   sortCards(corpDeck.cards);
-  const runnerDeck = decks.find((d) => d.details.side_id === "runner") ?? new Deck();
+  const runnerDeck = decks.find((d) => d.details.side_id === "runner") ?? new Deck("runner");
   sortCards(runnerDeck.cards);
 
   return {

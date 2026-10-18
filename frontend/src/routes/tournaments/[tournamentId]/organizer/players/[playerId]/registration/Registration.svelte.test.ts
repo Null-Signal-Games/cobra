@@ -61,15 +61,15 @@ const MockPageData: PageProps["data"] = {
   },
   player: MockPlayerAlice,
   registrationPlayer: MockPlayerBob,
-  corpDeck: new Deck(),
-  runnerDeck: new Deck()
+  corpDeck: new Deck("corp"),
+  runnerDeck: new Deck("runner")
 };
 
 const user = userEvent.setup();
 
 describe("Registration", () => {
   function renderRegistration(
-    corpDeck = new Deck(), runnerDeck = new Deck())
+    corpDeck = new Deck("corp"), runnerDeck = new Deck("runner"))
   {
     const props = {
       params: {
@@ -79,9 +79,7 @@ describe("Registration", () => {
       data: MockPageData,
     };
     MockPageData.corpDeck = corpDeck;
-    MockPageData.corpDeck.details.side_id = "corp";
     MockPageData.runnerDeck = runnerDeck;
-    MockPageData.runnerDeck.details.side_id = "runner";
 
     return render(Registration, { props: props });
   }

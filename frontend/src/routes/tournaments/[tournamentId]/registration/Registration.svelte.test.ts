@@ -53,8 +53,8 @@ const MockPageData: PageProps["data"] = {
   },
   player: MockPlayerBob,
   nrdbDecks: Promise.resolve([]),
-  originalCorpDeck: new Deck(),
-  originalRunnerDeck: new Deck()
+  originalCorpDeck: new Deck("corp"),
+  originalRunnerDeck: new Deck("runner")
 };
 
 const user = userEvent.setup();
@@ -74,14 +74,12 @@ describe("Registration", () => {
 
     const convertedDecks = decks.map((d) => convertNrdbDeck(d, MockPrintings));
     MockPageData.nrdbDecks = Promise.resolve(convertedDecks);
-    if (selectedCorpDeckIndex !== undefined) {
-      MockPageData.originalCorpDeck = convertedDecks[0];
-    }
-    MockPageData.originalCorpDeck.details.side_id = "corp";
-    if (selectedRunnerDeckIndex !== undefined) {
-      MockPageData.originalRunnerDeck = convertedDecks[1];
-    }
-    MockPageData.originalRunnerDeck.details.side_id = "runner";
+    MockPageData.originalCorpDeck = selectedCorpDeckIndex !== undefined
+      ? convertedDecks[0]
+      : new Deck("corp");
+    MockPageData.originalRunnerDeck = selectedRunnerDeckIndex !== undefined
+      ? convertedDecks[1]
+      : new Deck("runner");
 
     await MockPageData.nrdbDecks;
 
