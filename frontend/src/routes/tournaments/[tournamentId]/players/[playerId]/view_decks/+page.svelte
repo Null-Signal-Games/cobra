@@ -23,7 +23,6 @@
   
   <h3>{data.playerName}</h3>
 
-  <!-- TODO: Don't display edit deck link -->
   <div class="row">
     <div class="col-md-6">
       <DeckDisplay deck={data.corpDeck} title="Corp Deck" editMode={false} />

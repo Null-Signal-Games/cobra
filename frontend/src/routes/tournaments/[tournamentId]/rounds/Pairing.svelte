@@ -58,12 +58,12 @@
   {#if stage.view_decks}
     {#if pairing.player1.side}
       <a
-        href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=pairings`)}
+        href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=rounds`)}
       >
         <FontAwesomeIcon icon="eye" /> View decks
       </a>
     {:else}
-      <a href={resolve(`/tournaments/${tournament.id}/players/${pairing.player1.id}/view_decks?back_to=pairings`)}>
+      <a href={resolve(`/tournaments/${tournament.id}/players/${pairing.player1.id}/view_decks?back_to=rounds`)}>
         <FontAwesomeIcon icon="eye" /> View decks
       </a>
     {/if}
@@ -97,7 +97,7 @@
     show_ids={!stage.is_single_sided || pairing.player2.side !== null}
   />
   {#if stage.view_decks && !pairing.player1.side && pairing.player2.id}
-    <a href={resolve(`/tournaments/${tournament.id}/players/${pairing.player2.id}/view_decks?back_to=pairings`)}>
+    <a href={resolve(`/tournaments/${tournament.id}/players/${pairing.player2.id}/view_decks?back_to=rounds`)}>
       <FontAwesomeIcon icon="eye" /> View decks
     </a>
   {/if}

@@ -24,7 +24,6 @@
   <h3>{data.stageName}</h3>
   <h4>Round {params.roundId}, {data.tableLabel}</h4>
 
-  <!-- TODO: Don't display edit deck link -->
   <div class="row">
     <div class="col-md-6">
       <DeckDisplay deck={data.corpPlayerDeck} title={data.corpPlayer.name} editMode={false} />
