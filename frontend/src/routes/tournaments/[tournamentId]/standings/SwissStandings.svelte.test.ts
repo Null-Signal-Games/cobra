@@ -57,6 +57,7 @@ describe("SwissStandings", () => {
   it("renders round summary, player names, and point totals", () => {
     render(SwissStandings, {
       props: {
+        tournamentId: 1,
         stage: mockSwissStage,
         manual_seed: false,
       },
@@ -74,6 +75,7 @@ describe("SwissStandings", () => {
   it("renders bye points when greater than 0", () => {
     render(SwissStandings, {
       props: {
+        tournamentId: 1,
         stage: mockSwissStage,
         manual_seed: false,
       },
@@ -85,6 +87,7 @@ describe("SwissStandings", () => {
   it("shows dropped icon and tooltip for inactive players", async () => {
     render(SwissStandings, {
       props: {
+        tournamentId: 1,
         stage: mockSwissStage,
         manual_seed: false,
       },
@@ -102,6 +105,7 @@ describe("SwissStandings", () => {
   it("renders seed column when manual_seed is enabled", () => {
     render(SwissStandings, {
       props: {
+        tournamentId: 1,
         stage: mockSwissStage,
         manual_seed: true,
       },
@@ -115,6 +119,7 @@ describe("SwissStandings", () => {
   it("does not render seed column when manual_seed is false", () => {
     render(SwissStandings, {
       props: {
+        tournamentId: 1,
         stage: mockSwissStage,
         manual_seed: false,
       },
@@ -141,6 +146,7 @@ describe("SwissStandings", () => {
 
     render(SwissStandings, {
       props: {
+        tournamentId: 1,
         stage: singleSidedStage,
         manual_seed: false,
       },
@@ -169,6 +175,7 @@ describe("SwissStandings", () => {
 
     render(SwissStandings, {
       props: {
+        tournamentId: 1,
         stage: doubleSidedStage,
         manual_seed: false,
       },
@@ -197,6 +204,7 @@ describe("SwissStandings", () => {
 
     render(SwissStandings, {
       props: {
+        tournamentId: 1,
         stage: decksViewableStage,
         manual_seed: false,
       },

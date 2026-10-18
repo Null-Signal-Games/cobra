@@ -8,7 +8,7 @@
     tournamentId,
     stage,
   }: {
-    tournamentId: string;
+    tournamentId: number | string;
     stage: CutStage;
   } = $props();
 </script>

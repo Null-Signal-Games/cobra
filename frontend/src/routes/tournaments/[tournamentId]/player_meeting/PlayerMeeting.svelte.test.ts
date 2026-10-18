@@ -1,9 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import PlayerMeetingPage from "./+page.svelte";
-import { createPlayerMeetingPairings, getBackDetails } from "./pairings";
+import { createPlayerMeetingPairings } from "./pairings";
 import { Player } from "$lib/model/Player";
 import { Tournament } from "$lib/model/Tournament";
+import { getBackDetails } from "$lib/utils/navigation";
 
 function createPlayer(name: string): Player {
   const p = new Player();

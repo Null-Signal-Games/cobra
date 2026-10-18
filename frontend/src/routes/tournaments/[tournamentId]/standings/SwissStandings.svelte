@@ -10,7 +10,7 @@
     stage,
     manual_seed,
   }: {
-    tournamentId: string;
+    tournamentId: number | string;
     stage: SwissStage;
     manual_seed: boolean;
   } = $props();
