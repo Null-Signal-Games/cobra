@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import * as csrfModule from "$lib/csrf";
+import { authStore } from "$lib/utils/auth.svelte";
 import { ApiBase } from "$lib/api/apiBase";
 import { ok, err, type StatusOr } from "$lib/api/statusOr";
 import { ValidationError } from "$lib/utils/errors";
@@ -22,7 +22,7 @@ describe("ApiBase with StatusOr", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.spyOn(csrfModule, "csrfToken").mockReturnValue("mock-csrf-token");
+    vi.spyOn(authStore, "getCsrfToken").mockResolvedValue("mock-csrf-token");
     globalMessages.warnings = [];
     api = new ApiBase("https://tournaments.nullsignal.games", mockFetch);
   });

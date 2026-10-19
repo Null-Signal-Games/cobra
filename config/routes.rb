@@ -43,6 +43,7 @@ Rails.application.routes.draw do
 
   # Add /api/classic route to support the new Svelte frontend and deployment.
   scope path: 'api/classic', as: :api_classic do
+    get :csrf_token, to: 'csrf_tokens#show'
     resources :tournaments, only: %i[create update] do
       collection do
         get :new_form

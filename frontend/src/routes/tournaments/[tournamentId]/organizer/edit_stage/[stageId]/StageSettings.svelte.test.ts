@@ -6,6 +6,7 @@ import TableRangeEdit from "./TableRangeEdit.svelte";
 import { StageData, type Stage } from "$lib/api/classicTypes";
 import { classicApi } from "$lib/api/classic";
 import { ValidationError } from "$lib/utils/errors";
+import { authStore } from "$lib/utils/auth.svelte";
 
 vi.mock("$app/env/public", () => ({
   CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000",
@@ -30,6 +31,7 @@ describe("StageSettings API helpers", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.spyOn(authStore, "getCsrfToken").mockResolvedValue("mock-csrf-token");
   });
 
   afterEach(() => {
@@ -188,6 +190,10 @@ describe("TableRangeEdit component", () => {
 
 describe("StageSettings Page Component", () => {
   const user = userEvent.setup();
+
+  beforeEach(() => {
+    vi.spyOn(authStore, "getCsrfToken").mockResolvedValue("mock-csrf-token");
+  });
 
   afterEach(() => {
     cleanup();

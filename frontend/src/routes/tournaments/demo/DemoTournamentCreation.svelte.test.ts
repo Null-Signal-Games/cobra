@@ -123,7 +123,6 @@ describe("DemoTournamentCreation", () => {
         expect.objectContaining({
           name: "Test Demo Tournament",
         }),
-        "fake-csrf-token"
       );
     });
 
