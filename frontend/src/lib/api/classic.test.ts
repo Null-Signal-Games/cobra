@@ -4,7 +4,7 @@ import { ApiBase } from "./apiBase";
 import { Tournament } from "$lib/model/Tournament";
 import type { DemoTournamentSettings, Stage } from "$lib/api/classicTypes";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-import * as csrfModule from "$lib/csrf";
+import { authStore } from "$lib/utils/auth.svelte";
 import { ValidationError } from "$lib/utils/errors";
 
 describe("ClassicApi", () => {
@@ -27,7 +27,7 @@ describe("ClassicApi", () => {
     globalMessages.errors = [];
     globalMessages.warnings = [];
     globalMessages.infos = [];
-    vi.spyOn(csrfModule, "csrfToken").mockReturnValue("mock-csrf-token");
+    vi.spyOn(authStore, "getCsrfToken").mockResolvedValue("mock-csrf-token");
     const apiBase = new ApiBase("https://tournaments.nullsignal.games", mockFetch);
     api = new ClassicApi(apiBase);
   });
@@ -196,13 +196,13 @@ describe("ClassicApi", () => {
         new Response(JSON.stringify(mockDemoResponse), { status: 201 }),
       );
 
-      const result = await api.createDemoTournament(demoTournament, "custom-csrf-token");
+      const result = await api.createDemoTournament(demoTournament);
 
       expect(result).toEqual(mockDemoResponse);
       const { url, requestOptions, headers, body } = getFetchCall();
       expect(url).toContain("/api/classic/tournaments/create_demo");
       expect(requestOptions?.method).toBe("POST");
-      expect(headers["X-CSRF-Token"]).toBe("custom-csrf-token");
+      expect(headers["X-CSRF-Token"]).toBe("mock-csrf-token");
       expect(body).toEqual({ tournament: demoTournament });
     });
 

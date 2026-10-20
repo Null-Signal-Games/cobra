@@ -1,5 +1,4 @@
 import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
-import { csrfToken } from "$lib/csrf";
 import type { StatusOr } from "$lib/api/statusOr";
 import { ValidationError, type Errors } from "$lib/utils/errors";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
@@ -49,7 +48,7 @@ export class ApiBase {
     if (options.csrfToken) {
       headers["X-CSRF-Token"] = options.csrfToken;
     } else if (isMutating) {
-      const token = csrfToken();
+      const token = await this.csrfToken(activeFetch);
       if (token) {
         headers["X-CSRF-Token"] = token;
       }
@@ -72,6 +71,17 @@ export class ApiBase {
       credentials: options.credentials ?? "include",
       body,
     });
+  }
+
+  private async csrfToken(activeFetch: typeof fetch): Promise<string> {
+    // Imported lazily: auth.svelte.ts loads the API modules, which depend on this one.
+    const { authStore } = await import("$lib/utils/auth.svelte");
+    try {
+      return await authStore.getCsrfToken(activeFetch);
+    } catch {
+      // Return an empty token if there is an error fetching the CSRF token.
+      return "";
+    }
   }
 
   async request<T = void>(

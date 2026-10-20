@@ -18,6 +18,15 @@ import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 export class ClassicApi {
   constructor(private api: ApiBase = defaultApi) {}
 
+  async loadCsrfToken(altFetch = fetch): Promise<string> {
+    const data = await this.api.getOrThrow<{ csrf_token: string }>(
+      "/api/classic/csrf_token",
+      altFetch,
+      "Failed to load CSRF token",
+    );
+    return data.csrf_token;
+  }
+
   async loadPairingsForUser(
     tournamentId: number,
     userId: number,
@@ -86,14 +95,10 @@ export class ClassicApi {
     });
   }
 
-  createDemoTournament(
-    tournament: DemoTournamentSettings,
-    csrfToken?: string,
-  ): Promise<TournamentDemoCreateResponse> {
+  createDemoTournament(tournament: DemoTournamentSettings): Promise<TournamentDemoCreateResponse> {
     return this.api.postOrThrow<TournamentDemoCreateResponse>(
       "/api/classic/tournaments/create_demo",
       { tournament },
-      csrfToken ? { csrfToken } : undefined,
     );
   }
 

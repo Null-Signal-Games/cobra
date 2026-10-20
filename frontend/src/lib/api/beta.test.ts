@@ -4,7 +4,7 @@ import { ApiBase } from "./apiBase";
 import { Player } from "$lib/model/Player";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-import * as csrfModule from "$lib/csrf";
+import { authStore } from "$lib/utils/auth.svelte";
 
 describe("BetaApi", () => {
   const mockFetch = vi.fn<typeof fetch>();
@@ -26,7 +26,7 @@ describe("BetaApi", () => {
     globalMessages.errors = [];
     globalMessages.warnings = [];
     globalMessages.infos = [];
-    vi.spyOn(csrfModule, "csrfToken").mockReturnValue("mock-csrf-token");
+    vi.spyOn(authStore, "getCsrfToken").mockResolvedValue("mock-csrf-token");
     const apiBase = new ApiBase("https://tournaments.nullsignal.games", mockFetch);
     api = new BetaApi(apiBase);
   });

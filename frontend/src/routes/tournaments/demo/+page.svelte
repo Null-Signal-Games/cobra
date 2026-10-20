@@ -7,20 +7,18 @@
   import DemoTournamentSettingsForm from "./DemoTournamentSettingsForm.svelte";
 
   let tournament = $state<DemoTournamentSettings | undefined>(undefined);
-  let csrfToken = "";
   let errors = $state<Errors>({});
 
   onMount(async () => {
     const data = await classicApi.loadNewDemoTournament();
     tournament = data.tournament;
-    csrfToken = data.csrf_token;
   });
 
   async function submitNewTournament(tournament: DemoTournamentSettings) {
     errors = {};
 
     try {
-      const response = await classicApi.createDemoTournament(tournament, csrfToken);
+      const response = await classicApi.createDemoTournament(tournament);
       navigateTo(response.url);
     } catch (error) {
       if (error instanceof ValidationError) {

@@ -1,4 +1,5 @@
 import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
+import { classicApi } from "$lib/api/classic";
 import { v1Api } from "$lib/api/v1";
 
 export interface AuthUser {
@@ -12,6 +13,11 @@ const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
 class AuthStore {
   user = $state<AuthUser | null>(null);
   isLoading = $state<boolean>(true);
+
+  // Rails ties the CSRF token to the session cookie, so one token is valid for every
+  // mutating request until the session changes.
+  private csrfToken: string | null = null;
+  private csrfTokenRequest: Promise<string> | null = null;
 
   get isAuthenticated(): boolean {
     return this.user !== null;
@@ -44,6 +50,33 @@ class AuthStore {
     return this.user;
   }
 
+  async getCsrfToken(altFetch = fetch): Promise<string> {
+    // Only cache in the browser; on the server this store is shared across requests.
+    if (typeof window === "undefined") {
+      return classicApi.loadCsrfToken(altFetch);
+    }
+
+    if (this.csrfToken) {
+      return this.csrfToken;
+    }
+
+    this.csrfTokenRequest ??= classicApi
+      .loadCsrfToken(altFetch)
+      .then((token) => {
+        this.csrfToken = token;
+        return token;
+      })
+      .finally(() => {
+        this.csrfTokenRequest = null;
+      });
+
+    return this.csrfTokenRequest;
+  }
+
+  clearCsrfToken() {
+    this.csrfToken = null;
+  }
+
   redirectToLogin(returnTo?: string) {
     if (typeof window !== "undefined") {
       const defaultReturn = window.location.origin + window.location.pathname;
@@ -58,6 +91,7 @@ class AuthStore {
 
   invalidateAndLogIn(returnTo?: string) {
     this.user = null;
+    this.clearCsrfToken();
     this.redirectToLogin(returnTo);
   }
 }

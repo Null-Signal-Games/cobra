@@ -23,12 +23,6 @@
   });
 </script>
 
-<svelte:head>
-  {#if data.tournamentData.csrf_token}
-    <meta name="csrf-token" content={data.tournamentData.csrf_token} />
-  {/if}
-</svelte:head>
-
 <!-- Tournament header -->
 <div class="row dontprint">
   <div class="col-md">
