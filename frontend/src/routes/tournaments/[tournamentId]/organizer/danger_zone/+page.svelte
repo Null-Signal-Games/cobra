@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { PageProps } from "./$types";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import DangerActionCard from "./DangerActionCard.svelte";
   import { betaApi } from "$lib/api/beta";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
@@ -37,8 +36,6 @@
 </script>
 
 <div class="col-12">
-  <GlobalMessages />
-
   <DangerActionCard
     title="Delete Entire Tournament"
     entityType="tournament"

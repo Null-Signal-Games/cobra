@@ -1,6 +1,5 @@
 <script lang="ts">
   import FontAwesomeIcon from '$lib/components/FontAwesomeIcon.svelte';
-  import GlobalMessages from '$lib/components/GlobalMessages.svelte';
   import Pairing from '../Pairing.svelte';
   import type { PageProps } from "./$types";
   import type { NewPairing } from '$lib/model/Pairing';
@@ -172,8 +171,6 @@
 </script>
 
 <div class="col-12">
-  <GlobalMessages />
-
   <h2>Round {data.round.number}</h2>
 
   <p>

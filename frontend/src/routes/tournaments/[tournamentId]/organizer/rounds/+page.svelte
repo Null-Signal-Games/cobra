@@ -1,7 +1,6 @@
 <script lang="ts">
   import "$lib/assets/css/pairings.sass";
   import Stage from "./Stage.svelte";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import ModalDialog from "$lib/components/ModalDialog.svelte";
   import type { ScoreReport } from "$lib/model/ScoreReport";
@@ -150,8 +149,6 @@
 </script>
 
 <div class="col-12">
-  <GlobalMessages />
-
   <p></p>
 
   {#if data.stages.length == 0}

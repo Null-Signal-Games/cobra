@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { PageProps } from "./$types";
   import TournamentSettingsForm from "../../../TournamentSettingsForm.svelte";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import type { Tournament } from "$lib/model/Tournament";
   import { type Errors, ValidationError } from "$lib/utils/errors";
   import { classicApi } from "$lib/api/classic";
@@ -29,8 +28,6 @@
 </script>
 
 <div class="col-12">
-  <GlobalMessages />
-
   {#if errors.base}
     <div class="alert alert-danger">{errors.base}</div>
   {/if}

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import type { PageProps } from "./$types";
   import {
     Player,
@@ -169,8 +168,6 @@
 </script>
 
 <div class="col-12">
-    <GlobalMessages />
-
     {#if data}
       <a href={resolve(`/tournaments/${tournamentId}/player_meeting?back_to=players`)} class="btn btn-primary">
       <FontAwesomeIcon icon="list-ul" /> Player meeting

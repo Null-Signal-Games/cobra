@@ -2,7 +2,6 @@
   import { Deck } from "$lib/model/Deck";
   import { Identity } from "$lib/model/Identity";
   import { betaApi } from "$lib/api/beta";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import ProgressButton from "$lib/components/ProgressButton.svelte";
   import { resolve } from "$app/paths";
@@ -85,8 +84,6 @@
 </script>
 
 <div class="col-12">
-  <GlobalMessages />
-  
   {#snippet deckListItem(deck: Deck, isCorp: boolean)}
     <button
       class="list-group-item list-group-item-action {deck.details.nrdb_uuid ===
