@@ -61,15 +61,15 @@ const MockPageData: PageProps["data"] = {
   },
   player: MockPlayerAlice,
   registrationPlayer: MockPlayerBob,
-  corpDeck: new Deck(),
-  runnerDeck: new Deck()
+  corpDeck: new Deck("corp"),
+  runnerDeck: new Deck("runner")
 };
 
 const user = userEvent.setup();
 
 describe("Registration", () => {
   function renderRegistration(
-    corpDeck = new Deck(), runnerDeck = new Deck())
+    corpDeck = new Deck("corp"), runnerDeck = new Deck("runner"))
   {
     const props = {
       params: {
@@ -105,7 +105,7 @@ describe("Registration", () => {
   });
 
   describe("no existing decks", () => {
-    it("displays new player information correctly", () => {
+    it("displays new player information correctly", async () => {
       renderRegistration();
 
       const registrationCard = screen.getByLabelText(
@@ -119,12 +119,7 @@ describe("Registration", () => {
         getByLabelText(registrationCard, "Video coverage allowed"),
       ).not.toBeChecked();
 
-      expect(screen.getByLabelText("corp deck")).toHaveTextContent(
-        "No deck selected",
-      );
-      expect(screen.getByLabelText("runner deck")).toHaveTextContent(
-        "No deck selected",
-      );
+      expect((await screen.findAllByText("No deck selected")).length).toEqual(2);
     });
 
     it("allows standard player info to be edited", async () => {

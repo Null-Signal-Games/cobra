@@ -12,4 +12,8 @@ class PlayerPolicy < ApplicationPolicy # rubocop:disable Style/Documentation
   def view_decks?
     record.decks_visible_to?(user)
   end
+
+  def decks?
+    record.decks_visible_to?(user)
+  end
 end

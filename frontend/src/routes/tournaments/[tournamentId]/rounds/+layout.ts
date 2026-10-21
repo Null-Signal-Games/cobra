@@ -1,7 +1,7 @@
-import type { PageLoad } from "./$types";
+import type { LayoutLoad } from "./$types";
 import { betaApi } from "$lib/api/beta";
 
-export const load: PageLoad = async ({ params, fetch }) => {
+export const load: LayoutLoad = async ({ params, fetch }) => {
   const pairingsData = await betaApi.loadPairings(parseInt(params.tournamentId), fetch);
 
   return {

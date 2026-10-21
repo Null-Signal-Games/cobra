@@ -53,8 +53,8 @@ const MockPageData: PageProps["data"] = {
   },
   player: MockPlayerBob,
   nrdbDecks: Promise.resolve([]),
-  originalCorpDeck: new Deck(),
-  originalRunnerDeck: new Deck()
+  originalCorpDeck: new Deck("corp"),
+  originalRunnerDeck: new Deck("runner")
 };
 
 const user = userEvent.setup();
@@ -71,14 +71,15 @@ describe("Registration", () => {
       },
       data: MockPageData,
     };
+
     const convertedDecks = decks.map((d) => convertNrdbDeck(d, MockPrintings));
     MockPageData.nrdbDecks = Promise.resolve(convertedDecks);
-    if (selectedCorpDeckIndex !== undefined) {
-      MockPageData.originalCorpDeck = convertedDecks[0];
-    }
-    if (selectedRunnerDeckIndex !== undefined) {
-      MockPageData.originalRunnerDeck = convertedDecks[1];
-    }
+    MockPageData.originalCorpDeck = selectedCorpDeckIndex !== undefined
+      ? convertedDecks[0]
+      : new Deck("corp");
+    MockPageData.originalRunnerDeck = selectedRunnerDeckIndex !== undefined
+      ? convertedDecks[1]
+      : new Deck("runner");
 
     await MockPageData.nrdbDecks;
 
@@ -125,12 +126,7 @@ describe("Registration", () => {
           exact: false,
         }),
       ).not.toBeNull();
-      expect(screen.getByLabelText("corp deck")).toHaveTextContent(
-        "No deck selected",
-      );
-      expect(screen.getByLabelText("runner deck")).toHaveTextContent(
-        "No deck selected",
-      );
+      expect((await screen.findAllByText("No deck selected")).length).toEqual(2);
     });
 
     it("allows standard player info to be edited", async () => {
@@ -169,11 +165,7 @@ describe("Registration", () => {
     it("allows deck selection", async () => {
       await renderRegistration(MockPlayerBobNrdbDecks);
 
-      const corpDeckHeaderTable = screen.getByLabelText("corp deck");
-      const runnerDeckHeaderTable = screen.getByLabelText("runner deck");
-
-      expect(corpDeckHeaderTable).toHaveTextContent("No deck selected");
-      expect(runnerDeckHeaderTable).toHaveTextContent("No deck selected");
+      expect((await screen.findAllByText("No deck selected")).length).toEqual(2);
 
       const corpDeckButton = getByRole(
         screen.getByLabelText("NRDB corp decks"),
@@ -201,7 +193,7 @@ describe("Registration", () => {
       expect(runnerDeckButton).not.toHaveClass("active");
       await user.click(runnerDeckButton);
       expect(runnerDeckButton).toHaveClass("active");
-      expect(runnerDeckHeaderTable).toHaveTextContent("Bob's Baz");
+      expect(screen.getByLabelText("runner deck")).toHaveTextContent("Bob's Baz");
       expect(screen.getByLabelText("runner deck ID")).toHaveTextContent(
         "Barry “Baz” Wong: Tri-Maf Veteran",
       );

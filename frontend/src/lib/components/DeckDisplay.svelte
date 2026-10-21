@@ -1,7 +1,7 @@
 <script lang="ts">
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import Identity from "$lib/components/identity/Identity.svelte";
-  import type { Card, Deck } from "$lib/model/Deck";
+  import { Deck, type Card } from "$lib/model/Deck";
   import type { Printing } from "$lib/api/v1ApiTypes";
   import { deckCsv, transformCardLookup } from "$lib/utils/decks.svelte";
   import { downloadBlob } from "$lib/utils/files";
@@ -20,33 +20,25 @@
   }
 
   let {
-    deck = $bindable(),
-    originalDeck,
-    isCorp,
+    deck = $bindable(new Deck()),
+    originalDeck = new Deck(),
+    title,
     editMode,
   }: {
     deck?: Deck;
-    originalDeck: Deck;
-    isCorp: boolean;
+    originalDeck?: Deck;
+    title: string;
     editMode: boolean;
   } = $props();
 
   let selectedCard = $state<Printing | null>(null);
   let cardDiffs = $state<CardDiff[]>([]);
   let cardTotal = $derived.by(() => {
-    if (!deck) {
-      return 0;
-    }
-
     return deck.cards
       .filter((card: Card) => !card.card_type_id.endsWith("identity"))
       .reduce((total: number, card: Card) => total + card.quantity, 0);
   });
   let influenceTotal = $derived.by(() => {
-    if (!deck) {
-      return 0;
-    }
-
     return deck.cards
       .filter((card: Card) => card.faction_id !== deck.details.faction_id)
       .reduce((total: number, card: Card) => total + card.influence, 0);
@@ -62,10 +54,6 @@
 
   function diffDecks() {
     cardDiffs = [];
-
-    if (!deck) {
-      return;
-    }
 
     // Identity
     if (originalDeck.details.identity_title !== deck.details.identity_title) {
@@ -118,10 +106,6 @@
   }
 
   async function copyToClipboard() {
-    if (!deck) {
-      return;
-    }
-
     await navigator.clipboard.writeText(
       deck.cards.reduce(
         (text: string, card: Card) => `${text}${card.quantity} ${card.title}\n`,
@@ -132,10 +116,6 @@
   }
 
   function downloadCsv() {
-    if (!deck) {
-      return;
-    }
-
     downloadBlob(
       `${deck.details.player_name} - ${deck.details.name}.csv`,
       new Blob([deckCsv([deck])], { type: "text/csv" }),
@@ -143,7 +123,7 @@
   }
 
   function changeIdentity(printing: Printing) {
-    if (!deck || !printing.id) {
+    if (!printing.id) {
       return;
     }
 
@@ -158,7 +138,7 @@
   }
 
   function changeCard(cardPrintingId: string | null, printing: Printing) {
-    if (!cardPrintingId || !deck || !printing.id) {
+    if (!cardPrintingId || !printing.id) {
       return;
     }
 
@@ -189,7 +169,7 @@
   }
 
   function addCard(selection: CardSearchOption | null) {
-    if (!deck || !selection?.value.id) {
+    if (!selection?.value.id) {
       return;
     }
 
@@ -215,13 +195,7 @@
     diffDecks();
   }
 
-
-
   function changeQuantity(card: Card, delta: number) {
-    if (!deck) {
-      return;
-    }
-
     card.quantity += delta;
     card.influence = card.influence_cost * card.quantity;
     if (card.quantity === 0) {
@@ -236,21 +210,21 @@
 </script>
 
 <!-- Deck summary -->
-<table
-  class="table table-bordered table-striped"
-  aria-label={isCorp ? "corp deck" : "runner deck"}
->
-  <thead class="thead-dark">
-    <tr>
-      <th class="text-center deck-name-header">
-        {isCorp ? "Corp Deck" : "Runner Deck"}
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>
-        {#if deck?.details.nrdb_uuid}
+{#if deck.details.nrdb_uuid}
+  <table
+    class="table table-bordered table-striped"
+    aria-label={deck.details.side_id === "corp" ? "corp deck" : "runner deck"}
+  >
+    <thead class="thead-dark">
+      <tr>
+        <th class="text-center deck-name-header">
+          {title}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
           {#if deck.details.name}
             {deck.details.name}
             <div class="float-right dontprint">
@@ -297,19 +271,15 @@
           {:else}
             Unnamed deck
           {/if}
-        {:else}
-          No deck selected
-        {/if}
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-{#if deck?.details.nrdb_uuid}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
   <!-- Identity -->
   <table
     class="table table-bordered table-striped"
-    aria-label={isCorp ? "corp deck ID" : "runner deck ID"}
+    aria-label={deck.details.side_id === "corp" ? "corp deck ID" : "runner deck ID"}
   >
     <thead class="thead-dark">
       <tr>
@@ -344,7 +314,7 @@
   <!-- Deck list -->
   <table
     class="table table-bordered table-striped"
-    aria-label={isCorp ? "corp deck list" : "runner deck list"}
+    aria-label={deck.details.side_id === "corp" ? "corp deck list" : "runner deck list"}
   >
     <thead class="thead-dark">
       <tr>
@@ -449,7 +419,7 @@
   {#if editMode}
     <table
       class="table table-bordered table-striped"
-      aria-label={isCorp ? "corp deck changes" : "runner deck changes"}
+      aria-label={deck.details.side_id === "corp" ? "corp deck changes" : "runner deck changes"}
     >
       <thead class="thead-dark">
         <tr>
@@ -475,4 +445,21 @@
       </tbody>
     </table>
   {/if}
+{:else}
+  <table class="table table-bordered table-striped">
+    <thead class="thead-dark">
+      <tr>
+        <th class="text-center deck-name-header">
+          {title}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          No deck selected
+        </td>
+      </tr>
+    </tbody>
+  </table>
 {/if}

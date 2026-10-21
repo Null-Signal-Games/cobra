@@ -37,6 +37,7 @@ describe("DoubleElimStandings", () => {
   it("renders rank, player name, seed, and identities", () => {
     render(DoubleElimStandings, {
       props: {
+        tournamentId: 1,
         stage: mockCutStage,
       },
     });
@@ -53,6 +54,7 @@ describe("DoubleElimStandings", () => {
   it("renders placeholder '???' when player is null", () => {
     render(DoubleElimStandings, {
       props: {
+        tournamentId: 1,
         stage: mockCutStage,
       },
     });
@@ -65,6 +67,7 @@ describe("DoubleElimStandings", () => {
   it("does not render decks column when any_decks_viewable is false", () => {
     render(DoubleElimStandings, {
       props: {
+        tournamentId: 1,
         stage: mockCutStage,
       },
     });
@@ -90,6 +93,7 @@ describe("DoubleElimStandings", () => {
 
     render(DoubleElimStandings, {
       props: {
+        tournamentId: 1,
         stage: decksViewableStage,
       },
     });

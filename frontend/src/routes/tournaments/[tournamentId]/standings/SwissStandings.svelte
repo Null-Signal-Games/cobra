@@ -3,11 +3,14 @@
   import Identity from "$lib/components/identity/Identity.svelte";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import Tooltip from "./Tooltip.svelte";
+  import { resolve } from "$app/paths";
 
   let {
+    tournamentId,
     stage,
     manual_seed,
   }: {
+    tournamentId: number | string;
     stage: SwissStage;
     manual_seed: boolean;
   } = $props();
@@ -67,9 +70,8 @@
         {#if stage.any_decks_viewable}
           <td>
             {#if standing.policy.view_decks}
-              <a href="#top" onclick={(event) => { event.preventDefault(); alert('TODO: Add view decks'); }}>
-                <FontAwesomeIcon icon="eye" />
-                View decks
+              <a href={resolve(`/tournaments/${tournamentId}/players/${standing.player.id}/view_decks?back_to=standings`)}>
+                <FontAwesomeIcon icon="eye" /> View decks
               </a>
             {/if}
           </td>

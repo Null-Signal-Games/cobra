@@ -32,11 +32,19 @@ export class DeckDetails {
   faction_id: string | null = null;
   mine: boolean | null = null;
   player_name: string | null = null;
+
+  constructor(init?: Partial<DeckDetails>) {
+    Object.assign(this, init);
+  }
 }
 
 export class Deck {
   details = new DeckDetails();
   cards: Card[] = [];
+
+  constructor(side_id?: string) {
+    this.details = new DeckDetails({ side_id: side_id ?? null });
+  }
 }
 
 export interface NrdbCard {

@@ -196,7 +196,7 @@
         <DeckDisplay
           bind:deck={corpDeck}
           originalDeck={data.corpDeck}
-          isCorp={true}
+          title="Corp Deck"
           editMode={editing}
         />
       </div>
@@ -205,7 +205,7 @@
         <DeckDisplay
           bind:deck={runnerDeck}
           originalDeck={data.runnerDeck}
-          isCorp={false}
+          title="Runner Deck"
           editMode={editing}
         />
       </div>

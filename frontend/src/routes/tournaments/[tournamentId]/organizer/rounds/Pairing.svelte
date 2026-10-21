@@ -10,6 +10,8 @@
   import PlayerDisplay from "$lib/components/PlayerDisplay.svelte";
   import type { Player } from "$lib/model/Player";
   import { resolve } from "$app/paths";
+  import { onMount } from "svelte";
+  import { authStore, type AuthUser } from "$lib/utils/auth.svelte";
 
   let {
     tournament,
@@ -35,6 +37,7 @@
     resetReportsCallback?: (pairingId: number) => void;
   } = $props();
 
+  let currentUser = $state<AuthUser | null>(null);
   let leftPlayer = $derived(
     stage.is_single_sided && pairing.player2.side == "corp"
       ? pairing.player2
@@ -82,6 +85,10 @@
 
     changePlayerSideCallback(pairing.id, adjSide);
   }
+
+  onMount(async () => {
+    currentUser = await authStore.checkAuth();
+  });
 </script>
 
 <div
@@ -124,7 +131,7 @@
   {#if stage.view_decks}
     {#if stage.is_single_sided}
       <a
-        href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=rounds`)}
+        href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=${tournament.user_id === currentUser?.id ? "pairings" : "rounds"}`)}
       >
         <FontAwesomeIcon icon="eye" /> View decks
       </a>

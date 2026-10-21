@@ -5,7 +5,7 @@ module Beta
     before_action :set_tournament
     before_action :set_player,
                   only: %i[show update destroy registration lock_registration unlock_registration drop reinstate
-                           nrdb_decks]
+                           nrdb_decks decks]
 
     def index
       authorize @tournament, :update?
@@ -139,13 +139,14 @@ module Beta
 
     def decks
       authorize @tournament, :show?
+      authorize @player
 
       decks = if params[:id]
                 @tournament.players.find(params[:id]&.to_i).decks
               else
                 @tournament.players.sort_by(&:name).flat_map(&:decks)
               end
-      decks = decks.select { |d| d.user_id == current_user.id } if current_user != @tournament.user
+      decks = decks.select { |d| d.user_id == current_user.id } if current_user && current_user != @tournament.user
 
       render json: decks.sort_by(&:side_id).map { |d| d.as_view(current_user) }
     end
