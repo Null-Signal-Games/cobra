@@ -8,6 +8,7 @@
   import type { ScoreReport } from '$lib/model/ScoreReport';
   import { betaApi } from "$lib/api/beta";
   import ProgressButton from '$lib/components/ProgressButton.svelte';
+  import { globalMessages } from '$lib/utils/GlobalMessageState.svelte';
 
   let { data, params }: PageProps = $props();
 
@@ -27,7 +28,7 @@
 
     const success = await betaApi.rePairRound(parseInt(params.tournamentId), parseInt(params.roundId));
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to re-pair the round.");
       return;
     }
 
@@ -45,7 +46,7 @@
 
     const success = await betaApi.completeRound(parseInt(params.tournamentId), parseInt(params.roundId), completed);
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to complete the round.");
       return;
     }
 
@@ -59,7 +60,7 @@
 
     const success = await betaApi.deleteRound(parseInt(params.tournamentId), parseInt(params.roundId));
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to delete the round.");
       return;
     }
 
@@ -80,7 +81,7 @@
       newPairing,
     );
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to create the pairing.");
       return;
     }
 
@@ -103,7 +104,7 @@
       pairingId,
     );
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to delete the pairing.");
       return;
     }
 
@@ -118,7 +119,7 @@
       side,
     );
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to change player sides.");
       return;
     }
 
@@ -134,7 +135,7 @@
       false,
     );
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to submit the score report.");
       return;
     }
 
@@ -147,7 +148,7 @@
       parseInt(params.roundId),
       pairingId);
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to reset the score reports.");
       return;
     }
 
@@ -160,7 +161,7 @@
       parseInt(params.roundId),
       sosWeight);
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to save the SOS weighting.");
       return false;
     }
 

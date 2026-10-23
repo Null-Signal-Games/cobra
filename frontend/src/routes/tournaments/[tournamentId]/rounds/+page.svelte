@@ -9,6 +9,7 @@
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidateAll } from "$app/navigation";
   import { betaApi } from "$lib/api/beta";
+  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
   let { data, params }: PageProps = $props();
 
@@ -21,7 +22,7 @@
       selfReport,
     );
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to submit the score report.");
       return;
     }
 
