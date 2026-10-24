@@ -20,7 +20,7 @@
     "@types/node": "^24.0.1",
     "@vitest/ui": "^4",
     "apexcharts": "^6",
-    "dompurify": "^3.4.13",
+    "dompurify": "^3.4.17",
     "eslint": "^10",
     "eslint-plugin-svelte": "^3.5.1",
     "globals": "^17",
