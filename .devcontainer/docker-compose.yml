@@ -20,6 +20,10 @@ services:
   db:
     image: postgres:14.5
     restart: unless-stopped
+    # nginx in app (port 80, see bin/dev-stack) is the only port published to the host. It's declared
+    # here because app runs in db's network. Host 3000 matches the NRDB OAuth redirect_uri.
+    ports:
+      - "127.0.0.1:3000:80"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./create-db-user.sql:/docker-entrypoint-initdb.d/create-db-user.sql

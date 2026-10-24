@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Runs the full local stack inside the devcontainer: nginx with deploy/nginx.conf on port 80
+# (published as http://localhost:3000), Rails on 127.0.0.1:3000 and Vite on 127.0.0.1:5173.
+# Ctrl-C stops everything.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+export COBRA_RAILS_UPSTREAM="${COBRA_RAILS_UPSTREAM:-127.0.0.1:3000}"
+export COBRA_SVELTE_UPSTREAM="${COBRA_SVELTE_UPSTREAM:-127.0.0.1:5173}"
+
+# Only substitute our variables so nginx's own ($host, $http_upgrade, ...) are left alone.
+envsubst '${COBRA_RAILS_UPSTREAM} ${COBRA_SVELTE_UPSTREAM}' < deploy/nginx.conf \
+  | sudo tee /etc/nginx/conf.d/cobra.conf > /dev/null
+sudo nginx -t -q
+
+# Stop nginx by process name, not /run/nginx.pid: a leftover instance (e.g. one still draining
+# Vite's HMR websocket) can leave that file empty or stale.
+stop_nginx() {
+  sudo pkill -x nginx 2> /dev/null || true
+  for _ in {1..50}; do
+    pgrep -x nginx > /dev/null || return 0
+    sleep 0.1
+  done
+  sudo pkill -KILL -x nginx 2> /dev/null || true
+}
+
+stop_nginx
+sudo nginx
+
+pids=()
+cleanup() {
+  trap - EXIT INT TERM
+  kill "${pids[@]}" 2> /dev/null || true
+  wait 2> /dev/null || true
+  stop_nginx
+}
+trap cleanup EXIT INT TERM
+
+bin/rails server -b 127.0.0.1 -p 3000 &
+pids+=($!)
+(cd frontend && exec node_modules/.bin/vite dev) &
+pids+=($!)
+
+# Stop the rest if either server exits.
+wait -n

@@ -35,23 +35,9 @@
             "upgradePackages": true
         }
     },
-    // Use 'forwardPorts' to make a list of ports inside the container available locally.
-    // This can be used to network with other containers or the host.
-    "forwardPorts": [
-        3000,
-        5173
-    ],
-    "portsAttributes": {
-        "3000": {
-            "label": "API",
-            "onAutoForward": "notify"
-        },
-        "5173": {
-            "label": "Frontend",
-            "onAutoForward": "notify"
-        }
-    },
-    // Ignore automatic forwarding for unlisted/ephemeral ports (like browser debugging sockets)
+    // Rails (3000) and Vite (5173) are not forwarded. Run bin/dev-stack to start them behind nginx
+    // (deploy/nginx.conf), which is published as http://localhost:3000 in docker-compose.yml.
+    // Ignore automatic forwarding for all ports (like browser debugging sockets)
     "otherPortsAttributes": {
         "onAutoForward": "ignore"
     },
