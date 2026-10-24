@@ -1,7 +1,6 @@
 <script lang="ts">
   import "$lib/assets/css/pairings.sass";
   import Stage from "./Stage.svelte";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import ModalDialog from "$lib/components/ModalDialog.svelte";
   import type { ScoreReport } from "$lib/model/ScoreReport";
@@ -11,13 +10,14 @@
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidateAll } from "$app/navigation";
   import { betaApi } from "$lib/api/beta";
+  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
   let { data, params }: PageProps = $props();
 
   async function addStage(cutSingleElim?: boolean, cutCount?: number) {
     const success = await betaApi.createStage(data.tournamentData.tournament.id, cutSingleElim, cutCount);
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to create the stage.");
       return;
     }
 
@@ -36,7 +36,7 @@
 
     const success = await betaApi.pairRound(data.tournamentData.tournament.id);
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to pair a new round.");
       return;
     }
 
@@ -46,7 +46,7 @@
   async function setRegistrationStatus(open: boolean) {
     const success = await betaApi.setRegistrationStatus(data.tournamentData.tournament.id, open);
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push(`Unable to ${open ? "open" : "close"} the tournament registration.`);
       return;
     }
 
@@ -59,7 +59,7 @@
       open,
     );
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push(`Unable to ${open ? "unlock" : "lock"} all players.`);
       return;
     }
 
@@ -73,7 +73,7 @@
 
     const success = await betaApi.deletePairing(data.tournamentData.tournament.id, roundId, pairingId);
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to delete the pairing.");
       return;
     }
 
@@ -87,8 +87,9 @@
       pairingId,
       side,
     );
+
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to change player sides.");
       return;
     }
 
@@ -109,7 +110,7 @@
       selfReport,
     );
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to submit the score report.");
       return;
     }
 
@@ -119,7 +120,7 @@
   async function completeRoundCallback(roundId: number) {
     const success = await betaApi.completeRound(data.tournamentData.tournament.id, roundId, true);
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to complete the round.");
       return;
     }
 
@@ -141,7 +142,7 @@
       operation,
     );
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to update the round timer.");
       return;
     }
 
@@ -150,8 +151,6 @@
 </script>
 
 <div class="col-12">
-  <GlobalMessages />
-
   <p></p>
 
   {#if data.stages.length == 0}

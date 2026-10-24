@@ -1,7 +1,6 @@
 <script lang="ts">
   import "$lib/assets/css/pairings.sass";
   import Stage from "./Stage.svelte";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import ModalDialog from "$lib/components/ModalDialog.svelte";
   import type { ScoreReport } from "$lib/model/ScoreReport";
@@ -10,6 +9,7 @@
   import { showIdentities } from "$lib/utils/ShowIdentities";
   import { invalidateAll } from "$app/navigation";
   import { betaApi } from "$lib/api/beta";
+  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
   let { data, params }: PageProps = $props();
 
@@ -22,7 +22,7 @@
       selfReport,
     );
     if (!success) {
-      // TODO: Notify the user
+      globalMessages.errors.push("Unable to submit the score report.");
       return;
     }
 
@@ -31,8 +31,6 @@
 </script>
 
 <div class="col-12">
-  <GlobalMessages />
-
   <p></p>
 
   {#if data.stages.length > 0}

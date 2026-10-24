@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import type { TournamentInfo } from "$lib/api/v1ApiTypes";
   import TournamentRow from "$lib/components/TournamentRow.svelte";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -51,8 +50,6 @@
 </script>
 
 <div>
-  <GlobalMessages />
-
   <h4>Today's tournaments</h4>
   {#if loading}
     <LoadingSpinner />

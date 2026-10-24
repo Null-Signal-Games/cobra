@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Identity } from "$lib/model/Identity";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import ProgressButton from "$lib/components/ProgressButton.svelte";
   import { resolve } from "$app/paths";
@@ -64,8 +63,6 @@
 </script>
 
 <div class="col-12">
-  <GlobalMessages />
-  
   {#if player.id !== 0}
     <!-- General registration information -->
     <div class="card mb-3" aria-label="registration information">
