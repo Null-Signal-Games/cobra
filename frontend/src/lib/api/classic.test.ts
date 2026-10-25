@@ -152,6 +152,45 @@ describe("ClassicApi", () => {
     });
   });
 
+  describe("loadNrtmJson", () => {
+    it("loads the tournament results in NRTM JSON format", async () => {
+      const mockResults = { name: "Tourney", players: [] };
+      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockResults), { status: 200 }));
+
+      const result = await api.loadNrtmJson(10, mockFetch);
+
+      expect(result).toEqual(mockResults);
+      const { url } = getFetchCall();
+      expect(url).toContain("/api/classic/tournaments/10/save_json");
+    });
+  });
+
+  describe("uploadToAbr", () => {
+    it("posts the upload and returns the ABR code", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ abr_code: "abc123" }), { status: 200 }),
+      );
+
+      const result = await api.uploadToAbr(10);
+
+      expect(result).toEqual({ abr_code: "abc123" });
+      const { url, requestOptions, headers } = getFetchCall();
+      expect(url).toContain("/api/classic/tournaments/10/upload_to_abr");
+      expect(requestOptions?.method).toBe("POST");
+      expect(headers["X-CSRF-Token"]).toBe("mock-csrf-token");
+    });
+
+    it("throws the server error when the upload fails", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: "Upload to Always Be Running failed." }), {
+          status: 422,
+        }),
+      );
+
+      await expect(api.uploadToAbr(10)).rejects.toThrow("Upload to Always Be Running failed.");
+    });
+  });
+
   describe("loadStage", () => {
     it("loads stage settings", async () => {
       const mockStage = {

@@ -254,7 +254,17 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
     response = AbrUpload.upload!(@tournament, root_url, tournament_url(@tournament.slug, @request))
     @tournament.update(abr_code: response[:code]) if response[:code]
 
-    redirect_to edit_tournament_path(@tournament)
+    respond_to do |format|
+      format.html { redirect_to edit_tournament_path(@tournament) }
+      format.json do
+        if response[:code]
+          render json: { abr_code: @tournament.abr_code }
+        else
+          render json: { error: response[:error] || 'Upload to Always Be Running failed.' },
+                 status: :unprocessable_content
+        end
+      end
+    end
   end
 
   def save_json

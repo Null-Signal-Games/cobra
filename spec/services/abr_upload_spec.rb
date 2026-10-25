@@ -40,6 +40,28 @@ RSpec.describe AbrUpload do
       end
     end
 
+    it 'returns an error when ABR rejects the upload' do
+      allow(upload).to receive(:send_data).and_return(
+        instance_double(Faraday::Response, success?: false, status: 401, body: '<!DOCTYPE html>')
+      )
+
+      expect(upload.upload![:error]).to eq('Always Be Running rejected the upload (HTTP 401).')
+    end
+
+    it 'returns an error when ABR responds with something other than json' do
+      allow(upload).to receive(:send_data).and_return(
+        instance_double(Faraday::Response, success?: true, status: 200, body: '<!DOCTYPE html>')
+      )
+
+      expect(upload.upload![:error]).to eq('Always Be Running returned an unexpected response.')
+    end
+
+    it 'returns an error when ABR cannot be reached' do
+      allow(upload).to receive(:send_data).and_raise(Faraday::ConnectionFailed, 'connection refused')
+
+      expect(upload.upload![:error]).to eq('Could not reach Always Be Running: connection refused')
+    end
+
     it 'delegates to json class' do
       VCR.use_cassette :upload_to_abr do
         upload.upload!

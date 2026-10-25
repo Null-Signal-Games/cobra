@@ -20,9 +20,7 @@ describe("TournamentSettingsForm dropdowns", () => {
       { id: "vantage_point", name: "Vantage Point" },
       { id: "system_gateway", name: "System Gateway" },
     ],
-    deckbuilding_restrictions: [
-      { id: "standard_balance_update_26_08", name: "Standard Ban List" },
-    ],
+    deckbuilding_restrictions: [{ id: "standard_balance_update_26_08", name: "Standard Ban List" }],
     time_zones: [
       { id: "UTC", name: "(GMT+00:00) UTC" },
       {
@@ -64,7 +62,9 @@ describe("TournamentSettingsForm dropdowns", () => {
     const formatSelect = screen.getByLabelText("Play Format") as HTMLSelectElement;
     expect(formatSelect.value).toBe("1");
 
-    const restrictionSelect = screen.getByLabelText("Deckbuilding Restriction") as HTMLSelectElement;
+    const restrictionSelect = screen.getByLabelText(
+      "Deckbuilding Restriction",
+    ) as HTMLSelectElement;
     expect(restrictionSelect.value).toBe("standard_balance_update_26_08");
 
     const prizeKitSelect = screen.getByLabelText("Official Prize Kit") as HTMLSelectElement;
@@ -132,6 +132,37 @@ describe("TournamentSettingsForm dropdowns", () => {
       screen.getByText("Swiss format cannot be changed once rounds exist."),
     ).toBeInTheDocument();
   });
+
+  it("does not render ABR buttons without callbacks", () => {
+    const tournament = new Tournament({ name: "Test Tournament", abr_code: "abc123" });
+
+    render(TournamentSettingsForm, { props: { tournament, options } });
+
+    expect(screen.queryByRole("button", { name: /upload to always be running/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /download as json/i })).toBeNull();
+    expect(screen.queryByText(/uploaded to abr with code/i)).toBeNull();
+  });
+
+  it("renders ABR buttons and calls their callbacks with the tournament", async () => {
+    const tournament = new Tournament({ name: "Test Tournament", abr_code: "abc123" });
+    const mockUpload = vi.fn().mockResolvedValue(true);
+    const mockDownload = vi.fn().mockResolvedValue(true);
+
+    render(TournamentSettingsForm, {
+      props: {
+        tournament,
+        options,
+        onUploadToAbr: mockUpload,
+        onDownloadJson: mockDownload,
+      },
+    });
+
+    expect(screen.getByText("Uploaded to ABR with code abc123")).toBeInTheDocument();
+
+    await fireEvent.click(screen.getByRole("button", { name: /upload to always be running/i }));
+    expect(mockUpload).toHaveBeenCalledWith(tournament);
+
+    await fireEvent.click(screen.getByRole("button", { name: /download as json/i }));
+    expect(mockDownload).toHaveBeenCalledWith(tournament);
+  });
 });
-
-

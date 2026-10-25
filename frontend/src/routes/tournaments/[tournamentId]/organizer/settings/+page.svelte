@@ -6,6 +6,7 @@
   import { classicApi } from "$lib/api/classic";
   import { invalidateAll } from "$app/navigation";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+  import { downloadBlob } from "$lib/utils/files";
   let { data }: PageProps = $props();
   let errors = $state<Errors>({});
 
@@ -22,6 +23,38 @@
       } else {
         errors = { base: ["An unexpected error occurred. Please try again."] };
       }
+      return false;
+    }
+  }
+
+  async function uploadToAbr(tournament: Tournament): Promise<boolean> {
+    errors = {};
+    try {
+      const response = await classicApi.uploadToAbr(tournament.id);
+      globalMessages.infos = [`Uploaded to Always Be Running with code ${response.abr_code}.`];
+      await invalidateAll();
+      return true;
+    } catch (error) {
+      errors = {
+        base: [error instanceof Error ? error.message : "Upload to Always Be Running failed."],
+      };
+      return false;
+    }
+  }
+
+  async function downloadJson(tournament: Tournament): Promise<boolean> {
+    errors = {};
+    try {
+      const results = await classicApi.loadNrtmJson(tournament.id);
+      downloadBlob(
+        `${tournament.name}.json`,
+        new Blob([JSON.stringify(results)], { type: "application/json" }),
+      );
+      return true;
+    } catch (error) {
+      errors = {
+        base: [error instanceof Error ? error.message : "Failed to download tournament results."],
+      };
       return false;
     }
   }
@@ -42,6 +75,8 @@
         submitIcon="save"
         {errors}
         onSubmitCallback={handleSave}
+        onUploadToAbr={uploadToAbr}
+        onDownloadJson={downloadJson}
       />
     {/key}
   {:else}
