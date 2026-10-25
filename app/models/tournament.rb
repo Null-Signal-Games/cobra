@@ -39,13 +39,13 @@ class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style
   before_create :default_date, unless: :date
   after_create :create_stage
 
-  def cut_to!(format, number)
+  def cut_to!(format, number, random: nil)
     previous_stage = current_stage
     stages.create!(
       format:,
       number: previous_stage.number + 1
     ).tap do |stage|
-      previous_stage.top(number).each_with_index do |player, i|
+      previous_stage.standings(random:).top(number).each_with_index do |player, i|
         stage.registrations.create!(
           player:,
           seed: i + 1

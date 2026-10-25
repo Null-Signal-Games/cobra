@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 class SosCalculator # rubocop:disable Style/Documentation
-  def self.calculate!(stage)
+  # Exact ties are broken by a shuffle using `random` rather than any player attribute (like registration
+  # order), so no player gets a systematic advantage. The default seed keeps tie order stable for a stage
+  # across page loads; pass a seeded Random to control it (e.g. in tests).
+  def self.calculate!(stage, random: nil)
+    random ||= Random.new(stage.id)
     players = stage.players.includes(:tournament).index_by(&:id)
 
     # calculate points and cache values for sos calculations
@@ -70,7 +74,7 @@ class SosCalculator # rubocop:disable Style/Documentation
                          end
     end
 
-    players.values.map do |p|
+    standings = players.values.map do |p|
       Standing.new(p,
                    points: points[p.id],
                    sos: sos[p.id],
@@ -78,6 +82,10 @@ class SosCalculator # rubocop:disable Style/Documentation
                    bye_points: bye_points[p.id] || 0,
                    corp_points: corp_points[p.id],
                    runner_points: runner_points[p.id])
-    end.sort
+    end
+
+    # Sort by id before shuffling so the tie order depends only on `random`, not on database row order.
+    tiebreak = standings.sort_by { |s| s.player.id }.shuffle(random:).each_with_index.to_h
+    standings.sort { |a, b| (a <=> b).nonzero? || (tiebreak[a] <=> tiebreak[b]) }
   end
 end

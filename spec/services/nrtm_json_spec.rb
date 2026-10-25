@@ -58,7 +58,7 @@ RSpec.describe NrtmJson do
                                            score2_corp: 0, score1_corp: 3, score2_runner: 0)
         allow(StandingStrategies::Swiss)
           .to receive(:new)
-          .with(tournament.current_stage)
+          .with(tournament.current_stage, random: nil)
           .and_return(
             instance_double(
               StandingStrategies::Swiss,
@@ -136,7 +136,7 @@ RSpec.describe NrtmJson do
                                            score2_corp: 0, side: :player1_is_runner)
         allow(StandingStrategies::Swiss)
           .to receive(:new)
-          .with(tournament.current_stage)
+          .with(tournament.current_stage, random: nil)
           .and_return(
             instance_double(
               StandingStrategies::Swiss,
@@ -167,7 +167,7 @@ RSpec.describe NrtmJson do
         round.pairings << create(:pairing, player1: pop, player2: nil, table_number: 4, score1: 3, score2: 0)
         allow(StandingStrategies::Swiss)
           .to receive(:new)
-          .with(tournament.current_stage)
+          .with(tournament.current_stage, random: nil)
           .and_return(
             instance_double(
               StandingStrategies::Swiss,

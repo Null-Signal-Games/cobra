@@ -27,8 +27,8 @@ class Stage < ApplicationRecord # rubocop:disable Style/Documentation
     rounds.create(number:, tournament_id:, length_minutes: default_round_minutes)
   end
 
-  def standings
-    Standings.new(self)
+  def standings(random: nil)
+    Standings.new(self, random:)
   end
 
   def eligible_pairings

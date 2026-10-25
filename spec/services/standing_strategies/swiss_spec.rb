@@ -13,7 +13,7 @@ RSpec.describe StandingStrategies::Swiss do
     it 'calls SosCalculator' do
       strategy.calculate!
 
-      expect(SosCalculator).to have_received(:calculate!).with(stage)
+      expect(SosCalculator).to have_received(:calculate!).with(stage, random: nil)
     end
   end
 end

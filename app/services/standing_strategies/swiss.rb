@@ -3,7 +3,7 @@
 module StandingStrategies
   class Swiss < Base # rubocop:disable Style/Documentation
     def calculate!
-      SosCalculator.calculate!(stage)
+      SosCalculator.calculate!(stage, random:)
     end
   end
 end

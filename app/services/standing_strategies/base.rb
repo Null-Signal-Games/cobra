@@ -2,10 +2,11 @@
 
 module StandingStrategies
   class Base # rubocop:disable Style/Documentation
-    attr_reader :stage
+    attr_reader :stage, :random
 
-    def initialize(stage)
+    def initialize(stage, random: nil)
       @stage = stage
+      @random = random
     end
   end
 end
