@@ -7,7 +7,6 @@
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import ThemeToggle from "$lib/components/ThemeToggle.svelte";
   import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
-  import { authStore } from "$lib/utils/auth.svelte";
   import { onMount } from "svelte";
   import type { Snippet } from "svelte";
   import { theme } from "$lib/utils/theme.svelte";
@@ -32,7 +31,6 @@
 
   onMount(() => {
     theme.init();
-    void authStore.checkAuth();
   });
 
   const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
@@ -107,7 +105,7 @@
           </div>
         </li>
 
-        {#if authStore.isAuthenticated}
+        {#if data.user}
           <li class="nav-item dropdown">
             <button
               type="button"
@@ -115,9 +113,7 @@
               data-toggle="dropdown"
             >
               <FontAwesomeIcon icon="user" />
-              {#if authStore.user}
-                {authStore.user.nrdb_username}
-              {/if}
+              {data.user.nrdb_username}
             </button>
             <div class="dropdown-menu dropdown-menu-right">
               <a href={resolve("/tournaments/new")} class="dropdown-item">
