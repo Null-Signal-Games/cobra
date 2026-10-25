@@ -16,7 +16,7 @@ services:
       - backend
 
   svelte:
-    image: registry.digitalocean.com/nsgcr/cobra-frontend:${FRONTEND_VERSION:-latest}
+    image: registry.digitalocean.com/nsgcr/cobra-frontend:${FRONTEND_VERSION:?set FRONTEND_VERSION in deploy/.env}
     build:
       context: ../frontend
       dockerfile: ../deploy/Dockerfile.frontend
@@ -26,22 +26,24 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - ORIGIN=http://localhost:3000
+      - ORIGIN=${COBRA_ORIGIN:?set COBRA_ORIGIN in deploy/.env}
       - SERVER_COBRA_API_ENDPOINT=http://gateway
     networks:
       - backend
 
   rails:
-    image: registry.digitalocean.com/nsgcr/cobra:${COBRA_SERVER_VERSION:-latest}
+    image: registry.digitalocean.com/nsgcr/cobra:${COBRA_SERVER_VERSION:?set COBRA_SERVER_VERSION in deploy/.env}
     build:
       context: ..
       dockerfile: Dockerfile
+    # Rails-only secrets. Shared settings come from deploy/.env below so each value has one home.
     env_file:
-      - path: ../.env
-        required: false
+      - path: rails.env
+        required: true
     environment:
-      - RAILS_ENV=${RAILS_ENV:-development}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-cobra}
+      - RAILS_ENV=${RAILS_ENV:?set RAILS_ENV in deploy/.env}
+      - COBRA_DOMAIN=${COBRA_DOMAIN:?set COBRA_DOMAIN in deploy/.env}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
     depends_on:
       - db
     restart: unless-stopped
@@ -57,12 +59,9 @@ services:
   db:
     image: postgres:14.5-alpine
     environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-cobra}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_DB=${POSTGRES_DB:-cobra}
-    env_file:
-      - path: ../.env
-        required: false
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/.env}
+      - POSTGRES_USER=${POSTGRES_USER:?set POSTGRES_USER in deploy/.env}
+      - POSTGRES_DB=${POSTGRES_DB:?set POSTGRES_DB in deploy/.env}
     restart: unless-stopped
     ports:
       - "5432:5432"

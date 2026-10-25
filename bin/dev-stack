@@ -8,6 +8,9 @@ cd "$(dirname "$0")/.."
 
 export COBRA_RAILS_UPSTREAM="${COBRA_RAILS_UPSTREAM:-127.0.0.1:3000}"
 export COBRA_SVELTE_UPSTREAM="${COBRA_SVELTE_UPSTREAM:-127.0.0.1:5173}"
+# Send server-side API requests through nginx, as production does with http://gateway, so dev
+# exercises the same rewrite and cookie forwarding in frontend/src/hooks.server.ts.
+export SERVER_COBRA_API_ENDPOINT="${SERVER_COBRA_API_ENDPOINT:-http://127.0.0.1}"
 
 # Only substitute our variables so nginx's own ($host, $http_upgrade, ...) are left alone.
 envsubst '${COBRA_RAILS_UPSTREAM} ${COBRA_SVELTE_UPSTREAM}' < deploy/nginx.conf \

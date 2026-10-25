@@ -1,0 +1,7 @@
+# Local env files hold dev values; the container gets its environment from deploy/docker-compose.yml.
+.env
+.env.*
+node_modules
+.svelte-kit
+build
+tmp

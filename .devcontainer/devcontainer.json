@@ -42,7 +42,7 @@
         "onAutoForward": "ignore"
     },
     // Use 'postCreateCommand' to run commands after the container is created and volumes are mounted.
-    "postCreateCommand": "cp -n config/database.example.app-in-docker.yml config/database.yml 2>/dev/null || true && bundle install && bundle exec rails db:prepare && npm install && cd frontend && npm install",
+    "postCreateCommand": "cp -n config/database.example.app-in-docker.yml config/database.yml 2>/dev/null || true && bundle install && bundle exec rails db:prepare && npm install && cd frontend && (cp -n .env.example .env 2>/dev/null || true) && npm install",
     // Configure tool-specific properties.
     "customizations": {
         "vscode": {

@@ -9,6 +9,9 @@
 !/tmp/pids/.keep
 /config/master.key
 /.env
+/deploy/.env
+/deploy/rails.env
+/frontend/.env
 /.DS_STORE
 /public/packs
 /public/packs-test

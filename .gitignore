@@ -12,6 +12,7 @@
 *.DS_Store
 
 .env
+/deploy/rails.env
 
 config/database.yml
 

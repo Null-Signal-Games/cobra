@@ -10,10 +10,10 @@ services:
   gateway:
     logging: *default-logging
     environment:
-      VIRTUAL_HOST: ${COBRA_DOMAIN:-tournaments.nullsignal.games}
+      VIRTUAL_HOST: ${COBRA_DOMAIN:?set COBRA_DOMAIN in deploy/.env}
       VIRTUAL_PORT: "80"
-      LETSENCRYPT_HOST: ${COBRA_DOMAIN:-tournaments.nullsignal.games}
-      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-webdev-team@nullsignal.games}
+      LETSENCRYPT_HOST: ${COBRA_DOMAIN:?set COBRA_DOMAIN in deploy/.env}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?set LETSENCRYPT_EMAIL in deploy/.env}
     networks:
       - null_signal
       - backend

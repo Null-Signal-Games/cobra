@@ -32,8 +32,7 @@ Local changes are live refreshed for both Ruby and Svelte aside from server-star
 1. Set up config files
    ```sh
    $ cat config/database.example.app-in-docker.yml | sed s/localhost/db/ > config/database.yml
-   $ echo "POSTGRES_PASSWORD=cobra" > .env
-   $ echo "RAILS_ENV=development" >> .env
+   $ cp .env.example .env
    ```
 2. Start the application
    ```sh
@@ -61,8 +60,7 @@ $ docker compose exec app /bin/sh
    ```
 4. Set up database in Docker
    ```sh
-   $ echo "POSTGRES_PASSWORD=cobra" > .env
-   $ echo "RAILS_ENV=development" >> .env
+   $ cp .env.example .env
    $ bin/init-db-from-host
    ```
 
