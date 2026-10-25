@@ -25,6 +25,7 @@ import { Tournament } from "$lib/model/Tournament";
 import { goto } from "$app/navigation";
 
 export const MockPageData: PageProps["data"] = {
+  user: null,
   tournamentTypes: [],
   policy: { update: true, custom_table_numbering: false },
   stage: {

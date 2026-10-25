@@ -1,10 +1,9 @@
-import { authStore } from "$lib/utils/auth.svelte";
 import { betaApi } from "$lib/api/beta";
 import { v1Api } from "$lib/api/v1";
 import type { LayoutLoad } from "./$types";
 
-export const load: LayoutLoad = async ({ params, fetch }) => {
-  const user = await authStore.checkAuth(fetch);
+export const load: LayoutLoad = async ({ params, parent, fetch }) => {
+  const { user } = await parent();
   const tournamentId = parseInt(params.tournamentId);
 
   const tournament = await betaApi.loadTournament(tournamentId, fetch);

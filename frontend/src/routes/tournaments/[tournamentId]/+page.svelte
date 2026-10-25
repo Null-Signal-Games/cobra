@@ -4,17 +4,15 @@
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { page } from "$app/state";
-  import { authStore } from "$lib/utils/auth.svelte";
   import { formatWallClockTime } from "$lib/utils/time";
   import { swissFormatDisplayString } from "$lib/model/Tournament";
-  import { onMount } from "svelte";
   import RegistrationCard from "./RegistrationCard.svelte";
   import Markdown from '@magidoc/plugin-svelte-marked'
   import { qr } from '@svelte-put/qr/svg';
 
   let { data }: PageProps = $props();
 
-  let userId = $state(0);
+  let userId = $derived(data.user?.id ?? 0);
   let tournament = $derived(data.tournamentData.tournament);
   let shortcodeUrl = $derived(tournament.slug ? `${page.url.origin}/${tournament.slug}` : "");
 
@@ -52,11 +50,6 @@
     printWindow.print();
     printWindow.close();
   }
-
-  onMount(async () => {
-    const user = await authStore.checkAuth();
-    userId = user?.id ?? 0;
-  });
 </script>
 
 {#if tournament.id === 0}
@@ -222,7 +215,7 @@
             {/if}
           {/if}
         {:else if !tournament.registration_closed && tournament.self_registration}
-          {#if authStore.isAuthenticated && data.player}
+          {#if data.user && data.player}
             <RegistrationCard /* User is logged in and not registered */
               {userId} {tournament} player={data.player} />
           {:else}

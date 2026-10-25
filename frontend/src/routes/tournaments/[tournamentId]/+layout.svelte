@@ -4,13 +4,12 @@
   import type { LayoutData } from "./$types";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import { resolve } from "$app/paths";
-  import { authStore } from "$lib/utils/auth.svelte";
   import RoundTimer from "./RoundTimer.svelte";
 
   let { children, data }: { children: Snippet; data: LayoutData } = $props();
 
   let tournament = $derived(data.tournamentData.tournament);
-  let canEdit = $derived(tournament.user_id === authStore.user?.id);
+  let canEdit = $derived(tournament.user_id === data.user?.id);
   // TODO: We should also enforce well-formed URLs on the tournament settings page
   let streamUrl = $derived.by(() => {
     // Make sure that we don't present a malformed URL to the user
@@ -54,7 +53,7 @@
     </a>
   </li>
 
-  {#if authStore.user}
+  {#if data.user}
     <li class="nav-item">
       <a
         href={resolve(`/tournaments/${tournament.id}/me`)}

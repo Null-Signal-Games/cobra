@@ -42,6 +42,7 @@ const MockPolicy: TournamentPolicies = {
 };
 
 const MockPageData: PageProps["data"] = {
+  user: null,
   tournamentTypes: [],
   tournamentData: {
     tournament: MockTournament,

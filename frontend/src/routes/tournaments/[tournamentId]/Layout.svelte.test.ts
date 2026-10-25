@@ -22,6 +22,7 @@ describe("Tournament navigation tab strip", () => {
     return render(TournamentLayout, {
       props: {
         data: {
+          user: null,
           tournamentTypes: [],
           tournamentData: {
             tournament,

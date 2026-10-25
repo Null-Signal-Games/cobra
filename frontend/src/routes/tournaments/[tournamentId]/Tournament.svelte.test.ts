@@ -12,7 +12,7 @@ import { Tournament } from "$lib/model/Tournament";
 import type { IdentityNames } from "$lib/model/Identity";
 import { Player } from "$lib/model/Player";
 import type { ComponentProps } from "svelte";
-import { authStore } from "$lib/utils/auth.svelte";
+import { authStore, type AuthUser } from "$lib/utils/auth.svelte";
 import { page } from "$app/state";
 import { betaApi } from "$lib/api/beta";
 
@@ -108,6 +108,8 @@ vi.mock('$app/env/public', () => {
 const user = userEvent.setup();
 
 describe("Tournament", () => {
+  let currentUser: AuthUser | null = null;
+
   const createProps = (
     player: Player
   ): ComponentProps<typeof TournamentPage> => ({
@@ -115,6 +117,7 @@ describe("Tournament", () => {
       tournamentId: MockTournament.id.toString()
     },
     data: {
+      user: currentUser,
       tournamentTypes: [],
       tournamentData: {
         tournament: MockTournament,
@@ -170,7 +173,8 @@ describe("Tournament", () => {
 
   describe("when player is logged out", () => {
     beforeEach(() => {
-      vi.spyOn(authStore, "isAuthenticated", "get").mockReturnValue(false);
+      currentUser = null;
+      authStore.user = null;
     });
 
     describe("when registration is open", () => {
@@ -242,8 +246,9 @@ describe("Tournament", () => {
 
   describe("when player is logged in", () => {
     beforeEach(() => {
-      vi.spyOn(authStore, "user", "get").mockReturnValue({ id: MockPlayerBob.user_id, nrdb_id: 0, nrdb_username: MockPlayerBob.name });
-      vi.spyOn(authStore, "isAuthenticated", "get").mockReturnValue(true);
+      currentUser = { id: MockPlayerBob.user_id, nrdb_id: 0, nrdb_username: MockPlayerBob.name };
+      // RegistrationCard prefills the name from the client-side store after mount.
+      authStore.user = currentUser;
     });
 
     describe("when player is not registered", () => {
