@@ -9,6 +9,10 @@ export interface TournamentSettingsData {
   csrf_token: string;
 }
 
+export interface AbrUploadResponse {
+  abr_code: string;
+}
+
 export interface TournamentCreateResponse {
   id: number;
   name: string;

@@ -52,6 +52,8 @@ Rails.application.routes.draw do
       end
       member do
         get :edit_form
+        get :save_json
+        post :upload_to_abr
       end
       resources :players, only: [] do
         get :standings_data, on: :collection

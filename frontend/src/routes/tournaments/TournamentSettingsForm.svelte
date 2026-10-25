@@ -19,6 +19,8 @@
     submitIcon = "floppy-o",
     errors = {},
     onSubmitCallback,
+    onUploadToAbr,
+    onDownloadJson,
   }: {
     tournament: Tournament;
     options?: TournamentOptions;
@@ -28,6 +30,8 @@
     submitIcon?: string;
     errors?: Errors;
     onSubmitCallback?: (tournament: Tournament) => Promise<boolean>;
+    onUploadToAbr?: (tournament: Tournament) => Promise<boolean>;
+    onDownloadJson?: (tournament: Tournament) => Promise<boolean>;
   } = $props();
 
   // svelte-ignore state_referenced_locally
@@ -357,3 +361,35 @@
   <FontAwesomeIcon icon={submitIcon} />
   {submitLabel}
 </ProgressButton>
+
+{#if onUploadToAbr !== undefined || onDownloadJson !== undefined}
+  <div class="d-flex flex-wrap align-items-center mt-4">
+    {#if onUploadToAbr}
+      <span class="mr-3 mb-2">
+        <ProgressButton
+          css="btn btn-success"
+          inProgressText="Uploading"
+          completeText="Uploaded"
+          onclick={() => onUploadToAbr(tournament)}
+        >
+          <FontAwesomeIcon icon="arrow-circle-up" /> Upload to Always Be Running
+        </ProgressButton>
+      </span>
+    {/if}
+    {#if onDownloadJson}
+      <span class="mr-3 mb-2">
+        <ProgressButton
+          css="btn btn-success"
+          inProgressText="Downloading"
+          completeText="Downloaded"
+          onclick={() => onDownloadJson(tournament)}
+        >
+          <FontAwesomeIcon icon="arrow-circle-down" /> Download as JSON
+        </ProgressButton>
+      </span>
+    {/if}
+    {#if tournament.abr_code}
+      <span class="mb-2">Uploaded to ABR with code {tournament.abr_code}</span>
+    {/if}
+  </div>
+{/if}

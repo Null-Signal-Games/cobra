@@ -18,6 +18,54 @@ RSpec.describe TournamentsController do
       )
       expect(response.body).to eq('{"some":"data"}')
     end
+
+    it 'is available from the classic api' do
+      get save_json_api_classic_tournament_path(tournament)
+
+      expect(response.body).to eq('{"some":"data"}')
+    end
+  end
+
+  describe '#upload_to_abr' do
+    before { sign_in tournament.user }
+
+    it 'stores the ABR code and returns it as json' do
+      allow(AbrUpload).to receive(:upload!).and_return({ code: 'abc123' }.with_indifferent_access)
+
+      post upload_to_abr_api_classic_tournament_path(tournament), as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to eq('abr_code' => 'abc123')
+      expect(tournament.reload.abr_code).to eq('abc123')
+    end
+
+    it 'returns the upload error when ABR rejects the upload' do
+      allow(AbrUpload).to receive(:upload!)
+        .and_return({ error: 'Always Be Running rejected the upload (HTTP 401).' }.with_indifferent_access)
+
+      post upload_to_abr_api_classic_tournament_path(tournament), as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body).to eq('error' => 'Always Be Running rejected the upload (HTTP 401).')
+    end
+
+    it 'returns an error when ABR does not return a code' do
+      allow(AbrUpload).to receive(:upload!).and_return({}.with_indifferent_access)
+
+      post upload_to_abr_api_classic_tournament_path(tournament), as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body).to eq('error' => 'Upload to Always Be Running failed.')
+      expect(tournament.reload.abr_code).to be_nil
+    end
+
+    it 'redirects to the edit page for html requests' do
+      allow(AbrUpload).to receive(:upload!).and_return({ code: 'abc123' }.with_indifferent_access)
+
+      post upload_to_abr_tournament_path(tournament)
+
+      expect(response).to redirect_to(edit_tournament_path(tournament))
+    end
   end
 
   describe '#cut' do

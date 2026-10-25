@@ -1,6 +1,7 @@
 import { api as defaultApi, type ApiBase } from "$lib/api/apiBase";
 import type { PairingsData } from "$lib/api/betaTypes";
 import type {
+  AbrUploadResponse,
   DemoTournamentSettings,
   DemoTournamentSettingsData,
   TournamentCreateResponse,
@@ -105,6 +106,20 @@ export class ClassicApi {
   async updateTournamentSettings(tournament: Tournament): Promise<boolean> {
     await this.api.patchOrThrow(`/api/classic/tournaments/${tournament.id}`, { tournament });
     return true;
+  }
+
+  loadNrtmJson(tournamentId: number, altFetch = fetch): Promise<unknown> {
+    return this.api.getOrThrow<unknown>(
+      `/api/classic/tournaments/${tournamentId}/save_json`,
+      altFetch,
+      "Failed to load tournament results",
+    );
+  }
+
+  uploadToAbr(tournamentId: number): Promise<AbrUploadResponse> {
+    return this.api.postOrThrow<AbrUploadResponse>(
+      `/api/classic/tournaments/${tournamentId}/upload_to_abr`,
+    );
   }
 
   saveStage(tournamentId: number, stage: Stage, altFetch = fetch): Promise<SaveStageResponse> {
