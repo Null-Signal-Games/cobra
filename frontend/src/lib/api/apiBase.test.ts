@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { authStore } from "$lib/utils/auth.svelte";
 import { ApiBase } from "$lib/api/apiBase";
 import { ok, err, type StatusOr } from "$lib/api/statusOr";
@@ -20,7 +20,13 @@ describe("ApiBase with StatusOr", () => {
     return { url, requestOptions, headers, body };
   }
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   beforeEach(() => {
+    // globalMessages are only written in the browser.
+    vi.stubGlobal("window", {});
     vi.resetAllMocks();
     vi.spyOn(authStore, "getCsrfToken").mockResolvedValue("mock-csrf-token");
     globalMessages.warnings = [];

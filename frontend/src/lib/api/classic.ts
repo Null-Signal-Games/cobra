@@ -13,7 +13,7 @@ import type {
 import type { BracketData } from "$lib/model/Bracket";
 import type { StandingsData } from "$lib/model/Standings";
 import type { Tournament } from "$lib/model/Tournament";
-import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+import { addError } from "$lib/utils/GlobalMessageState.svelte";
 
 export class ClassicApi {
   constructor(private api: ApiBase = defaultApi) {}
@@ -38,7 +38,7 @@ export class ClassicApi {
     );
 
     if (!res.ok) {
-      globalMessages.errors.push(`Error loading pairings for user ${userId}.`);
+      addError(`Error loading pairings for user ${userId}.`);
       return null;
     }
 

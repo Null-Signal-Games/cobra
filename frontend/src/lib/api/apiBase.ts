@@ -1,7 +1,7 @@
 import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
 import type { StatusOr } from "$lib/api/statusOr";
 import { ValidationError, type Errors } from "$lib/utils/errors";
-import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+import { setWarnings } from "$lib/utils/GlobalMessageState.svelte";
 
 export interface RequestOptions {
   altFetch?: typeof fetch;
@@ -157,9 +157,9 @@ export class ApiBase {
       if (typeof data === "object" && data !== null) {
         const payload = data as { warnings?: unknown; warning?: unknown };
         if (Array.isArray(payload.warnings)) {
-          globalMessages.warnings = payload.warnings as string[];
+          setWarnings(payload.warnings as string[]);
         } else if (typeof payload.warning === "string") {
-          globalMessages.warnings = payload.warning ? [payload.warning] : [];
+          setWarnings(payload.warning ? [payload.warning] : []);
         }
       }
       return {

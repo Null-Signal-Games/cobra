@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ClassicApi, classicApi } from "./classic";
 import { ApiBase } from "./apiBase";
 import { Tournament } from "$lib/model/Tournament";
@@ -22,7 +22,13 @@ describe("ClassicApi", () => {
     return { url, requestOptions, headers, body };
   }
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   beforeEach(() => {
+    // globalMessages are only written in the browser.
+    vi.stubGlobal("window", {});
     vi.resetAllMocks();
     globalMessages.errors = [];
     globalMessages.warnings = [];
