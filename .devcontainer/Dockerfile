@@ -20,6 +20,12 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
        libmanette-0.2-0 libgles2-mesa \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Install nginx (and envsubst) to front Rails and Vite with deploy/nginx.conf; see bin/dev-stack
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends nginx gettext-base \
+    && rm -f /etc/nginx/sites-enabled/default \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Pre-install matching Bundler version and Ruby LSP
 RUN gem install "bundler:>= 4.0.9" ruby-lsp
 

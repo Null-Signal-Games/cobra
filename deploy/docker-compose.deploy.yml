@@ -1,0 +1,39 @@
+# Production deployment overlay for nginx-proxy and acme-companion
+x-logging: &default-logging
+  driver: "local"
+  options:
+    max-size: "100m"
+    max-file: "7"
+    compress: "true"
+
+services:
+  gateway:
+    logging: *default-logging
+    environment:
+      VIRTUAL_HOST: ${COBRA_DOMAIN:-tournaments.nullsignal.games}
+      VIRTUAL_PORT: "80"
+      LETSENCRYPT_HOST: ${COBRA_DOMAIN:-tournaments.nullsignal.games}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:-webdev-team@nullsignal.games}
+    networks:
+      - null_signal
+      - backend
+
+  svelte:
+    logging: *default-logging
+    networks:
+      - backend
+
+  rails:
+    logging: *default-logging
+    networks:
+      - backend
+
+  db:
+    logging: *default-logging
+    networks:
+      - backend
+
+networks:
+  backend:
+  null_signal:
+    external: true

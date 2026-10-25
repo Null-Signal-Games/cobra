@@ -1,0 +1,80 @@
+services:
+  gateway:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/default.conf.template:ro
+    environment:
+      - COBRA_RAILS_UPSTREAM=rails:3000
+      - COBRA_SVELTE_UPSTREAM=svelte:3000
+    depends_on:
+      - rails
+      - svelte
+    networks:
+      - backend
+
+  svelte:
+    image: registry.digitalocean.com/nsgcr/cobra-frontend:${FRONTEND_VERSION:-latest}
+    build:
+      context: ../frontend
+      dockerfile: ../deploy/Dockerfile.frontend
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ORIGIN=http://localhost:3000
+      - SERVER_COBRA_API_ENDPOINT=http://gateway
+    networks:
+      - backend
+
+  rails:
+    image: registry.digitalocean.com/nsgcr/cobra:${COBRA_SERVER_VERSION:-latest}
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    env_file:
+      - path: ../.env
+        required: false
+    environment:
+      - RAILS_ENV=${RAILS_ENV:-development}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-cobra}
+    depends_on:
+      - db
+    restart: unless-stopped
+    expose:
+      - "3000"
+    volumes:
+      - ../config/database.yml:/var/www/cobra/config/database.yml
+      - ../log:/var/www/cobra/log
+      - cobra-tmp:/var/www/cobra/tmp
+    networks:
+      - backend
+
+  db:
+    image: postgres:14.5-alpine
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-cobra}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-cobra}
+    env_file:
+      - path: ../.env
+        required: false
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - cobra-postgres:/var/lib/postgresql/data
+      - ../postgres-docker-init.sql:/docker-entrypoint-initdb.d/postgres-docker-init.sql
+    networks:
+      - backend
+
+volumes:
+  cobra-postgres:
+  cobra-tmp:
+
+networks:
+  backend:
