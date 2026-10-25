@@ -41,6 +41,10 @@ export default defineConfig({
         extends: "./vite.config.ts",
         test: {
           name: "client",
+          // Limit the number of workers to avoid exhausting system resources in the devcontainer.
+          maxWorkers: 4,
+          // Projects with different maxWorkers must run in separate groups.
+          sequence: { groupOrder: 1 },
           browser: {
             enabled: true,
             provider: playwright({
@@ -60,6 +64,7 @@ export default defineConfig({
         test: {
           name: "server",
           environment: "node",
+          sequence: { groupOrder: 0 },
           include: ["src/**/*.{test,spec}.{js,ts}"],
           exclude: ["src/**/*.svelte.{test,spec}.{js,ts}"],
         },

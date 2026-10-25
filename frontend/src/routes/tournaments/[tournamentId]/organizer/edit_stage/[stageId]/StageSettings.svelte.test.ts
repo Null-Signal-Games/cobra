@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/svelte";
+import { cleanup, render, screen, waitFor } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
 import StageSettings from "./StageSettings.svelte";
 import TableRangeEdit from "./TableRangeEdit.svelte";
@@ -263,7 +263,10 @@ describe("StageSettings Page Component", () => {
     const saveBtn = screen.getByRole("button", { name: "Save stage" });
     await user.click(saveBtn);
 
-    expect(onSave).toHaveBeenCalledOnce();
+    // submitStage awaits the CSRF token, fetch, and response parsing before calling onSave.
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledOnce();
+    });
     expect(fetchSpy).toHaveBeenCalledOnce();
     const { body } = getFetchCall(fetchSpy);
     const stageBody = body.stage as Stage;
