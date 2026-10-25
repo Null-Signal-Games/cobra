@@ -8,40 +8,92 @@ describe("authStore (SvelteKit frontend)", () => {
     authStore.isLoading = true;
   });
 
-  it("should populate user on HTTP 200 response", async () => {
-    const mockUserResponse = {
-      data: {
-        id: "42",
-        attributes: {
-          nrdb_id: 12345,
-          nrdb_username: "runner_one",
-        },
-      },
-    };
-
-    vi.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify(mockUserResponse), { status: 200 }),
-    );
-
-    const user = await authStore.checkAuth();
-
-    expect(user).toEqual({
-      id: 42,
-      nrdb_id: 12345,
-      nrdb_username: "runner_one",
+  describe("in the browser", () => {
+    beforeEach(() => {
+      // The user is only cached in the browser.
+      vi.stubGlobal("window", {});
     });
-    expect(authStore.isAuthenticated).toBe(true);
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("should populate user on HTTP 200 response", async () => {
+      const mockUserResponse = {
+        data: {
+          id: "42",
+          attributes: {
+            nrdb_id: 12345,
+            nrdb_username: "runner_one",
+          },
+        },
+      };
+
+      vi.spyOn(global, "fetch").mockResolvedValueOnce(
+        new Response(JSON.stringify(mockUserResponse), { status: 200 }),
+      );
+
+      const user = await authStore.checkAuth();
+
+      expect(user).toEqual({
+        id: 42,
+        nrdb_id: 12345,
+        nrdb_username: "runner_one",
+      });
+      expect(authStore.isAuthenticated).toBe(true);
+    });
+
+    it("should set user to null on HTTP 401 response", async () => {
+      vi.spyOn(global, "fetch").mockResolvedValueOnce(
+        new Response(JSON.stringify({ errors: [{ status: "401" }] }), { status: 401 }),
+      );
+
+      const user = await authStore.checkAuth();
+
+      expect(user).toBeNull();
+      expect(authStore.isAuthenticated).toBe(false);
+    });
   });
 
-  it("should set user to null on HTTP 401 response", async () => {
-    vi.spyOn(global, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify({ errors: [{ status: "401" }] }), { status: 401 }),
-    );
+  describe("on the server", () => {
+    beforeEach(() => {
+      vi.stubGlobal("window", undefined);
+    });
 
-    const user = await authStore.checkAuth();
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
 
-    expect(user).toBeNull();
-    expect(authStore.isAuthenticated).toBe(false);
+    it("returns the user without storing it in the shared store", async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              data: { id: "7", attributes: { nrdb_id: 1, nrdb_username: "corp" } },
+            }),
+            { status: 200 },
+          ),
+        );
+
+      const user = await authStore.checkAuth(mockFetch);
+
+      expect(user).toEqual({ id: 7, nrdb_id: 1, nrdb_username: "corp" });
+      expect(authStore.user).toBeNull();
+      expect(authStore.isAuthenticated).toBe(false);
+    });
+
+    it("ignores a user already in the store", async () => {
+      authStore.user = { id: 1, nrdb_id: 1, nrdb_username: "someone_else" };
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(new Response(JSON.stringify({}), { status: 401 }));
+
+      const user = await authStore.checkAuth(mockFetch);
+
+      expect(user).toBeNull();
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("getCsrfToken", () => {
