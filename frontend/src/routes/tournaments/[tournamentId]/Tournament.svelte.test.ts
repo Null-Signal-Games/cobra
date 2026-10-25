@@ -23,8 +23,9 @@ export const MockTournament = new Tournament({
   user_id: 1,
   tournament_organizer: "Alice",
   date: "2026-04-21",
-  registration_starts: "2026-04-21T10:00:00",
-  tournament_starts: "2026-04-21T11:00:00",
+  registration_starts: "10:00",
+  tournament_starts: "11:00",
+  time_zone: "Central Time (US & Canada)",
   description: "This is a test tournament.",
   official_prize_kit_id: 1,
   official_prize_kit_name: "2026 Test Tournament Kit",
@@ -191,7 +192,9 @@ describe("Tournament", () => {
         expect(screen.getByLabelText("first round time")).toHaveTextContent(
           "11:00 AM",
         );
-        expect(screen.getByLabelText("time zone")).toHaveTextContent("UTC");
+        expect(screen.getByLabelText("time zone")).toHaveTextContent(
+          "Central Time (US & Canada)",
+        );
         expect(screen.getByLabelText("tournament organiser")).toHaveTextContent(
           "Alice",
         );

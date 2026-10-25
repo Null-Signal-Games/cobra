@@ -5,6 +5,7 @@
   import type { PageProps } from "./$types";
   import { page } from "$app/state";
   import { authStore } from "$lib/utils/auth.svelte";
+  import { formatWallClockTime } from "$lib/utils/time";
   import { swissFormatDisplayString } from "$lib/model/Tournament";
   import { onMount } from "svelte";
   import RegistrationCard from "./RegistrationCard.svelte";
@@ -105,26 +106,20 @@
               {#if tournament.registration_starts}
                 <div class="mr-4" aria-label="registration time">
                   <div class="small text-secondary">Registration:</div>
-                  {new Date(tournament.registration_starts).toLocaleTimeString(
-                    navigator.languages,
-                    { hour: "2-digit", minute: "2-digit" },
-                  )}
+                  {formatWallClockTime(tournament.registration_starts)}
                 </div>
               {/if}
 
               {#if tournament.tournament_starts}
                 <div class="mr-4" aria-label="first round time">
                   <div class="small text-secondary">First Round:</div>
-                  {new Date(tournament.tournament_starts).toLocaleTimeString(
-                    navigator.languages,
-                    { hour: "2-digit", minute: "2-digit" },
-                  )}
+                  {formatWallClockTime(tournament.tournament_starts)}
                 </div>
               {/if}
 
-              {#if tournament.registration_starts ?? tournament.tournament_starts}
+              {#if (tournament.registration_starts ?? tournament.tournament_starts) && tournament.time_zone}
                 <div style="align-self: flex-end" aria-label="time zone">
-                  {Intl.DateTimeFormat().resolvedOptions().timeZone}
+                  {tournament.time_zone}
                 </div>
               {/if}
             </div>
