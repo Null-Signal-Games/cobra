@@ -33,6 +33,7 @@ vi.mock("$lib/api/beta", () => ({
 }));
 
 const MockPageData: PageProps["data"] = {
+  user: null,
   tournamentTypes: [],
   tournamentData: {
     tournament: MockTournament,

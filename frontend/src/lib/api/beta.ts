@@ -7,7 +7,7 @@ import type { RoundTimer } from "$lib/model/Round";
 import type { ScoreReport } from "$lib/model/ScoreReport";
 import type { Stats, CutStats } from "$lib/model/Stats";
 import type { Tournament } from "$lib/model/Tournament";
-import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+import { addError, setErrors } from "$lib/utils/GlobalMessageState.svelte";
 
 interface SavePlayerResponse {
   player: Player;
@@ -45,11 +45,11 @@ export class BetaApi {
       : await this.api.patch<SavePlayerResponse>(path, body, { altFetch });
 
     if (!res.ok) {
-      globalMessages.errors = [res.error.message];
+      setErrors([res.error.message]);
       return player;
     }
 
-    globalMessages.errors = res.data.errors ?? [];
+    setErrors(res.data.errors ?? []);
     return res.data.player;
   }
 
@@ -126,7 +126,7 @@ export class BetaApi {
   async saveTournament(tournament: Tournament): Promise<boolean> {
     const res = await this.api.patch(`/beta/tournaments/${tournament.id}`, tournament);
     if (!res.ok) {
-      globalMessages.errors = [res.error.message];
+      setErrors([res.error.message]);
       return false;
     }
     return true;
@@ -169,7 +169,7 @@ export class BetaApi {
     );
 
     if (!res.ok) {
-      globalMessages.errors.push("Failed to report score.");
+      addError("Failed to report score.");
       return false;
     }
 
@@ -237,11 +237,11 @@ export class BetaApi {
 
     if (!res.ok) {
       if (res.status === 422) {
-        globalMessages.errors.push(res.error.message);
+        addError(res.error.message);
       } else if (res.status === 0) {
-        globalMessages.errors.push(`Failed to delete ${entityName}: ${res.error.message}`);
+        addError(`Failed to delete ${entityName}: ${res.error.message}`);
       } else {
-        globalMessages.errors.push(`Failed to delete ${entityName}.`);
+        addError(`Failed to delete ${entityName}.`);
       }
       return false;
     }

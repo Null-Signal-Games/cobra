@@ -1,7 +1,7 @@
 import type { Card, CardSearchOption, Deck, NrdbDeck } from "$lib/model/Deck";
 import type { Printing, PrintingsResponse } from "$lib/api/v1ApiTypes";
 import { quoteCsvValue } from "./files";
-import { globalMessages } from "./GlobalMessageState.svelte";
+import { addError } from "./GlobalMessageState.svelte";
 
 const printings = $state(new Map<string, Printing>());
 
@@ -168,12 +168,12 @@ export async function loadPrintings(query?: string, altFetch = fetch) {
       return (await response.json()) as PrintingsResponse;
     }
 
-    globalMessages.errors.push(
+    addError(
       `Failed to load printings: ${response.statusText}`,
     );
   } catch (e) {
     const err = e as Error;
-    globalMessages.errors.push(`Failed to load printings: ${err.message}`);
+    addError(`Failed to load printings: ${err.message}`);
   }
 
   return null;

@@ -11,7 +11,7 @@ import type {
 import type { IdentityNames } from "$lib/model/Identity";
 import { Player } from "$lib/model/Player";
 import { v1Adapter } from "$lib/model/v1Adapter";
-import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+import { addError } from "$lib/utils/GlobalMessageState.svelte";
 
 const JSON_API_HEADERS = {
   Accept: "application/vnd.api+json",
@@ -44,7 +44,7 @@ export class V1Api {
     });
 
     if (!res.ok) {
-      globalMessages.errors.push(`Failed to load tournaments: ${res.error.message}`);
+      addError(`Failed to load tournaments: ${res.error.message}`);
       return { data: [] };
     }
 
@@ -72,7 +72,7 @@ export class V1Api {
     });
 
     if (!res.ok) {
-      globalMessages.errors.push(`Failed to load tournament types: ${res.error.message}`);
+      addError(`Failed to load tournament types: ${res.error.message}`);
       return [];
     }
 
@@ -86,7 +86,7 @@ export class V1Api {
     });
 
     if (!res.ok) {
-      globalMessages.errors.push(`Failed to load user tournaments: ${res.error.message}`);
+      addError(`Failed to load user tournaments: ${res.error.message}`);
       return { data: [] };
     }
 
@@ -113,7 +113,7 @@ export class V1Api {
     });
 
     if (!res.ok) {
-      globalMessages.errors.push(`Failed to load identities: ${res.error.message}`);
+      addError(`Failed to load identities: ${res.error.message}`);
       return [];
     }
 
@@ -149,7 +149,7 @@ export class V1Api {
     });
 
     if (!res.ok) {
-      globalMessages.errors.push(`Failed to load players: ${res.error.message}`);
+      addError(`Failed to load players: ${res.error.message}`);
       return { data: [] };
     }
 

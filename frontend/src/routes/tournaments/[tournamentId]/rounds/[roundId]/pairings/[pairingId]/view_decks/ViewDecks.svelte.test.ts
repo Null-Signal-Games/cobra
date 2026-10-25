@@ -125,6 +125,7 @@ const MockPlayerBobRunnerDeck: Deck = {
 };
 
 const MockPageData: PageProps["data"] = {
+  user: null,
   tournamentTypes: [],
   tournamentData: {
     tournament: new Tournament({ id: 1 }),

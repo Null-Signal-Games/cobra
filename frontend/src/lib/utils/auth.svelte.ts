@@ -10,6 +10,23 @@ export interface AuthUser {
 
 const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
 
+async function loadUser(altFetch: typeof fetch): Promise<AuthUser | null> {
+  try {
+    const response = await v1Api.loadCurrentUser(altFetch);
+    if (!response) {
+      return null;
+    }
+
+    return {
+      id: Number(response.data.id),
+      nrdb_id: response.data.attributes.nrdb_id,
+      nrdb_username: response.data.attributes.nrdb_username,
+    };
+  } catch {
+    return null;
+  }
+}
+
 class AuthStore {
   user = $state<AuthUser | null>(null);
   isLoading = $state<boolean>(true);
@@ -24,25 +41,19 @@ class AuthStore {
   }
 
   async checkAuth(altFetch = fetch): Promise<AuthUser | null> {
+    // Never read or write this state on the server side.
+    // Server-side code should get the current user from load data (see routes/+layout.ts).
+    if (typeof window === "undefined") {
+      return loadUser(altFetch);
+    }
+
     if (this.isAuthenticated) {
       return this.user;
     }
 
     this.isLoading = true;
     try {
-      const response = await v1Api.loadCurrentUser(altFetch);
-
-      if (response) {
-        this.user = {
-          id: Number(response.data.id),
-          nrdb_id: response.data.attributes.nrdb_id,
-          nrdb_username: response.data.attributes.nrdb_username,
-        };
-      } else {
-        this.user = null;
-      }
-    } catch {
-      this.user = null;
+      this.user = await loadUser(altFetch);
     } finally {
       this.isLoading = false;
     }

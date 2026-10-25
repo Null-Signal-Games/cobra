@@ -55,6 +55,7 @@ describe("TournamentCreation", () => {
   ): ComponentProps<typeof TournamentCreation> => ({
     params: {},
     data: {
+      user: null,
       tournamentTypes: [],
       tournamentSettings: mockTournamentData,
       ...dataPartial,

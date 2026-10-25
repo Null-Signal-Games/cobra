@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { V1Api, v1Api } from "$lib/api/v1";
 import { ApiBase } from "$lib/api/apiBase";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
@@ -14,7 +14,13 @@ describe("V1Api", () => {
     return { url, requestOptions, headers };
   }
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   beforeEach(() => {
+    // globalMessages are only written in the browser.
+    vi.stubGlobal("window", {});
     vi.resetAllMocks();
     globalMessages.errors = [];
     const apiBase = new ApiBase("https://tournaments.nullsignal.games", mockFetch);
