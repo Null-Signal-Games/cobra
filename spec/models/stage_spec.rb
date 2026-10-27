@@ -37,7 +37,7 @@ RSpec.describe Stage do
 
     it 'returns standings object' do
       expect(stage.standings).to eq(standings)
-      expect(Standings).to have_received(:new).with(stage)
+      expect(Standings).to have_received(:new).with(stage, random: nil)
     end
   end
 

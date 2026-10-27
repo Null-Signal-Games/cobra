@@ -161,4 +161,27 @@ RSpec.describe SosCalculator do
       end
     end
   end
+
+  describe 'exact ties' do
+    # With no completed rounds every player is tied on all tiebreakers.
+    def order(random = nil)
+      described_class.calculate!(stage, random:).map(&:player)
+    end
+
+    it 'orders ties by a shuffle of the given random' do
+      expected = [snap, crackle, pop, other].sort_by(&:id).shuffle(random: Random.new(7))
+
+      expect(order(Random.new(7))).to eq(expected)
+    end
+
+    it 'does not always favour the earliest registered player' do
+      firsts = (0...10).map { |seed| order(Random.new(seed)).first }
+
+      expect(firsts.uniq.size).to be > 1
+    end
+
+    it 'seeds the shuffle from the stage by default so tie order is stable across page loads' do
+      expect(order).to eq(order(Random.new(stage.id)))
+    end
+  end
 end

@@ -149,7 +149,8 @@ RSpec.describe RoundsController do
     describe 'during cut before any results' do
       before do
         Pairer.new(tournament.new_round!, Random.new(0)).pair!
-        tournament.cut_to!(:single_elim, 3)
+        # All three players are tied (round 1 is incomplete), so seed the tiebreak shuffle.
+        tournament.cut_to!(:single_elim, 3, random: Random.new(0))
         Pairer.new(tournament.new_round!, Random.new(0)).pair!
       end
 
@@ -202,7 +203,7 @@ RSpec.describe RoundsController do
                            'pairings' => [
                              { 'intentional_draw' => false,
                                'player1' => player_with_no_ids('Bob', 'he/him', seed: 2),
-                               'player2' => player_with_no_ids('Charlie', 'she/her', seed: 3),
+                               'player2' => player_with_no_ids('Alice', 'she/her', seed: 3),
                                'policy' => { 'self_report' => false },
                                'ui_metadata' => { 'row_highlighted' => false },
                                'reported' => false,
@@ -269,7 +270,7 @@ RSpec.describe RoundsController do
                            'pairings' => [
                              { 'intentional_draw' => false,
                                'player1' => player_with_no_ids('Bob', 'he/him', seed: 2),
-                               'player2' => player_with_no_ids('Charlie', 'she/her', seed: 3),
+                               'player2' => player_with_no_ids('Alice', 'she/her', seed: 3),
                                'policy' => { 'self_report' => false },
                                'ui_metadata' => { 'row_highlighted' => false },
                                'reported' => false,

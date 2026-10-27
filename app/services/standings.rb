@@ -3,16 +3,17 @@
 class Standings # rubocop:disable Style/Documentation
   include Enumerable
 
-  attr_reader :stage
+  attr_reader :stage, :random
 
   delegate :each, to: :players
 
-  def initialize(stage)
+  def initialize(stage, random: nil)
     @stage = stage
+    @random = random
   end
 
   def players
-    @players ||= strategy.new(stage).calculate!
+    @players ||= strategy.new(stage, random:).calculate!
   end
 
   def top(number)
