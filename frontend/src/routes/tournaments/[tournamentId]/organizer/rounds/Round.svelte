@@ -99,7 +99,7 @@
         </a>
         <a
           class="btn btn-primary"
-          href={resolve(`/tournaments/${tournament.id}/organizer/pairings_by_name/${round.id}`)}
+          href={resolve(`/tournaments/${tournament.id}/organizer/rounds/${round.id}/pairings/by_name`)}
         >
           <FontAwesomeIcon icon="list-ul" /> Pairings by name
         </a>
