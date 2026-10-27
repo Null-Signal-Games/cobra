@@ -9,6 +9,10 @@ services:
       - bundle-data:/home/vscode/.bundle
       - command-history:/commandhistory
 
+    # Run tini as PID 1 so orphaned processes (e.g. Playwright browsers) are reaped
+    # instead of accumulating as zombies, and so `docker stop` signals are forwarded.
+    init: true
+
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
 
