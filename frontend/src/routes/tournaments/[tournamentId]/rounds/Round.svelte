@@ -46,7 +46,7 @@
       <div aria-label="round controls">
         <a
           class="btn btn-primary"
-          href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings`)}
+          href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings/by_name`)}
         >
           <FontAwesomeIcon icon="list-ul" /> Pairings by name
         </a>
