@@ -53,7 +53,8 @@ export const MockPageData: PageProps["data"] = {
     csrf_token: ""
   },
   timer: MockRound1Timer,
-  player: null
+  player: null,
+  stages: []
 };
 
 vi.mock("$lib/api/beta", () => ({

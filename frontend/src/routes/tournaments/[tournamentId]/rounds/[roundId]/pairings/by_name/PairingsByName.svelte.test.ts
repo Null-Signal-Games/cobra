@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import PairingsByNamePage from "./+page.svelte";
-import { formatPlayerDisplay, generatePairingsByName } from "./pairings_by_name";
+import { formatPlayerDisplay, generatePairingsByName } from "$lib/model/Pairing";
 import { Player } from "$lib/model/Player";
 import type { Pairing } from "$lib/model/Pairing";
 import type { Round } from "$lib/model/Round";
@@ -202,7 +202,7 @@ describe("PairingsByName Page Component", () => {
     const backLink = screen.getByRole("link", { name: /Back to pairings/i });
     expect(backLink).toBeDefined();
     expect(backLink.getAttribute("href")).toBe(
-      "/tournaments/7/organizer/rounds",
+      "/tournaments/7/rounds",
     );
 
     const rows = screen.getAllByRole("row");

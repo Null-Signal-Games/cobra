@@ -2,7 +2,7 @@
   import { resolve } from "$app/paths";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import type { PageProps } from "./$types";
-  import { generatePairingsByName } from "./pairings_by_name";
+  import { generatePairingsByName } from "$lib/model/Pairing";
 
   let { data, params }: PageProps = $props();
 
