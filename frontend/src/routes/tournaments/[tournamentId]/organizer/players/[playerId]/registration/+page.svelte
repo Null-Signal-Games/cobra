@@ -21,6 +21,9 @@
 
   function toggleEditing() {
     editing = !editing;
+    
+    corpDeck = $state.snapshot(data.corpDeck);
+    runnerDeck = $state.snapshot(data.runnerDeck);
   }
 
   async function save() {
@@ -190,21 +193,25 @@
     <!-- Deck display -->
     <div class="row">
       <div class="col-md-6">
-        <DeckDisplay
-          bind:deck={corpDeck}
-          originalDeck={data.corpDeck}
-          title="Corp Deck"
-          editMode={editing}
-        />
+        {#key corpDeck}
+          <DeckDisplay
+            bind:deck={corpDeck}
+            originalDeck={data.corpDeck}
+            title="Corp Deck"
+            editMode={editing}
+          />
+        {/key}
       </div>
   
       <div class="col-md-6">
-        <DeckDisplay
-          bind:deck={runnerDeck}
-          originalDeck={data.runnerDeck}
-          title="Runner Deck"
-          editMode={editing}
-        />
+        {#key runnerDeck}
+          <DeckDisplay
+            bind:deck={runnerDeck}
+            originalDeck={data.runnerDeck}
+            title="Runner Deck"
+            editMode={editing}
+          />
+        {/key}
       </div>
   
       {#if editing}
