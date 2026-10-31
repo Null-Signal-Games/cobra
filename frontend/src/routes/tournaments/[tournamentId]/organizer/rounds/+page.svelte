@@ -173,14 +173,6 @@
   {:else}
     <!-- Upper controls -->
     <div>
-      <ProgressButton
-        css="btn btn-success"
-        inProgressText="Refreshing"
-        completeText="Refreshed"
-        onclick={refreshData}
-      >
-        <FontAwesomeIcon icon="rotate" /> Refresh
-      </ProgressButton>
       {#if data.stages.every((s) => s.rounds.length === 0)}
         <a
           href={resolve(`/tournaments/${params.tournamentId}/player_meeting?back_to=pairings`)}
@@ -189,6 +181,14 @@
           <FontAwesomeIcon icon="list-ul" /> Player meeting
         </a>
       {:else}
+        <ProgressButton
+          css="btn btn-success"
+          inProgressText="Refreshing"
+          completeText="Refreshed"
+          onclick={refreshData}
+        >
+          <FontAwesomeIcon icon="rotate" /> Refresh
+        </ProgressButton>
         <button
           type="button"
           class="btn btn-primary"
