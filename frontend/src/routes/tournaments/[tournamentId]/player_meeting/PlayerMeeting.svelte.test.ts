@@ -2,9 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import PlayerMeetingPage from "./+page.svelte";
 import { createPlayerMeetingPairings } from "./pairings";
-import { Player } from "$lib/model/Player";
-import { Tournament } from "$lib/model/Tournament";
 import { getBackDetails } from "$lib/utils/navigation";
+import { Player } from "$lib/model/Player";
 
 function createPlayer(name: string): Player {
   const p = new Player();
@@ -101,27 +100,13 @@ describe("PlayerMeeting Page Component", () => {
     vi.restoreAllMocks();
   });
 
-  const mockTournament = new Tournament({
-    id: 14,
-    name: "Meeting Tournament",
-    slug: "MEET14",
-  });
-
-  const mockPlayersData = {
-    tournament: mockTournament,
-    tournamentPolicies: {
-      update: true,
-      custom_table_numbering: false,
-    },
-    activePlayers: [
-      createPlayer("Jack"),
-      createPlayer("Jill"),
-      createPlayer("Snap"),
-      createPlayer("Crackle"),
-      createPlayer("Pop"),
-    ],
-    droppedPlayers: [],
-  };
+  const mockPlayersData = [
+    createPlayer("Jack"),
+    createPlayer("Jill"),
+    createPlayer("Snap"),
+    createPlayer("Crackle"),
+    createPlayer("Pop"),
+  ];
 
   it("renders heading and table with correct headers and alphabetical pairings", () => {
     render(PlayerMeetingPage, {
