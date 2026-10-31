@@ -362,4 +362,8 @@
     background-color: var(--cobra-surface);
     border-color: var(--cobra-border) !important;
   }
+  .bracket-embedded::-webkit-scrollbar:vertical {
+    display: none;
+    width: 0;
+  }
 </style>
