@@ -11,8 +11,14 @@
   import { invalidateAll } from "$app/navigation";
   import { betaApi } from "$lib/api/beta";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+  import ProgressButton from "$lib/components/ProgressButton.svelte";
 
   let { data, params }: PageProps = $props();
+
+  async function refreshData() {
+    await invalidateAll();
+    return true;
+  }
 
   async function addStage(cutSingleElim?: boolean, cutCount?: number) {
     const success = await betaApi.createStage(data.tournamentData.tournament.id, cutSingleElim, cutCount);
@@ -167,6 +173,14 @@
   {:else}
     <!-- Upper controls -->
     <div>
+      <ProgressButton
+        css="btn btn-success"
+        inProgressText="Refreshing"
+        completeText="Refreshed"
+        onclick={refreshData}
+      >
+        <FontAwesomeIcon icon="rotate" /> Refresh
+      </ProgressButton>
       {#if data.stages.every((s) => s.rounds.length === 0)}
         <a
           href={resolve(`/tournaments/${params.tournamentId}/player_meeting?back_to=pairings`)}
