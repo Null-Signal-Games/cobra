@@ -87,6 +87,40 @@ describe("V1Api", () => {
     });
   });
 
+  describe("loadTournament", () => {
+    it("fetches a single tournament with JSON:API headers", async () => {
+      const mockResponse = {
+        data: {
+          id: "29",
+          type: "tournaments",
+          attributes: { name: "GNK", format_name: "Standard", has_elimination_stage: true },
+        },
+      };
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { "Content-Type": "application/vnd.api+json" },
+        }),
+      );
+
+      const result = await api.loadTournament(29, mockFetch);
+
+      expect(result.tournament.id).toBe(29);
+      expect(result.tournament.name).toBe("GNK");
+      expect(result.tournament.format_name).toBe("Standard");
+      expect(result.tournament.has_elimination_stage).toBe(true);
+      const { url, headers } = getFetchCall();
+      expect(url).toContain("/api/v1/public/tournaments/29");
+      expect(headers.Accept).toBe("application/vnd.api+json");
+    });
+
+    it("throws on failure", async () => {
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 404, statusText: "Not Found" }));
+
+      await expect(api.loadTournament(29, mockFetch)).rejects.toThrow();
+    });
+  });
+
   describe("loadTournamentBySlug", () => {
     it("requests tournaments filtered by slug", async () => {
       const mockResponse = {
