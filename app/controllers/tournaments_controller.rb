@@ -55,7 +55,7 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
       end
       format.json do
         headers['Access-Control-Allow-Origin'] = '*'
-        render json: NrtmJson.new(@tournament, root_url).data(tournament_url(@tournament.slug, @request))
+        render json: NrtmJson.new(@tournament, root_url).data(tournament_shortlink_url(slug: @tournament.slug.downcase))
       end
     end
   end
@@ -251,7 +251,7 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
   def upload_to_abr
     authorize @tournament
 
-    response = AbrUpload.upload!(@tournament, root_url, tournament_url(@tournament.slug, @request))
+    response = AbrUpload.upload!(@tournament, root_url, tournament_shortlink_url(slug: @tournament.slug.downcase))
     @tournament.update(abr_code: response[:code]) if response[:code]
 
     respond_to do |format|
@@ -270,7 +270,7 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
   def save_json
     authorize @tournament
 
-    data = NrtmJson.new(@tournament, root_url).data(tournament_url(@tournament.slug, @request))
+    data = NrtmJson.new(@tournament, root_url).data(tournament_shortlink_url(slug: @tournament.slug.downcase))
 
     send_data data.to_json,
               type: :json,

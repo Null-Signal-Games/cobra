@@ -1,17 +1,11 @@
 # frozen_string_literal: true
 
 module UrlHelper # rubocop:disable Style/Documentation
-  def tournament_url(slug, request)
-    server = "#{request.protocol}#{request.host}"
-    server += ":#{request.port}" if !request.port.nil? && (request.port != 80) && (request.port != 443)
-    "#{server}/#{slug.downcase}"
-  end
-
-  def qr_code(slug, request)
+  def qr_code(slug)
     return unless slug
 
     @qr_code ||= RQRCode::QRCode.new(
-      tournament_url(slug, request),
+      tournament_shortlink_url(slug: slug.downcase),
       level: :h
     )
   end

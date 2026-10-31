@@ -1,7 +1,7 @@
 = content_for :head do
   meta property="og:title" content="#{@tournament.name}"
   meta property="og:description" content="#{@tournament.name} on Cobra, hosted by #{@tournament.user.nrdb_username}"
-  meta property="og:url" content="#{tournament_url(@tournament.slug, request)}"
+  meta property="og:url" content="#{tournament_shortlink_url(slug: @tournament.slug.downcase)}"
   meta property="og:site_name" content="Cobra Netrunner Tournament Software"
 
 .container

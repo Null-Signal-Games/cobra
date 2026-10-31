@@ -1,6 +1,6 @@
 .col-12.text-center
-  h1.mb-5 #{tournament_url(@tournament.slug, request)}
+  h1.mb-5 #{tournament_shortlink_url(slug: @tournament.slug.downcase)}
   .d-inline-block.bg-white.p-4.rounded.shadow-sm
-    p.m-0= raw qr_code(h(@tournament.slug), request).as_svg(offset: 0, color: '000',
+    p.m-0= raw qr_code(@tournament.slug).as_svg(offset: 0, color: '000',
                    shape_rendering: 'crispEdges',
                    module_size: 25)

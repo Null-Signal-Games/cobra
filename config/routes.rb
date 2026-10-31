@@ -186,7 +186,7 @@ Rails.application.routes.draw do
 
   get '/help', to: 'home#help'
 
-  get ':slug', to: 'tournaments#shortlink'
+  get ':slug', to: 'tournaments#shortlink', as: :tournament_shortlink
 
   match '*path', to: redirect('/error'), via: :all
 end
