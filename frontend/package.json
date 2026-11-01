@@ -65,6 +65,7 @@
     "cookie": "^0.7.0",
     "@magidoc/plugin-svelte-marked": {
       "svelte": "$svelte"
-    }
+    },
+    "minimatch": "^11.0.1"
   }
 }

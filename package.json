@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@eslint/js": "^10",
+    "@eslint/js": "^10.0.1",
     "@sveltejs/vite-plugin-svelte": "^7",
     "@testing-library/jest-dom": "^7",
     "@testing-library/svelte": "^5.2.8",
