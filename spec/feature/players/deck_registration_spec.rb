@@ -105,8 +105,8 @@ RSpec.describe 'registering a deck from NetrunnerDB', type: :feature do
       visit registration_tournament_path(tournament)
       expect(page).to have_css '#display_decks'
       expect(page).to have_no_css '#nrdb_decks'
-      expect(find_by_id('player_corp_deck', visible: false).value).to match(/^\{.+}$/)
-      expect(find_by_id('player_runner_deck', visible: false).value).to match(/^\{.+}$/)
+      expect(find_by_id('player_corp_deck', visible: :hidden).value).to match(/^\{.+}$/)
+      expect(find_by_id('player_runner_deck', visible: :hidden).value).to match(/^\{.+}$/)
     end
   end
 
@@ -150,8 +150,8 @@ RSpec.describe 'registering a deck from NetrunnerDB', type: :feature do
 
   def select_deck(side, deck)
     deck.player = Player.last
-    first("#player_#{side}_deck", visible: false).set(deck.as_view(player).to_json)
-    first("#player_#{side}_identity", visible: false).set(deck.identity_title)
+    first("#player_#{side}_deck", visible: :hidden).set(deck.as_view(player).to_json)
+    first("#player_#{side}_identity", visible: :hidden).set(deck.identity_title)
   end
 
   def with_nrdb_decks(&block)
