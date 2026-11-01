@@ -10,10 +10,29 @@ AllCops:
     - 'bin/*'
     - 'db/**/*'
     - 'vendor/**/*'
-
+Capybara/AbsoluteXPathInElementScope: # new in 3.1
+  Enabled: true
+Capybara/AlwaysTrueCountQuery: # new in 3.1
+  Enabled: true
 Capybara/AssertStyle: # new in 2.17
   Enabled: true
+Capybara/ChainedFind: # new in 3.1
+  Enabled: true
 Capybara/FindAllFirst: # new in 2.22
+  Enabled: true
+Capybara/IgnoredQueryOption: # new in 3.1
+  Enabled: true
+Capybara/ModalMethodWithoutBlock: # new in 3.1
+  Enabled: true
+Capybara/NativeAttribute: # new in 3.1
+  Enabled: true
+Capybara/UnorderedWindowAccess: # new in 3.1
+  Enabled: true
+Capybara/VisibilityOption: # new in 3.1
+  Enabled: true
+Capybara/RSpec/CurrentUrlExpectation: # new in 3.1
+  Enabled: true
+Capybara/RSpec/FindElementValueEq: # new in 3.1
   Enabled: true
 Capybara/RSpec/NegationMatcher:
   Enabled: true
@@ -229,6 +248,8 @@ RSpec/NestedGroups:
   Enabled: false
 RSpec/NoExpectationExample:
   Enabled: false
+RSpec/Output: # new in 3.9
+  Enabled: true
 RSpec/SpecFilePathSuffix:
   Enabled: false
 RSpecRails/AvoidSetupHook: # new in 2.4
@@ -236,6 +257,8 @@ RSpecRails/AvoidSetupHook: # new in 2.4
 RSpecRails/FileFixture: # new in 2.33
   Enabled: true
 RSpecRails/HaveHttpStatus: # new in 2.12
+  Enabled: true
+RSpecRails/HttpStatusNameConsistency: # new in 2.32
   Enabled: true
 RSpecRails/InferredSpecType: # new in 2.14
   Enabled: true
