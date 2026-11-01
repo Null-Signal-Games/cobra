@@ -1,17 +1,15 @@
 # frozen_string_literal: true
 
 module UrlHelper # rubocop:disable Style/Documentation
-  def tournament_url(slug, request)
-    server = "#{request.protocol}#{request.host}"
-    server += ":#{request.port}" if !request.port.nil? && (request.port != 80) && (request.port != 443)
-    "#{server}/#{slug.downcase}"
+  def qr_code_svg(slug)
+    qr_code(slug)&.as_svg(offset: 0, color: '000', shape_rendering: 'crispEdges', module_size: 25)
   end
 
-  def qr_code(slug, request)
+  def qr_code(slug)
     return unless slug
 
     @qr_code ||= RQRCode::QRCode.new(
-      tournament_url(slug, request),
+      tournament_shortlink_url(slug: slug),
       level: :h
     )
   end

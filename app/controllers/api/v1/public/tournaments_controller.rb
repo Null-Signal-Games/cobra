@@ -28,7 +28,7 @@ module Api
             private_owned_scope = Tournament.where(private: true, user_id: current_user.id)
             base_scope = base_scope.or(private_owned_scope)
           end
-          base_scope.includes(%i[deckbuilding_restriction format official_prize_kit tournament_type user])
+          base_scope.includes(%i[deckbuilding_restriction format official_prize_kit stages tournament_type user])
         end
       end
     end

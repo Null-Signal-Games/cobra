@@ -15,8 +15,3 @@ export interface RoundData {
   policy?: TournamentPolicies;
   warnings?: string[];
 }
-
-export interface TournamentData {
-  tournament: Tournament,
-  csrf_token: string,
-}

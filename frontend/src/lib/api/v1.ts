@@ -4,12 +4,14 @@ import type {
   IdentitiesResponse,
   IdentityInfo,
   PlayersResponse,
+  TournamentResponse,
   TournamentsResponse,
   TournamentTypeInfo,
   TournamentTypesResponse,
 } from "$lib/api/v1ApiTypes";
 import type { IdentityNames } from "$lib/model/Identity";
 import { Player } from "$lib/model/Player";
+import type { Tournament } from "$lib/model/Tournament";
 import { v1Adapter } from "$lib/model/v1Adapter";
 import { addError } from "$lib/utils/GlobalMessageState.svelte";
 
@@ -49,6 +51,17 @@ export class V1Api {
     }
 
     return res.data;
+  }
+
+  async loadTournament(
+    tournamentId: number,
+    altFetch = fetch,
+  ): Promise<{ tournament: Tournament }> {
+    const res = await this.api.getOrThrow<TournamentResponse>(
+      `/api/v1/public/tournaments/${tournamentId}`,
+      { altFetch, headers: JSON_API_HEADERS },
+    );
+    return { tournament: v1Adapter.adaptTournament(res.data) };
   }
 
   loadTournamentBySlug(

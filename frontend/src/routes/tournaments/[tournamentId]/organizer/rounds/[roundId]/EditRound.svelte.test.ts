@@ -50,7 +50,6 @@ export const MockPageData: PageProps["data"] = {
   },
   tournamentData: {
     tournament: new Tournament(),
-    csrf_token: ""
   },
   timer: MockRound1Timer,
   player: null,

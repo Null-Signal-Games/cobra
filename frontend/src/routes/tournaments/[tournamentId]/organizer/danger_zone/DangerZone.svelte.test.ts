@@ -50,7 +50,6 @@ describe("Danger Zone Page", () => {
   const mockData = {
     tournamentData: {
       tournament: mockTournament,
-      csrf_token: "test-csrf-token",
     },
     stages: [mockSwissStage, mockElimStage],
   };

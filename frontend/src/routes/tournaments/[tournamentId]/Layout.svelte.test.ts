@@ -26,7 +26,6 @@ describe("Tournament navigation tab strip", () => {
           tournamentTypes: [],
           tournamentData: {
             tournament,
-            csrf_token: "",
           },
           timer: { show: false, started: false, running: false, paused: false, state: {
             started: false,

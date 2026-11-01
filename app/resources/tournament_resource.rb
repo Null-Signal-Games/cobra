@@ -39,6 +39,9 @@ class TournamentResource < ApplicationResource
   end
 
   attribute :stage, :string
+  attribute :has_elimination_stage, :boolean do
+    @object.stages.any?(&:elimination?)
+  end
 
   attribute :manual_seed, :boolean
   attribute :self_registration, :boolean

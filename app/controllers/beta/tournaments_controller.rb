@@ -100,7 +100,7 @@ module Beta
     def qr
       authorize @tournament, :show?
 
-      send_data(RQRCode::QRCode.new(tournament_url(@tournament.slug, request), level: :h)
+      send_data(RQRCode::QRCode.new(tournament_shortlink_url(slug: @tournament.slug), level: :h)
                                .as_svg(offset: 0, color: '000', shape_rendering: 'crispEdges', module_size: 25),
                 type: 'image/svg+xml',
                 disposition: 'inline')
@@ -235,12 +235,6 @@ module Beta
         # Used for demo tournaments
         :num_players, :num_first_round_byes
       )
-    end
-
-    def tournament_url(slug, request)
-      server = "#{request.protocol}#{request.host}"
-      server += ":#{request.port}" if !request.port.nil? && (request.port != 80) && (request.port != 443)
-      "#{server}/#{slug}"
     end
 
     def transform_stats(stats)

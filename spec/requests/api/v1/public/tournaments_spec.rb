@@ -45,6 +45,16 @@ RSpec.describe 'Public API Tournaments' do
       )
     end
 
+    it 'reports no elimination stage for a swiss-only tournament' do
+      matches_record("/api/v1/public/tournaments/#{tournament.id}", tournament.id, has_elimination_stage: false)
+    end
+
+    it 'reports an elimination stage once one exists' do
+      create(:stage, tournament: tournament, format: :single_elim, number: 2)
+
+      matches_record("/api/v1/public/tournaments/#{tournament.id}", tournament.id, has_elimination_stage: true)
+    end
+
     it 'does not match missing record' do
       missing_record('/api/v1/public/tournaments/999999')
     end

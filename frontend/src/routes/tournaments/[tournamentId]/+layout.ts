@@ -6,7 +6,7 @@ export const load: LayoutLoad = async ({ params, parent, fetch }) => {
   const { user } = await parent();
   const tournamentId = parseInt(params.tournamentId);
 
-  const tournament = await betaApi.loadTournament(tournamentId, fetch);
+  const tournament = await v1Api.loadTournament(tournamentId, fetch);
 
   return {
     tournamentData: tournament,

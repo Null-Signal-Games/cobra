@@ -8,7 +8,8 @@
         li.list-group-item
           .small.text-secondary Shortcode:
           | #{@tournament.slug} (
-          = link_to tournament_url(@tournament.slug, request), tournament_url(@tournament.slug, request)
+          = link_to tournament_shortlink_url(slug: @tournament.slug),
+                    tournament_shortlink_path(slug: @tournament.slug)
           | )
 
       li.list-group-item

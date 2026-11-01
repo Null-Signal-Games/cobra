@@ -129,7 +129,6 @@ const MockPageData: PageProps["data"] = {
   tournamentTypes: [],
   tournamentData: {
     tournament: new Tournament({ id: 1 }),
-    csrf_token: ""
   },
   timer: {
     show: false,

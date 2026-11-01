@@ -1,5 +1,5 @@
 import { api as defaultApi, type ApiBase } from "$lib/api/apiBase";
-import type { PairingsData, RoundData, TournamentData } from "$lib/api/betaTypes";
+import type { PairingsData, RoundData } from "$lib/api/betaTypes";
 import type { Deck, NrdbDeck } from "$lib/model/Deck";
 import type { NewPairing } from "$lib/model/Pairing";
 import { type Player, playerRequestObject, type PlayersData } from "$lib/model/Player";
@@ -16,10 +16,6 @@ interface SavePlayerResponse {
 
 export class BetaApi {
   constructor(private api: ApiBase = defaultApi) {}
-
-  loadTournament(tournamentId: number, altFetch = fetch): Promise<TournamentData> {
-    return this.api.getOrThrow<TournamentData>(`/beta/tournaments/${tournamentId}`, altFetch);
-  }
 
   loadPlayer(tournamentId: number, playerId: number, altFetch = fetch): Promise<Player> {
     return this.api.getOrThrow<Player>(`/beta/tournaments/${tournamentId}/players/${playerId}`, altFetch);

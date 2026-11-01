@@ -88,7 +88,6 @@ export const MockPlayerBob: Player = {
 
 vi.mock("$lib/api/beta", () => ({
   betaApi: {
-    loadTournament: vi.fn(),
     savePlayer: vi.fn(),
   },
 }));
@@ -121,7 +120,6 @@ describe("Tournament", () => {
       tournamentTypes: [],
       tournamentData: {
         tournament: MockTournament,
-        csrf_token: ""
       },
       timer: {
         show: false,

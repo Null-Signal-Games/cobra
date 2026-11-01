@@ -3,11 +3,28 @@
 RSpec.describe TournamentsController do
   let(:tournament) { create(:tournament, name: 'My Tournament') }
 
+  let(:shortlink) { "http://www.example.com/#{tournament.slug}" }
+
+  describe '#show as json' do
+    it 'links the export to the tournament shortlink' do
+      get tournament_path(tournament, format: :json)
+
+      uploaded_from = response.parsed_body['links'].find { |link| link['rel'] == 'uploadedfrom' }
+      expect(uploaded_from['href']).to eq(shortlink)
+    end
+  end
+
   describe '#save_json' do
+    let(:nrtm_json) { instance_double(NrtmJson, data: { some: :data }) }
+
     before do
-      allow(NrtmJson).to receive(:new).with(tournament, root_url).and_return(
-        instance_double(NrtmJson, data: { some: :data })
-      )
+      allow(NrtmJson).to receive(:new).with(tournament, root_url).and_return(nrtm_json)
+    end
+
+    it 'links the export to the tournament shortlink' do
+      get save_json_tournament_path(tournament)
+
+      expect(nrtm_json).to have_received(:data).with(shortlink)
     end
 
     it 'responds with json file' do
@@ -37,6 +54,14 @@ RSpec.describe TournamentsController do
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body).to eq('abr_code' => 'abc123')
       expect(tournament.reload.abr_code).to eq('abc123')
+    end
+
+    it 'uploads with the tournament shortlink' do
+      allow(AbrUpload).to receive(:upload!).and_return({ code: 'abc123' }.with_indifferent_access)
+
+      post upload_to_abr_api_classic_tournament_path(tournament), as: :json
+
+      expect(AbrUpload).to have_received(:upload!).with(tournament, root_url, shortlink)
     end
 
     it 'returns the upload error when ABR rejects the upload' do
