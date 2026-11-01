@@ -100,7 +100,7 @@ module Beta
     def qr
       authorize @tournament, :show?
 
-      send_data(RQRCode::QRCode.new(tournament_shortlink_url(slug: @tournament.slug.downcase), level: :h)
+      send_data(RQRCode::QRCode.new(tournament_shortlink_url(slug: @tournament.slug), level: :h)
                                .as_svg(offset: 0, color: '000', shape_rendering: 'crispEdges', module_size: 25),
                 type: 'image/svg+xml',
                 disposition: 'inline')

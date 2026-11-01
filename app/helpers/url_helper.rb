@@ -9,7 +9,7 @@ module UrlHelper # rubocop:disable Style/Documentation
     return unless slug
 
     @qr_code ||= RQRCode::QRCode.new(
-      tournament_shortlink_url(slug: slug.downcase),
+      tournament_shortlink_url(slug: slug),
       level: :h
     )
   end

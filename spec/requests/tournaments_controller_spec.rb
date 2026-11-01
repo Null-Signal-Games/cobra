@@ -3,7 +3,7 @@
 RSpec.describe TournamentsController do
   let(:tournament) { create(:tournament, name: 'My Tournament') }
 
-  let(:shortlink) { "http://www.example.com/#{tournament.slug.downcase}" }
+  let(:shortlink) { "http://www.example.com/#{tournament.slug}" }
 
   describe '#show as json' do
     it 'links the export to the tournament shortlink' do

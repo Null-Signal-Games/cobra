@@ -1,4 +1,4 @@
 .col-12.text-center
-  h1.mb-5 #{tournament_shortlink_url(slug: @tournament.slug.downcase)}
+  h1.mb-5 #{tournament_shortlink_url(slug: @tournament.slug)}
   .d-inline-block.bg-white.p-4.rounded.shadow-sm
     p.m-0= qr_code_svg(@tournament.slug)
