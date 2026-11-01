@@ -8,8 +8,7 @@
 
   let { data, params }: PageProps = $props();
 
-  let pairings = $derived(createPlayerMeetingPairings(data.players.activePlayers));
-
+  let pairings = $derived(createPlayerMeetingPairings(data.players));
   let backTo = $derived(data.back_to ?? page.url.searchParams.get("back_to"));
   let backDetails = $derived(getBackDetails(backTo, params.tournamentId));
 </script>

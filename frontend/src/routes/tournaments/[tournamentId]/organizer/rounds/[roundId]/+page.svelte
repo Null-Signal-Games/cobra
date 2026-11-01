@@ -64,7 +64,7 @@
       return;
     }
 
-    await goto(resolve(`/tournaments/${params.tournamentId}/organizer/rounds`));
+    await goto(resolve(`/tournaments/${params.tournamentId}/organizer/rounds`), { invalidateAll: true });
   }
 
   async function createPairing(e: SubmitEvent) {

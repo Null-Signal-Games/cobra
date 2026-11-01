@@ -172,7 +172,7 @@ describe("EditRound", () => {
       await user.click(screen.getByRole("button", { name: /delete round/i }));
 
       expect(betaApi.deleteRound).toHaveBeenCalledOnce();
-      expect(goto).toHaveBeenCalledExactlyOnceWith("/tournaments/0/organizer/rounds");
+      expect(goto).toHaveBeenCalledExactlyOnceWith("/tournaments/0/organizer/rounds", { invalidateAll: true });
     });
 
     it("does not delete the round if cancelled", async () => {
