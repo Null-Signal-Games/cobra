@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable RSpec/Output
+
 require 'json'
 require 'stackprof'
 
@@ -730,3 +732,4 @@ RSpec.describe 'load testing' do # rubocop:disable RSpec/DescribeClass
     end
   end
 end
+# rubocop:enable RSpec/Output
