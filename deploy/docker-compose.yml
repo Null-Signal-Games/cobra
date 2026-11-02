@@ -26,7 +26,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - ORIGIN=${COBRA_ORIGIN:?set COBRA_ORIGIN in deploy/.env}
+      # Build event.url from the gateway's Host and X-Forwarded-Proto instead of a fixed ORIGIN,
+      # so one image serves every environment (adapter-node 6 drops ORIGIN).
+      - PROTOCOL_HEADER=x-forwarded-proto
       - SERVER_COBRA_API_ENDPOINT=http://gateway
     networks:
       - backend
