@@ -303,7 +303,7 @@
     font-size: 0.7rem;
     white-space: nowrap;
     overflow-x: hidden;
-    overflow-y: visible;
+    overflow-y: hidden;
     line-height: 1.2;
     margin-top: 2px;
   }
