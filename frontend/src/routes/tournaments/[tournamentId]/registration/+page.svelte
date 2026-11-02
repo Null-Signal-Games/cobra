@@ -6,7 +6,7 @@
   import ProgressButton from "$lib/components/ProgressButton.svelte";
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
-  import { invalidateAll } from "$app/navigation";
+  import { refreshAll } from "$app/navigation";
   import { sortCards } from "$lib/utils/decks.svelte";
   import { authStore } from "$lib/utils/auth.svelte";
   import DeckDisplay from "$lib/components/DeckDisplay.svelte";
@@ -63,7 +63,7 @@
       ),
     );
 
-    await invalidateAll();
+    await refreshAll();
 
     return true;
   }

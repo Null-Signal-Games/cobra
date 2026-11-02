@@ -5,7 +5,7 @@ import DangerZonePage from "./+page.svelte";
 import { Tournament } from "$lib/model/Tournament";
 import type { Stage } from "$lib/model/Stage";
 import { betaApi } from "$lib/api/beta";
-import { goto, invalidateAll } from "$app/navigation";
+import { goto, refreshAll } from "$app/navigation";
 import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
 vi.mock("$lib/api/beta", () => ({
@@ -17,7 +17,7 @@ vi.mock("$lib/api/beta", () => ({
 
 vi.mock("$app/navigation", () => ({
   goto: vi.fn(),
-  invalidateAll: vi.fn(),
+  refreshAll: vi.fn(),
 }));
 
 describe("Danger Zone Page", () => {
@@ -194,7 +194,7 @@ describe("Danger Zone Page", () => {
 
     expect(confirmSpy).toHaveBeenCalledWith("Are you absolutely sure? This cannot be reversed.");
     expect(betaApi.deleteStage).toHaveBeenCalledWith(1, 101, "Danger Noodle");
-    expect(invalidateAll).toHaveBeenCalledOnce();
+    expect(refreshAll).toHaveBeenCalledOnce();
     expect(globalMessages.infos).toContain("Stage deleted.");
   });
 
@@ -214,7 +214,7 @@ describe("Danger Zone Page", () => {
 
     expect(confirmSpy).toHaveBeenCalled();
     expect(betaApi.deleteStage).not.toHaveBeenCalled();
-    expect(invalidateAll).not.toHaveBeenCalled();
+    expect(refreshAll).not.toHaveBeenCalled();
   });
 
   it("does not invalidate or show info message if deleteStage returns false", async () => {
@@ -232,7 +232,7 @@ describe("Danger Zone Page", () => {
     await user.click(deleteElimBtn);
 
     expect(betaApi.deleteStage).toHaveBeenCalledWith(1, 102, "Danger Noodle");
-    expect(invalidateAll).not.toHaveBeenCalled();
+    expect(refreshAll).not.toHaveBeenCalled();
     expect(globalMessages.infos).toHaveLength(0);
   });
 });

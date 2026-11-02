@@ -12,7 +12,7 @@
   import { v1Api } from "$lib/api/v1";
   import { navigateTo } from "$lib/utils/navigation";
   import { authStore } from "$lib/utils/auth.svelte";
-  import { invalidateAll } from "$app/navigation";
+  import { refreshAll } from "$app/navigation";
 
   let {
     userId,
@@ -41,7 +41,7 @@
     playerEdit = await betaApi.savePlayer(tournament.id, playerEdit);
     readOnly = true;
 
-    await invalidateAll();
+    await refreshAll();
 
     if (tournament.nrdb_deck_registration) {
       navigateTo(`/tournaments/${tournament.id}/registration`);

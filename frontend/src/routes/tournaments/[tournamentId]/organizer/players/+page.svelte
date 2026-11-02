@@ -6,7 +6,7 @@
   } from "$lib/model/Player";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import PlayerForm from "./PlayerForm.svelte";
-  import { invalidateAll } from "$app/navigation";
+  import { refreshAll } from "$app/navigation";
   import {
     CutDeckVisibility,
     deckVisibilityString,
@@ -47,7 +47,7 @@
   });
 
   async function newPlayerSavedCallback() {
-    await invalidateAll();
+    await refreshAll();
     newPlayer = new Player();
   }
 
@@ -60,7 +60,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function setRegistrationStatus(open: boolean) {
@@ -69,7 +69,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function setCutDeckVisibility(visibility: CutDeckVisibility) {
@@ -100,7 +100,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function setSwissDeckVisibility(visibility: SwissDeckVisibility) {
@@ -131,7 +131,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function downloadDecksSpreadsheet() {
@@ -163,7 +163,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 </script>
 
@@ -351,9 +351,9 @@
             tournamentPolicies={players.tournamentPolicies}
             identityNames={identityNames}
             organizerView={true}
-            savedCallback={invalidateAll}
-            droppedCallback={invalidateAll}
-            deletedCallback={invalidateAll}
+            savedCallback={() => refreshAll()}
+            droppedCallback={() => refreshAll()}
+            deletedCallback={() => refreshAll()}
             />
         </li>
         {/each}

@@ -17,7 +17,7 @@ import {
   Tournament,
 } from "$lib/model/Tournament";
 import type { IdentityNames } from "$lib/model/Identity";
-import { invalidateAll } from "$app/navigation";
+import { refreshAll } from "$app/navigation";
 import { betaApi } from "$lib/api/beta";
 
 let user = userEvent.setup();
@@ -33,7 +33,7 @@ vi.mock("$app/env/public", () => ({
 }));
 
 vi.mock("$app/navigation", () => ({
-  invalidateAll: vi.fn(async () => {
+  refreshAll: vi.fn(async () => {
     if (rerenderFn) {
       const clonedTournament = new Tournament(currentTournament);
       await rerenderFn({
@@ -295,7 +295,7 @@ describe("Players", () => {
       aliceEdit.registration_locked = true;
 
       expect(betaApi.togglePlayerLock).toHaveBeenCalledExactlyOnceWith(1, aliceEdit);
-      expect(invalidateAll).toHaveBeenCalledOnce();
+      expect(refreshAll).toHaveBeenCalledOnce();
     });
 
     it("unlocks a player", async () => {
@@ -309,7 +309,7 @@ describe("Players", () => {
       bobEdit.registration_locked = false;
 
       expect(betaApi.togglePlayerLock).toHaveBeenCalledExactlyOnceWith(1, bobEdit);
-      expect(invalidateAll).toHaveBeenCalledOnce();
+      expect(refreshAll).toHaveBeenCalledOnce();
     });
 
     it("saves player edits", async () => {
@@ -343,7 +343,7 @@ describe("Players", () => {
       aliceEdit.fixed_table_number = 1;
 
       expect(betaApi.savePlayer).toHaveBeenCalledExactlyOnceWith(1, aliceEdit, true);
-      expect(invalidateAll).toHaveBeenCalledOnce();
+      expect(refreshAll).toHaveBeenCalledOnce();
     });
 
     it("drops a player", async () => {
@@ -352,7 +352,7 @@ describe("Players", () => {
       await user.click(getByRole(playerItems[0], "button", { name: "Drop" }));
 
       expect(betaApi.dropPlayer).toHaveBeenCalledExactlyOnceWith(1, mockAlice);
-      expect(invalidateAll).toHaveBeenCalledOnce();
+      expect(refreshAll).toHaveBeenCalledOnce();
     });
 
     it("deletes a player", async () => {
@@ -362,7 +362,7 @@ describe("Players", () => {
       await user.click(getByRole(playerItems[0], "button", { name: "Delete" }));
 
       expect(betaApi.deletePlayer).toHaveBeenCalledExactlyOnceWith(1, mockAlice);
-      expect(invalidateAll).toHaveBeenCalledOnce();
+      expect(refreshAll).toHaveBeenCalledOnce();
     });
 
     describe.each([
@@ -372,7 +372,7 @@ describe("Players", () => {
       [false, false, "closed"],
     ])("sets lock and registration status", (unlock, open, description) => {
       it(description, async () => {
-        let invalidateCount = 0;
+        let refreshCount = 0;
 
         const dropdown = screen.getByText(/Registration: .*/);
         await user.click(dropdown);
@@ -382,7 +382,7 @@ describe("Players", () => {
         );
         if (!lockOption.classList.contains("disabled")) {
           await user.click(lockOption);
-          invalidateCount++;
+          refreshCount++;
           expect(betaApi.setPlayerRegistrationStatus).toHaveBeenCalledExactlyOnceWith(
             1,
             !unlock,
@@ -394,14 +394,14 @@ describe("Players", () => {
         );
         if (!registrationOption.classList.contains("disabled")) {
           await user.click(registrationOption);
-          invalidateCount++;
+          refreshCount++;
           expect(betaApi.setRegistrationStatus).toHaveBeenCalledExactlyOnceWith(
             1,
             open,
           );
         }
 
-        expect(invalidateAll).toHaveBeenCalledTimes(invalidateCount);
+        expect(refreshAll).toHaveBeenCalledTimes(refreshCount);
         expect(dropdown).toHaveTextContent(`Registration: ${description}`);
       });
     });
@@ -456,7 +456,7 @@ describe("Players", () => {
       "sets deck visibility",
       (swissVisibility, cutVisibility, description) => {
         it(description, async () => {
-          let invalidateCount = 0;
+          let refreshCount = 0;
 
           vi.spyOn(window, "confirm").mockReturnValue(true);
           const tournamentEdit = structuredClone(currentTournament);
@@ -471,7 +471,7 @@ describe("Players", () => {
           );
           if (!swissOption.classList.contains("disabled")) {
             await user.click(swissOption);
-            invalidateCount++;
+            refreshCount++;
 
             tournamentEdit.swiss_deck_visibility = swissVisibility;
             expect(betaApi.saveTournament).toHaveBeenCalledWith(tournamentEdit);
@@ -484,13 +484,13 @@ describe("Players", () => {
           );
           if (!cutOption.classList.contains("disabled")) {
             await user.click(cutOption);
-            invalidateCount++;
+            refreshCount++;
 
             tournamentEdit.cut_deck_visibility = cutVisibility;
             expect(betaApi.saveTournament).toHaveBeenCalledWith(tournamentEdit);
           }
 
-          expect(invalidateAll).toHaveBeenCalledTimes(invalidateCount);
+          expect(refreshAll).toHaveBeenCalledTimes(refreshCount);
           expect(dropdown).toHaveTextContent(`Decks: ${description}`);
         });
       },
@@ -537,7 +537,7 @@ describe("Players", () => {
       charlieEdit.fixed_table_number = 1;
 
       expect(betaApi.savePlayer).toHaveBeenCalledExactlyOnceWith(1, charlieEdit, true);
-      expect(invalidateAll).toHaveBeenCalledOnce();
+      expect(refreshAll).toHaveBeenCalledOnce();
     });
   });
 
@@ -584,7 +584,7 @@ describe("Players", () => {
       );
 
       expect(betaApi.reinstatePlayer).toHaveBeenCalledExactlyOnceWith(1, mockBob);
-      expect(invalidateAll).toHaveBeenCalledOnce();
+      expect(refreshAll).toHaveBeenCalledOnce();
     });
   });
 });

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PageProps } from "./$types";
-  import { invalidateAll } from "$app/navigation";
+  import { refreshAll } from "$app/navigation";
   import type { Pairing } from "$lib/model/Pairing";
   import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
   import PlayerDisplay from "$lib/components/PlayerDisplay.svelte";
@@ -95,7 +95,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 </script>
 

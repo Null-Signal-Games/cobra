@@ -2,7 +2,7 @@
   Explanation of the rerender() function used throughout this file:
 
   render() returns a rerender() function which is useful for simulating changes
-  to props. We rely on invalidateAll() to cause load() to be called again,
+  to props. We rely on refreshAll() to cause load() to be called again,
   changing the data prop, which in turn causes the props object's reactivity to
   kick in and rerender things. This is where rerender() comes into play for us.
   

@@ -7,7 +7,7 @@
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { showIdentities } from "$lib/utils/ShowIdentities";
-  import { invalidateAll } from "$app/navigation";
+  import { refreshAll } from "$app/navigation";
   import { betaApi } from "$lib/api/beta";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
 
@@ -26,7 +26,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 </script>
 

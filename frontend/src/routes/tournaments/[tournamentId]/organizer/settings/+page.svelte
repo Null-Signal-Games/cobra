@@ -4,7 +4,7 @@
   import type { Tournament } from "$lib/model/Tournament";
   import { type Errors, ValidationError } from "$lib/utils/errors";
   import { classicApi } from "$lib/api/classic";
-  import { invalidateAll } from "$app/navigation";
+  import { refreshAll } from "$app/navigation";
   import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
   import { downloadBlob } from "$lib/utils/files";
   let { data }: PageProps = $props();
@@ -15,7 +15,7 @@
     try {
       await classicApi.updateTournamentSettings(tournamentEdit);
       globalMessages.infos = ["Tournament settings saved."];
-      await invalidateAll();
+      await refreshAll();
       return true;
     } catch (error) {
       if (error instanceof ValidationError) {
@@ -32,7 +32,7 @@
     try {
       const response = await classicApi.uploadToAbr(tournament.id);
       globalMessages.infos = [`Uploaded to Always Be Running with code ${response.abr_code}.`];
-      await invalidateAll();
+      await refreshAll();
       return true;
     } catch (error) {
       errors = {
