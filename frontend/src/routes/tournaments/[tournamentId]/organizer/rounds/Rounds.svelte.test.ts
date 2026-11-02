@@ -20,7 +20,7 @@ import {
 } from "@testing-library/svelte";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { betaApi } from "$lib/api/beta";
+import { betaApi } from "#lib/api/beta.ts";
 import RoundsPage from "./+page.svelte";
 import type { PageProps } from "./$types";
 import {
@@ -35,7 +35,7 @@ import {
   MockDoubleElimCutStage,
   MockTournament,
 } from "./RoundsTestData";
-import type { TournamentPolicies } from "$lib/model/Tournament";
+import type { TournamentPolicies } from "#lib/model/Tournament.ts";
 
 const MockPolicy: TournamentPolicies = {
   update: false,
@@ -66,7 +66,7 @@ const MockPageData: PageProps["data"] = {
   stages: [MockSwissStage],
 };
 
-vi.mock("$lib/api/beta", () => ({
+vi.mock("#lib/api/beta.ts", () => ({
   betaApi: {
     changePlayerSide: vi.fn(),
     completeRound: vi.fn(),

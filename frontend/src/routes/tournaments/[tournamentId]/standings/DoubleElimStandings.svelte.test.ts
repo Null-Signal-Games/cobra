@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import DoubleElimStandings from "./DoubleElimStandings.svelte";
-import type { CutStage } from "$lib/model/Standings";
+import type { CutStage } from "#lib/model/Standings.ts";
 
 describe("DoubleElimStandings", () => {
   afterEach(() => {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { V1Api, v1Api } from "$lib/api/v1";
-import { ApiBase } from "$lib/api/apiBase";
-import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+import { V1Api, v1Api } from "#lib/api/v1.ts";
+import { ApiBase } from "#lib/api/apiBase.ts";
+import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
 
 describe("V1Api", () => {
   const mockFetch = vi.fn<typeof fetch>();

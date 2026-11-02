@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { authStore, type AuthUser } from "$lib/utils/auth.svelte";
+  import { authStore, type AuthUser } from "#lib/utils/auth.svelte.ts";
 
   let user = $state<AuthUser | null>(null);
   let isLoading = $state<boolean>(true);

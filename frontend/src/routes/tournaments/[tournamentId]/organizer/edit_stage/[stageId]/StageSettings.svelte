@@ -3,15 +3,15 @@
   import {
     StageData,
     type SaveStageResponse,
-  } from "$lib/api/classicTypes";
-  import { classicApi } from "$lib/api/classic";
-  import { ValidationError } from "$lib/utils/errors";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  } from "#lib/api/classicTypes.ts";
+  import { classicApi } from "#lib/api/classic.ts";
+  import { ValidationError } from "#lib/utils/errors.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import TableRangeEdit from "./TableRangeEdit.svelte";
-  import ModalDialog from "$lib/components/ModalDialog.svelte";
+  import ModalDialog from "#lib/components/ModalDialog.svelte";
   import { resolve } from "$app/paths";
   import { goto } from "$app/navigation";
-  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+  import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
 
   interface Props {
     tournamentId: number;

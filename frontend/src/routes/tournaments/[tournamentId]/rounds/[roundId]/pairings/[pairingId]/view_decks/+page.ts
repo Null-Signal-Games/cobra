@@ -1,8 +1,8 @@
 import type { PageLoad } from "./$types";
-import { betaApi } from "$lib/api/beta";
-import { Player } from "$lib/model/Player";
-import { Deck } from "$lib/model/Deck";
-import { sortCards } from "$lib/utils/decks.svelte";
+import { betaApi } from "#lib/api/beta.ts";
+import { Player } from "#lib/model/Player.ts";
+import { Deck } from "#lib/model/Deck.ts";
+import { sortCards } from "#lib/utils/decks.svelte.ts";
 
 export const load: PageLoad = async ({ parent, params, fetch }) => {
   const { stages } = await parent();

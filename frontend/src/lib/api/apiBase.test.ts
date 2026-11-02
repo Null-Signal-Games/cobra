@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { authStore } from "$lib/utils/auth.svelte";
-import { ApiBase } from "$lib/api/apiBase";
-import { ok, err, type StatusOr } from "$lib/api/statusOr";
-import { ValidationError } from "$lib/utils/errors";
-import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+import { authStore } from "#lib/utils/auth.svelte.ts";
+import { ApiBase } from "#lib/api/apiBase.ts";
+import { ok, err, type StatusOr } from "#lib/api/statusOr.ts";
+import { ValidationError } from "#lib/utils/errors.ts";
+import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
 
 describe("ApiBase with StatusOr", () => {
   const mockFetch = vi.fn<typeof fetch>();

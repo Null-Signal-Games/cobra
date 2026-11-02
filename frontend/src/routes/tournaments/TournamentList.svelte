@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { TournamentsResponse, TournamentTypeInfo } from "$lib/api/v1ApiTypes";
-  import PagingRow from "$lib/components/PagingRow.svelte";
-  import TournamentRow from "$lib/components/TournamentRow.svelte";
-  import { v1Api } from "$lib/api/v1";
+  import type { TournamentsResponse, TournamentTypeInfo } from "#lib/api/v1ApiTypes.ts";
+  import PagingRow from "#lib/components/PagingRow.svelte";
+  import TournamentRow from "#lib/components/TournamentRow.svelte";
+  import { v1Api } from "#lib/api/v1.ts";
 
   let {
     typeId = null,

@@ -1,5 +1,5 @@
-import type { Tournament, TournamentOptions, FeatureFlags } from "$lib/model/Tournament";
-import type { Errors } from "$lib/utils/errors";
+import type { Tournament, TournamentOptions, FeatureFlags } from "#lib/model/Tournament.ts";
+import type { Errors } from "#lib/utils/errors.ts";
 
 export interface TournamentSettingsData {
   tournament: Tournament;

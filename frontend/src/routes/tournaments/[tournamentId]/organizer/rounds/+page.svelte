@@ -1,17 +1,17 @@
 <script lang="ts">
-  import "$lib/assets/css/pairings.sass";
+  import "#lib/assets/css/pairings.sass";
   import Stage from "./Stage.svelte";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ModalDialog from "$lib/components/ModalDialog.svelte";
-  import type { ScoreReport } from "$lib/model/ScoreReport";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ModalDialog from "#lib/components/ModalDialog.svelte";
+  import type { ScoreReport } from "#lib/model/ScoreReport.ts";
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
-  import { showReportedPairings } from "$lib/utils/ShowReportedPairings";
-  import { showIdentities } from "$lib/utils/ShowIdentities";
+  import { showReportedPairings } from "#lib/utils/ShowReportedPairings.ts";
+  import { showIdentities } from "#lib/utils/ShowIdentities.ts";
   import { refreshAll } from "$app/navigation";
-  import { betaApi } from "$lib/api/beta";
-  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
+  import { betaApi } from "#lib/api/beta.ts";
+  import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
 
   let { data, params }: PageProps = $props();
 

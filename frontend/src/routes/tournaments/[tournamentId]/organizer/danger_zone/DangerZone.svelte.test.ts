@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
 import DangerZonePage from "./+page.svelte";
-import { Tournament } from "$lib/model/Tournament";
-import type { Stage } from "$lib/model/Stage";
-import { betaApi } from "$lib/api/beta";
+import { Tournament } from "#lib/model/Tournament.ts";
+import type { Stage } from "#lib/model/Stage.ts";
+import { betaApi } from "#lib/api/beta.ts";
 import { goto, refreshAll } from "$app/navigation";
-import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
 
-vi.mock("$lib/api/beta", () => ({
+vi.mock("#lib/api/beta.ts", () => ({
   betaApi: {
     deleteTournament: vi.fn(),
     deleteStage: vi.fn(),

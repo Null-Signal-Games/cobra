@@ -1,8 +1,8 @@
 <script lang="ts">
   import Round from "./Round.svelte";
-  import type { ScoreReport } from "$lib/model/ScoreReport";
-  import type { Stage } from "$lib/model/Stage";
-  import type { Tournament } from "$lib/model/Tournament";
+  import type { ScoreReport } from "#lib/model/ScoreReport.ts";
+  import type { Stage } from "#lib/model/Stage.ts";
+  import type { Tournament } from "#lib/model/Tournament.ts";
 
   let {
     tournament,

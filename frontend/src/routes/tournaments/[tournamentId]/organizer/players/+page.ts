@@ -1,6 +1,6 @@
 import type { PageLoad } from "./$types";
-import { betaApi } from "$lib/api/beta";
-import { v1Api } from "$lib/api/v1";
+import { betaApi } from "#lib/api/beta.ts";
+import { v1Api } from "#lib/api/v1.ts";
 
 export const load: PageLoad = async ({ params, fetch, parent }) => {
   await parent();

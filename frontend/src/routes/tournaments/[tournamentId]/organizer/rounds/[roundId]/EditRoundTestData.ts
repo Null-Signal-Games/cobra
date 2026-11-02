@@ -1,10 +1,10 @@
-import { Identity } from "$lib/model/Identity";
-import type { Pairing } from "$lib/model/Pairing";
-import type { Player } from "$lib/model/Player";
-import type { RoundTimer } from "$lib/model/Round";
-import type { ScoreReport } from "$lib/model/ScoreReport";
-import { Tournament } from "$lib/model/Tournament";
-import type { RoundData } from "$lib/api/betaTypes";
+import { Identity } from "#lib/model/Identity.ts";
+import type { Pairing } from "#lib/model/Pairing.ts";
+import type { Player } from "#lib/model/Player.ts";
+import type { RoundTimer } from "#lib/model/Round.ts";
+import type { ScoreReport } from "#lib/model/ScoreReport.ts";
+import { Tournament } from "#lib/model/Tournament.ts";
+import type { RoundData } from "#lib/api/betaTypes.ts";
 
 export const MockPlayerAlice: Player = {
   id: 1,

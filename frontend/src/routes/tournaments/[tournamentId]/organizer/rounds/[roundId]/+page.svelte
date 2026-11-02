@@ -1,14 +1,14 @@
 <script lang="ts">
-  import FontAwesomeIcon from '$lib/components/FontAwesomeIcon.svelte';
+  import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
   import Pairing from '../Pairing.svelte';
   import type { PageProps } from "./$types";
-  import type { NewPairing } from '$lib/model/Pairing';
+  import type { NewPairing } from '#lib/model/Pairing.ts';
   import { goto, refreshAll } from '$app/navigation';
   import { resolve } from '$app/paths';
-  import type { ScoreReport } from '$lib/model/ScoreReport';
-  import { betaApi } from "$lib/api/beta";
-  import ProgressButton from '$lib/components/ProgressButton.svelte';
-  import { globalMessages } from '$lib/utils/GlobalMessageState.svelte';
+  import type { ScoreReport } from '#lib/model/ScoreReport.ts';
+  import { betaApi } from "#lib/api/beta.ts";
+  import ProgressButton from '#lib/components/ProgressButton.svelte';
+  import { globalMessages } from '#lib/utils/GlobalMessageState.svelte.ts';
 
   let { data, params }: PageProps = $props();
 

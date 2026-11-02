@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import PlayerMeetingPage from "./+page.svelte";
 import { createPlayerMeetingPairings } from "./pairings";
-import { getBackDetails } from "$lib/utils/navigation";
-import { Player } from "$lib/model/Player";
+import { getBackDetails } from "#lib/utils/navigation.ts";
+import { Player } from "#lib/model/Player.ts";
 
 function createPlayer(name: string): Player {
   const p = new Player();

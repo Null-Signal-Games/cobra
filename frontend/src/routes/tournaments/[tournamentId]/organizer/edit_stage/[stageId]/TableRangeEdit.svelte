@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { type Stage, type TableRange } from "$lib/api/classicTypes";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import { type Stage, type TableRange } from "#lib/api/classicTypes.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
 
   interface Props {
     stage: Stage;

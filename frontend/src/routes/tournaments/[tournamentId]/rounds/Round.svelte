@@ -1,10 +1,10 @@
 <script lang="ts">
   import Pairing from "./Pairing.svelte";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import type { Tournament } from "$lib/model/Tournament";
-  import type { Round } from "$lib/model/Round";
-  import type { ScoreReport } from "$lib/model/ScoreReport";
-  import type { Stage } from "$lib/model/Stage";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import type { Tournament } from "#lib/model/Tournament.ts";
+  import type { Round } from "#lib/model/Round.ts";
+  import type { ScoreReport } from "#lib/model/ScoreReport.ts";
+  import type { Stage } from "#lib/model/Stage.ts";
   import { resolve } from "$app/paths";
 
   let {

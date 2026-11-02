@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { SwissStage } from "$lib/model/Standings";
-  import Identity from "$lib/components/identity/Identity.svelte";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import type { SwissStage } from "#lib/model/Standings.ts";
+  import Identity from "#lib/components/identity/Identity.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import Tooltip from "./Tooltip.svelte";
   import { resolve } from "$app/paths";
 

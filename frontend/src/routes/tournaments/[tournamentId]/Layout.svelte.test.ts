@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen, cleanup } from "@testing-library/svelte";
 import TournamentLayout from "./+layout.svelte";
-import { Tournament } from "$lib/model/Tournament";
+import { Tournament } from "#lib/model/Tournament.ts";
 import { createRawSnippet } from "svelte";
 
 vi.mock("$app/env/public", () => ({

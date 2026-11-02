@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { authStore } from "$lib/utils/auth.svelte";
+  import { authStore } from "#lib/utils/auth.svelte.ts";
   import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
 
   const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
   let returnTo = $state("/tournaments/my");

@@ -1,15 +1,15 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import type { IdentityNames } from "$lib/model/Identity";
-  import type { Tournament, TournamentPolicies } from "$lib/model/Tournament";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
+  import type { IdentityNames } from "#lib/model/Identity.ts";
+  import type { Tournament, TournamentPolicies } from "#lib/model/Tournament.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
   import {
     Player,
-  } from "$lib/model/Player";
-  import { betaApi } from "$lib/api/beta";
-  import IdentitySelect from "$lib/components/IdentitySelect.svelte";
-  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+  } from "#lib/model/Player.ts";
+  import { betaApi } from "#lib/api/beta.ts";
+  import IdentitySelect from "#lib/components/IdentitySelect.svelte";
+  import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
 
   let {
     player,

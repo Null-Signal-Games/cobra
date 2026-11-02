@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { classicApi } from "$lib/api/classic";
-  import type { DemoTournamentSettings } from "$lib/api/classicTypes";
-  import { type Errors, ValidationError } from "$lib/utils/errors";
-  import { navigateTo } from "$lib/utils/navigation";
+  import { classicApi } from "#lib/api/classic.ts";
+  import type { DemoTournamentSettings } from "#lib/api/classicTypes.ts";
+  import { type Errors, ValidationError } from "#lib/utils/errors.ts";
+  import { navigateTo } from "#lib/utils/navigation.ts";
   import DemoTournamentSettingsForm from "./DemoTournamentSettingsForm.svelte";
 
   let tournament = $state<DemoTournamentSettings | undefined>(undefined);

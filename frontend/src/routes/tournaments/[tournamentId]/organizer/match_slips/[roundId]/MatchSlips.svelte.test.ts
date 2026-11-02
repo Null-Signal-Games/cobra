@@ -2,10 +2,10 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
 import MatchSlips from "./+page.svelte";
-import { Player } from "$lib/model/Player";
-import type { Pairing } from "$lib/model/Pairing";
-import type { Round } from "$lib/model/Round";
-import { TournamentPolicies } from "$lib/model/Tournament";
+import { Player } from "#lib/model/Player.ts";
+import type { Pairing } from "#lib/model/Pairing.ts";
+import type { Round } from "#lib/model/Round.ts";
+import { TournamentPolicies } from "#lib/model/Tournament.ts";
 
 const user = userEvent.setup();
 

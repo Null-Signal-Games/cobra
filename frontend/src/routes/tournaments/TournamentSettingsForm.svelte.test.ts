@@ -2,7 +2,7 @@
 import { render, screen, fireEvent, cleanup } from "@testing-library/svelte";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import TournamentSettingsForm from "./TournamentSettingsForm.svelte";
-import { Tournament, type TournamentOptions } from "$lib/model/Tournament";
+import { Tournament, type TournamentOptions } from "#lib/model/Tournament.ts";
 
 describe("TournamentSettingsForm dropdowns", () => {
   afterEach(cleanup);

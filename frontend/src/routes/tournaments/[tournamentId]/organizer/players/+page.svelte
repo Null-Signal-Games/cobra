@@ -3,18 +3,18 @@
   import type { PageProps } from "./$types";
   import {
     Player,
-  } from "$lib/model/Player";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  } from "#lib/model/Player.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import PlayerForm from "./PlayerForm.svelte";
   import { refreshAll } from "$app/navigation";
   import {
     CutDeckVisibility,
     deckVisibilityString,
     SwissDeckVisibility,
-  } from "$lib/model/Tournament";
-  import { downloadBlob, quoteCsvValue } from "$lib/utils/files";
-  import { deckCsv } from "$lib/utils/decks.svelte";
-  import { betaApi } from "$lib/api/beta";
+  } from "#lib/model/Tournament.ts";
+  import { downloadBlob, quoteCsvValue } from "#lib/utils/files.ts";
+  import { deckCsv } from "#lib/utils/decks.svelte.ts";
+  import { betaApi } from "#lib/api/beta.ts";
 
   let { data, params }: PageProps = $props();
 

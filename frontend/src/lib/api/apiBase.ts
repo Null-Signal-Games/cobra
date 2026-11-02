@@ -1,7 +1,7 @@
 import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
-import type { StatusOr } from "$lib/api/statusOr";
-import { ValidationError, type Errors } from "$lib/utils/errors";
-import { setWarnings } from "$lib/utils/GlobalMessageState.svelte";
+import type { StatusOr } from "#lib/api/statusOr.ts";
+import { ValidationError, type Errors } from "#lib/utils/errors.ts";
+import { setWarnings } from "#lib/utils/GlobalMessageState.svelte.ts";
 
 export interface RequestOptions {
   altFetch?: typeof fetch;
@@ -75,7 +75,7 @@ export class ApiBase {
 
   private async csrfToken(activeFetch: typeof fetch): Promise<string> {
     // Imported lazily: auth.svelte.ts loads the API modules, which depend on this one.
-    const { authStore } = await import("$lib/utils/auth.svelte");
+    const { authStore } = await import("#lib/utils/auth.svelte.ts");
     try {
       return await authStore.getCsrfToken(activeFetch);
     } catch {

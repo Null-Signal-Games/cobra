@@ -1,4 +1,4 @@
-import type { Identity } from "$lib/model/Identity";
+import type { Identity } from "#lib/model/Identity.ts";
 
 // TODO: Merge / unify types in here with the types in src/lib/model/.
 export interface BracketData {

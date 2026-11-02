@@ -1,14 +1,14 @@
 <script lang="ts">
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
   import {
     emptyTournamentOptions,
     swissFormatDisplayString,
     type FeatureFlags,
     type Tournament,
     type TournamentOptions,
-  } from "$lib/model/Tournament";
-  import { type Errors } from "$lib/utils/errors";
+  } from "#lib/model/Tournament.ts";
+  import { type Errors } from "#lib/utils/errors.ts";
 
   let {
     tournament,

@@ -1,5 +1,5 @@
 import type { PageLoad } from "./$types";
-import { classicApi } from "$lib/api/classic";
+import { classicApi } from "#lib/api/classic.ts";
 
 export const load: PageLoad = async ({ params, fetch, parent }) => {
   await parent(); // Ensures organizer authorization in +layout.ts runs first

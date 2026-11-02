@@ -4,10 +4,10 @@
     Player,
     PlayerSource,
     PredecessorMap,
-  } from "$lib/model/Bracket";
-  import type { Identity } from "$lib/model/Identity";
-  import IdentityComponent from "$lib/components/identity/Identity.svelte";
-  import { showIdentities } from "$lib/utils/ShowIdentities";
+  } from "#lib/model/Bracket.ts";
+  import type { Identity } from "#lib/model/Identity.ts";
+  import IdentityComponent from "#lib/components/identity/Identity.svelte";
+  import { showIdentities } from "#lib/utils/ShowIdentities.ts";
 
   let {
     match,

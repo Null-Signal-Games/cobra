@@ -2,7 +2,7 @@
   import type { PageProps } from "./$types";
   import DoubleElimStandings from "./DoubleElimStandings.svelte";
   import SwissStandings from "./SwissStandings.svelte";
-  import type { CutStage, SwissStage } from "$lib/model/Standings";
+  import type { CutStage, SwissStage } from "#lib/model/Standings.ts";
   
   let { data, params }: PageProps = $props();
 </script>

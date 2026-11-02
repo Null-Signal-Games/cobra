@@ -1,7 +1,7 @@
 import type { PageLoad } from "./$types";
-import { betaApi } from "$lib/api/beta";
-import { Deck } from "$lib/model/Deck";
-import { sortCards } from "$lib/utils/decks.svelte";
+import { betaApi } from "#lib/api/beta.ts";
+import { Deck } from "#lib/model/Deck.ts";
+import { sortCards } from "#lib/utils/decks.svelte.ts";
 
 export const load: PageLoad = async ({ params, fetch }) => {
   const tournamentId = parseInt(params.tournamentId);

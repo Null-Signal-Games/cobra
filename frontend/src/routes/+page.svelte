@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { TournamentInfo } from "$lib/api/v1ApiTypes";
-  import TournamentRow from "$lib/components/TournamentRow.svelte";
-  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import type { TournamentInfo } from "#lib/api/v1ApiTypes.ts";
+  import TournamentRow from "#lib/components/TournamentRow.svelte";
+  import LoadingSpinner from "#lib/components/LoadingSpinner.svelte";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { v1Api } from "$lib/api/v1";
+  import { v1Api } from "#lib/api/v1.ts";
 
   let tournaments: TournamentInfo[] = $state([]);
   let tournamentTypes: Record<string, string> = $state({});

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Identity } from "$lib/model/Identity";
+  import type { Identity } from "#lib/model/Identity.ts";
 
   let {
     identity,

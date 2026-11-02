@@ -1,17 +1,17 @@
 <script lang="ts">
   import type { PageProps } from "./$types";
   import { refreshAll } from "$app/navigation";
-  import type { Pairing } from "$lib/model/Pairing";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import PlayerDisplay from "$lib/components/PlayerDisplay.svelte";
-  import SelfReportOptions from "$lib/components/SelfReportOptions.svelte";
-  import { betaApi } from "$lib/api/beta";
-  import type { ScoreReport } from "$lib/model/ScoreReport";
-  import Identity from "$lib/components/identity/Identity.svelte";
+  import type { Pairing } from "#lib/model/Pairing.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import PlayerDisplay from "#lib/components/PlayerDisplay.svelte";
+  import SelfReportOptions from "#lib/components/SelfReportOptions.svelte";
+  import { betaApi } from "#lib/api/beta.ts";
+  import type { ScoreReport } from "#lib/model/ScoreReport.ts";
+  import Identity from "#lib/components/identity/Identity.svelte";
   import {
     CreateMyTournamentSummary,
     type MyTournamentPairing,
-  } from "$lib/utils/transformations";
+  } from "#lib/utils/transformations.ts";
 
   let { data }: PageProps = $props();
 

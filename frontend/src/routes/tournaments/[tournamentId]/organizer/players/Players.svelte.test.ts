@@ -9,16 +9,16 @@ import {
 import userEvent from "@testing-library/user-event";
 import PlayersPage from "./+page.svelte";
 import type { PageProps } from "./$types";
-import { Player, type PlayersData } from "$lib/model/Player";
+import { Player, type PlayersData } from "#lib/model/Player.ts";
 import {
   CutDeckVisibility,
   deckVisibilityString,
   SwissDeckVisibility,
   Tournament,
-} from "$lib/model/Tournament";
-import type { IdentityNames } from "$lib/model/Identity";
+} from "#lib/model/Tournament.ts";
+import type { IdentityNames } from "#lib/model/Identity.ts";
 import { refreshAll } from "$app/navigation";
-import { betaApi } from "$lib/api/beta";
+import { betaApi } from "#lib/api/beta.ts";
 
 let user = userEvent.setup();
 
@@ -55,7 +55,7 @@ vi.mock("$app/navigation", () => ({
   }),
 }));
 
-vi.mock("$lib/api/beta", () => ({
+vi.mock("#lib/api/beta.ts", () => ({
   betaApi: {
     saveTournament: vi.fn((tournament: Tournament) => {
       currentTournament.swiss_deck_visibility = tournament.swiss_deck_visibility;

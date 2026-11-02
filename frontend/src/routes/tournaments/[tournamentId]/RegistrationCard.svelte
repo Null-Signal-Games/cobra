@@ -1,17 +1,17 @@
 <script lang="ts">
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import type { Player } from "$lib/model/Player";
-  import type { Tournament } from "$lib/model/Tournament";
-  import type { IdentityNames } from "$lib/model/Identity";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import type { Player } from "#lib/model/Player.ts";
+  import type { Tournament } from "#lib/model/Tournament.ts";
+  import type { IdentityNames } from "#lib/model/Identity.ts";
   import { resolve } from "$app/paths";
-  import IdentitySelect from "$lib/components/IdentitySelect.svelte";
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
-  import Identity from "$lib/components/identity/Identity.svelte";
+  import IdentitySelect from "#lib/components/IdentitySelect.svelte";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
+  import Identity from "#lib/components/identity/Identity.svelte";
   import { onMount } from "svelte";
-  import { betaApi } from "$lib/api/beta";
-  import { v1Api } from "$lib/api/v1";
-  import { navigateTo } from "$lib/utils/navigation";
-  import { authStore } from "$lib/utils/auth.svelte";
+  import { betaApi } from "#lib/api/beta.ts";
+  import { v1Api } from "#lib/api/v1.ts";
+  import { navigateTo } from "#lib/utils/navigation.ts";
+  import { authStore } from "#lib/utils/auth.svelte.ts";
   import { refreshAll } from "$app/navigation";
 
   let {

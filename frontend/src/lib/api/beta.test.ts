@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BetaApi, betaApi } from "./beta";
 import { ApiBase } from "./apiBase";
-import { Player } from "$lib/model/Player";
-import type { ScoreReport } from "$lib/model/ScoreReport";
-import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-import { authStore } from "$lib/utils/auth.svelte";
+import { Player } from "#lib/model/Player.ts";
+import type { ScoreReport } from "#lib/model/ScoreReport.ts";
+import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
+import { authStore } from "#lib/utils/auth.svelte.ts";
 
 describe("BetaApi", () => {
   const mockFetch = vi.fn<typeof fetch>();

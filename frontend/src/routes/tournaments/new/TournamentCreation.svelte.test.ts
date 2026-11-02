@@ -1,25 +1,25 @@
 import type { ComponentProps } from "svelte";
 import type { PageProps } from "./$types";
-import { Tournament } from "$lib/model/Tournament";
-import { ValidationError } from "$lib/utils/errors";
+import { Tournament } from "#lib/model/Tournament.ts";
+import { ValidationError } from "#lib/utils/errors.ts";
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/svelte";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import TournamentCreation from "./+page.svelte";
-import { navigateTo } from "$lib/utils/navigation";
+import { navigateTo } from "#lib/utils/navigation.ts";
 
-import { classicApi } from "$lib/api/classic";
+import { classicApi } from "#lib/api/classic.ts";
 
 vi.mock("$app/env/public", () => ({
   CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000",
 }));
 
-vi.mock("$lib/api/classic", () => ({
+vi.mock("#lib/api/classic.ts", () => ({
   classicApi: {
     createTournament: vi.fn(),
   },
 }));
 
-vi.mock("$lib/utils/navigation", () => ({
+vi.mock("#lib/utils/navigation.ts", () => ({
   navigateTo: vi.fn(),
 }));
 

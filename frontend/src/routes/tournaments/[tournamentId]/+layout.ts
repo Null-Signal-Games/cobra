@@ -1,5 +1,5 @@
-import { betaApi } from "$lib/api/beta";
-import { v1Api } from "$lib/api/v1";
+import { betaApi } from "#lib/api/beta.ts";
+import { v1Api } from "#lib/api/v1.ts";
 import type { LayoutLoad } from "./$types";
 
 export const load: LayoutLoad = async ({ params, parent, fetch }) => {

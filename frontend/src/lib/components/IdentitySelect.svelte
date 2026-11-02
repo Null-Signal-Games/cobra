@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { IdentityName } from "$lib/model/Identity";
+  import type { IdentityName } from "#lib/model/Identity.ts";
   import Svelecte from "svelecte";
 
   let {

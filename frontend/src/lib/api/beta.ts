@@ -1,13 +1,13 @@
-import { api as defaultApi, type ApiBase } from "$lib/api/apiBase";
-import type { PairingsData, RoundData } from "$lib/api/betaTypes";
-import type { Deck, NrdbDeck } from "$lib/model/Deck";
-import type { NewPairing } from "$lib/model/Pairing";
-import { type Player, playerRequestObject, type PlayersData } from "$lib/model/Player";
-import type { RoundTimer } from "$lib/model/Round";
-import type { ScoreReport } from "$lib/model/ScoreReport";
-import type { Stats, CutStats } from "$lib/model/Stats";
-import type { Tournament } from "$lib/model/Tournament";
-import { addError, setErrors } from "$lib/utils/GlobalMessageState.svelte";
+import { api as defaultApi, type ApiBase } from "#lib/api/apiBase.ts";
+import type { PairingsData, RoundData } from "#lib/api/betaTypes.ts";
+import type { Deck, NrdbDeck } from "#lib/model/Deck.ts";
+import type { NewPairing } from "#lib/model/Pairing.ts";
+import { type Player, playerRequestObject, type PlayersData } from "#lib/model/Player.ts";
+import type { RoundTimer } from "#lib/model/Round.ts";
+import type { ScoreReport } from "#lib/model/ScoreReport.ts";
+import type { Stats, CutStats } from "#lib/model/Stats.ts";
+import type { Tournament } from "#lib/model/Tournament.ts";
+import { addError, setErrors } from "#lib/utils/GlobalMessageState.svelte.ts";
 
 interface SavePlayerResponse {
   player: Player;

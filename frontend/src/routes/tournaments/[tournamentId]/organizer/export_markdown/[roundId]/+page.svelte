@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import type { PageProps } from "./$types";
   import SharePage from "./SharePage.svelte";
   import { generateMarkdownPages } from "./markdown";

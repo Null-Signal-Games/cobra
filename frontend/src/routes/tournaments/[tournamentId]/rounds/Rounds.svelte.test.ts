@@ -14,10 +14,10 @@ import {
 } from "@testing-library/svelte";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { betaApi } from "$lib/api/beta";
+import { betaApi } from "#lib/api/beta.ts";
 import RoundsPage from "./+page.svelte";
-import type { ScoreReport } from "$lib/model/ScoreReport";
-import { Player } from "$lib/model/Player";
+import type { ScoreReport } from "#lib/model/ScoreReport.ts";
+import { Player } from "#lib/model/Player.ts";
 import type { PageProps } from "./$types";
 import {
   MockSwissStage,
@@ -28,7 +28,7 @@ import {
   MockSelfReportPlayer2Sweep,
   MockTournament,
 } from "./RoundsTestData";
-import type { TournamentPolicies } from "$lib/model/Tournament";
+import type { TournamentPolicies } from "#lib/model/Tournament.ts";
 
 vi.mock('$app/env/public', () => {
   return {
@@ -65,7 +65,7 @@ const MockPageData: PageProps["data"] = {
   stages: [MockSwissStage],
 };
 
-vi.mock("$lib/api/beta", () => ({
+vi.mock("#lib/api/beta.ts", () => ({
   betaApi: {
     loadPairings: vi.fn(() => { return { policy: MockPolicy, stages: [MockSwissStage] }; }),
     reportScore: vi.fn(() => true),

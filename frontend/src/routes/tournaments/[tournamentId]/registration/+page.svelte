@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { Deck } from "$lib/model/Deck";
-  import { Identity } from "$lib/model/Identity";
-  import { betaApi } from "$lib/api/beta";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
+  import { Deck } from "#lib/model/Deck.ts";
+  import { Identity } from "#lib/model/Identity.ts";
+  import { betaApi } from "#lib/api/beta.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { refreshAll } from "$app/navigation";
-  import { sortCards } from "$lib/utils/decks.svelte";
-  import { authStore } from "$lib/utils/auth.svelte";
-  import DeckDisplay from "$lib/components/DeckDisplay.svelte";
+  import { sortCards } from "#lib/utils/decks.svelte.ts";
+  import { authStore } from "#lib/utils/auth.svelte.ts";
+  import DeckDisplay from "#lib/components/DeckDisplay.svelte";
 
   let { data, params }: PageProps = $props();
 

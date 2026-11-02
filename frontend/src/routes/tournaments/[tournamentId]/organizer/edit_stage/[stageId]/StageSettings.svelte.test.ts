@@ -3,10 +3,10 @@ import { cleanup, render, screen, waitFor } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
 import StageSettings from "./StageSettings.svelte";
 import TableRangeEdit from "./TableRangeEdit.svelte";
-import { StageData, type Stage } from "$lib/api/classicTypes";
-import { classicApi } from "$lib/api/classic";
-import { ValidationError } from "$lib/utils/errors";
-import { authStore } from "$lib/utils/auth.svelte";
+import { StageData, type Stage } from "#lib/api/classicTypes.ts";
+import { classicApi } from "#lib/api/classic.ts";
+import { ValidationError } from "#lib/utils/errors.ts";
+import { authStore } from "#lib/utils/auth.svelte.ts";
 
 vi.mock("$app/env/public", () => ({
   CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000",

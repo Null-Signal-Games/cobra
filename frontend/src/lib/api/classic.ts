@@ -1,5 +1,5 @@
-import { api as defaultApi, type ApiBase } from "$lib/api/apiBase";
-import type { PairingsData } from "$lib/api/betaTypes";
+import { api as defaultApi, type ApiBase } from "#lib/api/apiBase.ts";
+import type { PairingsData } from "#lib/api/betaTypes.ts";
 import type {
   AbrUploadResponse,
   DemoTournamentSettings,
@@ -10,11 +10,11 @@ import type {
   SaveStageResponse,
   Stage,
   StageData,
-} from "$lib/api/classicTypes";
-import type { BracketData } from "$lib/model/Bracket";
-import type { StandingsData } from "$lib/model/Standings";
-import type { Tournament } from "$lib/model/Tournament";
-import { addError } from "$lib/utils/GlobalMessageState.svelte";
+} from "#lib/api/classicTypes.ts";
+import type { BracketData } from "#lib/model/Bracket.ts";
+import type { StandingsData } from "#lib/model/Standings.ts";
+import type { Tournament } from "#lib/model/Tournament.ts";
+import { addError } from "#lib/utils/GlobalMessageState.svelte.ts";
 
 export class ClassicApi {
   constructor(private api: ApiBase = defaultApi) {}

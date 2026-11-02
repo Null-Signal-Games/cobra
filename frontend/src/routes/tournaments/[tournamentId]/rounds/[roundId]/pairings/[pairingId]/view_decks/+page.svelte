@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { resolve } from "$app/paths";
-  import DeckDisplay from "$lib/components/DeckDisplay.svelte";
+  import DeckDisplay from "#lib/components/DeckDisplay.svelte";
   import type { PageProps } from "./$types";
-  import { getBackDetails } from "$lib/utils/navigation";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import { getBackDetails } from "#lib/utils/navigation.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
 
   let { data, params }: PageProps = $props();
 

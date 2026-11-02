@@ -13,7 +13,7 @@ import {
   waitFor,
 } from "@testing-library/svelte";
 import Registration from "./+page.svelte";
-import { Deck } from "$lib/model/Deck";
+import { Deck } from "#lib/model/Deck.ts";
 import type { PageProps } from "./$types";
 import {
   MockBazPrinting,
@@ -25,8 +25,8 @@ import {
   MockTournament,
   MockZahyaPrinting,
 } from "./RegistrationTestData";
-import { Identity } from "$lib/model/Identity";
-import { betaApi } from "$lib/api/beta";
+import { Identity } from "#lib/model/Identity.ts";
+import { betaApi } from "#lib/api/beta.ts";
 
 vi.mock('$app/env/public', () => {
   return {
@@ -34,7 +34,7 @@ vi.mock('$app/env/public', () => {
   };
 });
 
-vi.mock("$lib/api/beta", () => ({
+vi.mock("#lib/api/beta.ts", () => ({
   betaApi: {
     savePlayer: vi.fn(),
   },

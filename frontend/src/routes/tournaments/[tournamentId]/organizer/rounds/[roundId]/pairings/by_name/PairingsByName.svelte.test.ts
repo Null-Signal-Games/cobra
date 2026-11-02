@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import PairingsByNamePage from "./+page.svelte";
-import { formatPlayerDisplay, generatePairingsByName } from "$lib/model/Pairing";
-import { Player } from "$lib/model/Player";
-import type { Pairing } from "$lib/model/Pairing";
-import type { Round } from "$lib/model/Round";
-import type { Stage } from "$lib/model/Stage";
-import { TournamentPolicies } from "$lib/model/Tournament";
+import { formatPlayerDisplay, generatePairingsByName } from "#lib/model/Pairing.ts";
+import { Player } from "#lib/model/Player.ts";
+import type { Pairing } from "#lib/model/Pairing.ts";
+import type { Round } from "#lib/model/Round.ts";
+import type { Stage } from "#lib/model/Stage.ts";
+import { TournamentPolicies } from "#lib/model/Tournament.ts";
 
 function createPlayer(name: string, sideLabel?: string): Player {
   const p = new Player();

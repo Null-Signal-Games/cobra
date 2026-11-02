@@ -1,7 +1,7 @@
-import type { NrdbDeck } from "$lib/model/Deck";
-import type { Player } from "$lib/model/Player";
-import { Tournament } from "$lib/model/Tournament";
-import type { Printing } from "$lib/api/v1ApiTypes";
+import type { NrdbDeck } from "#lib/model/Deck.ts";
+import type { Player } from "#lib/model/Player.ts";
+import { Tournament } from "#lib/model/Tournament.ts";
+import type { Printing } from "#lib/api/v1ApiTypes.ts";
 
 export const MockTournament = new Tournament({
   id: 1,
