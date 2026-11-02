@@ -21,6 +21,10 @@ The top-level `Dockerfile`, `docker-compose.yml`, and `docker-compose.deploy.yml
 | `location ~ ^/(favicon.*\|robots\.txt)$` | `node_upstream` (`svelte:3000`) | Svelte | Static favicon and crawler configuration |
 | `location /` (catch-all) | `node_upstream` (`svelte:3000`) | Svelte | All UI routes (`/`, `/tournaments`, `/tournaments/*`, `/login`, `/profile`, `/help`, `/:slug`) |
 
+### Public origin
+
+The SvelteKit server builds its public URL (`event.url`, `page.url`) from each request instead of a configured origin: the host comes from `Host` and the protocol from `X-Forwarded-Proto` (`PROTOCOL_HEADER=x-forwarded-proto` in `docker-compose.yml`). The gateway passes on the `X-Forwarded-Proto` that nginx-proxy sets after terminating TLS, so production gets `https`. Without a proxy in front (the local stack on port 3000), it falls back to the gateway's own `http`. Rails gets the same header.
+
 ---
 
 ## Directory Contents
@@ -63,7 +67,6 @@ Compose reads `.env` from the project directory, which is the folder of the firs
 ### `deploy/.env` settings
 - `FRONTEND_VERSION` / `COBRA_SERVER_VERSION`: Tags for the SvelteKit and Rails images.
 - `COBRA_DOMAIN`: Public hostname. Used for `VIRTUAL_HOST` and `LETSENCRYPT_HOST`, and passed to Rails for the NRDB OAuth `redirect_uri`.
-- `COBRA_ORIGIN`: Public URL of the site (e.g. `https://tournaments.nullsignal.games`), passed to the SvelteKit server as `ORIGIN`. adapter-node builds server-side URLs (`event.url`, `page.url`) from it rather than the request's Host header.
 - `LETSENCRYPT_EMAIL`: Contact email for Let's Encrypt certificates.
 - `RAILS_ENV`: Rails environment (`production` on deployed hosts).
 - `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB`: Database credentials, shared by the `db` and `rails` containers.
