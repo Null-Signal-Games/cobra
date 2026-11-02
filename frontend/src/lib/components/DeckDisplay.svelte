@@ -210,7 +210,7 @@
 </script>
 
 <!-- Deck summary -->
-{#if deck.details.nrdb_uuid}
+{#if editMode || deck.details.id !== 0 || deck.details.nrdb_uuid}
   <table
     class="table table-bordered table-striped"
     aria-label={deck.details.side_id === "corp" ? "corp deck" : "runner deck"}

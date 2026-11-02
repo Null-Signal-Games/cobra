@@ -12,7 +12,7 @@ module Beta
     end
 
     def show
-      authorize @player, :update?
+      authorize @player, :show?
 
       render json: @player
     end
