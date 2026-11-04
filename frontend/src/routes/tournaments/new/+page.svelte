@@ -34,7 +34,7 @@
   }
 </script>
 
-<div>
+<div class="py-3">
   <h1>Create a tournament</h1>
 
   {#if errors.base}
