@@ -2,7 +2,7 @@
 FROM node:24-alpine AS node-builder
 
 # Stage 2: Create the final ruby & node image
-FROM ruby:3.4.10-alpine3.24 AS base
+FROM ruby:3.4-alpine3.24 AS base
 
 # Copy Node.js binaries from the node-builder stage
 COPY --from=node-builder /usr/lib /usr/lib
