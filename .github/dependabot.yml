@@ -1,0 +1,55 @@
+version: 2
+updates:
+  # Rails app (Gemfile / Gemfile.lock at repo root)
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 5
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      bundler-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Top-level npm packages (package.json at repo root)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 5
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      npm-root-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Standalone SvelteKit app (frontend/package.json)
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 5
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+    groups:
+      npm-frontend-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
