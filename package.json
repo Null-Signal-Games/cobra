@@ -26,7 +26,7 @@
     "globals": "^17",
     "jsdom": "^29.1.1",
     "marked": "^18.0.5",
-    "msw": "^2",
+    "msw": "^3",
     "prettier": "^3",
     "prettier-plugin-svelte": "^4",
     "svelecte": "^5.3.0",
