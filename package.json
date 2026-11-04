@@ -18,7 +18,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@tsconfig/svelte": "^5.0.4",
     "@types/node": "^24.0.1",
-    "@vitest/ui": "^4",
+    "@vitest/ui": "^5",
     "apexcharts": "^6",
     "dompurify": "^3.4.17",
     "eslint": "^10",
