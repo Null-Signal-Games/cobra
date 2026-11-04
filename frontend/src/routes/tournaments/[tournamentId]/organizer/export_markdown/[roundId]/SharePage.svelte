@@ -1,6 +1,6 @@
 <script lang="ts">
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
 
   let { text, page }: { text: string; page: number } = $props();
 

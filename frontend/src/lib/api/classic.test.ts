@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ClassicApi, classicApi } from "./classic";
 import { ApiBase } from "./apiBase";
-import { Tournament } from "$lib/model/Tournament";
-import type { DemoTournamentSettings, Stage } from "$lib/api/classicTypes";
-import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-import { authStore } from "$lib/utils/auth.svelte";
-import { ValidationError } from "$lib/utils/errors";
+import { Tournament } from "#lib/model/Tournament.ts";
+import type { DemoTournamentSettings, Stage } from "#lib/api/classicTypes.ts";
+import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
+import { authStore } from "#lib/utils/auth.svelte.ts";
+import { ValidationError } from "#lib/utils/errors.ts";
 
 describe("ClassicApi", () => {
   const mockFetch = vi.fn<typeof fetch>();

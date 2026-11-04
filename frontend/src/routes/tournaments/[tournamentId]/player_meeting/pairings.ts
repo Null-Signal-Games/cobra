@@ -1,4 +1,4 @@
-import type { Player } from "$lib/model/Player";
+import type { Player } from "#lib/model/Player.ts";
 
 export function createPlayerMeetingPairings(players: Player[]): [Player, Player | undefined][] {
   const sorted = [...players].sort((a, b) =>

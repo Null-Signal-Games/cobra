@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
 
   let {
     title,

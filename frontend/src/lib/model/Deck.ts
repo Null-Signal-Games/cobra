@@ -1,4 +1,4 @@
-import type { Printing } from "$lib/api/v1ApiTypes";
+import type { Printing } from "#lib/api/v1ApiTypes.ts";
 
 export interface Card {
   id: number;

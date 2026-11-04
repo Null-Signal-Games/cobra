@@ -1,11 +1,11 @@
 <script lang="ts">
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ModalDialog from "$lib/components/ModalDialog.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ModalDialog from "#lib/components/ModalDialog.svelte";
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
   import { page } from "$app/state";
-  import { formatWallClockTime } from "$lib/utils/time";
-  import { swissFormatDisplayString } from "$lib/model/Tournament";
+  import { formatWallClockTime } from "#lib/utils/time.ts";
+  import { swissFormatDisplayString } from "#lib/model/Tournament.ts";
   import RegistrationCard from "./RegistrationCard.svelte";
   import Markdown from '@magidoc/plugin-svelte-marked'
   import { qr } from '@svelte-put/qr/svg';

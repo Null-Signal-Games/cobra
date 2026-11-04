@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { PageProps } from "./$types";
   import TournamentSettingsForm from "../TournamentSettingsForm.svelte";
-  import type { Tournament } from "$lib/model/Tournament";
-  import { type Errors, ValidationError } from "$lib/utils/errors";
-  import { classicApi } from "$lib/api/classic";
-  import { navigateTo } from "$lib/utils/navigation";
+  import type { Tournament } from "#lib/model/Tournament.ts";
+  import { type Errors, ValidationError } from "#lib/utils/errors.ts";
+  import { classicApi } from "#lib/api/classic.ts";
+  import { navigateTo } from "#lib/utils/navigation.ts";
 
   let { data }: PageProps = $props();
 

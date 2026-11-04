@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { type Pairing } from "$lib/model/Pairing";
-  import type { Player } from "$lib/model/Player";
+  import { type Pairing } from "#lib/model/Pairing.ts";
+  import type { Player } from "#lib/model/Player.ts";
   import FontAwesomeIcon from "./FontAwesomeIcon.svelte";
   import Identity from "./identity/Identity.svelte";
-  import { showIdentities } from "$lib/utils/ShowIdentities";
+  import { showIdentities } from "#lib/utils/ShowIdentities.ts";
 
   let {
     player,

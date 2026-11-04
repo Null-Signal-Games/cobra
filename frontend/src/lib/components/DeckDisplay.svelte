@@ -1,12 +1,12 @@
 <script lang="ts">
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import Identity from "$lib/components/identity/Identity.svelte";
-  import { Deck, type Card } from "$lib/model/Deck";
-  import type { Printing } from "$lib/api/v1ApiTypes";
-  import { deckCsv, transformCardLookup } from "$lib/utils/decks.svelte";
-  import { downloadBlob } from "$lib/utils/files";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import Identity from "#lib/components/identity/Identity.svelte";
+  import { Deck, type Card } from "#lib/model/Deck.ts";
+  import type { Printing } from "#lib/api/v1ApiTypes.ts";
+  import { deckCsv, transformCardLookup } from "#lib/utils/decks.svelte.ts";
+  import { downloadBlob } from "#lib/utils/files.ts";
   import Svelecte from "svelecte";
-  import { getCardTypeImage } from "$lib/utils/images";
+  import { getCardTypeImage } from "#lib/utils/images.ts";
   import EditableCard from "./EditableCard.svelte";
 
   interface CardSearchOption {

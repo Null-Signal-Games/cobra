@@ -1,4 +1,4 @@
-import type { Pairing } from "$lib/model/Pairing";
+import type { Pairing } from "#lib/model/Pairing.ts";
 
 export function sortByTableNumber(p1: Pairing, p2: Pairing): number {
   return p1.table_number - p2.table_number;

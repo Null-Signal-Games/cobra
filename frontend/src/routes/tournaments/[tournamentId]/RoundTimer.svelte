@@ -1,7 +1,7 @@
 <script lang="ts">
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ModalDialog from "$lib/components/ModalDialog.svelte";
-  import type { RoundTimer } from "$lib/model/Round";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ModalDialog from "#lib/components/ModalDialog.svelte";
+  import type { RoundTimer } from "#lib/model/Round.ts";
   import { onMount } from "svelte";
 
   let { timer }: { timer: RoundTimer } = $props();

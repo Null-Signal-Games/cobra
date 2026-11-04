@@ -1,6 +1,6 @@
 import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
-import { classicApi } from "$lib/api/classic";
-import { v1Api } from "$lib/api/v1";
+import { classicApi } from "#lib/api/classic.ts";
+import { v1Api } from "#lib/api/v1.ts";
 
 export interface AuthUser {
   id: number;

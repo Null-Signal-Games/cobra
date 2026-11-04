@@ -1,8 +1,8 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import type { PageProps } from "./$types";
-  import { generatePairingsByName } from "$lib/model/Pairing";
+  import { generatePairingsByName } from "#lib/model/Pairing.ts";
 
   let { data, params }: PageProps = $props();
 

@@ -8,9 +8,9 @@ import {
   screen,
 } from "@testing-library/svelte";
 import Registration from "./+page.svelte";
-import { Deck, type NrdbDeck } from "$lib/model/Deck";
-import { betaApi } from "$lib/api/beta";
-import { convertNrdbDeck } from "$lib/utils/decks.svelte";
+import { Deck, type NrdbDeck } from "#lib/model/Deck.ts";
+import { betaApi } from "#lib/api/beta.ts";
+import { convertNrdbDeck } from "#lib/utils/decks.svelte.ts";
 import type { PageProps } from "./$types";
 import {
   MockPlayerBob,
@@ -18,7 +18,7 @@ import {
   MockPrintings,
   MockTournament,
 } from "./RegistrationTestData";
-import { Identity } from "$lib/model/Identity";
+import { Identity } from "#lib/model/Identity.ts";
 
 vi.mock('$app/env/public', () => {
   return {
@@ -26,7 +26,7 @@ vi.mock('$app/env/public', () => {
   };
 });
 
-vi.mock("$lib/api/beta", () => ({
+vi.mock("#lib/api/beta.ts", () => ({
   betaApi: {
     savePlayer: vi.fn(() => true),
   },

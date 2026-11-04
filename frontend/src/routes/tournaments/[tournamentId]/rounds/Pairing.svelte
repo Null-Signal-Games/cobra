@@ -1,12 +1,12 @@
 <script lang="ts">
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import SelfReportOptions from "$lib/components/SelfReportOptions.svelte";
-  import type { Stage } from "$lib/model/Stage";
-  import type { Round } from "$lib/model/Round";
-  import { type Pairing } from "$lib/model/Pairing";
-  import type { Tournament } from "$lib/model/Tournament";
-  import { readableReportScore, type ScoreReport } from "$lib/model/ScoreReport";
-  import PlayerDisplay from "$lib/components/PlayerDisplay.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import SelfReportOptions from "#lib/components/SelfReportOptions.svelte";
+  import type { Stage } from "#lib/model/Stage.ts";
+  import type { Round } from "#lib/model/Round.ts";
+  import { type Pairing } from "#lib/model/Pairing.ts";
+  import type { Tournament } from "#lib/model/Tournament.ts";
+  import { readableReportScore, type ScoreReport } from "#lib/model/ScoreReport.ts";
+  import PlayerDisplay from "#lib/components/PlayerDisplay.svelte";
   import { resolve } from "$app/paths";
 
   let {

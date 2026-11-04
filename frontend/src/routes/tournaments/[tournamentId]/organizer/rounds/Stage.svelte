@@ -1,9 +1,9 @@
 <script lang="ts">
   import Round from "./Round.svelte";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import type { ScoreReport } from "$lib/model/ScoreReport";
-  import type { Stage } from "$lib/model/Stage";
-  import type { Tournament, TournamentPolicies } from "$lib/model/Tournament";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import type { ScoreReport } from "#lib/model/ScoreReport.ts";
+  import type { Stage } from "#lib/model/Stage.ts";
+  import type { Tournament, TournamentPolicies } from "#lib/model/Tournament.ts";
   import { resolve } from "$app/paths";
 
   let {

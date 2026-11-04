@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+  import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
 </script>
 
 <div>

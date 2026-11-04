@@ -9,10 +9,10 @@ import {
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import ViewDecksPage from "./+page.svelte";
 import type { PageProps } from "./$types";
-import { Tournament } from "$lib/model/Tournament";
-import type { Player } from "$lib/model/Player";
-import { Identity } from "$lib/model/Identity";
-import { Deck } from "$lib/model/Deck";
+import { Tournament } from "#lib/model/Tournament.ts";
+import type { Player } from "#lib/model/Player.ts";
+import { Identity } from "#lib/model/Identity.ts";
+import { Deck } from "#lib/model/Deck.ts";
 
 const MockPlayerAlice: Player = {
   id: 1,

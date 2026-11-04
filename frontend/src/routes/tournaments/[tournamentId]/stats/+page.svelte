@@ -2,10 +2,10 @@
   import ApexCharts from "apexcharts";
   import type { ApexOptions } from "apexcharts";
   import type { PageProps } from "./$types";
-  import type { IdStats, CutFactionStats, CutIdStats, FactionStats } from "$lib/model/Stats";
-  import Identity from "$lib/components/identity/Identity.svelte";
-  import Faction from "$lib/components/Faction.svelte";
-  import { getFaction } from "$lib/utils/factions";
+  import type { IdStats, CutFactionStats, CutIdStats, FactionStats } from "#lib/model/Stats.ts";
+  import Identity from "#lib/components/identity/Identity.svelte";
+  import Faction from "#lib/components/Faction.svelte";
+  import { getFaction } from "#lib/utils/factions.ts";
 
   let { data }: PageProps = $props();
   let { stats, stages, cutStats } = $derived(data);

@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { CreateMyTournamentSummary } from "./transformations";
-import type { PairingsData } from "$lib/api/betaTypes";
-import type { Player } from "$lib/model/Player";
-import type { Round } from "$lib/model/Round";
+import type { PairingsData } from "#lib/api/betaTypes.ts";
+import type { Player } from "#lib/model/Player.ts";
+import type { Round } from "#lib/model/Round.ts";
 
 const createPlayer = (overrides: Partial<Player>): Player => ({
   side: null,

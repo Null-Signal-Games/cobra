@@ -1,8 +1,8 @@
 <script lang="ts">
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import type { Pairing } from "$lib/model/Pairing";
-  import { type ScoreReport, scorePresets } from "$lib/model/ScoreReport";
-  import type { Stage } from "$lib/model/Stage";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import type { Pairing } from "#lib/model/Pairing.ts";
+  import { type ScoreReport, scorePresets } from "#lib/model/ScoreReport.ts";
+  import type { Stage } from "#lib/model/Stage.ts";
 
   let {
     stage,

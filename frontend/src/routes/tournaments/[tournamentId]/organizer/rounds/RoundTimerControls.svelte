@@ -1,6 +1,6 @@
 <script lang="ts">
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import type { Round } from "$lib/model/Round";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import type { Round } from "#lib/model/Round.ts";
   import { onMount } from "svelte";
 
   let {

@@ -2,7 +2,7 @@
   Explanation of the rerender() function used throughout this file:
 
   render() returns a rerender() function which is useful for simulating changes
-  to props. We rely on invalidateAll() to cause load() to be called again,
+  to props. We rely on refreshAll() to cause load() to be called again,
   changing the data prop, which in turn causes the props object's reactivity to
   kick in and rerender things. This is where rerender() comes into play for us.
   
@@ -20,7 +20,7 @@ import {
 } from "@testing-library/svelte";
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { betaApi } from "$lib/api/beta";
+import { betaApi } from "#lib/api/beta.ts";
 import RoundsPage from "./+page.svelte";
 import type { PageProps } from "./$types";
 import {
@@ -35,7 +35,7 @@ import {
   MockDoubleElimCutStage,
   MockTournament,
 } from "./RoundsTestData";
-import type { TournamentPolicies } from "$lib/model/Tournament";
+import type { TournamentPolicies } from "#lib/model/Tournament.ts";
 
 const MockPolicy: TournamentPolicies = {
   update: false,
@@ -66,7 +66,7 @@ const MockPageData: PageProps["data"] = {
   stages: [MockSwissStage],
 };
 
-vi.mock("$lib/api/beta", () => ({
+vi.mock("#lib/api/beta.ts", () => ({
   betaApi: {
     changePlayerSide: vi.fn(),
     completeRound: vi.fn(),

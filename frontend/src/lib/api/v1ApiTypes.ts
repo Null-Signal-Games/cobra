@@ -1,4 +1,4 @@
-import type { Tournament } from "$lib/model/Tournament";
+import type { Tournament } from "#lib/model/Tournament.ts";
 
 // The JSON::API response types common between all entity types.
 export interface ApiResponse<T, I = never> {

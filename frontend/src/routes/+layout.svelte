@@ -1,17 +1,17 @@
 <script lang="ts">
   import "@fortawesome/fontawesome-free/css/all.min.css";
   import "@fortawesome/fontawesome-free/css/v4-shims.min.css";
-  import "$lib/assets/css/application.scss";
-  import favicon from "$lib/assets/favicon.ico";
+  import "#lib/assets/css/application.scss";
+  import favicon from "#lib/assets/favicon.ico";
   import { resolve } from "$app/paths";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ThemeToggle from "$lib/components/ThemeToggle.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ThemeToggle from "#lib/components/ThemeToggle.svelte";
   import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
   import { onMount } from "svelte";
   import type { Snippet } from "svelte";
-  import { theme } from "$lib/utils/theme.svelte";
-  import GlobalMessages from "$lib/components/GlobalMessages.svelte";
-  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
+  import { theme } from "#lib/utils/theme.svelte.ts";
+  import GlobalMessages from "#lib/components/GlobalMessages.svelte";
+  import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
   import type { LayoutData } from "./$types";
   import { beforeNavigate, afterNavigate } from "$app/navigation";
 

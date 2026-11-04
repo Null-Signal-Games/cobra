@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/svelte";
 import SwissStandings from "./SwissStandings.svelte";
-import type { SwissStage } from "$lib/model/Standings";
+import type { SwissStage } from "#lib/model/Standings.ts";
 
 describe("SwissStandings", () => {
   afterEach(() => {

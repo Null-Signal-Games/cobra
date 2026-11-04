@@ -1,5 +1,5 @@
-import type { Pairing } from "$lib/model/Pairing";
-import type { Player } from "$lib/model/Player";
+import type { Pairing } from "#lib/model/Pairing.ts";
+import type { Player } from "#lib/model/Player.ts";
 
 export const MAX_MARKDOWN_PAGE_LENGTH = 2000;
 

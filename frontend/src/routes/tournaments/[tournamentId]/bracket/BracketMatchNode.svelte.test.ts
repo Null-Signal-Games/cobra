@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import BracketMatchNode from "./BracketMatchNode.svelte";
-import type { BracketPairing } from "$lib/model/Bracket";
+import type { BracketPairing } from "#lib/model/Bracket.ts";
 
 describe("BracketMatchNode", () => {
   afterEach(() => {

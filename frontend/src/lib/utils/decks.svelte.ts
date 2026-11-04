@@ -1,5 +1,5 @@
-import type { Card, CardSearchOption, Deck, NrdbDeck } from "$lib/model/Deck";
-import type { Printing, PrintingsResponse } from "$lib/api/v1ApiTypes";
+import type { Card, CardSearchOption, Deck, NrdbDeck } from "#lib/model/Deck.ts";
+import type { Printing, PrintingsResponse } from "#lib/api/v1ApiTypes.ts";
 import { quoteCsvValue } from "./files";
 import { addError } from "./GlobalMessageState.svelte";
 

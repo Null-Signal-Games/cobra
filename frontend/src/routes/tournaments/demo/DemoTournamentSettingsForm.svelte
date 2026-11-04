@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { DemoTournamentSettings } from "$lib/api/classicTypes";
-  import type { Errors } from "$lib/utils/errors";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
-  import { swissFormatDisplayString } from "$lib/model/Tournament";
+  import type { DemoTournamentSettings } from "#lib/api/classicTypes.ts";
+  import type { Errors } from "#lib/utils/errors.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
+  import { swissFormatDisplayString } from "#lib/model/Tournament.ts";
 
   let {
     tournament,

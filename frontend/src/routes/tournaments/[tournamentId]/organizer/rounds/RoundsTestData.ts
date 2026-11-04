@@ -1,10 +1,10 @@
-import { Identity } from "$lib/model/Identity";
-import type { Pairing } from "$lib/model/Pairing";
-import type { Player } from "$lib/model/Player";
-import type { Round, RoundTimer } from "$lib/model/Round";
-import type { ScoreReport } from "$lib/model/ScoreReport";
-import type { Stage } from "$lib/model/Stage";
-import { Tournament } from "$lib/model/Tournament";
+import { Identity } from "#lib/model/Identity.ts";
+import type { Pairing } from "#lib/model/Pairing.ts";
+import type { Player } from "#lib/model/Player.ts";
+import type { Round, RoundTimer } from "#lib/model/Round.ts";
+import type { ScoreReport } from "#lib/model/ScoreReport.ts";
+import type { Stage } from "#lib/model/Stage.ts";
+import { Tournament } from "#lib/model/Tournament.ts";
 
 export const MockTournament = new Tournament({
   id: 1,

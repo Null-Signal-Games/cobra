@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { PageProps } from "./$types";
   import DangerActionCard from "./DangerActionCard.svelte";
-  import { betaApi } from "$lib/api/beta";
-  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-  import { goto, invalidateAll } from "$app/navigation";
+  import { betaApi } from "#lib/api/beta.ts";
+  import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
+  import { goto, refreshAll } from "$app/navigation";
   import { resolve } from "$app/paths";
 
   let { data }: PageProps = $props();
@@ -28,7 +28,7 @@
     );
     if (success) {
       globalMessages.infos = ["Stage deleted."];
-      await invalidateAll();
+      await refreshAll();
       return true;
     }
     return false;

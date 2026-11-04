@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { CutStage } from "$lib/model/Standings";
-  import Identity from "$lib/components/identity/Identity.svelte";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import type { CutStage } from "#lib/model/Standings.ts";
+  import Identity from "#lib/components/identity/Identity.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import { resolve } from "$app/paths";
 
   let {

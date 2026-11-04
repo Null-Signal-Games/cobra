@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { theme } from "$lib/utils/theme.svelte";
+  import { theme } from "#lib/utils/theme.svelte.ts";
   import FontAwesomeIcon from "./FontAwesomeIcon.svelte";
 </script>
 

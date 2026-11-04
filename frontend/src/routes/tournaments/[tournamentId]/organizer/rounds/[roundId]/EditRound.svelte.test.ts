@@ -19,9 +19,9 @@ import {
   MockSelfReport2,
   Pairing1,
 } from "./EditRoundTestData";
-import { betaApi } from "$lib/api/beta";
+import { betaApi } from "#lib/api/beta.ts";
 import type { PageProps } from "./$types";
-import { Tournament } from "$lib/model/Tournament";
+import { Tournament } from "#lib/model/Tournament.ts";
 import { goto } from "$app/navigation";
 
 export const MockPageData: PageProps["data"] = {
@@ -56,7 +56,7 @@ export const MockPageData: PageProps["data"] = {
   stages: []
 };
 
-vi.mock("$lib/api/beta", () => ({
+vi.mock("#lib/api/beta.ts", () => ({
   betaApi: {
     changePlayerSide: vi.fn(() => true),
     completeRound: vi.fn(() => true),

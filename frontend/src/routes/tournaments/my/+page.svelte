@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { resolve } from "$app/paths";
-  import { v1Api } from "$lib/api/v1";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import type { Tournament } from "$lib/model/Tournament";
-  import { v1Adapter } from "$lib/model/v1Adapter";
-  import { authStore, type AuthUser } from "$lib/utils/auth.svelte";
+  import { v1Api } from "#lib/api/v1.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import type { Tournament } from "#lib/model/Tournament.ts";
+  import { v1Adapter } from "#lib/model/v1Adapter.ts";
+  import { authStore, type AuthUser } from "#lib/utils/auth.svelte.ts";
 
   let user = $state<AuthUser | null>(null);
   let tournaments = $state<Tournament[]>([]);

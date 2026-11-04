@@ -1,17 +1,17 @@
 <script lang="ts">
   import AdminReportOptions from "./AdminReportOptions.svelte";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ModalDialog from "$lib/components/ModalDialog.svelte";
-  import type { Stage } from "$lib/model/Stage";
-  import type { Round } from "$lib/model/Round";
-  import type { Pairing } from "$lib/model/Pairing";
-  import type { Tournament } from "$lib/model/Tournament";
-  import { readableReportScore, reportsMatch, type ScoreReport } from "$lib/model/ScoreReport";
-  import PlayerDisplay from "$lib/components/PlayerDisplay.svelte";
-  import type { Player } from "$lib/model/Player";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ModalDialog from "#lib/components/ModalDialog.svelte";
+  import type { Stage } from "#lib/model/Stage.ts";
+  import type { Round } from "#lib/model/Round.ts";
+  import type { Pairing } from "#lib/model/Pairing.ts";
+  import type { Tournament } from "#lib/model/Tournament.ts";
+  import { readableReportScore, reportsMatch, type ScoreReport } from "#lib/model/ScoreReport.ts";
+  import PlayerDisplay from "#lib/components/PlayerDisplay.svelte";
+  import type { Player } from "#lib/model/Player.ts";
   import { resolve } from "$app/paths";
   import { onMount } from "svelte";
-  import { authStore, type AuthUser } from "$lib/utils/auth.svelte";
+  import { authStore, type AuthUser } from "#lib/utils/auth.svelte.ts";
 
   let {
     tournament,

@@ -1,5 +1,5 @@
 import type { PageLoad } from "./$types";
-import { v1Api } from "$lib/api/v1";
+import { v1Api } from "#lib/api/v1.ts";
 
 export const load: PageLoad = async ({ params, fetch }) => {
   return {

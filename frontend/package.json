@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "imports": {
+    "#lib": "./src/lib/index.ts",
+    "#lib/*": "./src/lib/*"
+  },
   "//comments": {
     "dependencies": {
       "@sveltejs/adapter-node": "Pinned to ^5 because adapter-node v6 requires @sveltejs/kit ^3 (this app is on @sveltejs/kit ^2)",

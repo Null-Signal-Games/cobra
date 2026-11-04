@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/svelte";
 import { get } from "svelte/store";
 import BracketPage from "./+page.svelte";
-import { showIdentities } from "$lib/utils/ShowIdentities";
-import type { BracketData, BracketStage } from "$lib/model/Bracket";
+import { showIdentities } from "#lib/utils/ShowIdentities.ts";
+import type { BracketData, BracketStage } from "#lib/model/Bracket.ts";
 
 describe("Bracket Page Container", () => {
   afterEach(() => {

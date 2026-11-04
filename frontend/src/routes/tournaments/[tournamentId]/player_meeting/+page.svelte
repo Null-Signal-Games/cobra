@@ -1,10 +1,10 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import type { PageProps } from "./$types";
   import { createPlayerMeetingPairings } from "./pairings";
-  import { getBackDetails } from "$lib/utils/navigation";
+  import { getBackDetails } from "#lib/utils/navigation.ts";
 
   let { data, params }: PageProps = $props();
 

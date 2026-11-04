@@ -1,14 +1,14 @@
 <script lang="ts">
-  import FontAwesomeIcon from '$lib/components/FontAwesomeIcon.svelte';
+  import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
   import Pairing from '../Pairing.svelte';
   import type { PageProps } from "./$types";
-  import type { NewPairing } from '$lib/model/Pairing';
-  import { goto, invalidateAll } from '$app/navigation';
+  import type { NewPairing } from '#lib/model/Pairing.ts';
+  import { goto, refreshAll } from '$app/navigation';
   import { resolve } from '$app/paths';
-  import type { ScoreReport } from '$lib/model/ScoreReport';
-  import { betaApi } from "$lib/api/beta";
-  import ProgressButton from '$lib/components/ProgressButton.svelte';
-  import { globalMessages } from '$lib/utils/GlobalMessageState.svelte';
+  import type { ScoreReport } from '#lib/model/ScoreReport.ts';
+  import { betaApi } from "#lib/api/beta.ts";
+  import ProgressButton from '#lib/components/ProgressButton.svelte';
+  import { globalMessages } from '#lib/utils/GlobalMessageState.svelte.ts';
 
   let { data, params }: PageProps = $props();
 
@@ -32,7 +32,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function complete(completed: boolean) {
@@ -50,7 +50,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function deleteRound() {
@@ -90,7 +90,7 @@
     newPairing.side = "";
     newPairing.player2_id = 0;
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function deletePairingCallback(pairingId: number) {
@@ -108,7 +108,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function changePlayerSideCallback(pairingId: number, side: string) {
@@ -123,7 +123,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function reportScoreCallback(pairingId: number, report: ScoreReport) {
@@ -139,7 +139,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function resetReportsCallback(pairingId: number) {
@@ -152,7 +152,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function saveSOSWeighting() {
@@ -165,7 +165,7 @@
       return false;
     }
 
-    await invalidateAll();
+    await refreshAll();
 
     return true;
   }

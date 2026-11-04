@@ -8,13 +8,13 @@ import {
 } from "@testing-library/svelte";
 import TournamentPage from "./+page.svelte";
 import userEvent from "@testing-library/user-event";
-import { Tournament } from "$lib/model/Tournament";
-import type { IdentityNames } from "$lib/model/Identity";
-import { Player } from "$lib/model/Player";
+import { Tournament } from "#lib/model/Tournament.ts";
+import type { IdentityNames } from "#lib/model/Identity.ts";
+import { Player } from "#lib/model/Player.ts";
 import type { ComponentProps } from "svelte";
-import { authStore, type AuthUser } from "$lib/utils/auth.svelte";
+import { authStore, type AuthUser } from "#lib/utils/auth.svelte.ts";
 import { page } from "$app/state";
-import { betaApi } from "$lib/api/beta";
+import { betaApi } from "#lib/api/beta.ts";
 
 export const MockTournament = new Tournament({
   id: 1,
@@ -86,13 +86,13 @@ export const MockPlayerBob: Player = {
   fixed_table_number: null,
 };
 
-vi.mock("$lib/api/beta", () => ({
+vi.mock("#lib/api/beta.ts", () => ({
   betaApi: {
     savePlayer: vi.fn(),
   },
 }));
 
-vi.mock("$lib/api/v1", () => ({
+vi.mock("#lib/api/v1.ts", () => ({
   v1Api: {
     loadIdentityNames: vi.fn(() => Promise.resolve(MockIdentityNames)),
   },

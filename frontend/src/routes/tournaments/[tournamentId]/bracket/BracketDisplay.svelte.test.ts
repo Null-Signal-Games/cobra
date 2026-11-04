@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import BracketDisplay from "./BracketDisplay.svelte";
-import type { BracketStage } from "$lib/model/Bracket";
+import type { BracketStage } from "#lib/model/Bracket.ts";
 
 describe("BracketDisplay", () => {
   afterEach(() => {

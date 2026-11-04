@@ -1,4 +1,4 @@
-import { api as defaultApi, type ApiBase } from "$lib/api/apiBase";
+import { api as defaultApi, type ApiBase } from "#lib/api/apiBase.ts";
 import type {
   CurrentUserResponse,
   IdentitiesResponse,
@@ -8,12 +8,12 @@ import type {
   TournamentsResponse,
   TournamentTypeInfo,
   TournamentTypesResponse,
-} from "$lib/api/v1ApiTypes";
-import type { IdentityNames } from "$lib/model/Identity";
-import { Player } from "$lib/model/Player";
-import type { Tournament } from "$lib/model/Tournament";
-import { v1Adapter } from "$lib/model/v1Adapter";
-import { addError } from "$lib/utils/GlobalMessageState.svelte";
+} from "#lib/api/v1ApiTypes.ts";
+import type { IdentityNames } from "#lib/model/Identity.ts";
+import { Player } from "#lib/model/Player.ts";
+import type { Tournament } from "#lib/model/Tournament.ts";
+import { v1Adapter } from "#lib/model/v1Adapter.ts";
+import { addError } from "#lib/utils/GlobalMessageState.svelte.ts";
 
 const JSON_API_HEADERS = {
   Accept: "application/vnd.api+json",

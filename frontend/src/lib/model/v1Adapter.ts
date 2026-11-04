@@ -1,7 +1,7 @@
-import type { IdentityInfo, PlayerInfo, TournamentInfo } from "$lib/api/v1ApiTypes";
-import type { IdentityName, IdentityNames } from "$lib/model/Identity";
-import { Player } from "$lib/model/Player";
-import type { Tournament } from "$lib/model/Tournament";
+import type { IdentityInfo, PlayerInfo, TournamentInfo } from "#lib/api/v1ApiTypes.ts";
+import type { IdentityName, IdentityNames } from "#lib/model/Identity.ts";
+import { Player } from "#lib/model/Player.ts";
+import type { Tournament } from "#lib/model/Tournament.ts";
 
 export class V1Adapter {
     adaptTournament(t : TournamentInfo) : Tournament {

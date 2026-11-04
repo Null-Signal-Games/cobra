@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import StatsPage from "./+page.svelte";
-import type { Stage } from "$lib/model/Stage";
-import type { CutStats, Stats } from "$lib/model/Stats";
+import type { Stage } from "#lib/model/Stage.ts";
+import type { CutStats, Stats } from "#lib/model/Stats.ts";
 
 describe("Stats Page Container", () => {
   afterEach(() => {

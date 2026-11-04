@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import type { TournamentInfo } from "$lib/api/v1ApiTypes";
+  import type { TournamentInfo } from "#lib/api/v1ApiTypes.ts";
 
   let {
     tournament,

@@ -1,22 +1,22 @@
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/svelte";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import DemoTournamentCreation from "./+page.svelte";
-import { classicApi } from "$lib/api/classic";
-import { navigateTo } from "$lib/utils/navigation";
-import { ValidationError } from "$lib/utils/errors";
+import { classicApi } from "#lib/api/classic.ts";
+import { navigateTo } from "#lib/utils/navigation.ts";
+import { ValidationError } from "#lib/utils/errors.ts";
 
 vi.mock("$app/env/public", () => ({
   CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000",
 }));
 
-vi.mock("$lib/api/classic", () => ({
+vi.mock("#lib/api/classic.ts", () => ({
   classicApi: {
     loadNewDemoTournament: vi.fn(),
     createDemoTournament: vi.fn(),
   },
 }));
 
-vi.mock("$lib/utils/navigation", () => ({
+vi.mock("#lib/utils/navigation.ts", () => ({
   navigateTo: vi.fn(),
 }));
 

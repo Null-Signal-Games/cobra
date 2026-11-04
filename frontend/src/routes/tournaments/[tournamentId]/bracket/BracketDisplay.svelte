@@ -3,10 +3,10 @@
     BracketStage,
     BracketPairing,
     PredecessorMap,
-  } from "$lib/model/Bracket";
+  } from "#lib/model/Bracket.ts";
   import BracketMatchNode from "./BracketMatchNode.svelte";
   import { SvelteMap } from "svelte/reactivity";
-  import { showIdentities } from "$lib/utils/ShowIdentities.js";
+  import { showIdentities } from "#lib/utils/ShowIdentities.ts";
 
   let { stage }: { stage: BracketStage } = $props();
 

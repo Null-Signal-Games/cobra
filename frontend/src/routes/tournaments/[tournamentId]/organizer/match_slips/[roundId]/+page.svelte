@@ -1,7 +1,7 @@
 <script lang="ts">
-  import "$lib/assets/css/pairings.sass";
+  import "#lib/assets/css/pairings.sass";
   import { resolve } from "$app/paths";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import type { PageProps } from "./$types";
   import { getProcessedPairings } from "./collate";
 

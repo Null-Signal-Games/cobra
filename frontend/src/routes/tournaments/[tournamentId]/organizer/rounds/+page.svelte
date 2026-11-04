@@ -1,22 +1,22 @@
 <script lang="ts">
-  import "$lib/assets/css/pairings.sass";
+  import "#lib/assets/css/pairings.sass";
   import Stage from "./Stage.svelte";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ModalDialog from "$lib/components/ModalDialog.svelte";
-  import type { ScoreReport } from "$lib/model/ScoreReport";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ModalDialog from "#lib/components/ModalDialog.svelte";
+  import type { ScoreReport } from "#lib/model/ScoreReport.ts";
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
-  import { showReportedPairings } from "$lib/utils/ShowReportedPairings";
-  import { showIdentities } from "$lib/utils/ShowIdentities";
-  import { invalidateAll } from "$app/navigation";
-  import { betaApi } from "$lib/api/beta";
-  import { globalMessages } from "$lib/utils/GlobalMessageState.svelte";
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
+  import { showReportedPairings } from "#lib/utils/ShowReportedPairings.ts";
+  import { showIdentities } from "#lib/utils/ShowIdentities.ts";
+  import { refreshAll } from "$app/navigation";
+  import { betaApi } from "#lib/api/beta.ts";
+  import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
 
   let { data, params }: PageProps = $props();
 
   async function refreshData() {
-    await invalidateAll();
+    await refreshAll();
     return true;
   }
 
@@ -27,7 +27,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function pairNewRound() {
@@ -46,7 +46,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function setRegistrationStatus(open: boolean) {
@@ -56,7 +56,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function setPlayerRegistrationStatus(open: boolean) {
@@ -69,7 +69,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function deletePairingCallback(roundId: number, pairingId: number) {
@@ -83,7 +83,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function changePlayerSideCallback(roundId: number, pairingId: number, side: string) {
@@ -99,7 +99,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function reportScoreCallback(
@@ -120,7 +120,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function completeRoundCallback(roundId: number) {
@@ -130,7 +130,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 
   async function updateTimerCallback(roundId: number, length_minutes: number, operation: string) {
@@ -152,7 +152,7 @@
       return;
     }
 
-    await invalidateAll();
+    await refreshAll();
   }
 </script>
 

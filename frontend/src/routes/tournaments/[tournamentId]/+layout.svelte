@@ -2,7 +2,7 @@
   import { page } from "$app/state";
   import type { Snippet } from "svelte";
   import type { LayoutData } from "./$types";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import { resolve } from "$app/paths";
   import RoundTimer from "./RoundTimer.svelte";
 

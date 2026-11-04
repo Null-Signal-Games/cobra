@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { Identity } from "$lib/model/Identity";
-  import FontAwesomeIcon from "$lib/components/FontAwesomeIcon.svelte";
-  import ProgressButton from "$lib/components/ProgressButton.svelte";
+  import { Identity } from "#lib/model/Identity.ts";
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import ProgressButton from "#lib/components/ProgressButton.svelte";
   import { resolve } from "$app/paths";
   import type { PageProps } from "./$types";
-  import { invalidateAll } from "$app/navigation";
-  import { betaApi } from "$lib/api/beta";
-  import DeckDisplay from "$lib/components/DeckDisplay.svelte";
-  import { sortCards } from "$lib/utils/decks.svelte";
+  import { refreshAll } from "$app/navigation";
+  import { betaApi } from "#lib/api/beta.ts";
+  import DeckDisplay from "#lib/components/DeckDisplay.svelte";
+  import { sortCards } from "#lib/utils/decks.svelte.ts";
 
   let { data, params }: PageProps = $props();
 
@@ -52,7 +52,7 @@
       ),
     );
 
-    await invalidateAll();
+    await refreshAll();
 
     sortCards(corpDeck.cards);
     sortCards(runnerDeck.cards);
