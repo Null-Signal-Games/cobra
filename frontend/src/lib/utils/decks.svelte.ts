@@ -1,7 +1,7 @@
 import type { Card, CardSearchOption, Deck, NrdbDeck } from "#lib/model/Deck.ts";
 import type { Printing, PrintingsResponse } from "#lib/api/v1ApiTypes.ts";
-import { quoteCsvValue } from "./files";
-import { addError } from "./GlobalMessageState.svelte";
+import { quoteCsvValue } from "./files.ts";
+import { addError } from "./GlobalMessageState.svelte.ts";
 
 const printings = $state(new Map<string, Printing>());
 

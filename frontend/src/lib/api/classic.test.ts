@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { ClassicApi, classicApi } from "./classic";
-import { ApiBase } from "./apiBase";
+import { ClassicApi, classicApi } from "./classic.ts";
+import { ApiBase } from "./apiBase.ts";
 import { Tournament } from "#lib/model/Tournament.ts";
 import type { DemoTournamentSettings, Stage } from "#lib/api/classicTypes.ts";
 import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";

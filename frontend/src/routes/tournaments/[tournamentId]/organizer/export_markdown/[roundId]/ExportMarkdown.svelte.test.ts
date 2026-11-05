@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
 import ExportMarkdownPage from "./+page.svelte";
-import { generateMarkdownPages } from "./markdown";
+import { generateMarkdownPages } from "./markdown.ts";
 import { Player } from "#lib/model/Player.ts";
 import type { Pairing } from "#lib/model/Pairing.ts";
 import type { Round } from "#lib/model/Round.ts";

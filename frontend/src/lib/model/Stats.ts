@@ -1,4 +1,4 @@
-import type { Identity } from "./Identity";
+import type { Identity } from "./Identity.ts";
 
 export interface IdStats {
   identity: Identity;

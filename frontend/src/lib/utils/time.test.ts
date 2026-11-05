@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatWallClockTime } from "./time";
+import { formatWallClockTime } from "./time.ts";
 
 describe("formatWallClockTime", () => {
   it("formats an HH:MM time in the given locale", () => {

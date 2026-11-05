@@ -18,7 +18,7 @@ import {
   MockRoundData,
   MockSelfReport2,
   Pairing1,
-} from "./EditRoundTestData";
+} from "./EditRoundTestData.ts";
 import { betaApi } from "#lib/api/beta.ts";
 import type { PageProps } from "./$types";
 import { Tournament } from "#lib/model/Tournament.ts";

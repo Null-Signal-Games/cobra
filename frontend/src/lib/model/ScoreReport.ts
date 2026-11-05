@@ -1,5 +1,5 @@
-import type { Pairing } from "./Pairing";
-import type { Stage } from "./Stage";
+import type { Pairing } from "./Pairing.ts";
+import type { Stage } from "./Stage.ts";
 
 export interface ScoreReport {
   report_player_id?: number;

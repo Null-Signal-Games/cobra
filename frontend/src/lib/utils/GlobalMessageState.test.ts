@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { addError, globalMessages, setErrors, setWarnings } from "./GlobalMessageState.svelte";
+import { addError, globalMessages, setErrors, setWarnings } from "./GlobalMessageState.svelte.ts";
 
 describe("globalMessages helpers", () => {
   beforeEach(() => {

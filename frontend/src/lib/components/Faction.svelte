@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getFaction } from "../utils/factions";
+  import { getFaction } from "../utils/factions.ts";
 
   let { name }: { name: string } = $props();
 </script>

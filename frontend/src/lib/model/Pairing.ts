@@ -1,5 +1,5 @@
-import type { Player } from "./Player";
-import type { ScoreReport } from "./ScoreReport";
+import type { Player } from "./Player.ts";
+import type { ScoreReport } from "./ScoreReport.ts";
 
 export interface Pairing {
   id: number;

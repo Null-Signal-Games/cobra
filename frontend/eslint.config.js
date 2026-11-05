@@ -10,6 +10,9 @@ import ts from "typescript-eslint";
 
 const gitignorePath = path.resolve(import.meta.dirname, ".gitignore");
 
+// Relative and #lib imports with no file extension. Skips SvelteKit's generated ./$types.
+const missingExtension = String.raw`/^(\.{1,2}\x2F|#lib\x2F)(?!.*(\$types|\.(ts|js|svelte|json|css|sass|scss|svg|png|ico))$)/`;
+
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
   eslint.configs.recommended,
@@ -32,6 +35,18 @@ export default defineConfig(
       "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
       "@typescript-eslint/no-unused-vars": ["error", { ignoreRestSiblings: true }],
       "eol-last": ["error", "always"],
+      "no-restricted-syntax": [
+        "error",
+        ...[
+          "ImportDeclaration",
+          "ExportNamedDeclaration",
+          "ExportAllDeclaration",
+          "ImportExpression",
+        ].map((node) => ({
+          selector: `${node}[source.value=${missingExtension}]`,
+          message: "Include the file extension in relative and #lib imports.",
+        })),
+      ],
     },
   },
   {

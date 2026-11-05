@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { BetaApi, betaApi } from "./beta";
-import { ApiBase } from "./apiBase";
+import { BetaApi, betaApi } from "./beta.ts";
+import { ApiBase } from "./apiBase.ts";
 import { Player } from "#lib/model/Player.ts";
 import type { ScoreReport } from "#lib/model/ScoreReport.ts";
 import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";

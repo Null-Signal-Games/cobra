@@ -5,7 +5,7 @@ vi.mock("$app/env/private", () => ({
   SERVER_COBRA_API_ENDPOINT: "http://gateway",
 }));
 
-const { handleFetch } = await import("./hooks.server");
+const { handleFetch } = await import("./hooks.server.ts");
 
 function eventWithCookie(cookie?: string): RequestEvent {
   const headers = new Headers();

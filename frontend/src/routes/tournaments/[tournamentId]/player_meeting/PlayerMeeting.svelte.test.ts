@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/svelte";
 import PlayerMeetingPage from "./+page.svelte";
-import { createPlayerMeetingPairings } from "./pairings";
+import { createPlayerMeetingPairings } from "./pairings.ts";
 import { getBackDetails } from "#lib/utils/navigation.ts";
 import { Player } from "#lib/model/Player.ts";
 

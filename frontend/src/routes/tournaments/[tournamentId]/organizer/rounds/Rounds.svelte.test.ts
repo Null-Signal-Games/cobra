@@ -34,7 +34,7 @@ import {
   MockSingleElimCutStage,
   MockDoubleElimCutStage,
   MockTournament,
-} from "./RoundsTestData";
+} from "./RoundsTestData.ts";
 import type { TournamentPolicies } from "#lib/model/Tournament.ts";
 
 const MockPolicy: TournamentPolicies = {

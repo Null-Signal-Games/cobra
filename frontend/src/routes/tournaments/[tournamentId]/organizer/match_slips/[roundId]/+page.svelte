@@ -3,7 +3,7 @@
   import { resolve } from "$app/paths";
   import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import type { PageProps } from "./$types";
-  import { getProcessedPairings } from "./collate";
+  import { getProcessedPairings } from "./collate.ts";
 
   let { data, params }: PageProps = $props();
 

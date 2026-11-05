@@ -17,7 +17,7 @@ import {
   MockPlayerBobNrdbDecks,
   MockPrintings,
   MockTournament,
-} from "./RegistrationTestData";
+} from "./RegistrationTestData.ts";
 import { Identity } from "#lib/model/Identity.ts";
 
 vi.mock('$app/env/public', () => {
