@@ -45,7 +45,7 @@
 <ul class="nav nav-tabs dontprint">
   <li class="nav-item">
     <a
-      href={resolve(`/tournaments/${tournament.id}`)}
+      href={resolve(`tournaments/${tournament.id}`)}
       class="nav-link"
       class:active={page.route.id === "/tournaments/[tournamentId]"}
     >
@@ -56,7 +56,7 @@
   {#if data.user}
     <li class="nav-item">
       <a
-        href={resolve(`/tournaments/${tournament.id}/me`)}
+        href={resolve(`tournaments/${tournament.id}/me`)}
         class="nav-link"
         class:active={(page.route.id as string) === "/tournaments/[tournamentId]/me"}
       >
@@ -67,7 +67,7 @@
   {#if canEdit}
     <li class="nav-item">
       <a
-        href={resolve(`/tournaments/${tournament.id}/organizer/players`)}
+        href={resolve(`tournaments/${tournament.id}/organizer/players`)}
         class="nav-link"
         class:active={(page.route.id as string) === "/tournaments/[tournamentId]/organizer/players"}
       >
@@ -79,8 +79,8 @@
     <a
       href={resolve(
         canEdit
-          ? `/tournaments/${tournament.id}/organizer/rounds`
-          : `/tournaments/${tournament.id}/rounds`,
+          ? `tournaments/${tournament.id}/organizer/rounds`
+          : `tournaments/${tournament.id}/rounds`,
       )}
       class="nav-link"
       class:active={(page.route.id as string) ===
@@ -93,7 +93,7 @@
   </li>
   <li class="nav-item">
     <a
-      href={resolve(`/tournaments/${tournament.id}/standings`)}
+      href={resolve(`tournaments/${tournament.id}/standings`)}
       class="nav-link"
       class:active={page.route.id === "/tournaments/[tournamentId]/standings"}
     >
@@ -103,7 +103,7 @@
   {#if tournament.has_elimination_stage }
   <li class="nav-item">
     <a
-      href={resolve(`/tournaments/${tournament.id}/bracket`)}
+      href={resolve(`tournaments/${tournament.id}/bracket`)}
       class="nav-link"
       class:active={(page.route.id as string) === "/tournaments/[tournamentId]/bracket"}
     >
@@ -113,7 +113,7 @@
   {/if}
   <li class="nav-item">
     <a
-      href={resolve(`/tournaments/${tournament.id}/stats`)}
+      href={resolve(`tournaments/${tournament.id}/stats`)}
       class="nav-link"
       class:active={(page.route.id as string) === "/tournaments/[tournamentId]/stats"}
     >
@@ -123,7 +123,7 @@
   {#if canEdit}
     <li class="nav-item">
       <a
-        href={resolve(`/tournaments/${tournament.id}/organizer/settings`)}
+        href={resolve(`tournaments/${tournament.id}/organizer/settings`)}
         class="nav-link"
         class:active={(page.route.id as string) ===
           "/tournaments/[tournamentId]/organizer/settings"}
@@ -135,7 +135,7 @@
   {#if canEdit}
     <li class="nav-item">
       <a
-        href={resolve(`/tournaments/${tournament.id}/organizer/danger_zone`)}
+        href={resolve(`tournaments/${tournament.id}/organizer/danger_zone`)}
         class="nav-link"
         class:active={(page.route.id as string) ===
           "/tournaments/[tournamentId]/organizer/danger_zone"}

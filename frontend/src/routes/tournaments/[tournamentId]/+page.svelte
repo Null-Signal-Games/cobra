@@ -76,7 +76,7 @@
             <li class="list-group-item" aria-label="shortcode">
               <div class="small text-secondary">Shortcode:</div>
               {tournament.slug}
-              (<a href={resolve(`/${tournament.slug}`)}>
+              (<a href={resolve("/[slug]", { slug: tournament.slug })}>
                 {shortcodeUrl}
               </a>)
             </li>
@@ -203,7 +203,7 @@
             {#if userId === tournament.user_id}
               <p /* User is the Tournament Organizer (TO) and is registered, but is currently dropped */>
                 You can reinstate yourself on the
-                <a href={resolve(`/tournaments/${tournament.id}/organizer/players`)}>
+                <a href={resolve(`tournaments/${tournament.id}/organizer/players`)}>
                   Players
                 </a>
                 tab.
@@ -227,7 +227,7 @@
               </p>
               <a
                 class="alert-link"
-                href={resolve(`/login?return_to=/tournaments/${tournament.id}`)}
+                href={resolve(`login?return_to=/tournaments/${tournament.id}`)}
               >
                 <FontAwesomeIcon icon="sign-in" /> Sign in
               </a>

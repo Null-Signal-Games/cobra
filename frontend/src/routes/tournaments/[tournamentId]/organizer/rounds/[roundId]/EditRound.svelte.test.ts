@@ -77,12 +77,12 @@ vi.mock('$app/env/public', () => {
   };
 });
 
-vi.mock("$app/navigation", async () => {
-  return {
-    ...await vi.importActual("$app/navigation"),
-    goto: vi.fn(() => true),
-  };
-});
+vi.mock("$app/navigation", () => ({
+  goto: vi.fn(() => true),
+  refreshAll: vi.fn(async () => {
+    await Promise.resolve();
+  }),
+}));
 
 const user = userEvent.setup();
 
@@ -171,7 +171,7 @@ describe("EditRound", () => {
       await user.click(screen.getByRole("button", { name: /delete round/i }));
 
       expect(betaApi.deleteRound).toHaveBeenCalledOnce();
-      expect(goto).toHaveBeenCalledExactlyOnceWith("/tournaments/0/organizer/rounds", { invalidateAll: true });
+      expect(goto).toHaveBeenCalledExactlyOnceWith("/tournaments/0/organizer/rounds", { refreshAll: true });
     });
 
     it("does not delete the round if cancelled", async () => {

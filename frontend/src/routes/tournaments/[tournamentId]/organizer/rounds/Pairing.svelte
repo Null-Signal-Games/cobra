@@ -131,7 +131,7 @@
   {#if stage.view_decks}
     {#if stage.is_single_sided}
       <a
-        href={resolve(`/tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=${tournament.user_id === currentUser?.id ? "pairings" : "rounds"}`)}
+        href={resolve(`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=${tournament.user_id === currentUser?.id ? "pairings" : "rounds"}`)}
       >
         <FontAwesomeIcon icon="eye" /> View decks
       </a>

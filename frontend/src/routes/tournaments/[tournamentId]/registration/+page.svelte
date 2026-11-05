@@ -163,7 +163,7 @@
               <FontAwesomeIcon icon="print" />
             </button>
             <a
-              href={resolve(`/tournaments/${params.tournamentId}`)}
+              href={resolve(`tournaments/${params.tournamentId}`)}
               class="btn btn-link p-0"
               title="Cancel"
             >

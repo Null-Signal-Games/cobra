@@ -76,7 +76,7 @@
         <!-- Admin controls -->
         <a
           class="btn btn-warning"
-          href={resolve(`/tournaments/${tournament.id}/organizer/rounds/${round.id}`)}
+          href={resolve(`tournaments/${tournament.id}/organizer/rounds/${round.id}`)}
         >
           <FontAwesomeIcon icon="pencil" /> Edit
         </a>
@@ -87,19 +87,19 @@
         {/if}
         <a
           class="btn btn-primary"
-          href={resolve(`/tournaments/${tournament.id}/organizer/match_slips/${round.id}`)}
+          href={resolve(`tournaments/${tournament.id}/organizer/match_slips/${round.id}`)}
         >
           <FontAwesomeIcon icon="flag-checkered" /> Match slips
         </a>
         <a
           class="btn btn-primary"
-          href={resolve(`/tournaments/${tournament.id}/organizer/export_markdown/${round.id}`)}
+          href={resolve(`tournaments/${tournament.id}/organizer/export_markdown/${round.id}`)}
         >
           <FontAwesomeIcon icon="share" /> Export markdown
         </a>
         <a
           class="btn btn-primary"
-          href={resolve(`/tournaments/${tournament.id}/organizer/rounds/${round.id}/pairings/by_name`)}
+          href={resolve(`tournaments/${tournament.id}/organizer/rounds/${round.id}/pairings/by_name`)}
         >
           <FontAwesomeIcon icon="list-ul" /> Pairings by name
         </a>

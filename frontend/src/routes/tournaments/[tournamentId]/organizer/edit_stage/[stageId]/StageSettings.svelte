@@ -59,7 +59,7 @@
       if (onSaveCallback) {
         onSaveCallback(response);
       } else {
-        await goto(resolve(`/tournaments/${tournamentId}/organizer/rounds`));
+        await goto(resolve(`tournaments/${tournamentId}/organizer/rounds`));
       }
     } catch (err) {
       error =
@@ -78,7 +78,7 @@
 </script>
 
 <p class="dontprint">
-  <a href={resolve(`/tournaments/${tournamentId}/organizer/rounds`)} class="btn btn-primary">
+  <a href={resolve(`tournaments/${tournamentId}/organizer/rounds`)} class="btn btn-primary">
     <FontAwesomeIcon icon="arrow-left" /> Back to Pairings
   </a>
 </p>

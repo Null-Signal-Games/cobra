@@ -76,7 +76,7 @@
     <div class="collapse navbar-collapse {isNavOpen ? 'show' : ''}" id="navbarNav">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a href={resolve("/help")} class="nav-link text-light">
+          <a href={resolve("help")} class="nav-link text-light">
             <FontAwesomeIcon icon="life-ring" />
             How to
           </a>
@@ -93,7 +93,7 @@
           </button>
           <div class="dropdown-menu dropdown-menu-right">
             {#each data.tournamentTypes as type (type.id)}
-              <a href={resolve(`/tournaments/type/${type.id}`)} class="dropdown-item">
+              <a href={resolve(`tournaments/type/${type.id}`)} class="dropdown-item">
                 {#if type.attributes.nsg_format}
                   <FontAwesomeIcon icon="nsg" />
                 {:else}
@@ -116,19 +116,19 @@
               {data.user.nrdb_username}
             </button>
             <div class="dropdown-menu dropdown-menu-right">
-              <a href={resolve("/tournaments/new")} class="dropdown-item">
+              <a href={resolve("tournaments/new")} class="dropdown-item">
                 <FontAwesomeIcon icon="plus" />
                 Create tournament
               </a>
-              <a href={resolve("/tournaments/demo")} class="dropdown-item">
+              <a href={resolve("tournaments/demo")} class="dropdown-item">
                 <FontAwesomeIcon icon="plus" />
                 Create demo tournament
               </a>
-              <a href={resolve("/tournaments/my")} class="dropdown-item">
+              <a href={resolve("tournaments/my")} class="dropdown-item">
                 <FontAwesomeIcon icon="trophy" />
                 My Tournaments
               </a>
-              <a href={resolve("/profile")} class="dropdown-item">
+              <a href={resolve("profile")} class="dropdown-item">
                 <FontAwesomeIcon icon="user" />
                 Profile
               </a>
@@ -141,7 +141,7 @@
           </li>
         {:else}
           <li class="nav-item">
-            <a href={resolve("/login")} id="signIn" class="nav-link text-light">
+            <a href={resolve("login")} id="signIn" class="nav-link text-light">
               <FontAwesomeIcon icon="sign-in" />
               Sign in
             </a>

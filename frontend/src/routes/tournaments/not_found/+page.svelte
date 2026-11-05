@@ -10,7 +10,7 @@
     const formData = new FormData(event.currentTarget as HTMLFormElement);
     const cleanCode = (formData.get("shortcode") as string).trim().toUpperCase();
     if (cleanCode) {
-      await goto(resolve(`/${cleanCode}`));
+      await goto(resolve("/[slug]", { slug: encodeURIComponent(cleanCode) }));
     }
   }
 </script>

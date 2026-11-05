@@ -14,7 +14,7 @@
 <div class="tournament card m-3">
   <div class="card-body">
     <h4 class="card-title">
-      <a href={resolve(`/tournaments/${tournament.id}`)}>
+      <a href={resolve(`tournaments/${tournament.id}`)}>
         {tournament.attributes.name}
       </a>
       {#if tournamentTypeName}

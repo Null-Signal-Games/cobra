@@ -10,10 +10,10 @@ export interface BackDetails {
     | "Back to Standings"
     | "Back to Tournament";
   path:
-    | `/tournaments/${string}/organizer/players`
-    | `/tournaments/${string}/organizer/rounds`
-    | `/tournaments/${string}/rounds`
-    | `/tournaments/${string}`;
+    | `tournaments/${string}/organizer/players`
+    | `tournaments/${string}/organizer/rounds`
+    | `tournaments/${string}/rounds`
+    | `tournaments/${string}`;
 }
 
 export function getBackDetails(
@@ -24,27 +24,27 @@ export function getBackDetails(
     case "players":
       return {
         label: "Back to Players",
-        path: `/tournaments/${tournamentId}/organizer/players`,
+        path: `tournaments/${tournamentId}/organizer/players`,
       };
     case "pairings":
       return {
         label: "Back to Pairings",
-        path: `/tournaments/${tournamentId}/organizer/rounds`,
+        path: `tournaments/${tournamentId}/organizer/rounds`,
       };
     case "rounds":
       return {
         label: "Back to Pairings",
-        path: `/tournaments/${tournamentId}/rounds`,
+        path: `tournaments/${tournamentId}/rounds`,
       };
     case "standings":
       return {
         label: "Back to Standings",
-        path: `/tournaments/${tournamentId}/standings`,
+        path: `tournaments/${tournamentId}/standings`,
       };
     default:
       return {
         label: "Back to Tournament",
-        path: `/tournaments/${tournamentId}`,
+        path: `tournaments/${tournamentId}`,
       };
   }
 }

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { authStore } from "./auth.svelte.ts";
 
+vi.mock("$app/env/public", () => ({ CLIENT_COBRA_API_ENDPOINT: "" }));
+
 describe("authStore (SvelteKit frontend)", () => {
   beforeEach(() => {
     vi.resetAllMocks();
