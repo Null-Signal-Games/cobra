@@ -36,7 +36,7 @@
     "@sveltejs/kit": "^3",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@types/node": "^24",
-    "@vitest/browser-playwright": "^4.1.8",
+    "@vitest/browser-playwright": "^5.0.5",
     "apexcharts": "^8.4.1",
     "dompurify": "^3.4.13",
     "eslint": "^10.4.1",
