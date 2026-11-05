@@ -9,9 +9,12 @@ updates:
     open-pull-requests-limit: 10
     cooldown:
       default-days: 5
-      semver-major-days: 14
       semver-minor-days: 7
       semver-patch-days: 3
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       bundler-minor-and-patch:
         update-types:
@@ -27,9 +30,12 @@ updates:
     open-pull-requests-limit: 10
     cooldown:
       default-days: 5
-      semver-major-days: 14
       semver-minor-days: 7
       semver-patch-days: 3
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       npm-root-minor-and-patch:
         update-types:
@@ -45,9 +51,12 @@ updates:
     open-pull-requests-limit: 10
     cooldown:
       default-days: 5
-      semver-major-days: 14
       semver-minor-days: 7
       semver-patch-days: 3
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       npm-frontend-minor-and-patch:
         update-types:
