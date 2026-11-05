@@ -84,7 +84,7 @@
               <FontAwesomeIcon icon="print" />
             </button>
             <a
-              href={resolve(`/tournaments/${params.tournamentId}/organizer/players`)}
+              href={resolve(`tournaments/${params.tournamentId}/organizer/players`)}
               class="btn btn-link p-0"
               title="Cancel"
             >
@@ -151,7 +151,7 @@
               </button>
             {:else}
               <a
-                href={resolve(`/tournaments/${params.tournamentId}/registration`)}
+                href={resolve(`tournaments/${params.tournamentId}/registration`)}
                 class="btn btn-link"
               >
                 <FontAwesomeIcon icon="edit" />

@@ -64,7 +64,7 @@
       return;
     }
 
-    await goto(resolve(`/tournaments/${params.tournamentId}/organizer/rounds`), { invalidateAll: true });
+    await goto(resolve(`tournaments/${params.tournamentId}/organizer/rounds`), { refreshAll: true });
   }
 
   async function createPairing(e: SubmitEvent) {
@@ -175,7 +175,7 @@
   <h2>Round {data.round.number}</h2>
 
   <p>
-    <a href={resolve(`/tournaments/${params.tournamentId}/organizer/rounds`)} class="btn btn-primary">
+    <a href={resolve(`tournaments/${params.tournamentId}/organizer/rounds`)} class="btn btn-primary">
       <FontAwesomeIcon icon="arrow-left" /> Back to pairings
     </a>
 

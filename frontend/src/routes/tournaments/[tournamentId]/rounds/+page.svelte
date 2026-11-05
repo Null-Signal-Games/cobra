@@ -38,7 +38,7 @@
     <div>
       {#if data.stages.every((s) => s.rounds.length === 0)}
         <a
-          href={resolve(`/tournaments/${params.tournamentId}/player_meeting?back_to=rounds`)}
+          href={resolve(`tournaments/${params.tournamentId}/player_meeting?back_to=rounds`)}
           class="btn btn-primary"
         >
           <FontAwesomeIcon icon="list-ul" /> Player meeting
@@ -63,7 +63,7 @@
         </button>
         {#if data.policy.update}
           <a
-            href={resolve(`/tournaments/${params.tournamentId}/organizer/rounds`)}
+            href={resolve(`tournaments/${params.tournamentId}/organizer/rounds`)}
             class="btn btn-primary float-right"
           >
             <FontAwesomeIcon icon="user" /> See organizer pairings view

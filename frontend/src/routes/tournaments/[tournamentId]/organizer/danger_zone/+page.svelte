@@ -14,7 +14,7 @@
       confirmationName,
     );
     if (success) {
-      await goto(resolve("/tournaments"));
+      await goto(resolve("tournaments"));
       return true;
     }
     return false;

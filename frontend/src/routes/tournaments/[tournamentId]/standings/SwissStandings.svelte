@@ -70,7 +70,7 @@
         {#if stage.any_decks_viewable}
           <td>
             {#if standing.policy.view_decks}
-              <a href={resolve(`/tournaments/${tournamentId}/players/${standing.player.id}/view_decks?back_to=standings`)}>
+              <a href={resolve(`tournaments/${tournamentId}/players/${standing.player.id}/view_decks?back_to=standings`)}>
                 <FontAwesomeIcon icon="eye" /> View decks
               </a>
             {/if}

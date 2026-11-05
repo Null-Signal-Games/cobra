@@ -19,7 +19,7 @@
 
 <div class="col-12">
   <p class="dontprint">
-    <a href={resolve(`/tournaments/${params.tournamentId}/rounds`)} class="btn btn-primary">
+    <a href={resolve(`tournaments/${params.tournamentId}/rounds`)} class="btn btn-primary">
       <FontAwesomeIcon icon="arrow-left" /> Back to pairings
     </a>
   </p>
@@ -46,7 +46,7 @@
               <td>
                 <a
                   href={resolve(
-                    `/tournaments/${params.tournamentId}/rounds/${data.round.id}/pairings/${row.pairingId}/view_decks?back_to=pairings`,
+                    `tournaments/${params.tournamentId}/rounds/${data.round.id}/pairings/${row.pairingId}/view_decks?back_to=pairings`,
                   )}
                   class="ml-2"
                 >

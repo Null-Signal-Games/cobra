@@ -1,4 +1,4 @@
-import type { Handle, HandleFetch } from "@sveltejs/kit";
+import type { Handle, HandleFetch } from "@sveltejs/kit/hooks";
 import { SERVER_COBRA_API_ENDPOINT } from "$app/env/private";
 
 // Keep shared caches (nginx, CDNs) from storing pages rendered for a logged-in user.

@@ -175,7 +175,7 @@
     <div>
       {#if data.stages.every((s) => s.rounds.length === 0)}
         <a
-          href={resolve(`/tournaments/${params.tournamentId}/player_meeting?back_to=pairings`)}
+          href={resolve(`tournaments/${params.tournamentId}/player_meeting?back_to=pairings`)}
           class="btn btn-primary"
         >
           <FontAwesomeIcon icon="list-ul" /> Player meeting
@@ -212,7 +212,7 @@
         </button>
         {#if data.policy.update}
           <a
-            href={resolve(`/tournaments/${params.tournamentId}/rounds`)}
+            href={resolve(`tournaments/${params.tournamentId}/rounds`)}
             class="btn btn-primary float-right"
           >
             <FontAwesomeIcon icon="users" /> See player pairings view

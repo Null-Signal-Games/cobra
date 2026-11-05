@@ -59,37 +59,37 @@ describe("getBackDetails", () => {
   it("returns 'Back to Players' when coming from players view", () => {
     const details = getBackDetails("players", 14);
     expect(details.label).toBe("Back to Players");
-    expect(details.path).toBe("/tournaments/14/organizer/players");
+    expect(details.path).toBe("tournaments/14/organizer/players");
   });
 
   it("returns 'Back to Pairings' and organizer rounds path when coming from organizer rounds", () => {
     const details = getBackDetails("pairings", 14);
     expect(details.label).toBe("Back to Pairings");
-    expect(details.path).toBe("/tournaments/14/organizer/rounds");
+    expect(details.path).toBe("tournaments/14/organizer/rounds");
   });
 
   it("returns 'Back to Pairings' and public rounds path when coming from public rounds", () => {
     const details = getBackDetails("rounds", 14);
     expect(details.label).toBe("Back to Pairings");
-    expect(details.path).toBe("/tournaments/14/rounds");
+    expect(details.path).toBe("tournaments/14/rounds");
   });
 
   it("defaults to 'Back to Tournament' when backTo is missing or unrecognized", () => {
     expect(getBackDetails(null, 14)).toEqual({
       label: "Back to Tournament",
-      path: "/tournaments/14",
+      path: "tournaments/14",
     });
     expect(getBackDetails(undefined, 14)).toEqual({
       label: "Back to Tournament",
-      path: "/tournaments/14",
+      path: "tournaments/14",
     });
     expect(getBackDetails("", 14)).toEqual({
       label: "Back to Tournament",
-      path: "/tournaments/14",
+      path: "tournaments/14",
     });
     expect(getBackDetails("unrecognized_page", 14)).toEqual({
       label: "Back to Tournament",
-      path: "/tournaments/14",
+      path: "tournaments/14",
     });
   });
 });

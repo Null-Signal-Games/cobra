@@ -19,7 +19,7 @@
 <div class="col-12">
 
 <p class="dontprint">
-  <a href={resolve(`/tournaments/${params.tournamentId}/organizer/rounds`)} class="btn btn-primary">
+  <a href={resolve(`tournaments/${params.tournamentId}/organizer/rounds`)} class="btn btn-primary">
     <FontAwesomeIcon icon="arrow-left" /> Back to Pairings
   </a>
   <button type="button" class="btn btn-primary" onclick={toggleCollated}>

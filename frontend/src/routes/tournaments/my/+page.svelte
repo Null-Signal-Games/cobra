@@ -48,7 +48,7 @@
         <h2>My Tournaments</h2>
         <p class="text-muted mb-0">Logged in as <strong>{user.nrdb_username}</strong></p>
       </div>
-      <a href={resolve("/tournaments/new")} class="btn btn-success">
+      <a href={resolve("tournaments/new")} class="btn btn-success">
         <FontAwesomeIcon icon="plus" /> New Tournament
       </a>
     </div>
@@ -63,7 +63,7 @@
           >
             <div>
               <h5 class="mb-1">
-                <a href={resolve(`/tournaments/${t.id}`)}>{t.name}</a>
+                <a href={resolve(`tournaments/${t.id}`)}>{t.name}</a>
                 {#if t.private}
                   <span class="badge badge-secondary ml-2">Private</span>
                 {/if}
@@ -74,13 +74,13 @@
             </div>
             <div>
               <a
-                href={resolve(`/tournaments/${t.id}/organizer/settings`)}
+                href={resolve(`tournaments/${t.id}/organizer/settings`)}
                 class="btn btn-sm btn-outline-primary mr-2"
               >
                 <FontAwesomeIcon icon="edit" /> Edit
               </a>
               <a
-                href={resolve(`/tournaments/${t.id}`)}
+                href={resolve(`tournaments/${t.id}`)}
                 class="btn btn-sm btn-primary"
               >
                 View

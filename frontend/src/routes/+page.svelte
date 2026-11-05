@@ -44,7 +44,7 @@
     const formData = new FormData(event.currentTarget as HTMLFormElement);
     const cleanCode = (formData.get("shortcode") as string).trim().toUpperCase();
     if (cleanCode) {
-      await goto(resolve(`/${cleanCode}`));
+      await goto(resolve("/[slug]", { slug: encodeURIComponent(cleanCode) }));
     }
   }
 </script>
@@ -86,7 +86,7 @@
 
 <div class="mt-3 text-center">
   <p>
-    <a href={resolve("/tournaments")} class="btn btn-primary">
+    <a href={resolve("tournaments")} class="btn btn-primary">
       <i class="fa fa-users"></i>
       More tournaments
     </a>
