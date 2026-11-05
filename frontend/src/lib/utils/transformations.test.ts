@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { CreateMyTournamentSummary } from "./transformations";
+import { CreateMyTournamentSummary } from "./transformations.ts";
 import type { PairingsData } from "#lib/api/betaTypes.ts";
 import type { Player } from "#lib/model/Player.ts";
 import type { Round } from "#lib/model/Round.ts";

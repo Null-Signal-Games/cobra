@@ -1,5 +1,5 @@
-import type { Pairing } from "./Pairing";
-import type { Player } from "./Player";
+import type { Pairing } from "./Pairing.ts";
+import type { Player } from "./Player.ts";
 
 export interface Round {
   id: number;

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { authStore } from "./auth.svelte";
+import { authStore } from "./auth.svelte.ts";
 
 describe("authStore (SvelteKit frontend)", () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
-import { deckRequestObject, type Deck } from "./Deck";
-import { Identity } from "./Identity";
-import type { Tournament, TournamentPolicies } from "./Tournament";
+import { deckRequestObject, type Deck } from "./Deck.ts";
+import { Identity } from "./Identity.ts";
+import type { Tournament, TournamentPolicies } from "./Tournament.ts";
 
 export interface PlayersData {
   tournament: Tournament;

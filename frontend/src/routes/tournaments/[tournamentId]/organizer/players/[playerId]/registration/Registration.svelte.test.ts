@@ -24,7 +24,7 @@ import {
   MockSureGamblePrinting,
   MockTournament,
   MockZahyaPrinting,
-} from "./RegistrationTestData";
+} from "./RegistrationTestData.ts";
 import { Identity } from "#lib/model/Identity.ts";
 import { betaApi } from "#lib/api/beta.ts";
 

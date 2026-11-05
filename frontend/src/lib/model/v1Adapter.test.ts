@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { TournamentInfo } from '../api/v1ApiTypes';
-import { Tournament } from '../model/Tournament';
-import { v1Adapter } from './v1Adapter';
+import type { TournamentInfo } from '../api/v1ApiTypes.ts';
+import { Tournament } from '../model/Tournament.ts';
+import { v1Adapter } from './v1Adapter.ts';
 
 describe('v1Adapter', () => {
   it('throws error for an invalid ID', () => {

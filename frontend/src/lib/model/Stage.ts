@@ -1,4 +1,4 @@
-import { type Round } from "./Round";
+import { type Round } from "./Round.ts";
 
 export interface Stage {
   id: number;

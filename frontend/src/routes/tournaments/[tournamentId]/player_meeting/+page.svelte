@@ -3,7 +3,7 @@
   import { page } from "$app/state";
   import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import type { PageProps } from "./$types";
-  import { createPlayerMeetingPairings } from "./pairings";
+  import { createPlayerMeetingPairings } from "./pairings.ts";
   import { getBackDetails } from "#lib/utils/navigation.ts";
 
   let { data, params }: PageProps = $props();

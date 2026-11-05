@@ -3,7 +3,7 @@
   import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import type { PageProps } from "./$types";
   import SharePage from "./SharePage.svelte";
-  import { generateMarkdownPages } from "./markdown";
+  import { generateMarkdownPages } from "./markdown.ts";
 
   let { data, params }: PageProps = $props();
 

@@ -27,7 +27,7 @@ import {
   MockSelfReportRunnerSplit,
   MockSelfReportPlayer2Sweep,
   MockTournament,
-} from "./RoundsTestData";
+} from "./RoundsTestData.ts";
 import type { TournamentPolicies } from "#lib/model/Tournament.ts";
 
 vi.mock('$app/env/public', () => {
