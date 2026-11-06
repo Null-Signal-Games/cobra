@@ -2,7 +2,7 @@
 
 class Deck < ApplicationRecord # rubocop:disable Style/Documentation
   belongs_to :player
-  belongs_to :user
+  belongs_to :user, optional: true
   has_many :deck_cards, dependent: :destroy
   has_many :cards, class_name: 'DeckCard'
 

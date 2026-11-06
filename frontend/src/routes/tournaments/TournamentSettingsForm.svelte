@@ -365,7 +365,7 @@
 {#if onUploadToAbr !== undefined || onDownloadJson !== undefined}
   <div class="d-flex flex-wrap align-items-center mt-4">
     {#if onUploadToAbr}
-      <span class="mr-3 mb-2">
+      <span class="mr-3">
         <ProgressButton
           css="btn btn-success"
           inProgressText="Uploading"
@@ -377,7 +377,7 @@
       </span>
     {/if}
     {#if onDownloadJson}
-      <span class="mr-3 mb-2">
+      <span class="mr-3">
         <ProgressButton
           css="btn btn-success"
           inProgressText="Downloading"

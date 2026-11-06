@@ -50,7 +50,7 @@
     return (
       playerEdit.id !== 0 ||
       !tournament.registration_closed ||
-      confirm("Tournament is closed, add new player anyway?")
+      confirm("Tournament registration is closed. Add new player anyway?")
     );
   }
 
