@@ -56,6 +56,74 @@ RSpec.describe Tournament do
 
       expect(tournament.stream_url).to eq('https://twitch.tv')
     end
+
+    it 'rejects stream url without a scheme' do
+      tournament.update(stream_url: 'mycoolstreamsite.co.uk')
+
+      expect(tournament).not_to be_valid
+      expect(tournament.errors[:stream_url]).to include('must be a full URL starting with http:// or https://')
+    end
+
+    it 'rejects stream url with scheme other than http or https' do
+      tournament.update(stream_url: 'ftp://example.com')
+
+      expect(tournament).not_to be_valid
+      expect(tournament.errors[:stream_url]).to include('must be a full URL starting with http:// or https://')
+    end
+
+    it 'rejects stream url with scheme but no host' do
+      tournament.update(stream_url: 'http:example.com')
+
+      expect(tournament).not_to be_valid
+      expect(tournament.errors[:stream_url]).to include('must be a full URL starting with http:// or https://')
+    end
+
+    it 'rejects stream url with invalid URL' do
+      tournament.update(stream_url: ' asdflkjhasd f asdflkjhas df ')
+
+      expect(tournament).not_to be_valid
+      expect(tournament.errors[:stream_url]).to include('is not a valid URL')
+    end
+  end
+
+  describe 'event_link' do
+    it 'has no event_link by default' do
+      expect(tournament.event_link).to be_nil
+    end
+
+    it 'can have an event_link set' do
+      tournament.update(event_link: 'https://alwaysberunning.net/tournaments/4723/milwaukee-megacity-championship')
+
+      expect(tournament.event_link).to eq('https://alwaysberunning.net/tournaments/4723/milwaukee-megacity-championship')
+    end
+
+    it 'rejects event_link without a scheme' do
+      tournament.update(event_link: 'mycoolstreamsite.co.uk')
+
+      expect(tournament).not_to be_valid
+      expect(tournament.errors[:event_link]).to include('must be a full URL starting with http:// or https://')
+    end
+
+    it 'rejects event_link with scheme other than http or https' do
+      tournament.update(event_link: 'ftp://example.com')
+
+      expect(tournament).not_to be_valid
+      expect(tournament.errors[:event_link]).to include('must be a full URL starting with http:// or https://')
+    end
+
+    it 'rejects event_link with scheme but no host' do
+      tournament.update(event_link: 'http:example.com')
+
+      expect(tournament).not_to be_valid
+      expect(tournament.errors[:event_link]).to include('must be a full URL starting with http:// or https://')
+    end
+
+    it 'rejects event_link with invalid URL' do
+      tournament.update(event_link: ' asdflkjhasd f asdflkjhas df ')
+
+      expect(tournament).not_to be_valid
+      expect(tournament.errors[:event_link]).to include('is not a valid URL')
+    end
   end
 
   describe '#corp_counts' do

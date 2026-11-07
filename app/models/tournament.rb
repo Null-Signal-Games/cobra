@@ -15,9 +15,21 @@ class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style
   scope :public_tournaments, -> { where(private: false) }
 
   # This is a list of attributes that will be replaced with nil if they are blank.
-  NULL_ATTRS = %w[organizer_contact event_link description additional_prizes_description time_zone card_set_id
-                  format_id deckbuilding_restriction_id official_prize_kit_id tournament_type_id registration_starts
-                  tournament_starts].freeze
+  NULL_ATTRS = %w[
+    additional_prizes_description
+    card_set_id
+    deckbuilding_restriction_id
+    description
+    event_link
+    format_id
+    official_prize_kit_id
+    organizer_contact
+    registration_starts
+    stream_url
+    time_zone
+    tournament_starts
+    tournament_type_id
+  ].freeze
   before_validation :generate_slug, on: :create, unless: :slug
   before_save :nil_if_blank
 
@@ -35,6 +47,8 @@ class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style
 
   validates :name, :slug, presence: true
   validates :slug, uniqueness: true # rubocop:disable Rails/UniqueValidationWithoutIndex
+  validates :stream_url, http_url: true, allow_blank: true
+  validates :event_link, http_url: true, allow_blank: true
 
   before_create :default_date, unless: :date
   after_create :create_stage

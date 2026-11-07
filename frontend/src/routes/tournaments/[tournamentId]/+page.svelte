@@ -5,6 +5,7 @@
   import type { PageProps } from "./$types";
   import { page } from "$app/state";
   import { formatWallClockTime } from "#lib/utils/time.ts";
+  import { httpUrlOrNull } from "#lib/utils/url.ts";
   import { swissFormatDisplayString } from "#lib/model/Tournament.ts";
   import RegistrationCard from "./RegistrationCard.svelte";
   import Markdown from '@magidoc/plugin-svelte-marked'
@@ -14,6 +15,7 @@
 
   let userId = $derived(data.user?.id ?? 0);
   let tournament = $derived(data.tournamentData.tournament);
+  let eventLinkUrl = $derived(httpUrlOrNull(tournament.event_link));
   let shortcodeUrl = $derived(tournament.slug ? `${page.url.origin}/${tournament.slug}` : "");
 
   let notices = $derived.by(() => {
@@ -187,7 +189,11 @@
           {#if tournament.event_link}
             <li class="list-group-item">
               <div class="small text-secondary">More Information:</div>
-              <a href={tournament.event_link} target="_blank" rel="external">{tournament.event_link}</a>
+              {#if eventLinkUrl}
+                <a href={eventLinkUrl} target="_blank" rel="external">{tournament.event_link}</a>
+              {:else}
+                {tournament.event_link}
+              {/if}
             </li>
           {/if}
         </div>
