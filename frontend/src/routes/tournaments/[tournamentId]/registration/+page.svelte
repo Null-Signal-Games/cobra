@@ -146,6 +146,12 @@
   {/snippet}
   
   {#if player && player.id !== 0}
+    {#if player.registration_locked}
+      <div class="alert alert-info dontprint">
+        Registration is locked. Talk to a tournament organiser to change your name or decks.
+      </div>
+    {/if}
+
     <!-- General registration information -->
     <div class="card mb-3" aria-label="registration information">
       <div class="card-header">
@@ -184,6 +190,7 @@
               class="form-control"
               placeholder="Enter player name"
               bind:value={player.name}
+              disabled={player.registration_locked}
             />
           </div>
   
@@ -233,58 +240,60 @@
       </div>
     </div>
   
-    <div class="alert alert-danger dontprint">
+    <div class="alert alert-warning dontprint">
       <FontAwesomeIcon icon="exclamation-triangle" /> Deck legality is not yet checked.
       Please ensure your decks are legal.
     </div>
   
     <!-- Deck selection -->
-    <div class="alert alert-secondary dontprint">
-      Please select from your decks below. <a
-        href="https://netrunnerdb.com/en/decks"
-        target="_blank">See your decks in NetrunnerDB</a
-      >. Refresh the page to reload from NetrunnerDB.
-    </div>
-
-    <div class="row mb-3 justify-content-center dontprint">
-      {#await data.nrdbDecks}
-        <div class="spinner-border m-auto"></div>
-      {:then nrdbDecks}
-        {#if nrdbDecks.length > 0}
-          <div class="col-md-6">
-            <div class="card" aria-label="NRDB corp decks">
-              <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-              {@render decksList(nrdbDecks, true, corpDeck)}
+    {#if !player.registration_locked}
+      <div class="alert alert-secondary dontprint">
+        Please select from your decks below. <a
+          href="https://netrunnerdb.com/en/decks"
+          target="_blank">See your decks in NetrunnerDB</a
+        >. Refresh the page to reload from NetrunnerDB.
+      </div>
+  
+      <div class="row mb-3 justify-content-center dontprint">
+        {#await data.nrdbDecks}
+          <div class="spinner-border m-auto"></div>
+        {:then nrdbDecks}
+          {#if nrdbDecks.length > 0}
+            <div class="col-md-6">
+              <div class="card" aria-label="NRDB corp decks">
+                <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
+                {@render decksList(nrdbDecks, true, corpDeck)}
+              </div>
             </div>
-          </div>
-
-          <div class="col-md-6">
-            <div class="card" aria-label="NRDB runner decks">
-              <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-              {@render decksList(nrdbDecks, false, runnerDeck)}
+  
+            <div class="col-md-6">
+              <div class="card" aria-label="NRDB runner decks">
+                <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
+                {@render decksList(nrdbDecks, false, runnerDeck)}
+              </div>
             </div>
-          </div>
-        {:else}
+          {:else}
+            <div class="alert alert-warning">
+              You have no decks saved in NRDB.
+            </div>
+          {/if}
+        {:catch}
           <div class="alert alert-warning">
-            You have no decks saved in NRDB.
+            <button
+              type="button"
+              onclick={() => {
+                authStore.invalidateAndLogIn(
+                  `/login?return_to=/tournaments/${params.tournamentId}/registration`);
+              }}
+              class="btn btn-link p-0 alert-link"
+            >
+              <FontAwesomeIcon icon="sign-in" /> Sign in
+            </button>
+            to NRDB to see your decks.
           </div>
-        {/if}
-      {:catch}
-        <div class="alert alert-warning">
-          <button
-            type="button"
-            onclick={() => {
-              authStore.invalidateAndLogIn(
-                `/login?return_to=/tournaments/${params.tournamentId}/registration`);
-            }}
-            class="btn btn-link p-0 alert-link"
-          >
-            <FontAwesomeIcon icon="sign-in" /> Sign in
-          </button>
-          to NRDB to see your decks.
-        </div>
-      {/await}
-    </div>
+        {/await}
+      </div>
+    {/if}
   
     <!-- Deck display -->
     <div class="row">
