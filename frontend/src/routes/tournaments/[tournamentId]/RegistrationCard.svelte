@@ -39,7 +39,6 @@
 
   async function savePlayer() {
     playerEdit = await betaApi.savePlayer(tournament.id, playerEdit);
-    readOnly = true;
 
     await refreshAll();
 
@@ -161,6 +160,7 @@
           placeholder="Enter your name"
           class="form-control"
           bind:value={playerEdit.name}
+          disabled={player.registration_locked}
         />
       </div>
 
@@ -183,6 +183,7 @@
             placeholder="Search for corp ID"
             identityNames={identityNames ? identityNames.corp : []}
             bind:value={playerEdit.corp_id.name}
+            enabled={!player.registration_locked}
           />
         </div>
 
@@ -193,6 +194,7 @@
             placeholder="Search for runner ID"
             identityNames={identityNames ? identityNames.runner : []}
             bind:value={playerEdit.runner_id.name}
+            enabled={!player.registration_locked}
           />
         </div>
       {/if}
