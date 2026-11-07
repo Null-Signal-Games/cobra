@@ -65,8 +65,12 @@
     return oppScore > myScore;
   }
 
+  function hasResult(pairing: Pairing): boolean {
+    return isBye(pairing) || pairing.reported;
+  }
+
   function getScoreResultStyle(pairing: Pairing): string {
-    if (pairing.score_label.trim() === "" || pairing.score_label.trim() === "-") {
+    if (!hasResult(pairing)) {
       return "";
     }
     if (isBye(pairing) || iWon(pairing)) {
@@ -213,7 +217,7 @@
                         {/if}
                     </td>
                     <td class="text-center align-middle" style={getScoreResultStyle(myPairing)}>
-                        {#if myPairing.score_label.trim() !== "" && myPairing.score_label.trim() !== "-"}
+                        {#if hasResult(myPairing)}
                         <div class="h4 mb-0 font-weight-bold">
                             {#if isBye(myPairing) || iWon(myPairing)}
                             W

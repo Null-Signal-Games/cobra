@@ -67,8 +67,8 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
 
     context 'with same bias' do
       before do
-        create(:pairing, player1:, side: :player1_is_corp)
-        create(:pairing, player1: player2, side: :player1_is_corp)
+        create(:pairing, :reported, player1:, side: :player1_is_corp)
+        create(:pairing, :reported, player1: player2, side: :player1_is_corp)
       end
 
       it 'returns 0' do
@@ -78,8 +78,8 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
 
     context 'with opposite bias' do
       before do
-        create(:pairing, player1:, side: :player1_is_corp)
-        create(:pairing, player1: player2, side: :player1_is_runner)
+        create(:pairing, :reported, player1:, side: :player1_is_corp)
+        create(:pairing, :reported, player1: player2, side: :player1_is_runner)
       end
 
       it 'returns positive number' do
@@ -89,11 +89,11 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
 
     context 'with even more opposite bias' do
       before do
-        create(:pairing, player1:, side: :player1_is_corp)
-        create(:pairing, player1:, side: :player1_is_corp)
+        create(:pairing, :reported, player1:, side: :player1_is_corp)
+        create(:pairing, :reported, player1:, side: :player1_is_corp)
 
-        create(:pairing, player1: player2, side: :player1_is_runner)
-        create(:pairing, player1: player2, side: :player1_is_runner)
+        create(:pairing, :reported, player1: player2, side: :player1_is_runner)
+        create(:pairing, :reported, player1: player2, side: :player1_is_runner)
       end
 
       it 'returns more positive number' do
@@ -125,9 +125,9 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
 
     context 'when player 1 has corped many times' do
       before do
-        create(:pairing, player1:, side: :player1_is_corp)
-        create(:pairing, player1:, side: :player1_is_corp)
-        create(:pairing, player1:, side: :player1_is_corp)
+        create(:pairing, :reported, player1:, side: :player1_is_corp)
+        create(:pairing, :reported, player1:, side: :player1_is_corp)
+        create(:pairing, :reported, player1:, side: :player1_is_corp)
       end
 
       it 'returns :runner' do
@@ -136,7 +136,7 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
 
       context 'and player 2 has corped once' do
         before do
-          create(:pairing, player2:, side: :player1_is_runner)
+          create(:pairing, :reported, player2:, side: :player1_is_runner)
         end
 
         it 'returns :runner' do
@@ -146,10 +146,10 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
 
       context 'and player 2 has corped even more times' do
         before do
-          create(:pairing, player2:, side: :player1_is_runner)
-          create(:pairing, player2:, side: :player1_is_runner)
-          create(:pairing, player2:, side: :player1_is_runner)
-          create(:pairing, player2:, side: :player1_is_runner)
+          create(:pairing, :reported, player2:, side: :player1_is_runner)
+          create(:pairing, :reported, player2:, side: :player1_is_runner)
+          create(:pairing, :reported, player2:, side: :player1_is_runner)
+          create(:pairing, :reported, player2:, side: :player1_is_runner)
         end
 
         it 'returns :corp' do
@@ -159,9 +159,9 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
 
       context 'and player 2 has corped the same amount' do
         before do
-          create(:pairing, player2:, side: :player1_is_runner)
-          create(:pairing, player2:, side: :player1_is_runner)
-          create(:pairing, player2:, side: :player1_is_runner)
+          create(:pairing, :reported, player2:, side: :player1_is_runner)
+          create(:pairing, :reported, player2:, side: :player1_is_runner)
+          create(:pairing, :reported, player2:, side: :player1_is_runner)
         end
 
         it 'returns nil' do

@@ -29,14 +29,17 @@
       ? pairing.player1
       : pairing.player2,
   );
-  let customReport: ScoreReport = $derived({
-    score1: pairing.score1,
-    score2: pairing.score2,
-    intentional_draw: pairing.intentional_draw,
-    score1_corp: 0,
-    score2_runner: 0,
-    score1_runner: 0,
-    score2_corp: 0,
+  let customReport: ScoreReport = $derived.by(() => {
+    let report = $state({
+      score1: pairing.score1,
+      score2: pairing.score2,
+      intentional_draw: pairing.intentional_draw,
+      score1_corp: 0,
+      score2_runner: 0,
+      score1_runner: 0,
+      score2_corp: 0,
+    });
+    return report;
   });
 
   function onCustomReportClicked() {

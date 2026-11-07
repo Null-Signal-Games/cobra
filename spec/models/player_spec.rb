@@ -158,8 +158,8 @@ RSpec.describe Player do
 
     context 'with balanced pairings' do
       before do
-        create_list(:pairing, 2, player1: player, side: :player1_is_corp)
-        create_list(:pairing, 2, player1: player, side: :player1_is_runner)
+        create_list(:pairing, 2, :reported, player1: player, side: :player1_is_corp)
+        create_list(:pairing, 2, :reported, player1: player, side: :player1_is_runner)
       end
 
       it 'returns 0' do
@@ -169,8 +169,8 @@ RSpec.describe Player do
 
     context 'with more corp pairings' do
       before do
-        create_list(:pairing, 3, player1: player, side: :player1_is_corp)
-        create_list(:pairing, 1, player1: player, side: :player1_is_runner)
+        create_list(:pairing, 3, :reported, player1: player, side: :player1_is_corp)
+        create_list(:pairing, 1, :reported, player1: player, side: :player1_is_runner)
       end
 
       it 'returns positive number' do
@@ -180,8 +180,8 @@ RSpec.describe Player do
 
     context 'with more runner pairings' do
       before do
-        create_list(:pairing, 1, player1: player, side: :player1_is_corp)
-        create_list(:pairing, 4, player1: player, side: :player1_is_runner)
+        create_list(:pairing, 1, :reported, player1: player, side: :player1_is_corp)
+        create_list(:pairing, 4, :reported, player1: player, side: :player1_is_runner)
       end
 
       it 'returns negative number' do
@@ -191,9 +191,9 @@ RSpec.describe Player do
 
     context 'with more corp pairings in swiss but more runner in cut' do
       before do
-        create_list(:pairing, 3, player1: player, side: :player1_is_corp)
-        create_list(:pairing, 2, player1: player, side: :player1_is_runner)
-        create_list(:pairing, 2, player1: player, side: :player1_is_runner, stage: cut_stage)
+        create_list(:pairing, 3, :reported, player1: player, side: :player1_is_corp)
+        create_list(:pairing, 2, :reported, player1: player, side: :player1_is_runner)
+        create_list(:pairing, 2, :reported, player1: player, side: :player1_is_runner, stage: cut_stage)
       end
 
       it 'returns positive number' do
