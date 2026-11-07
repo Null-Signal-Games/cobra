@@ -67,8 +67,16 @@ module Beta
     def update
       authorize @player
 
-      update = player_params
-      update[:user_id] = current_user.id unless organiser_view?
+      if organiser_view?
+        update = player_params
+      else
+        update = if @player.registration_locked?
+                   params.require(:player).permit(:pronouns, :include_in_stream)
+                 else
+                   player_params
+                 end
+        update[:user_id] = current_user.id
+      end
 
       @player.update(update.except(:corp_deck, :runner_deck))
       if @tournament.nrdb_deck_registration?
