@@ -171,6 +171,28 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
     end
   end
 
+  describe '.potential_pairing_weight' do
+    context 'when side bias would repeat the sides of a previous matchup' do
+      # Player 1 has corped more, Player 2 has run more, so player 1 side bias is runner.
+      # Player 1 and Player 2 already played and player 1 ran in that pairing.
+      # This rules out an exact repeat pairing.
+      # The only remaining option increases side bias for both players via side_bias_weight.
+      # This is undesireable, but allowed.
+      it 'allows the pairing with rematch and side-imbalance penalties' do
+        player1 = PairingStrategies::PlainPlayer.new(1, 'Player 1', true, false, side_bias: 1)
+        player2 = PairingStrategies::PlainPlayer.new(2, 'Player 2', true, false, side_bias: -1)
+        player1.add_opponent(player2.id, 'runner')
+        player2.add_opponent(player1.id, 'corp')
+
+        expect(described_class.preferred_player1_side(player1.side_bias, player2.side_bias)).to eq(:runner)
+        expect(described_class.legal_options(player1, player2)).to eq([true, false])
+
+        # 1000 - (points 0 + rematch 5 + side bias 50**1)
+        expect(described_class.potential_pairing_weight(player1, player2)).to eq(945)
+      end
+    end
+  end
+
   describe '.assign_side' do
     context 'when players have never played' do
       it 'selects randomly when there is no side bias' do
