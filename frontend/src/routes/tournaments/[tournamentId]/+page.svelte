@@ -20,19 +20,11 @@
 
   let notices = $derived.by(() => {
     let notices: string[] = [];
-    if (tournament.nrdb_deck_registration) {
-      if (
-        !tournament.registration_closed &&
-        (data.player?.id === 0 || !data.player?.registration_locked)
-      ) {
-        notices.push("Registration is open.");
-      }
-      if (userId === tournament.user_id && tournament.any_player_unlocked) {
-        notices.push("One or more players are unlocked for editing.");
-      }
-      if (data.player?.id !== 0 && !data.player?.registration_locked) {
-        notices.push("Your registration is editable.");
-      }
+    if (data.player?.id !== 0 && data.player?.registration_locked) {
+      notices.push("Registration is locked. Talk to a tournament organiser to change your name or decks.");
+    }
+    if (userId === tournament.user_id && tournament.nrdb_deck_registration && tournament.any_player_unlocked) {
+      notices.push("One or more players are unlocked for editing.");
     }
 
     return notices;
