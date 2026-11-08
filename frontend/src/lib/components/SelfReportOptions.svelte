@@ -29,7 +29,8 @@
       ? pairing.player1
       : pairing.player2,
   );
-  let customReport: ScoreReport = $derived({
+  // svelte-ignore state_referenced_locally
+  let customReport: ScoreReport = $state({
     score1: pairing.score1,
     score2: pairing.score2,
     intentional_draw: pairing.intentional_draw,

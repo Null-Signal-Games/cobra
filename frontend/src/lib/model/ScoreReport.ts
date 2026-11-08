@@ -213,7 +213,7 @@ export function readableReportScore(
   player1Side: string | null,
   isSingleSided: boolean,
 ): string {
-  if (report.score1 === 0 && report.score2 === 0) {
+  if (report.score1 == null && report.score2 == null) {
     return "-";
   }
 

@@ -171,6 +171,7 @@ RSpec.describe PairingsHelper do
     let(:corp_split) { create(:pairing, score1_corp: 3, score2_corp: 3) }
     let(:swept) { create(:pairing, score2_corp: 3, score2_runner: 3) }
     let(:unreported) { create(:pairing) }
+    let(:zero_zero) { create(:pairing, :reported) }
     let(:unusual) { create(:pairing, score1_corp: 3, score1_runner: 1, score2_corp: 1) }
     let(:undeclared_sides) { create(:pairing, score1: 3, score2: 3) }
 
@@ -181,8 +182,21 @@ RSpec.describe PairingsHelper do
         expect(helper.readable_score(corp_split)).to eq('3 - 3 (C)')
         expect(helper.readable_score(swept)).to eq('0 - 6')
         expect(helper.readable_score(unreported)).to eq('-')
+        expect(helper.readable_score(zero_zero)).to eq('0 - 0')
         expect(helper.readable_score(unusual)).to eq('4 - 1 (C)')
         expect(helper.readable_score(undeclared_sides)).to eq('3 - 3')
+      end
+    end
+  end
+
+  describe '#readable_self_report_score' do
+    let(:pairing) { create(:pairing) }
+
+    it 'outputs correct score description' do
+      aggregate_failures do
+        expect(helper.readable_self_report_score(pairing, SelfReport.new)).to eq('-')
+        expect(helper.readable_self_report_score(pairing, SelfReport.new(score1: 0, score2: 0))).to eq('0 - 0')
+        expect(helper.readable_self_report_score(pairing, SelfReport.new(score1: 6, score2: 0))).to eq('6 - 0')
       end
     end
   end

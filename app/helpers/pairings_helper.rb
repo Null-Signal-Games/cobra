@@ -135,7 +135,7 @@ module PairingsHelper # rubocop:disable Metrics/ModuleLength,Style/Documentation
   end
 
   def readable_score(pairing)
-    return '-' if pairing.score1&.zero? && pairing.score2&.zero?
+    return '-' if pairing.score1.nil? && pairing.score2.nil?
 
     ws = winning_side(pairing)
 
@@ -159,7 +159,7 @@ module PairingsHelper # rubocop:disable Metrics/ModuleLength,Style/Documentation
 
   # TODO: (TrueSvenpai): refactor to reduce code duplication.
   def readable_self_report_score(pairing, self_report)
-    return '-' if self_report.score1&.zero? && self_report.score2&.zero?
+    return '-' if self_report.score1.nil? && self_report.score2.nil?
 
     ws = winning_side(self_report)
 

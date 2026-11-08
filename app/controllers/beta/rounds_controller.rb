@@ -273,7 +273,7 @@ module Beta
 
     def score_label(swiss_format, player1_side, score1, score1_corp, score1_runner, score2, score2_corp, score2_runner) # rubocop:disable Metrics/ParameterLists
       # No scores reported.
-      return '-' if score1&.zero? && score2&.zero?
+      return '-' if score1.nil? && score2.nil?
 
       ws = winning_side(score1_corp, score1_runner, score2_corp, score2_runner)
 
