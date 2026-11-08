@@ -88,8 +88,6 @@ module PairingStrategies
         min_cost = [points + rematch + side_bias_weight(player2.side_bias, player1.side_bias), min_cost].min
       end
 
-      return nil if min_cost >= 100
-
       1000 - min_cost
     end
 

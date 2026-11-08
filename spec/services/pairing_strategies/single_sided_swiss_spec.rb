@@ -191,6 +191,19 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
         expect(described_class.potential_pairing_weight(player1, player2)).to eq(945)
       end
     end
+
+    context 'when players have a large point differential' do
+      # A 4-win gap (12 points) costs 144 in points weight.
+      it 'still allows the pairing' do
+        player1 = PairingStrategies::PlainPlayer.new(1, 'Player 1', true, false, points: 15, side_bias: 1)
+        player2 = PairingStrategies::PlainPlayer.new(2, 'Player 2', true, false, points: 3, side_bias: -1)
+        player1.add_opponent(player2.id, 'corp')
+        player2.add_opponent(player1.id, 'runner')
+
+        # 1000 - (points 144 + rematch 5 + side bias 50**0)
+        expect(described_class.potential_pairing_weight(player1, player2)).to eq(850)
+      end
+    end
   end
 
   describe '.assign_side' do
@@ -304,6 +317,53 @@ RSpec.describe PairingStrategies::SingleSidedSwiss do
 
         round3.reload
         expect(round3.pairings.count).to eq(0)
+      end
+    end
+
+    context '4 players, final round of a 6 round event with a large points gap' do
+      %i[ruben bea cal dee].each do |name|
+        let!(name) do
+          create(:player, name: name.to_s.humanize, tournament:)
+        end
+      end
+
+      let(:rounds) do
+        (1..5).map { |n| create(:round, tournament:, stage:, number: n, completed: true) }
+      end
+      let(:round6) { create(:round, tournament:, stage:, number: 6) }
+      let(:pairer) { described_class.new(round6) }
+
+      before do
+        # Every pairing has been played twice except Ann vs Dee and Bea vs Cal, which have been played once.
+        # Ruben has won every game (15 points) and Dee has won once (3 points).
+        [
+          [0, ruben, bea, 3, 0], [0, cal, dee, 0, 3],
+          [1, cal, ruben, 0, 3], [1, bea, dee, 3, 0],
+          [2, bea, ruben, 0, 3], [2, dee, cal, 0, 3],
+          [3, ruben, cal, 3, 0], [3, dee, bea, 0, 3],
+          [4, ruben, dee, 3, 0], [4, bea, cal, 3, 0]
+        ].each do |index, corp, runner, corp_score, runner_score|
+          create(:pairing, round: rounds[index],
+                           player1: corp, player2: runner,
+                           score1: corp_score, score2: runner_score,
+                           side: :player1_is_corp)
+        end
+      end
+
+      it 'pairs the only remaining valid matchups' do
+        pairer.pair!
+
+        round6.reload
+        expect(round6.pairings.count).to eq(2)
+        round6.pairings.each do |pairing|
+          if pairing.players.include?(ruben)
+            expect(pairing.players).to contain_exactly(ruben, dee)
+            expect(pairing.side_for(dee)).to eq(:corp)
+          else
+            expect(pairing.players).to contain_exactly(bea, cal)
+            expect(pairing.side_for(cal)).to eq(:corp)
+          end
+        end
       end
     end
 
