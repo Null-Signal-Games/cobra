@@ -72,12 +72,6 @@ module PairingStrategies
       # TODO(plural): Start here for investigating lucille's bug with 3 matchups.
       return nil if player1.opponents.key?(player2.id) && player1.opponents[player2.id].count >= 2
 
-      # Check if either player has a preferred side bias.
-      preferred_side = preferred_player1_side(player1.side_bias, player2.side_bias)
-
-      # return nil (no pairing possible) if there is a side bias and the sides would repeat the previous pairing
-      return nil if preferred_side && player1.opponents[player2.id]&.include?(preferred_side)
-
       # Points and Rematch weights aren't affected by sides so we only need to calculate them once.
       points = points_weight(player1.points, player2.points)
       rematch = rematch_bias_weight(player1.opponents.keys.include?(player2.id))
@@ -93,8 +87,6 @@ module PairingStrategies
       if legal_options[1]
         min_cost = [points + rematch + side_bias_weight(player2.side_bias, player1.side_bias), min_cost].min
       end
-
-      return nil if min_cost >= 100
 
       1000 - min_cost
     end
