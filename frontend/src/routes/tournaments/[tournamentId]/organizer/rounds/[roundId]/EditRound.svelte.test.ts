@@ -16,6 +16,7 @@ import {
   MockPlayerBob,
   MockRound1Timer,
   MockRoundData,
+  MockSelfReport1,
   MockSelfReport2,
   Pairing1,
 } from "./EditRoundTestData.ts";
@@ -325,8 +326,8 @@ describe("EditRound", () => {
   describe.each([
     [3, 0, "Corp Win"],
     [3, 3, "Tie"],
-    [3, 3, "Intentional Draw"],
-    [6, 0, "Runner Win"],
+    [1, 1, "Intentional Draw"],
+    [0, 3, "Runner Win"],
   ])("using preset score", (score1, score2, buttonText) => {
     it(buttonText, async () => {
       const { rerender } = renderEditRound();
@@ -360,6 +361,30 @@ describe("EditRound", () => {
   });
 
   describe("using custom scores", () => {
+    it("displays the Custom badge for custom scores", () => {
+        vi.spyOn(MockSelfReport1, "score1", "get").mockReturnValue(0);
+        vi.spyOn(MockSelfReport1, "score2", "get").mockReturnValue(4);
+        vi.spyOn(MockSelfReport1, "score1_corp", "get").mockReturnValue(0);
+        vi.spyOn(MockSelfReport1, "score1_runner", "get").mockReturnValue(0);
+        vi.spyOn(MockSelfReport1, "score2_corp", "get").mockReturnValue(2);
+        vi.spyOn(MockSelfReport1, "score2_runner", "get").mockReturnValue(2);
+        vi.spyOn(MockSelfReport2, "score1", "get").mockReturnValue(0);
+        vi.spyOn(MockSelfReport2, "score2", "get").mockReturnValue(4);
+        vi.spyOn(MockSelfReport2, "score1_corp", "get").mockReturnValue(0);
+        vi.spyOn(MockSelfReport2, "score1_runner", "get").mockReturnValue(0);
+        vi.spyOn(MockSelfReport2, "score2_corp", "get").mockReturnValue(2);
+        vi.spyOn(MockSelfReport2, "score2_runner", "get").mockReturnValue(2);
+
+        renderEditRound();
+        const table1Row = document.getElementsByClassName(
+          "table_1",
+        )[0] as HTMLElement;
+        
+        expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
+        expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
+        expect(table1Row).toContainElement(queryByText(table1Row, "Custom"));
+      });
+      
     it("saves a custom score", async () => {
       const { rerender } = renderEditRound();
 
@@ -441,7 +466,31 @@ describe("EditRound", () => {
   });
 
   describe("manage self-reports", () => {
+    it("displays the Partial badge when only one player has reported", () => {
+      vi.spyOn(Pairing1, "self_reports", "get").mockReturnValue([MockSelfReport1]);
+
+      renderEditRound();
+      const table1Row = document.getElementsByClassName(
+        "table_1",
+      )[0] as HTMLElement;
+      
+      expect(table1Row).toContainElement(queryByText(table1Row, "Partial"));
+      expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
+      expect(table1Row).not.toContainElement(queryByText(table1Row, "Custom"));
+    });
+
     describe("when self-reports agree", () => {
+      it("does not display any badges", () => {
+        renderEditRound();
+        const table1Row = document.getElementsByClassName(
+          "table_1",
+        )[0] as HTMLElement;
+
+        expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
+        expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
+        expect(table1Row).not.toContainElement(queryByText(table1Row, "Custom"));
+      });
+      
       it("accepts a report", async () => {
         const { rerender } = renderEditRound();
         const table1Row = document.getElementsByClassName(
@@ -464,10 +513,10 @@ describe("EditRound", () => {
         }
         const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
         expect(reportDialog).toContainElement(
-          getByText(reportDialog, /alice reported: 6 - 0/i),
+          getByText(reportDialog, /alice reported: 3 - 0/i),
         );
         expect(reportDialog).toContainElement(
-          getByText(reportDialog, /bob reported: 6 - 0/i),
+          getByText(reportDialog, /bob reported: 3 - 0/i),
         );
         expect(reportDialog).toContainElement(aliceAcceptButton);
         expect(reportDialog).toContainElement(
@@ -475,7 +524,7 @@ describe("EditRound", () => {
         );
 
         vi.spyOn(Pairing1, "reported", "get").mockReturnValue(true);
-        vi.spyOn(Pairing1, "score1", "get").mockReturnValue(6);
+        vi.spyOn(Pairing1, "score1", "get").mockReturnValue(3);
         vi.spyOn(Pairing1, "score2", "get").mockReturnValue(0);
         await user.click(aliceAcceptButton);
 
@@ -484,7 +533,7 @@ describe("EditRound", () => {
         expect(betaApi.reportScore).toHaveBeenCalledOnce();
         expect(
           within(table1Row).getByRole("textbox", { name: /corp-score/i }),
-        ).toHaveValue("6");
+        ).toHaveValue("3");
         expect(
           within(table1Row).getByRole("textbox", { name: /runner-score/i }),
         ).toHaveValue("0");
@@ -499,11 +548,22 @@ describe("EditRound", () => {
     describe("when self-reports disagree", () => {
       beforeEach(() => {
         vi.spyOn(MockSelfReport2, "score1", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport2, "score2", "get").mockReturnValue(6);
+        vi.spyOn(MockSelfReport2, "score2", "get").mockReturnValue(3);
         vi.spyOn(MockSelfReport2, "score1_corp", "get").mockReturnValue(0);
         vi.spyOn(MockSelfReport2, "score1_runner", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport2, "score2_corp", "get").mockReturnValue(3);
+        vi.spyOn(MockSelfReport2, "score2_corp", "get").mockReturnValue(0);
         vi.spyOn(MockSelfReport2, "score2_runner", "get").mockReturnValue(3);
+      });
+
+      it("displays the Mismatch badge", () => {
+        renderEditRound();
+        const table1Row = document.getElementsByClassName(
+          "table_1",
+        )[0] as HTMLElement;
+
+        expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
+        expect(table1Row).toContainElement(queryByText(table1Row, "Mismatch"));
+        expect(table1Row).not.toContainElement(queryByText(table1Row, "Custom"));
       });
 
       it("accepts a report", async () => {
@@ -516,9 +576,6 @@ describe("EditRound", () => {
         const reportsButton = within(table1Row).getByRole("button", {
           name: /reports/i,
         });
-        expect(reportsButton).toContainElement(
-          queryByTestId(reportsButton, "reportConflict"),
-        );
 
         await user.click(reportsButton);
 
@@ -529,10 +586,10 @@ describe("EditRound", () => {
         }
         const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
         expect(reportDialog).toContainElement(
-          getByText(reportDialog, /alice reported: 6 - 0/i),
+          getByText(reportDialog, /alice reported: 3 - 0/i),
         );
         expect(reportDialog).toContainElement(
-          getByText(reportDialog, /bob reported: 0 - 6/i),
+          getByText(reportDialog, /bob reported: 0 - 3/i),
         );
         expect(reportDialog).toContainElement(aliceAcceptButton);
         expect(reportDialog).toContainElement(
@@ -540,7 +597,7 @@ describe("EditRound", () => {
         );
 
         vi.spyOn(Pairing1, "reported", "get").mockReturnValue(true);
-        vi.spyOn(Pairing1, "score1", "get").mockReturnValue(6);
+        vi.spyOn(Pairing1, "score1", "get").mockReturnValue(3);
         vi.spyOn(Pairing1, "score2", "get").mockReturnValue(0);
         await user.click(aliceAcceptButton);
 
@@ -549,7 +606,7 @@ describe("EditRound", () => {
         expect(betaApi.reportScore).toHaveBeenCalledOnce();
         expect(
           within(table1Row).getByRole("textbox", { name: /corp-score/i }),
-        ).toHaveValue("6");
+        ).toHaveValue("3");
         expect(
           within(table1Row).getByRole("textbox", { name: /runner-score/i }),
         ).toHaveValue("0");
@@ -590,10 +647,10 @@ describe("EditRound", () => {
         await user.click(reportsButton);
 
         expect(reportDialog).not.toContainElement(
-          queryByText(reportDialog, /alice reported: 6 - 0/i),
+          queryByText(reportDialog, /alice reported: 3 - 0/i),
         );
         expect(reportDialog).not.toContainElement(
-          queryByText(reportDialog, /bob reported: 0 - 6/i),
+          queryByText(reportDialog, /bob reported: 0 - 3/i),
         );
         expect(reportDialog).not.toContainElement(
           queryByText(reportDialog, /accept alice/i),
