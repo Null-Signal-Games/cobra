@@ -70,6 +70,28 @@ export const MockPlayerBob: Player = {
   fixed_table_number: null,
 };
 
+export const MockSelfReport1: ScoreReport = {
+  report_player_id: MockPlayerAlice.user_id,
+  score1: 6,
+  score2: 0,
+  intentional_draw: false,
+  score1_corp: 3,
+  score2_corp: null,
+  score1_runner: 3,
+  score2_runner: null,
+};
+
+export const MockSelfReport2: ScoreReport = {
+  report_player_id: MockPlayerBob.user_id,
+  score1: 6,
+  score2: 0,
+  intentional_draw: false,
+  score1_corp: 3,
+  score2_corp: null,
+  score1_runner: 3,
+  score2_runner: null,
+};
+
 export const MockPairing1: Pairing = {
   id: 1,
   table_number: 1,
@@ -88,7 +110,7 @@ export const MockPairing1: Pairing = {
   score_label: "",
   intentional_draw: false,
   two_for_one: false,
-  self_reports: null,
+  self_reports: [MockSelfReport1, MockSelfReport2],
   reported: false,
   winner_game: null,
   loser_game: null,
