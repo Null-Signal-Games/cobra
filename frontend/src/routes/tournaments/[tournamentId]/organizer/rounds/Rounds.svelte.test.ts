@@ -21,6 +21,7 @@ import {
 import { userEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { betaApi } from "#lib/api/beta.ts";
+import { refreshAll } from "$app/navigation";
 import RoundsPage from "./+page.svelte";
 import type { PageProps } from "./$types";
 import {
@@ -79,6 +80,9 @@ vi.mock("#lib/api/beta.ts", () => ({
     setRegistrationStatus: vi.fn(),
     updateRoundTimer: vi.fn(),
   },
+}));
+vi.mock("$app/navigation", () => ({
+  refreshAll: vi.fn(),
 }));
 vi.mock('$app/env/public', () => {
   return {
@@ -594,6 +598,18 @@ describe("Rounds", () => {
 
         expect(betaApi.pairRound).toHaveBeenCalledOnce();
         expect(screen.queryByText(/round 2/i)).not.toBeNull();
+      });
+
+      it("refreshes the page even when pairing fails", async () => {
+        vi.mocked(betaApi.pairRound).mockResolvedValue(false);
+        vi.spyOn(window, "confirm").mockReturnValue(true);
+        renderRounds();
+
+        await user.click(
+          screen.getByRole("button", { name: /pair new round!/i }),
+        );
+
+        expect(refreshAll).toHaveBeenCalledOnce();
       });
 
       it("shows cut buttons and allows creating single elim stage", async () => {

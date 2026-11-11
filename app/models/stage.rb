@@ -19,7 +19,7 @@ class Stage < ApplicationRecord # rubocop:disable Style/Documentation
   }
 
   def pair_new_round!
-    new_round!.tap(&:pair!)
+    transaction { new_round!.tap(&:pair!) }
   end
 
   def new_round!

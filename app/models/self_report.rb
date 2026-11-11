@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
 class SelfReport < ApplicationRecord # rubocop:disable Style/Documentation
-  belongs_to :pairing, touch: true
+  include NoEliminationTies
 
-  before_save :normalise_scores_before_save
+  belongs_to :pairing, touch: true
+  delegate :stage, to: :pairing, allow_nil: true
+
+  # Normalise before validating so validations see the combined score1/score2.
+  before_validation :normalise_scores_before_save
 
   def normalise_scores_before_save
     # Handle score presets set as corp & runner scores
