@@ -22,6 +22,13 @@ export function reportsMatch(
   return report1.score1 === report2.score1 && report1.score2 === report2.score2;
 }
 
+export function isPreset(stage: Stage, report: ScoreReport): boolean {
+  const scores = [report.score1 ?? 0, report.score2 ?? 0];
+  return stage.is_single_sided
+    ? [[0, 0], [3, 0], [0, 3]].some((s) => s[0] === scores[0] && s[1] === scores[1])
+    : [[0, 0], [3, 3], [6, 0], [0, 6]].some((s) => s[0] === scores[0] && s[1] === scores[1]);
+}
+
 export function scorePresets(stage: Stage, pairing: Pairing) {
   if (!stage.is_elimination && !stage.is_single_sided) {
     return [

@@ -6,7 +6,7 @@
   import type { Round } from "#lib/model/Round.ts";
   import type { Pairing } from "#lib/model/Pairing.ts";
   import type { Tournament } from "#lib/model/Tournament.ts";
-  import { readableReportScore, reportsMatch, type ScoreReport } from "#lib/model/ScoreReport.ts";
+  import { isPreset, readableReportScore, reportsMatch, type ScoreReport } from "#lib/model/ScoreReport.ts";
   import PlayerDisplay from "#lib/components/PlayerDisplay.svelte";
   import type { Player } from "#lib/model/Player.ts";
   import { resolve } from "$app/paths";
@@ -168,12 +168,6 @@
       data-target="#reports{pairing.id}"
     >
       Reports
-      {#if !pairing.reported && pairing.self_reports?.length == 2 && !reportsMatch(pairing.self_reports[0], pairing.self_reports[1])}
-        <FontAwesomeIcon
-          icon="exclamation-triangle"
-          dataTestId="reportConflict"
-        />
-      {/if}
     </button>
     <button
       class="btn btn-danger"
@@ -184,6 +178,29 @@
     >
       <FontAwesomeIcon icon="trash" />
     </button>
+    <div>
+      {#if !pairing.reported && pairing.self_reports?.length == 1}
+        <div class="badge badge-warning">
+          Partial
+        </div>
+      {/if}
+      {#if !pairing.reported
+        && pairing.self_reports?.length == 2
+        && !reportsMatch(pairing.self_reports[0], pairing.self_reports[1])
+      }
+        <div class="badge badge-warning">
+          Mismatch
+        </div>
+      {/if}
+      {#if pairing.self_reports
+        && ((pairing.self_reports.length > 0 && !isPreset(stage, pairing.self_reports[0]))
+          || (pairing.self_reports.length > 1 && !isPreset(stage, pairing.self_reports[1])))
+      }
+        <div class="badge badge-secondary">
+          Custom
+        </div>
+      {/if}
+    </div>
   </div>
 
   {#snippet playerReport(player: Player, report: ScoreReport | undefined)}
