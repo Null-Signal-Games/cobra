@@ -362,28 +362,28 @@ describe("EditRound", () => {
 
   describe("using custom scores", () => {
     it("displays the Custom badge for custom scores", () => {
-        vi.spyOn(MockSelfReport1, "score1", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport1, "score2", "get").mockReturnValue(4);
-        vi.spyOn(MockSelfReport1, "score1_corp", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport1, "score1_runner", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport1, "score2_corp", "get").mockReturnValue(2);
-        vi.spyOn(MockSelfReport1, "score2_runner", "get").mockReturnValue(2);
-        vi.spyOn(MockSelfReport2, "score1", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport2, "score2", "get").mockReturnValue(4);
-        vi.spyOn(MockSelfReport2, "score1_corp", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport2, "score1_runner", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport2, "score2_corp", "get").mockReturnValue(2);
-        vi.spyOn(MockSelfReport2, "score2_runner", "get").mockReturnValue(2);
-
-        renderEditRound();
-        const table1Row = document.getElementsByClassName(
-          "table_1",
-        )[0] as HTMLElement;
-        
-        expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
-        expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
-        expect(table1Row).toContainElement(queryByText(table1Row, "Custom"));
-      });
+      vi.spyOn(MockSelfReport1, "score1", "get").mockReturnValue(0);
+      vi.spyOn(MockSelfReport1, "score2", "get").mockReturnValue(4);
+      vi.spyOn(MockSelfReport1, "score1_corp", "get").mockReturnValue(0);
+      vi.spyOn(MockSelfReport1, "score1_runner", "get").mockReturnValue(0);
+      vi.spyOn(MockSelfReport1, "score2_corp", "get").mockReturnValue(2);
+      vi.spyOn(MockSelfReport1, "score2_runner", "get").mockReturnValue(2);
+      vi.spyOn(MockSelfReport2, "score1", "get").mockReturnValue(0);
+      vi.spyOn(MockSelfReport2, "score2", "get").mockReturnValue(4);
+      vi.spyOn(MockSelfReport2, "score1_corp", "get").mockReturnValue(0);
+      vi.spyOn(MockSelfReport2, "score1_runner", "get").mockReturnValue(0);
+      vi.spyOn(MockSelfReport2, "score2_corp", "get").mockReturnValue(2);
+      vi.spyOn(MockSelfReport2, "score2_runner", "get").mockReturnValue(2);
+      
+      renderEditRound();
+      const table1Row = document.getElementsByClassName(
+        "table_1",
+      )[0] as HTMLElement;
+      
+      expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
+      expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
+      expect(table1Row).toContainElement(queryByText(table1Row, "Custom"));
+    });
       
     it("saves a custom score", async () => {
       const { rerender } = renderEditRound();
