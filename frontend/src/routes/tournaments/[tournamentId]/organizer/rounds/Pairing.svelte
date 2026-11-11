@@ -178,29 +178,31 @@
     >
       <FontAwesomeIcon icon="trash" />
     </button>
-    <div>
-      {#if !pairing.reported && pairing.self_reports?.length == 1}
-        <div class="badge badge-warning">
-          Partial
-        </div>
-      {/if}
-      {#if !pairing.reported
-        && pairing.self_reports?.length == 2
-        && !reportsMatch(pairing.self_reports[0], pairing.self_reports[1])
-      }
-        <div class="badge badge-warning">
-          Mismatch
-        </div>
-      {/if}
-      {#if pairing.self_reports
-        && ((pairing.self_reports.length > 0 && !isPreset(stage, pairing.self_reports[0]))
-          || (pairing.self_reports.length > 1 && !isPreset(stage, pairing.self_reports[1])))
-      }
-        <div class="badge badge-secondary">
-          Custom
-        </div>
-      {/if}
-    </div>
+    <!-- Player report status badges -->
+    {#if pairing.self_reports}
+      <div>
+        {#if !pairing.reported}
+          {#if pairing.self_reports.length == 1}
+            <div class="badge badge-warning">
+              Partial
+            </div>
+          {:else if pairing.self_reports.length == 2
+            && !reportsMatch(pairing.self_reports[0], pairing.self_reports[1])
+          }
+            <div class="badge badge-warning">
+              Mismatch
+            </div>
+          {/if}
+        {/if}
+        {#if (pairing.self_reports.length > 0 && !isPreset(stage, pairing.self_reports[0]))
+          || (pairing.self_reports.length > 1 && !isPreset(stage, pairing.self_reports[1]))
+        }
+          <div class="badge badge-secondary">
+            Custom
+          </div>
+        {/if}
+      </div>
+    {/if}
   </div>
 
   {#snippet playerReport(player: Player, report: ScoreReport | undefined)}
