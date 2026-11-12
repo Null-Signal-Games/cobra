@@ -123,6 +123,19 @@
     await refreshAll();
   }
 
+  async function resetReportsCallback(roundId: number, pairingId: number) {
+    const success = await betaApi.resetReports(
+      parseInt(params.tournamentId),
+      roundId,
+      pairingId);
+    if (!success) {
+      globalMessages.errors.push("Unable to reset the score reports.");
+      return;
+    }
+
+    await refreshAll();
+  }
+
   async function completeRoundCallback(roundId: number) {
     const success = await betaApi.completeRound(data.tournamentData.tournament.id, roundId, true);
     if (!success) {
@@ -301,6 +314,7 @@
           {reportScoreCallback}
           {completeRoundCallback}
           {updateTimerCallback}
+          {resetReportsCallback}
         />
       {/each}
     </div>

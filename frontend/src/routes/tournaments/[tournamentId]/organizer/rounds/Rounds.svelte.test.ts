@@ -14,6 +14,9 @@
 import {
   cleanup,
   getByRole,
+  getByText,
+  queryByTestId,
+  queryByText,
   render,
   screen,
   within,
@@ -34,6 +37,8 @@ import {
   MockSingleElimCutStage,
   MockDoubleElimCutStage,
   MockTournament,
+  MockSelfReport2,
+  MockSelfReport1,
 } from "./RoundsTestData.ts";
 import type { TournamentPolicies } from "#lib/model/Tournament.ts";
 
@@ -75,6 +80,7 @@ vi.mock("#lib/api/beta.ts", () => ({
     loadPairings: vi.fn(),
     pairRound: vi.fn(),
     reportScore: vi.fn(),
+    resetReports: vi.fn(),
     setPlayerRegistrationStatus: vi.fn(),
     setRegistrationStatus: vi.fn(),
     updateRoundTimer: vi.fn(),
@@ -636,6 +642,227 @@ describe("Rounds", () => {
 
         expect(betaApi.createStage).toHaveBeenCalledOnce();
         expect(screen.queryByText(/^double elim$/i)).not.toBeNull();
+      });
+    });
+
+    describe("manage self-reports", () => {
+      it("displays the Partial badge when only one player has reported", () => {
+        vi.spyOn(MockPairing1, "self_reports", "get").mockReturnValue([MockSelfReport1]);
+
+        renderRounds();
+        const table1Row = document.getElementsByClassName(
+          "table_1",
+        )[0] as HTMLElement;
+        
+        expect(table1Row).toContainElement(queryByText(table1Row, "Partial"));
+        expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
+        expect(table1Row).not.toContainElement(queryByText(table1Row, "Custom"));
+      });
+
+      describe("when self-reports agree", () => {
+        it("does not display any badges", () => {
+          renderRounds();
+          const table1Row = document.getElementsByClassName(
+            "table_1",
+          )[0] as HTMLElement;
+
+          expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
+          expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
+          expect(table1Row).not.toContainElement(queryByText(table1Row, "Custom"));
+        });
+
+        it("displays the Custom badge for custom scores", () => {
+          vi.spyOn(MockSelfReport1, "score1", "get").mockReturnValue(0);
+          vi.spyOn(MockSelfReport1, "score2", "get").mockReturnValue(4);
+          vi.spyOn(MockSelfReport1, "score1_corp", "get").mockReturnValue(0);
+          vi.spyOn(MockSelfReport1, "score1_runner", "get").mockReturnValue(0);
+          vi.spyOn(MockSelfReport1, "score2_corp", "get").mockReturnValue(2);
+          vi.spyOn(MockSelfReport1, "score2_runner", "get").mockReturnValue(2);
+          vi.spyOn(MockSelfReport2, "score1", "get").mockReturnValue(0);
+          vi.spyOn(MockSelfReport2, "score2", "get").mockReturnValue(4);
+          vi.spyOn(MockSelfReport2, "score1_corp", "get").mockReturnValue(0);
+          vi.spyOn(MockSelfReport2, "score1_runner", "get").mockReturnValue(0);
+          vi.spyOn(MockSelfReport2, "score2_corp", "get").mockReturnValue(2);
+          vi.spyOn(MockSelfReport2, "score2_runner", "get").mockReturnValue(2);
+
+          renderRounds();
+          const table1Row = document.getElementsByClassName(
+            "table_1",
+          )[0] as HTMLElement;
+          
+          expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
+          expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
+          expect(table1Row).toContainElement(queryByText(table1Row, "Custom"));
+        });
+
+        it("accepts a report", async () => {
+          const { rerender } = renderRounds();
+          const table1Row = document.getElementsByClassName(
+            "table_1",
+          )[0] as HTMLElement;
+  
+          const reportsButton = within(table1Row).getByRole("button", {
+            name: /reports/i,
+          });
+          expect(reportsButton).not.toContainElement(
+            queryByTestId(reportsButton, "reportConflict"),
+          );
+  
+          await user.click(reportsButton);
+  
+          const reportDialog = document.getElementById("reports1");
+          expect(reportDialog).not.toBeNull();
+          if (!reportDialog) {
+            return;
+          }
+          const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
+          expect(reportDialog).toContainElement(
+            getByText(reportDialog, /alice reported: 6 - 0/i),
+          );
+          expect(reportDialog).toContainElement(
+            getByText(reportDialog, /bob reported: 6 - 0/i),
+          );
+          expect(reportDialog).toContainElement(aliceAcceptButton);
+          expect(reportDialog).toContainElement(
+            queryByText(reportDialog, /accept bob/i),
+          );
+  
+          vi.spyOn(MockPairing1, "reported", "get").mockReturnValue(true);
+          vi.spyOn(MockPairing1, "score1", "get").mockReturnValue(6);
+          vi.spyOn(MockPairing1, "score2", "get").mockReturnValue(0);
+          await user.click(aliceAcceptButton);
+  
+          await rerender({ data: structuredClone(MockPageData) });
+  
+          expect(betaApi.reportScore).toHaveBeenCalledOnce();
+          expect(
+            within(table1Row).getByRole("textbox", { name: /corp-score/i }),
+          ).toHaveValue("6");
+          expect(
+            within(table1Row).getByRole("textbox", { name: /runner-score/i }),
+          ).toHaveValue("0");
+          expect(
+            within(table1Row).getByRole("checkbox", {
+              name: /intentional draw/i,
+            }),
+          ).not.toBeChecked();
+        });
+      });
+  
+      describe("when self-reports disagree", () => {
+        beforeEach(() => {
+          vi.spyOn(MockSelfReport2, "score1", "get").mockReturnValue(0);
+          vi.spyOn(MockSelfReport2, "score2", "get").mockReturnValue(6);
+          vi.spyOn(MockSelfReport2, "score1_corp", "get").mockReturnValue(0);
+          vi.spyOn(MockSelfReport2, "score1_runner", "get").mockReturnValue(0);
+          vi.spyOn(MockSelfReport2, "score2_corp", "get").mockReturnValue(3);
+          vi.spyOn(MockSelfReport2, "score2_runner", "get").mockReturnValue(3);
+        });
+
+        it("displays the Mismatch badge", () => {
+          renderRounds();
+          const table1Row = document.getElementsByClassName(
+            "table_1",
+          )[0] as HTMLElement;
+
+          expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
+          expect(table1Row).toContainElement(queryByText(table1Row, "Mismatch"));
+          expect(table1Row).not.toContainElement(queryByText(table1Row, "Custom"));
+        });
+  
+        it("accepts a report", async () => {
+          const { rerender } = renderRounds();
+  
+          const table1Row = document.getElementsByClassName(
+            "table_1",
+          )[0] as HTMLElement;
+  
+          const reportsButton = within(table1Row).getByRole("button", {
+            name: /reports/i,
+          });
+  
+          await user.click(reportsButton);
+  
+          const reportDialog = document.getElementById("reports1");
+          expect(reportDialog).not.toBeNull();
+          if (!reportDialog) {
+            return;
+          }
+          const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
+          expect(reportDialog).toContainElement(
+            getByText(reportDialog, /alice reported: 6 - 0/i),
+          );
+          expect(reportDialog).toContainElement(
+            getByText(reportDialog, /bob reported: 0 - 6/i),
+          );
+          expect(reportDialog).toContainElement(aliceAcceptButton);
+          expect(reportDialog).toContainElement(
+            queryByText(reportDialog, /accept bob/i),
+          );
+  
+          vi.spyOn(MockPairing1, "reported", "get").mockReturnValue(true);
+          vi.spyOn(MockPairing1, "score1", "get").mockReturnValue(6);
+          vi.spyOn(MockPairing1, "score2", "get").mockReturnValue(0);
+          await user.click(aliceAcceptButton);
+  
+          await rerender({ data: structuredClone(MockPageData) });
+  
+          expect(betaApi.reportScore).toHaveBeenCalledOnce();
+          expect(
+            within(table1Row).getByRole("textbox", { name: /corp-score/i }),
+          ).toHaveValue("6");
+          expect(
+            within(table1Row).getByRole("textbox", { name: /runner-score/i }),
+          ).toHaveValue("0");
+          expect(
+            within(table1Row).getByRole("checkbox", {
+              name: /intentional draw/i,
+            }),
+          ).not.toBeChecked();
+        });
+  
+        it("resets the reports", async () => {
+          const { rerender } = renderRounds();
+  
+          const table1Row = document.getElementsByClassName(
+            "table_1",
+          )[0] as HTMLElement;
+          const reportsButton = within(table1Row).getByRole("button", {
+            name: /reports/i,
+          });
+  
+          await user.click(reportsButton);
+  
+          const reportDialog = document.getElementById("reports1");
+          expect(reportDialog).not.toBeNull();
+          if (!reportDialog) {
+            return;
+          }
+  
+          vi.spyOn(MockPairing1, "self_reports", "get").mockReturnValue(null);
+          vi.spyOn(MockPairing1, "reported", "get").mockReturnValue(false);
+          vi.spyOn(MockPairing1, "score1", "get").mockReturnValue(0);
+          vi.spyOn(MockPairing1, "score2", "get").mockReturnValue(0);
+          await user.click(getByText(reportDialog, /reset/i));
+          expect(betaApi.resetReports).toHaveBeenCalledOnce();
+  
+          await rerender({ data: structuredClone(MockPageData) });
+  
+          await user.click(reportsButton);
+  
+          expect(reportDialog).not.toContainElement(
+            queryByText(reportDialog, /alice reported: 6 - 0/i),
+          );
+          expect(reportDialog).not.toContainElement(
+            queryByText(reportDialog, /bob reported: 0 - 6/i),
+          );
+          expect(reportDialog).not.toContainElement(
+            queryByText(reportDialog, /accept alice/i),
+          );
+          expect(reportDialog).not.toContainElement(
+            queryByText(reportDialog, /accept bob/i),
+          );
+        });
       });
     });
   });
