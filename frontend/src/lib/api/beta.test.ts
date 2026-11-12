@@ -142,6 +142,31 @@ describe("BetaApi", () => {
 
       expect(result).toBe(false);
     });
+
+    it("displays server validation error", async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ errors: ["Elimination games cannot end in a tie"] }), {
+          status: 422,
+        }),
+      );
+
+      const invalidTieReport: ScoreReport = {
+        score1: 3,
+        score2: 3,
+        score1_corp: 0,
+        score2_runner: 0,
+        score1_runner: 0,
+        score2_corp: 0,
+        intentional_draw: false,
+      };
+
+      const result = await api.reportScore(10, 2, 42, invalidTieReport, false, mockFetch);
+
+      expect(result).toBe(false);
+      expect(globalMessages.errors).toEqual([
+        "Failed to report score: Elimination games cannot end in a tie",
+      ]);
+    });
   });
 
   describe("resetReports", () => {

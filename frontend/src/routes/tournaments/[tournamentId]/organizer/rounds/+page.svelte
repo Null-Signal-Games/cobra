@@ -43,9 +43,9 @@
     const success = await betaApi.pairRound(data.tournamentData.tournament.id);
     if (!success) {
       globalMessages.errors.push("Unable to pair a new round.");
-      return;
     }
 
+    // Refresh even on failure so we aren't offering to pair again from stale data.
     await refreshAll();
   }
 

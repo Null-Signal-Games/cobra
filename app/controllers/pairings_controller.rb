@@ -46,7 +46,7 @@ class PairingsController < ApplicationController # rubocop:disable Metrics/Class
   def report
     authorize @tournament, :update?
 
-    save_report
+    flash[:alert] = pairing.errors.full_messages.to_sentence unless save_report
 
     redirect_back_or_to(tournament_rounds_path(tournament))
   end
@@ -64,7 +64,11 @@ class PairingsController < ApplicationController # rubocop:disable Metrics/Class
     authorize pairing, :can_self_report?
 
     self_report_score = self_report_score_params.merge(pairing_id: pairing.id).merge(report_player_id: current_user.id)
-    SelfReport.create(self_report_score)
+    self_report = SelfReport.new(self_report_score)
+    unless self_report.save
+      return render json: { success: false, errors: self_report.errors.full_messages },
+                    status: :unprocessable_content
+    end
 
     # if both players have reported and the reported scores match, finalize scores for the pairing
     reports = Pairing.find(params[:id]).self_reports
@@ -120,9 +124,8 @@ class PairingsController < ApplicationController # rubocop:disable Metrics/Class
   private
 
   def save_report
-    pairing.update(score_params)
-
-    return unless score_params.key?('side') && pairing.reported?
+    return false unless pairing.update(score_params)
+    return true unless score_params.key?('side') && pairing.reported?
 
     score1_corp = pairing.score1_corp
     pairing.score1_corp = pairing.score1_runner

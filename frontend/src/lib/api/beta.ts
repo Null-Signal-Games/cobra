@@ -8,6 +8,7 @@ import type { ScoreReport } from "#lib/model/ScoreReport.ts";
 import type { Stats, CutStats } from "#lib/model/Stats.ts";
 import type { Tournament } from "#lib/model/Tournament.ts";
 import { addError, setErrors } from "#lib/utils/GlobalMessageState.svelte.ts";
+import { ValidationError } from "#lib/utils/errors.ts";
 
 interface SavePlayerResponse {
   player: Player;
@@ -165,7 +166,11 @@ export class BetaApi {
     );
 
     if (!res.ok) {
-      addError("Failed to report score.");
+      addError(
+        res.error instanceof ValidationError
+          ? `Failed to report score: ${res.error.message}`
+          : "Failed to report score.",
+      );
       return false;
     }
 
