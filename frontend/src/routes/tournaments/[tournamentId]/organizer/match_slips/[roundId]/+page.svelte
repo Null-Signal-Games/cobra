@@ -7,6 +7,7 @@
 
   let { data, params }: PageProps = $props();
 
+  let blank = $state(true);
   let collated = $state(false);
   let showByes = $state(false);
 
@@ -18,6 +19,15 @@
     <a href={resolve(`tournaments/${params.tournamentId}/organizer/rounds`)} class="btn btn-primary">
       <FontAwesomeIcon icon="arrow-left" /> Back to Pairings
     </a>
+    <button type="button" class="btn btn-primary" onclick={() => blank = !blank}>
+      {#if blank}
+        <FontAwesomeIcon icon="users" />
+        Pre-populated
+      {:else}
+        <FontAwesomeIcon icon="users-slash" />
+        Blank
+      {/if}
+    </button>
     <button type="button" class="btn btn-primary" onclick={() => collated = !collated}>
       <FontAwesomeIcon icon="flag-checkered" />
       {collated ? "Uncollate" : "Collate"}
@@ -54,7 +64,11 @@
         <hr />
 
         <div class="match_slip">
-          <h4>Round {data.round.number} - Table {pairing.table_number}</h4>
+          {#if blank}
+            <h4>Round ____ - Table ____</h4>
+          {:else}
+            <h4>Round {data.round.number} - Table {pairing.table_number}</h4>
+          {/if}
 
           <table class="table table-bordered">
             <thead>
@@ -68,14 +82,26 @@
             </thead>
             <tbody>
               <tr>
-                <td>{pairing.player1.name_with_pronouns || pairing.player1.name}</td>
+                <td>
+                  {#if blank}
+                    &nbsp;
+                  {:else}
+                    pairing.player1.name_with_pronouns || pairing.player1.name
+                  {/if}
+                </td>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
               </tr>
               <tr>
-                <td>{pairing.player2.name_with_pronouns || pairing.player2.name}</td>
+                <td>
+                  {#if blank}
+                    &nbsp;
+                  {:else}
+                    pairing.player2.name_with_pronouns || pairing.player2.name
+                  {/if}
+                </td>
                 <td></td>
                 <td></td>
                 <td></td>
