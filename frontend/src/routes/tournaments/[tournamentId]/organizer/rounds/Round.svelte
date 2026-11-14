@@ -17,6 +17,7 @@
     deletePairingCallback,
     changePlayerSideCallback,
     reportScoreCallback,
+    resetReportsCallback,
     completeCallback,
     updateTimerCallback,
   }: {
@@ -36,6 +37,7 @@
       report: ScoreReport,
       selfReport: boolean,
     ) => void;
+    resetReportsCallback?: (roundId: number, pairingId: number) => void;
     completeCallback?: (roundId: number) => void;
     updateTimerCallback?: (
       roundId: number,
@@ -132,6 +134,9 @@
               selfReport: boolean,
             ) => {
               reportScoreCallback?.(round.id, pairingId, report, selfReport);
+            }}
+            resetReportsCallback={(pairingId: number) => {
+              resetReportsCallback?.(round.id, pairingId);
             }}
           />
         {/if}

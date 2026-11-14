@@ -15,6 +15,16 @@ RSpec.describe Stage do
       end.to change(stage.rounds, :count).by(1)
     end
 
+    it 'does not keep a new round if pairing fails' do
+      allow(Pairer).to receive(:new).and_raise(NoMethodError)
+
+      expect do
+        stage.pair_new_round!
+      rescue NoMethodError
+        nil
+      end.not_to change(stage.rounds, :count)
+    end
+
     describe 'round numbers' do
       it 'creates first with number 1' do
         expect(stage.pair_new_round!.number).to eq(1)

@@ -35,9 +35,9 @@ module Beta
 
       authorize @tournament, :update?
 
-      save_report
+      return head :ok if save_report
 
-      head :ok
+      render json: { errors: pairing.errors.full_messages }, status: :unprocessable_content
     end
 
     def reset_self_report
@@ -70,9 +70,8 @@ module Beta
     end
 
     def save_report
-      pairing.update(score_params)
-
-      return unless score_params.key?('side') && pairing.reported?
+      return false unless pairing.update(score_params)
+      return true unless score_params.key?('side') && pairing.reported?
 
       score1_corp = pairing.score1_corp
       pairing.score1_corp = pairing.score1_runner
@@ -92,7 +91,10 @@ module Beta
       self_report_score = score_params(self_report: true)
                           .merge(pairing_id: pairing.id)
                           .merge(report_player_id: current_user.id)
-      SelfReport.create(self_report_score)
+      self_report = SelfReport.new(self_report_score)
+      unless self_report.save
+        return render json: { errors: self_report.errors.full_messages }, status: :unprocessable_content
+      end
 
       # if both players have reported and the reported scores match, finalize scores for the pairing
       reports = Pairing.find(params[:id]).self_reports

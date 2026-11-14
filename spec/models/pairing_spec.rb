@@ -267,4 +267,33 @@ RSpec.describe Pairing do
       end
     end
   end
+
+  describe 'tied scores in elimination stages are not allowed' do
+    let(:stage) { create(:stage, format: :single_elim) }
+    let(:round) { create(:round, stage:) }
+    let(:pairing) { create(:pairing, round:, score1: nil, score2: nil) }
+
+    it 'rejects a tied custom score' do
+      expect(pairing.update(score1: 3, score2: 3)).to be(false)
+      expect(pairing.errors[:base]).to include('Elimination games cannot end in a tie')
+    end
+
+    it 'rejects a tie entered as side scores' do
+      expect(pairing.update(score1_corp: 3, score2_runner: 3)).to be(false)
+    end
+
+    it 'allows a decisive score' do
+      expect(pairing.update(score1: 3, score2: 0)).to be(true)
+    end
+
+    it 'allows an unreported pairing' do
+      expect(pairing).to be_valid
+    end
+
+    it 'allows ties in swiss stages' do
+      swiss_pairing = create(:pairing, score1: nil, score2: nil)
+
+      expect(swiss_pairing.update(score1: 3, score2: 3)).to be(true)
+    end
+  end
 end

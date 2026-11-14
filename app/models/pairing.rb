@@ -19,7 +19,10 @@ class Pairing < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style/Do
                         where(player1:, player2:).or(where(player1: player2, player2: player1))
                       }
 
-  before_save :normalise_scores_before_save
+  include NoEliminationTies
+
+  # Normalise before validating so validations see the combined score1/score2.
+  before_validation :normalise_scores_before_save
   after_update :cache_standings!, if: proc { round.completed? }
   delegate :cache_standings!, to: :stage
 

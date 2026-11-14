@@ -193,7 +193,8 @@ RSpec.describe Player do
       before do
         create_list(:pairing, 3, :reported, player1: player, side: :player1_is_corp)
         create_list(:pairing, 2, :reported, player1: player, side: :player1_is_runner)
-        create_list(:pairing, 2, :reported, player1: player, side: :player1_is_runner, stage: cut_stage)
+        create_list(:pairing, 2, :reported, player1: player, side: :player1_is_runner, stage: cut_stage, score1: 3,
+                                            score2: 0)
       end
 
       it 'returns positive number' do

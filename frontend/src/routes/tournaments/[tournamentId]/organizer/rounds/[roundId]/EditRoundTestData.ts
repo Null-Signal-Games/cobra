@@ -44,23 +44,23 @@ export const MockPlayerBob: Player = {
 
 export const MockSelfReport1: ScoreReport = {
   report_player_id: MockPlayerAlice.user_id,
-  score1: 6,
+  score1: 3,
   score2: 0,
   intentional_draw: false,
   score1_corp: 3,
   score2_corp: null,
-  score1_runner: 3,
+  score1_runner: 0,
   score2_runner: null,
 };
 
 export const MockSelfReport2: ScoreReport = {
   report_player_id: MockPlayerBob.user_id,
-  score1: 6,
+  score1: 3,
   score2: 0,
   intentional_draw: false,
   score1_corp: 3,
   score2_corp: null,
-  score1_runner: 3,
+  score1_runner: 0,
   score2_runner: null,
 };
 

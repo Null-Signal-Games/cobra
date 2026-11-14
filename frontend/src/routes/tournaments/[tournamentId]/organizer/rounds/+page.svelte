@@ -43,9 +43,9 @@
     const success = await betaApi.pairRound(data.tournamentData.tournament.id);
     if (!success) {
       globalMessages.errors.push("Unable to pair a new round.");
-      return;
     }
 
+    // Refresh even on failure so we aren't offering to pair again from stale data.
     await refreshAll();
   }
 
@@ -117,6 +117,19 @@
     );
     if (!success) {
       globalMessages.errors.push("Unable to submit the score report.");
+      return;
+    }
+
+    await refreshAll();
+  }
+
+  async function resetReportsCallback(roundId: number, pairingId: number) {
+    const success = await betaApi.resetReports(
+      parseInt(params.tournamentId),
+      roundId,
+      pairingId);
+    if (!success) {
+      globalMessages.errors.push("Unable to reset the score reports.");
       return;
     }
 
@@ -301,6 +314,7 @@
           {reportScoreCallback}
           {completeRoundCallback}
           {updateTimerCallback}
+          {resetReportsCallback}
         />
       {/each}
     </div>
