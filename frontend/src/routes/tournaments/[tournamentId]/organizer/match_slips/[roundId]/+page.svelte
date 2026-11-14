@@ -86,7 +86,7 @@
                   {#if blank}
                     &nbsp;
                   {:else}
-                    pairing.player1.name_with_pronouns || pairing.player1.name
+                    {pairing.player1.name_with_pronouns || pairing.player1.name}
                   {/if}
                 </td>
                 <td></td>
@@ -99,7 +99,7 @@
                   {#if blank}
                     &nbsp;
                   {:else}
-                    pairing.player2.name_with_pronouns || pairing.player2.name
+                    {pairing.player2.name_with_pronouns || pairing.player2.name}
                   {/if}
                 </td>
                 <td></td>
