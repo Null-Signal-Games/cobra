@@ -228,6 +228,38 @@ RSpec.describe PairingStrategies::Swiss do
     end
   end
 
+  context 'when using a seeded Random, with tied matchings in round 2' do
+    let(:players) { create_list(:player, 8, tournament:) }
+    let(:round1) { create(:round, tournament:, stage:, number: 1, completed: true) }
+    let(:round2) { create(:round, tournament:, stage:, number: 2) }
+
+    # Four players on 6 points and four players on 0. Nobody in the same bracket has played yet, so
+    # several matchings tie for the best weight and only the seeded shuffle decides between them.
+    before do
+      players.each_slice(2) do |winner, loser|
+        create(:pairing, round: round1, player1: winner, player2: loser, score1: 6, score2: 0)
+      end
+    end
+
+    def pair_with_seed(seed)
+      round2.pairings.destroy_all
+      described_class.new(round2, Random.new(seed)).pair!
+      round2.reload.pairings.map { |p| [p.player1_id, p.player2_id, p.table_number] }.sort
+    end
+
+    it 'produces identical pairings, sides and tables for the same seed' do
+      first_run = pair_with_seed(419)
+      10.times do
+        expect(pair_with_seed(419)).to eq(first_run)
+      end
+    end
+
+    it 'picks different tied matches for a different seed' do
+      seed1_pairings = pair_with_seed(1)
+      expect(pair_with_seed(2)).not_to eq(seed1_pairings)
+    end
+  end
+
   def pairings_table_by_player(pairings)
     index = {}
     pairings.each do |pairing|

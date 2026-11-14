@@ -25,6 +25,7 @@ module SwissImplementation # rubocop:disable Style/Documentation
       @delta_key = options[:delta_key] || :delta
       @exclude_key = options[:exclude_key] || :exclude
       @bye_delta = options[:bye_delta] || -1
+      @random = options[:random] || Random
     end
 
     def pair(player_data, &)
@@ -56,20 +57,19 @@ module SwissImplementation # rubocop:disable Style/Documentation
       GraphMatching::Graph::WeightedGraph.send('[]', *edges)
     end
 
+    # Checks each player's exclusion list directly rather than building a lists of
+    # every permitted target per pair to keep pairings fast.
     def permitted?(a, b) # rubocop:disable Naming/MethodParameterName
-      targets(a).include?(b) && targets(b).include?(a)
+      excluded_opponents(a).exclude?(exclusion_key(b)) && excluded_opponents(b).exclude?(exclusion_key(a))
     end
 
     def delta(a, b) # rubocop:disable Naming/MethodParameterName
       0 - ((delta_value(a) - delta_value(b))**2)
     end
 
-    def targets(player)
-      out = players - [player]
-
-      excluded = excluded_opponents(player)
-
-      out.reject { |p| excluded.include?(p == SwissImplementation::Bye ? p : p.id) }
+    # Exclusion lists hold player ids, plus the Bye sentinel itself.
+    def exclusion_key(player)
+      player == Bye ? Bye : player.id
     end
 
     def delta_value(player)
@@ -89,7 +89,7 @@ module SwissImplementation # rubocop:disable Style/Documentation
     def players
       @players ||= @player_data.clone.tap do |data|
         data << Bye unless data.length.even?
-      end.shuffle
+      end.shuffle(random: @random)
     end
   end
 end

@@ -25,6 +25,16 @@ RSpec.describe PairingStrategies::DoubleElim do
       end
     end
 
+    it 'passes random source to SideDeterminer' do
+      random = Random.new(419)
+      allow(SideDeterminer).to receive(:determine_sides).and_call_original
+
+      described_class.new(round, random).pair!
+
+      expect(SideDeterminer).to have_received(:determine_sides)
+        .with(anything, anything, stage, random:).exactly(4).times
+    end
+
     context 'with some results' do
       let(:round3) { create(:round, number: 3, stage:) }
       let(:pairer) { described_class.new(round3) }

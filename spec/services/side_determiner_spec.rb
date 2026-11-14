@@ -84,5 +84,18 @@ RSpec.describe SideDeterminer do
     it 'randomly picks sides' do
       expect(decision).not_to be_nil
     end
+
+    it 'picks the same sides for the same seed' do
+      first_run = described_class.determine_sides(player1, player2, swiss_stage, random: Random.new(419))
+
+      expect(described_class.determine_sides(player1, player2, swiss_stage, random: Random.new(419))).to eq(first_run)
+    end
+
+    it 'lets the seed decide the sides' do
+      expect(described_class.determine_sides(player1, player2, swiss_stage, random: Random.new(1)))
+        .to eq(:player1_is_runner)
+      expect(described_class.determine_sides(player1, player2, swiss_stage, random: Random.new(2)))
+        .to eq(:player1_is_corp)
+    end
   end
 end

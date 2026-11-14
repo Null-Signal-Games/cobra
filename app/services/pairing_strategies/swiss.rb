@@ -36,11 +36,12 @@ module PairingStrategies
       end
     end
 
-    def self.get_pairings(players)
+    def self.get_pairings(players, random: Random)
       SwissImplementation.pair(
         players,
         delta_key: :points,
-        exclude_key: :double_sided_unpairable_opponents
+        exclude_key: :double_sided_unpairable_opponents,
+        random:
       )
     end
 
@@ -60,7 +61,7 @@ module PairingStrategies
         return @paired_players
       end
 
-      @paired_players ||= self.class.get_pairings(players_to_pair)
+      @paired_players ||= self.class.get_pairings(players_to_pair, random:)
     end
 
     def pairing_params(pairing)
