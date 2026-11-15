@@ -215,7 +215,7 @@ describe("EditRound", () => {
       await user.keyboard("Alice{Enter}");
       getByLabelText(newPairingForm, /new pairing player 1 side/i).focus();
       await user.keyboard("{ArrowDown}");
-      await user.click(getByText(newPairingForm, "Corp"));
+      await user.click(getByText(newPairingForm, "Runner"));
       getByLabelText(newPairingForm, /^new pairing player 2$/i).focus();
       await user.keyboard("Bob{Enter}");
 
@@ -239,13 +239,92 @@ describe("EditRound", () => {
         {
           table_number: 11,
           player1_id: MockPlayerAlice.id,
-          side: "player1_is_corp",
+          side: "player1_is_runner",
           player2_id: MockPlayerBob.id,
         },
       );
       expect(
         document.getElementsByClassName("table_11")[0],
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("create pairing side", () => {
+    beforeEach(() => {
+      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([
+        MockPlayerAlice,
+        MockPlayerBob,
+      ]);
+    });
+
+    async function fillAndCreate(newPairingForm: HTMLElement) {
+      await user.type(
+        getByRole(newPairingForm, "spinbutton", { name: /new pairing table number/i }),
+        "3",
+      );
+      getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
+      await user.keyboard("Alice{Enter}");
+      getByLabelText(newPairingForm, /^new pairing player 2$/i).focus();
+      await user.keyboard("Bob{Enter}");
+      await user.click(getByRole(newPairingForm, "button", { name: /create/i }));
+    }
+
+    function getNewPairingForm() {
+      const newPairingForm = document.getElementById("new_pairing");
+      if (!newPairingForm) {
+        throw new Error("new pairing form not found");
+      }
+      return newPairingForm;
+    }
+
+    it("defaults player 1 to Corp", async () => {
+      renderEditRound();
+      const newPairingForm = getNewPairingForm();
+
+      expect(getByText(newPairingForm, "Corp")).toBeInTheDocument();
+      await fillAndCreate(newPairingForm);
+
+      expect(betaApi.createPairing).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        expect.objectContaining({ side: "player1_is_corp" }),
+      );
+    });
+
+    it("sends no side for double-sided stages", async () => {
+      vi.spyOn(MockPageData.stage, "is_single_sided", "get").mockReturnValue(false);
+      renderEditRound();
+      const newPairingForm = getNewPairingForm();
+
+      expect(queryByText(newPairingForm, "Corp")).toBeNull();
+      await fillAndCreate(newPairingForm);
+
+      expect(betaApi.createPairing).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        expect.objectContaining({ side: null }),
+      );
+    });
+  });
+
+  describe("unpaired players", () => {
+    it("shows a count and a sorted badge per player, fading dropped players", () => {
+      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([
+        Object.assign(structuredClone(MockPlayerBob), { active: false }),
+        MockPlayerAlice,
+      ]);
+
+      renderEditRound();
+
+      expect(
+        screen.getByRole("heading", { name: "Unpaired players (2)" }),
+      ).toBeInTheDocument();
+      expect(screen.getByText("Alice", { selector: ".badge" })).not.toHaveClass("dropped");
+      expect(screen.getByText(/Bob.*\(Dropped\)/, { selector: ".badge" })).toHaveClass("dropped");
+      const badgeNames = [...document.querySelectorAll(".unpaired-players .badge")].map(
+        (badge) => badge.textContent.trim(),
+      );
+      expect(badgeNames).toEqual(["Alice", "Bob\u00a0(Dropped)"]);
     });
   });
 

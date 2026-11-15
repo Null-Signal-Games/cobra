@@ -16,9 +16,12 @@
   let newPairing = $state<NewPairing>({
     table_number: null,
     player1_id: null,
-    side: null,
+    side: "player1_is_corp",
     player2_id: null,
   });
+  let sortedUnpairedPlayers = $derived(
+    (data.round.unpaired_players ?? []).toSorted((a, b) => a.name.localeCompare(b.name)),
+  );
   // Each player list leaves out whoever is picked in the other one.
   let player1Options = $derived(
     (data.round.unpaired_players ?? []).filter((p) => p.id !== newPairing.player2_id),
@@ -90,7 +93,11 @@
     const success = await betaApi.createPairing(
       parseInt(params.tournamentId),
       parseInt(params.roundId),
-      $state.snapshot(newPairing),
+      {
+        ...$state.snapshot(newPairing),
+        // Sides only apply to single-sided stages, when the side field is shown.
+        side: data.stage.is_single_sided ? newPairing.side : null,
+      },
     );
     if (!success) {
       globalMessages.errors.push("Unable to create the pairing.");
@@ -99,7 +106,7 @@
 
     newPairing.table_number = null;
     newPairing.player1_id = null;
-    newPairing.side = null;
+    newPairing.side = "player1_is_corp";
     newPairing.player2_id = null;
 
     await refreshAll();
@@ -237,17 +244,21 @@
   {/each}
   <hr />
 
-  <h3 class="mt-2 col-12">Unpaired players</h3>
+  <h3 class="mt-2 col-12">
+    Unpaired players
+    {#if data.round.unpaired_players?.length}
+      ({data.round.unpaired_players.length})
+    {/if}
+  </h3>
   <div class="col-12">
     {#if data.round.unpaired_players && data.round.unpaired_players.length !== 0}
-      {#each data.round.unpaired_players as player (player.id)}
-        <div>
-          {player.name}
-          {#if player.active === false}
-            (Dropped)
-          {/if}
-        </div>
-      {/each}  
+      <div class="unpaired-players">
+        {#each sortedUnpairedPlayers as player (player.id)}
+          <span class="badge badge-secondary" class:dropped={player.active === false}>
+            {player.name}{#if player.active === false}&nbsp;(Dropped){/if}
+          </span>
+        {/each}
+      </div>
       <h4 class="mt-2">Create pairing</h4>
       <form
         id="new_pairing"
@@ -333,6 +344,29 @@
 </div>
 
 <style>
+  .unpaired-players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    padding: 1.25rem;
+  }
+
+  /* Narrower on wider screens; full width on phones so names don't squeeze. */
+  @media (min-width: 768px) {
+    .unpaired-players {
+      width: 80%;
+    }
+  }
+
+  .unpaired-players .badge {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .unpaired-players .dropped {
+    opacity: 0.6;
+  }
+
   .new-pairing-player {
     min-width: 14rem;
   }
