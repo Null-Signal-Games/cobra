@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { render, screen, fireEvent, cleanup } from "@testing-library/svelte";
 import { describe, it, expect, vi, afterEach } from "vitest";
+import userEvent from "@testing-library/user-event";
 import TournamentSettingsForm from "./TournamentSettingsForm.svelte";
 import { Tournament, type TournamentOptions } from "#lib/model/Tournament.ts";
 
@@ -22,11 +23,9 @@ describe("TournamentSettingsForm dropdowns", () => {
     ],
     deckbuilding_restrictions: [{ id: "standard_balance_update_26_08", name: "Standard Ban List" }],
     time_zones: [
-      { id: "UTC", name: "(GMT+00:00) UTC" },
-      {
-        id: "America/New_York",
-        name: "(GMT-05:00) Eastern Time (US & Canada)",
-      },
+      { id: "UTC", name: "UTC" },
+      { id: "America/Chicago", name: "America/Chicago" },
+      { id: "America/New_York", name: "America/New York" },
     ],
     official_prize_kits: [{ id: 1, name: "2025 Q1 Game Night Kit" }],
   };
@@ -110,6 +109,27 @@ describe("TournamentSettingsForm dropdowns", () => {
     expect(submitted.format_id).toBe(2);
     expect(submitted.tournament_type_id).toBe(2);
     expect(submitted.card_set_id).toBe("system_gateway");
+  });
+
+  it("shows the selected time zone and submits a newly picked one", async () => {
+    const tournament = new Tournament({ name: "Test Tournament", time_zone: "America/New_York" });
+    const mockOnSubmit = vi.fn();
+
+    render(TournamentSettingsForm, {
+      props: { tournament, options, onSubmitCallback: mockOnSubmit },
+    });
+
+    expect(screen.getByText("America/New York")).toBeInTheDocument();
+
+    const user = userEvent.setup();
+    screen.getByLabelText("Time zone").focus();
+    await user.keyboard("Chicago{Enter}");
+
+    await fireEvent.click(screen.getByRole("button", { name: /save/i }));
+
+    expect(mockOnSubmit).toHaveBeenCalledOnce();
+    const submitted = mockOnSubmit.mock.calls[0][0] as Tournament;
+    expect(submitted.time_zone).toBe("America/Chicago");
   });
 
   it("disables swiss_format dropdown when canChangeSwissFormat is false", () => {

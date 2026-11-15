@@ -14,4 +14,15 @@ RSpec.describe TournamentHelper do
       expect(helper.short_date(tournament)).to be_nil
     end
   end
+
+  describe '#time_zone_options' do
+    it 'lists IANA zones labelled without underscores' do
+      expect(helper.time_zone_options).to include(
+        { id: 'UTC', name: 'UTC' },
+        { id: 'America/Chicago', name: 'America/Chicago' },
+        { id: 'America/New_York', name: 'America/New York' },
+        { id: 'US/Eastern', name: 'US/Eastern' }
+      )
+    end
+  end
 end

@@ -9,6 +9,7 @@
     type TournamentOptions,
   } from "#lib/model/Tournament.ts";
   import { type Errors } from "#lib/utils/errors.ts";
+  import Svelecte from "svelecte";
 
   let {
     tournament,
@@ -47,7 +48,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-md-6 col-lg-3">
     <div class="form-group">
       <label for="date">Date</label>
       <input type="date" id="date" class="form-control" bind:value={tournamentEdit.date} />
@@ -56,23 +57,25 @@
       {/if}
     </div>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6 col-lg-3">
     <div class="form-group">
       <label for="time_zone">Time zone</label>
-      <select id="time_zone" class="form-control" bind:value={tournamentEdit.time_zone}>
-        {#each options.time_zones as time_zone (time_zone.id)}
-          <option value={time_zone.id}>{time_zone.name}</option>
-        {/each}
-      </select>
+      <Svelecte
+        name="time_zone"
+        inputId="time_zone"
+        placeholder="Search for a time zone"
+        options={options.time_zones}
+        valueField="id"
+        labelField="name"
+        clearable
+        bind:value={tournamentEdit.time_zone}
+      />
       {#if errors.time_zone}
         <div class="invalid-feedback d-block">{errors.time_zone}</div>
       {/if}
     </div>
   </div>
-</div>
-
-<div class="row">
-  <div class="col-md-6">
+  <div class="col-md-6 col-lg-3">
     <div class="form-group">
       <label for="registration_starts">Registration starts</label>
       <input
@@ -86,7 +89,7 @@
       {/if}
     </div>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6 col-lg-3">
     <div class="form-group">
       <label for="tournament_starts">Tournament starts</label>
       <input

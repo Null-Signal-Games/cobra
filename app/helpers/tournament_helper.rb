@@ -81,7 +81,7 @@ module TournamentHelper # rubocop:disable Style/Documentation
         deckbuilding_restrictions: DeckbuildingRestriction.order(date_start: :desc).map do |d|
           { id: d.id, name: d.name }
         end,
-        time_zones: ActiveSupport::TimeZone.all.map { |z| { id: z.name, name: z.to_s } },
+        time_zones: time_zone_options,
         official_prize_kits: OfficialPrizeKit.order(position: :desc).map { |p| { id: p.id, name: p.name } }
       },
       feature_flags: {
@@ -90,5 +90,9 @@ module TournamentHelper # rubocop:disable Style/Documentation
       can_change_swiss_format: tournament.rounds.empty?,
       csrf_token: form_authenticity_token
     }
+  end
+
+  def time_zone_options
+    Tournament::TIME_ZONES.map { |id| { id:, name: id.tr('_', ' ') } }
   end
 end

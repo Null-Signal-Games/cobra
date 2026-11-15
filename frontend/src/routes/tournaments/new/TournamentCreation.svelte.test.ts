@@ -38,7 +38,7 @@ describe("TournamentCreation", () => {
       formats: [{ id: 1, name: "Standard" }],
       card_sets: [{ id: 1, name: "System Gateway" }],
       deckbuilding_restrictions: [{ id: 1, name: "Standard Ban List" }],
-      time_zones: [{ id: "UTC", name: "(GMT+00:00) UTC" }],
+      time_zones: [{ id: "UTC", name: "UTC" }],
       official_prize_kits: [{ id: 1, name: "2025 Q1 Game Night Kit" }],
     },
     feature_flags: {
