@@ -3,7 +3,8 @@
   import type { Errors } from "#lib/utils/errors.ts";
   import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import ProgressButton from "#lib/components/ProgressButton.svelte";
-  import { swissFormatDisplayString } from "#lib/model/Tournament.ts";
+  import { swissFormatOptions } from "#lib/model/Tournament.ts";
+  import Svelecte from "svelecte";
 
   let {
     tournament,
@@ -23,32 +24,38 @@
   let tournamentEdit = $state($state.snapshot(tournament));
 </script>
 
-<div class="form-group">
-  <label for="name"><abbr title="required">*</abbr> Tournament name</label>
-  <input
-    type="text"
-    id="name"
-    class="form-control"
-    bind:value={tournamentEdit.name}
-  />
-  {#if errors.name}
-    <div class="invalid-feedback d-block">{errors.name}</div>
-  {/if}
-</div>
-
-<div class="form-group">
-  <label for="swiss_format">Swiss format</label>
-  <select
-    id="swiss_format"
-    class="form-control"
-    bind:value={tournamentEdit.swiss_format}
-  >
-    <option value="double_sided">{swissFormatDisplayString("double_sided")}</option>
-    <option value="single_sided">{swissFormatDisplayString("single_sided")}</option>
-  </select>
-  {#if errors.swiss_format}
-    <div class="invalid-feedback d-block">{errors.swiss_format}</div>
-  {/if}
+<div class="row">
+  <div class="col-md-9">
+    <div class="form-group">
+      <label for="name"><abbr title="required">*</abbr> Tournament name</label>
+      <input
+        type="text"
+        id="name"
+        class="form-control"
+        bind:value={tournamentEdit.name}
+      />
+      {#if errors.name}
+        <div class="invalid-feedback d-block">{errors.name}</div>
+      {/if}
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="form-group">
+      <label for="swiss_format">Swiss format</label>
+      <Svelecte
+        name="swiss_format"
+        inputId="swiss_format"
+        options={swissFormatOptions}
+        valueField="id"
+        labelField="name"
+        searchable={false}
+        bind:value={tournamentEdit.swiss_format}
+      />
+      {#if errors.swiss_format}
+        <div class="invalid-feedback d-block">{errors.swiss_format}</div>
+      {/if}
+    </div>
+  </div>
 </div>
 
 <div class="row">

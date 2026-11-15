@@ -3,7 +3,7 @@
   import ProgressButton from "#lib/components/ProgressButton.svelte";
   import {
     emptyTournamentOptions,
-    swissFormatDisplayString,
+    swissFormatOptions,
     type FeatureFlags,
     type Tournament,
     type TournamentOptions,
@@ -37,11 +37,6 @@
 
   // svelte-ignore state_referenced_locally
   let tournamentEdit = $state($state.snapshot(tournament));
-
-  const swissFormatOptions = ["double_sided", "single_sided"].map((id) => ({
-    id,
-    name: swissFormatDisplayString(id),
-  }));
 </script>
 
 <div class="form-group">

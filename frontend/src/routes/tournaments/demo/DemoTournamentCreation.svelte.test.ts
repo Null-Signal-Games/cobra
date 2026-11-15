@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/svelte";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import userEvent from "@testing-library/user-event";
 import DemoTournamentCreation from "./+page.svelte";
 import { classicApi } from "#lib/api/classic.ts";
 import { navigateTo } from "#lib/utils/navigation.ts";
@@ -101,8 +102,9 @@ describe("DemoTournamentCreation", () => {
     await fireEvent.input(nameInput, {
       target: { value: "Test Demo Tournament" },
     });
-    const formatInput = screen.getByLabelText(/swiss format/i);
-    await fireEvent.change(formatInput, { target: { value: "Single-sided" } });
+    screen.getByLabelText(/swiss format/i).focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await userEvent.click(screen.getByText("Double-sided"));
     const numPlayersInput = screen.getByLabelText(/number of players/i);
     await fireEvent.input(numPlayersInput, { target: { value: "16" } });
     const numByesInput = screen.getByLabelText(/number of first round byes/i);
@@ -122,6 +124,7 @@ describe("DemoTournamentCreation", () => {
       expect(classicApi.createDemoTournament).toHaveBeenCalledWith(
         expect.objectContaining({
           name: "Test Demo Tournament",
+          swiss_format: "double_sided",
         }),
       );
     });
