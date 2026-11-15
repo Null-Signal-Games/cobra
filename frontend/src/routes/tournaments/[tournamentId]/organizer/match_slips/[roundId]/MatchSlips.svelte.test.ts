@@ -86,7 +86,20 @@ describe("MatchSlips", () => {
     });
   });
 
-  it("displays match slips", () => {
+  it("displays blank match slips", () => {
+    const matchSlips = document.getElementsByClassName("match_slip");
+
+    expect(matchSlips.length).toBe(8);
+    for (let i = 0; i < 8; i++) {
+      expect(matchSlips[i]).toHaveTextContent(`Round ____ - Table ____`);
+      expect(matchSlips[i]).not.toHaveTextContent(mockPairings[i].player1.name_with_pronouns);
+      expect(matchSlips[i]).not.toHaveTextContent(mockPairings[i].player2.name_with_pronouns);
+    }
+  });
+
+  it("displays pre-populated match slips", async () => {
+    await user.click(screen.getByRole("button", { name: /pre-populated/i }));
+
     const matchSlips = document.getElementsByClassName("match_slip");
 
     expect(matchSlips.length).toBe(8);
@@ -98,6 +111,7 @@ describe("MatchSlips", () => {
   });
 
   it("displays collated match slips", async () => {
+    await user.click(screen.getByRole("button", { name: /pre-populated/i }));
     await user.click(screen.getByRole("button", { name: /collate/i }));
 
     const matchSlips = document.getElementsByClassName("match_slip");
