@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SideDeterminer # rubocop:disable Style/Documentation
-  def self.determine_sides(player1, player2, stage)
+  def self.determine_sides(player1, player2, stage, random: Random)
     return nil unless player_has_pairings?(player1, stage) || player_has_pairings?(player2, stage)
 
     diff1 = differential(player1, stage)
@@ -10,7 +10,7 @@ class SideDeterminer # rubocop:disable Style/Documentation
     return :player1_is_corp if diff1 < diff2
     return :player1_is_runner if diff1 > diff2
 
-    %i[player1_is_corp player1_is_runner].sample
+    %i[player1_is_corp player1_is_runner].sample(random:)
   end
 
   # positive for more often corp, negative for more often runner

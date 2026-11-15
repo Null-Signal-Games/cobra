@@ -49,10 +49,10 @@ module PairingStrategies
       end
     end
 
-    def self.calculate_pairings(players)
+    def self.calculate_pairings(players, random: Random)
       # The block argument to SwissImplementation.pair is invoked for each potential pairing of players
       # and will return the calculated weight for that potential pairing.
-      SwissImplementation.pair(players) do |player1, player2|
+      SwissImplementation.pair(players, random:) do |player1, player2|
         next potential_pairing_weight(player1, player2)
       end
     end
@@ -162,7 +162,7 @@ module PairingStrategies
         return @paired_players
       end
 
-      @paired_players ||= self.class.calculate_pairings(players_to_pair)
+      @paired_players ||= self.class.calculate_pairings(players_to_pair, random:)
     end
 
     def pairing_params(pairing)
@@ -202,7 +202,7 @@ module PairingStrategies
       @plain_pairings.each do |pairing|
         next if pairing.bye?
 
-        pairing.player1_side = self.class.assign_side(pairing.player1, pairing.player2)
+        pairing.player1_side = self.class.assign_side(pairing.player1, pairing.player2, random: @random)
       end
     end
   end

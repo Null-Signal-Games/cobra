@@ -8,7 +8,7 @@ module PairingStrategies
           player1: pairing[:player1],
           player2: pairing[:player2],
           table_number: pairing[:table_number],
-          side: SideDeterminer.determine_sides(pairing[:player1], pairing[:player2], stage)
+          side: SideDeterminer.determine_sides(pairing[:player1], pairing[:player2], stage, random:)
         )
       end
     end
