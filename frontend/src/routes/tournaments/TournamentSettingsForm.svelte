@@ -37,6 +37,11 @@
 
   // svelte-ignore state_referenced_locally
   let tournamentEdit = $state($state.snapshot(tournament));
+
+  const swissFormatOptions = ["double_sided", "single_sided"].map((id) => ({
+    id,
+    name: swissFormatDisplayString(id),
+  }));
 </script>
 
 <div class="form-group">
@@ -107,15 +112,16 @@
 
 <div class="form-group">
   <label for="swiss_format">Swiss format</label>
-  <select
-    id="swiss_format"
-    class="form-control"
-    bind:value={tournamentEdit.swiss_format}
+  <Svelecte
+    name="swiss_format"
+    inputId="swiss_format"
+    options={swissFormatOptions}
+    valueField="id"
+    labelField="name"
+    searchable={false}
     disabled={!canChangeSwissFormat}
-  >
-    <option value="double_sided">{swissFormatDisplayString("double_sided")}</option>
-    <option value="single_sided">{swissFormatDisplayString("single_sided")}</option>
-  </select>
+    bind:value={tournamentEdit.swiss_format}
+  />
   {#if !canChangeSwissFormat}
     <small class="form-text text-muted">Swiss format cannot be changed once rounds exist.</small>
   {/if}
@@ -128,16 +134,15 @@
   <div class="col-md-6">
     <div class="form-group">
       <label for="tournament_type_id">Tournament Type</label>
-      <select
-        id="tournament_type_id"
-        class="form-control"
+      <Svelecte
+        name="tournament_type_id"
+        inputId="tournament_type_id"
+        options={options.tournament_types}
+        valueField="id"
+        labelField="name"
+        clearable
         bind:value={tournamentEdit.tournament_type_id}
-      >
-        <option value=""></option>
-        {#each options.tournament_types as tournament_type (tournament_type.id)}
-          <option value={tournament_type.id}>{tournament_type.name}</option>
-        {/each}
-      </select>
+      />
       {#if errors.tournament_type_id}
         <div class="invalid-feedback d-block">{errors.tournament_type_id}</div>
       {/if}
@@ -146,12 +151,15 @@
   <div class="col-md-6">
     <div class="form-group">
       <label for="card_set_id">Legal Cardpool Up To</label>
-      <select id="card_set_id" class="form-control" bind:value={tournamentEdit.card_set_id}>
-        <option value=""></option>
-        {#each options.card_sets as card_set (card_set.id)}
-          <option value={card_set.id}>{card_set.name}</option>
-        {/each}
-      </select>
+      <Svelecte
+        name="card_set_id"
+        inputId="card_set_id"
+        options={options.card_sets}
+        valueField="id"
+        labelField="name"
+        clearable
+        bind:value={tournamentEdit.card_set_id}
+      />
       {#if errors.card_set_id}
         <div class="invalid-feedback d-block">{errors.card_set_id}</div>
       {/if}
@@ -163,12 +171,15 @@
   <div class="col-md-6">
     <div class="form-group">
       <label for="format_id">Play Format</label>
-      <select id="format_id" class="form-control" bind:value={tournamentEdit.format_id}>
-        <option value=""></option>
-        {#each options.formats as format (format.id)}
-          <option value={format.id}>{format.name}</option>
-        {/each}
-      </select>
+      <Svelecte
+        name="format_id"
+        inputId="format_id"
+        options={options.formats}
+        valueField="id"
+        labelField="name"
+        clearable
+        bind:value={tournamentEdit.format_id}
+      />
       {#if errors.format_id}
         <div class="invalid-feedback d-block">{errors.format_id}</div>
       {/if}
@@ -177,16 +188,15 @@
   <div class="col-md-6">
     <div class="form-group">
       <label for="deckbuilding_restriction_id">Deckbuilding Restriction</label>
-      <select
-        id="deckbuilding_restriction_id"
-        class="form-control"
+      <Svelecte
+        name="deckbuilding_restriction_id"
+        inputId="deckbuilding_restriction_id"
+        options={options.deckbuilding_restrictions}
+        valueField="id"
+        labelField="name"
+        clearable
         bind:value={tournamentEdit.deckbuilding_restriction_id}
-      >
-        <option value=""></option>
-        {#each options.deckbuilding_restrictions as restriction (restriction.id)}
-          <option value={restriction.id}>{restriction.name}</option>
-        {/each}
-      </select>
+      />
       {#if errors.deckbuilding_restriction_id}
         <div class="invalid-feedback d-block">
           {errors.deckbuilding_restriction_id}
@@ -238,16 +248,15 @@
 
 <div class="form-group">
   <label for="official_prize_kit_id">Official Prize Kit</label>
-  <select
-    id="official_prize_kit_id"
-    class="form-control"
+  <Svelecte
+    name="official_prize_kit_id"
+    inputId="official_prize_kit_id"
+    options={options.official_prize_kits}
+    valueField="id"
+    labelField="name"
+    clearable
     bind:value={tournamentEdit.official_prize_kit_id}
-  >
-    <option value=""></option>
-    {#each options.official_prize_kits as prize_kit (prize_kit.id)}
-      <option value={prize_kit.id}>{prize_kit.name}</option>
-    {/each}
-  </select>
+  />
   {#if errors.official_prize_kit_id}
     <div class="invalid-feedback d-block">{errors.official_prize_kit_id}</div>
   {/if}

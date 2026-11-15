@@ -1,9 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { render, screen, fireEvent, cleanup } from "@testing-library/svelte";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
 import TournamentSettingsForm from "./TournamentSettingsForm.svelte";
 import { Tournament, type TournamentOptions } from "#lib/model/Tournament.ts";
+
+// Svelecte keeps a hidden native <select> in sync with the chosen option's id.
+function selectedValue(name: string) {
+  return document.querySelector<HTMLSelectElement>(`select[name="${name}"]`)?.value;
+}
+
+// Type into a Svelecte's search box and choose the first match.
+async function pick(label: string, search: string) {
+  screen.getByLabelText(label).focus();
+  await userEvent.keyboard(`${search}{Enter}`);
+}
 
 describe("TournamentSettingsForm dropdowns", () => {
   afterEach(cleanup);
@@ -49,25 +59,13 @@ describe("TournamentSettingsForm dropdowns", () => {
       },
     });
 
-    const swissFormatSelect = screen.getByLabelText<HTMLSelectElement>("Swiss format");
-    expect(swissFormatSelect.value).toBe("single_sided");
-
-    const tournamentTypeSelect = screen.getByLabelText("Tournament Type") as HTMLSelectElement;
-    expect(tournamentTypeSelect.value).toBe("1");
-
-    const cardSetSelect = screen.getByLabelText("Legal Cardpool Up To") as HTMLSelectElement;
-    expect(cardSetSelect.value).toBe("vantage_point");
-
-    const formatSelect = screen.getByLabelText("Play Format") as HTMLSelectElement;
-    expect(formatSelect.value).toBe("1");
-
-    const restrictionSelect = screen.getByLabelText(
-      "Deckbuilding Restriction",
-    ) as HTMLSelectElement;
-    expect(restrictionSelect.value).toBe("standard_balance_update_26_08");
-
-    const prizeKitSelect = screen.getByLabelText("Official Prize Kit") as HTMLSelectElement;
-    expect(prizeKitSelect.value).toBe("1");
+    expect(selectedValue("swiss_format")).toBe("single_sided");
+    expect(selectedValue("tournament_type_id")).toBe("1");
+    expect(selectedValue("card_set_id")).toBe("vantage_point");
+    expect(selectedValue("format_id")).toBe("1");
+    expect(selectedValue("deckbuilding_restriction_id")).toBe("standard_balance_update_26_08");
+    expect(selectedValue("official_prize_kit_id")).toBe("1");
+    expect(screen.getByText("Store Championship")).toBeInTheDocument();
   });
 
   it("calls onSubmitCallback with updated dropdown values", async () => {
@@ -92,14 +90,9 @@ describe("TournamentSettingsForm dropdowns", () => {
       },
     });
 
-    const formatSelect = screen.getByLabelText("Play Format") as HTMLSelectElement;
-    await fireEvent.change(formatSelect, { target: { value: "2" } });
-
-    const tournamentTypeSelect = screen.getByLabelText("Tournament Type") as HTMLSelectElement;
-    await fireEvent.change(tournamentTypeSelect, { target: { value: "2" } });
-
-    const cardSetSelect = screen.getByLabelText("Legal Cardpool Up To") as HTMLSelectElement;
-    await fireEvent.change(cardSetSelect, { target: { value: "system_gateway" } });
+    await pick("Play Format", "Startup");
+    await pick("Tournament Type", "Regional");
+    await pick("Legal Cardpool Up To", "System Gateway");
 
     const submitButton = screen.getByRole("button", { name: /save/i });
     await fireEvent.click(submitButton);
@@ -121,9 +114,7 @@ describe("TournamentSettingsForm dropdowns", () => {
 
     expect(screen.getByText("America/New York")).toBeInTheDocument();
 
-    const user = userEvent.setup();
-    screen.getByLabelText("Time zone").focus();
-    await user.keyboard("Chicago{Enter}");
+    await pick("Time zone", "Chicago");
 
     await fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
@@ -146,8 +137,7 @@ describe("TournamentSettingsForm dropdowns", () => {
       },
     });
 
-    const swissFormatSelect = screen.getByLabelText("Swiss format") as HTMLSelectElement;
-    expect(swissFormatSelect).toBeDisabled();
+    expect(screen.getByLabelText("Swiss format")).toBeDisabled();
     expect(
       screen.getByText("Swiss format cannot be changed once rounds exist."),
     ).toBeInTheDocument();

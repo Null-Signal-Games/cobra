@@ -43,6 +43,7 @@
 /* --- Svelecte (both themes) ------------------------------------------------ */
 .svelecte-control {
   --sv-placeholder-color: var(--cobra-text-muted);
+  --sv-disabled-bg: var(--cobra-surface-hover);
 
   .sv-input--text {
     color: inherit;
