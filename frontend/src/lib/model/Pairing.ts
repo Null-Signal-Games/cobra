@@ -34,9 +34,9 @@ export interface PairingPolicies {
 
 export interface NewPairing {
   table_number: number | null;
-  player1_id: number;
-  side: string;
-  player2_id: number;
+  player1_id: number | null;
+  side: string | null;
+  player2_id: number | null;
 }
 
 export interface PairingByNameRow {

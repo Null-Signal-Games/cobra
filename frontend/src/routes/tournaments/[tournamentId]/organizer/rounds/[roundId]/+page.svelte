@@ -8,16 +8,28 @@
   import type { ScoreReport } from '#lib/model/ScoreReport.ts';
   import { betaApi } from "#lib/api/beta.ts";
   import ProgressButton from '#lib/components/ProgressButton.svelte';
+  import Svelecte from "svelecte";
   import { globalMessages } from '#lib/utils/GlobalMessageState.svelte.ts';
 
   let { data, params }: PageProps = $props();
 
   let newPairing = $state<NewPairing>({
     table_number: null,
-    player1_id: 0,
-    side: "",
-    player2_id: 0,
+    player1_id: null,
+    side: null,
+    player2_id: null,
   });
+  // Each player list leaves out whoever is picked in the other one.
+  let player1Options = $derived(
+    (data.round.unpaired_players ?? []).filter((p) => p.id !== newPairing.player2_id),
+  );
+  let player2Options = $derived(
+    (data.round.unpaired_players ?? []).filter((p) => p.id !== newPairing.player1_id),
+  );
+  const sideOptions = [
+    { id: "player1_is_corp", name: "Corp" },
+    { id: "player1_is_runner", name: "Runner" },
+  ];
   // svelte-ignore state_referenced_locally
   let sosWeight = $state(data.round.weight);
 
@@ -78,7 +90,7 @@
     const success = await betaApi.createPairing(
       parseInt(params.tournamentId),
       parseInt(params.roundId),
-      newPairing,
+      $state.snapshot(newPairing),
     );
     if (!success) {
       globalMessages.errors.push("Unable to create the pairing.");
@@ -86,9 +98,9 @@
     }
 
     newPairing.table_number = null;
-    newPairing.player1_id = 0;
-    newPairing.side = "";
-    newPairing.player2_id = 0;
+    newPairing.player1_id = null;
+    newPairing.side = null;
+    newPairing.player2_id = null;
 
     await refreshAll();
   }
@@ -236,12 +248,6 @@
           {/if}
         </div>
       {/each}  
-      {#snippet playerOptions()}
-        <option value="">(Bye)</option>
-        {#each data.round.unpaired_players as player (player.id)}
-          <option value={player.id}>{player.name}</option>
-        {/each}
-      {/snippet}  
       <h4 class="mt-2">Create pairing</h4>
       <form
         id="new_pairing"
@@ -255,34 +261,47 @@
           placeholder="Table number"
           bind:value={newPairing.table_number}
         />
-        <select
-          aria-label="New pairing player 1"
-          class="form-control mx-2"
-          bind:value={newPairing.player1_id}
-        >
-          <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-          {@render playerOptions()}
-        </select>
+        <!-- An empty player is a bye -->
+        <label class="sr-only" for="new_pairing_player1">New pairing player 1</label>
+        <div class="mx-2 new-pairing-player">
+          <Svelecte
+            inputId="new_pairing_player1"
+            placeholder="(Bye)"
+            options={player1Options}
+            valueField="id"
+            labelField="name"
+            clearable
+            bind:value={newPairing.player1_id}
+          />
+        </div>
         {#if data.stage.is_single_sided}
-          <select
-            aria-label="New pairing player 1 side"
-            class="form-control mx-2"
-            bind:value={newPairing.side}
-          >
-            <option value="">Player 1 Side</option>
-            <option value="player1_is_corp">Corp</option>
-            <option value="player1_is_runner">Runner</option>
-          </select>
+          <label class="sr-only" for="new_pairing_side">New pairing player 1 side</label>
+          <div class="mx-2 new-pairing-side">
+            <Svelecte
+              inputId="new_pairing_side"
+              placeholder="Player 1 Side"
+              options={sideOptions}
+              valueField="id"
+              labelField="name"
+              searchable={false}
+              clearable
+              bind:value={newPairing.side}
+            />
+          </div>
         {/if}
         vs
-        <select
-          aria-label="New pairing player 2"
-          class="form-control mx-2"
-          bind:value={newPairing.player2_id}
-        >
-          <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-          {@render playerOptions()}
-        </select>
+        <label class="sr-only" for="new_pairing_player2">New pairing player 2</label>
+        <div class="mx-2 new-pairing-player">
+          <Svelecte
+            inputId="new_pairing_player2"
+            placeholder="(Bye)"
+            options={player2Options}
+            valueField="id"
+            labelField="name"
+            clearable
+            bind:value={newPairing.player2_id}
+          />
+        </div>
         <button type="submit" class="btn btn-success">
           <FontAwesomeIcon icon="plus" /> Create
         </button>
@@ -312,3 +331,13 @@
     </ProgressButton>
   </div>
 </div>
+
+<style>
+  .new-pairing-player {
+    min-width: 14rem;
+  }
+
+  .new-pairing-side {
+    min-width: 10rem;
+  }
+</style>

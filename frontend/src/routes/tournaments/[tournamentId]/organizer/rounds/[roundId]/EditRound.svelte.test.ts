@@ -1,5 +1,6 @@
 import {
   cleanup,
+  getByLabelText,
   getByRole,
   getByText,
   queryByTestId,
@@ -198,14 +199,6 @@ describe("EditRound", () => {
 
       expect(document.getElementsByClassName("table_1").length).toBe(0);
 
-      vi.spyOn(Pairing1, "table_number", "get").mockReturnValue(11);
-      vi.spyOn(MockPageData.round, "pairings", "get").mockReturnValue([
-        Pairing1,
-      ]);
-      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue(
-        [],
-      );
-
       const newPairingForm = document.getElementById("new_pairing");
       expect(newPairingForm).not.toBeNull();
       if (!newPairingForm) {
@@ -218,23 +211,21 @@ describe("EditRound", () => {
         }),
         "11",
       );
-      await user.selectOptions(
-        getByRole(newPairingForm, "combobox", {
-          name: /^new pairing player 1$/i,
-        }),
-        "Alice",
-      );
-      await user.selectOptions(
-        getByRole(newPairingForm, "combobox", {
-          name: /new pairing player 1 side/i,
-        }),
-        "Corp",
-      );
-      await user.selectOptions(
-        getByRole(newPairingForm, "combobox", {
-          name: /^new pairing player 2$/i,
-        }),
-        "Bob",
+      getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
+      await user.keyboard("Alice{Enter}");
+      getByLabelText(newPairingForm, /new pairing player 1 side/i).focus();
+      await user.keyboard("{ArrowDown}");
+      await user.click(getByText(newPairingForm, "Corp"));
+      getByLabelText(newPairingForm, /^new pairing player 2$/i).focus();
+      await user.keyboard("Bob{Enter}");
+
+      // What the page shows once the pairing exists.
+      vi.spyOn(Pairing1, "table_number", "get").mockReturnValue(11);
+      vi.spyOn(MockPageData.round, "pairings", "get").mockReturnValue([
+        Pairing1,
+      ]);
+      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue(
+        [],
       );
       await user.click(
         getByRole(newPairingForm, "button", { name: /create/i }),
@@ -242,10 +233,52 @@ describe("EditRound", () => {
 
       await rerender({ data: structuredClone(MockPageData) });
 
-      expect(betaApi.createPairing).toHaveBeenCalledOnce();
+      expect(betaApi.createPairing).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        {
+          table_number: 11,
+          player1_id: MockPlayerAlice.id,
+          side: "player1_is_corp",
+          player2_id: MockPlayerBob.id,
+        },
+      );
       expect(
         document.getElementsByClassName("table_11")[0],
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("create pairing player lists", () => {
+    beforeEach(() => {
+      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([
+        MockPlayerAlice,
+        MockPlayerBob,
+      ]);
+    });
+
+    it("does not offer the player already picked on the other side", async () => {
+      renderEditRound();
+
+      const newPairingForm = document.getElementById("new_pairing");
+      if (!newPairingForm) {
+        throw new Error("new pairing form not found");
+      }
+
+      getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
+      await user.keyboard("Alice{Enter}");
+
+      const player2Input = getByLabelText(newPairingForm, /^new pairing player 2$/i);
+      player2Input.focus();
+      await user.keyboard("Alice");
+      const player2Dropdown = player2Input
+        .closest(".svelecte")
+        ?.querySelector<HTMLElement>(".sv_dropdown");
+      if (!player2Dropdown) {
+        throw new Error("player 2 dropdown not found");
+      }
+      expect(player2Dropdown).toHaveTextContent("No matching options");
+      expect(player2Dropdown).not.toHaveTextContent("Alice");
     });
   });
 
