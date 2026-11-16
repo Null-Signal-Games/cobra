@@ -34,6 +34,21 @@ describe("Tooltip", () => {
     expect(queryByText("(dropped)")).toBeNull();
   });
 
+  it("shows tooltip text while its content has keyboard focus", async () => {
+    const buttonSnippet = createRawSnippet(() => ({
+      render: () => `<button type="button">help</button>`,
+    }));
+    const { getByRole, queryByText } = render(Tooltip, {
+      props: { text: "Explanation", children: buttonSnippet },
+    });
+
+    await fireEvent.focusIn(getByRole("button"));
+    expect(queryByText("Explanation")).not.toBeNull();
+
+    await fireEvent.focusOut(getByRole("button"));
+    expect(queryByText("Explanation")).toBeNull();
+  });
+
   it("renders child content inside the tooltip wrapper", () => {
     const childSnippet = createRawSnippet(() => ({
       render: () => `<span data-testid="tooltip-child">child icon</span>`,

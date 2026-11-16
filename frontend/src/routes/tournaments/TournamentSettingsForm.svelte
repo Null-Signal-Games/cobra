@@ -1,6 +1,7 @@
 <script lang="ts">
   import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import ProgressButton from "#lib/components/ProgressButton.svelte";
+  import Tooltip from "#lib/components/Tooltip.svelte";
   import {
     emptyTournamentOptions,
     swissFormatOptions,
@@ -37,6 +38,14 @@
 
   // svelte-ignore state_referenced_locally
   let tournamentEdit = $state($state.snapshot(tournament));
+
+  const streamingOptOutHelp =
+    "Allow players to choose whether their games should be included in video coverage " +
+    "(defaults to yes, and players are notified that in a top cut it may not be possible to " +
+    "exclude them).";
+  const manualSeedHelp =
+    'Players can be assigned a "seed" value that will be used before all other tiebreakers ' +
+    "(in ascending order; i.e. Seed 1 wins all ties).";
 </script>
 
 <div class="form-group">
@@ -280,82 +289,92 @@
   {/if}
 </div>
 
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="self_registration"
-    class="form-check-input"
-    bind:checked={tournamentEdit.self_registration}
-  />
-  <label for="self_registration" class="form-check-label">
-    Self-Registration: Allow players to use a link to register themselves
-  </label>
-</div>
-
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="nrdb_deck_registration"
-    class="form-check-input"
-    bind:checked={tournamentEdit.nrdb_deck_registration}
-  />
-  <label for="nrdb_deck_registration" class="form-check-label">
-    Deck registration: Upload decks from NetrunnerDB
-  </label>
-</div>
-
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="private"
-    class="form-check-input"
-    bind:checked={tournamentEdit.private}
-  />
-  <label for="private" class="form-check-label">
-    Private: Only I will be able to view this tournament
-  </label>
-</div>
-
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="manual_seed"
-    class="form-check-input"
-    bind:checked={tournamentEdit.manual_seed}
-  />
-  <label for="manual_seed" class="form-check-label">
-    Use manual seeding for tiebreakers: Players can be assigned a "seed" value that will be used
-    before all other tiebreakers (in ascending order; i.e. Seed 1 wins all ties)
-  </label>
-</div>
-
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="allow_streaming_opt_out"
-    class="form-check-input"
-    bind:checked={tournamentEdit.allow_streaming_opt_out}
-  />
-  <label for="allow_streaming_opt_out" class="form-check-label">
-    Streaming opt out: Allow players to choose whether their games should be included in video
-    coverage (defaults to yes, and players are notified that in a top cut it may not be possible to
-    exclude them)
-  </label>
-</div>
-
-{#if featureFlags.allow_self_reporting}
-  <div class="form-check mb-3">
-    <input
-      type="checkbox"
-      id="allow_self_reporting"
-      class="form-check-input"
-      bind:checked={tournamentEdit.allow_self_reporting}
-    />
-    <label for="allow_self_reporting" class="form-check-label">
-      Allow logged-in players to report their own match results
-    </label>
+<div class="row">
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="self_registration"
+        class="form-check-input"
+        bind:checked={tournamentEdit.self_registration}
+      />
+      <label for="self_registration" class="form-check-label"> Self-Registration </label>
+    </div>
   </div>
-{/if}
+  {#if featureFlags.allow_self_reporting}
+    <div class="col-md-4">
+      <div class="form-check mb-3">
+        <input
+          type="checkbox"
+          id="allow_self_reporting"
+          class="form-check-input"
+          bind:checked={tournamentEdit.allow_self_reporting}
+        />
+        <label for="allow_self_reporting" class="form-check-label"> Self Reporting </label>
+      </div>
+    </div>
+  {/if}
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="nrdb_deck_registration"
+        class="form-check-input"
+        bind:checked={tournamentEdit.nrdb_deck_registration}
+      />
+      <label for="nrdb_deck_registration" class="form-check-label"> NRDB Decklists Required </label>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="private"
+        class="form-check-input"
+        bind:checked={tournamentEdit.private}
+      />
+      <label for="private" class="form-check-label"> Private Tournament </label>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="allow_streaming_opt_out"
+        class="form-check-input"
+        bind:checked={tournamentEdit.allow_streaming_opt_out}
+      />
+      <label for="allow_streaming_opt_out" class="form-check-label">Streaming Opt Out</label>
+      <Tooltip text={streamingOptOutHelp}>
+        <button
+          type="button"
+          class="btn btn-link p-0 ml-1 text-muted"
+          aria-label={streamingOptOutHelp}
+        >
+          <FontAwesomeIcon icon="question-circle" />
+        </button>
+      </Tooltip>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="manual_seed"
+        class="form-check-input"
+        bind:checked={tournamentEdit.manual_seed}
+      />
+      <label for="manual_seed" class="form-check-label">Manual Seeding</label>
+      <Tooltip text={manualSeedHelp}>
+        <button type="button" class="btn btn-link p-0 ml-1 text-muted" aria-label={manualSeedHelp}>
+          <FontAwesomeIcon icon="question-circle" />
+        </button>
+      </Tooltip>
+    </div>
+  </div>
+</div>
 
 <ProgressButton
   css="btn btn-primary"
