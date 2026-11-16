@@ -39,6 +39,11 @@
   // svelte-ignore state_referenced_locally
   let tournamentEdit = $state($state.snapshot(tournament));
 
+  const selfRegistrationHelp =
+    "Players logged in via NRDB can register themselves for this tournament.";
+  const selfReportingHelp = "Players registered via NRDB can report their own match results.";
+  const decklistsRequiredHelp = "Require registered players to submit decklists via NRDB.";
+  const privateTournamentHelp = "This tournament will only be visible to the tournament organizer";
   const streamingOptOutHelp =
     "Allow players to choose whether their games should be included in video coverage " +
     "(defaults to yes, and players are notified that in a top cut it may not be possible to " +
@@ -47,6 +52,14 @@
     'Players can be assigned a "seed" value that will be used before all other tiebreakers ' +
     "(in ascending order; i.e. Seed 1 wins all ties).";
 </script>
+
+{#snippet helpTip(text: string)}
+  <Tooltip {text}>
+    <button type="button" class="btn btn-link p-0 ml-1 text-muted" aria-label={text}>
+      <FontAwesomeIcon icon="question-circle" />
+    </button>
+  </Tooltip>
+{/snippet}
 
 <div class="form-group">
   <label for="name"><abbr title="required">*</abbr> Tournament name</label>
@@ -299,6 +312,7 @@
         bind:checked={tournamentEdit.self_registration}
       />
       <label for="self_registration" class="form-check-label"> Self-Registration </label>
+      {@render helpTip(selfRegistrationHelp)}
     </div>
   </div>
   {#if featureFlags.allow_self_reporting}
@@ -311,6 +325,7 @@
           bind:checked={tournamentEdit.allow_self_reporting}
         />
         <label for="allow_self_reporting" class="form-check-label"> Self Reporting </label>
+        {@render helpTip(selfReportingHelp)}
       </div>
     </div>
   {/if}
@@ -323,6 +338,7 @@
         bind:checked={tournamentEdit.nrdb_deck_registration}
       />
       <label for="nrdb_deck_registration" class="form-check-label"> NRDB Decklists Required </label>
+      {@render helpTip(decklistsRequiredHelp)}
     </div>
   </div>
 </div>
@@ -336,6 +352,7 @@
         bind:checked={tournamentEdit.private}
       />
       <label for="private" class="form-check-label"> Private Tournament </label>
+      {@render helpTip(privateTournamentHelp)}
     </div>
   </div>
   <div class="col-md-4">
@@ -347,15 +364,7 @@
         bind:checked={tournamentEdit.allow_streaming_opt_out}
       />
       <label for="allow_streaming_opt_out" class="form-check-label">Streaming Opt Out</label>
-      <Tooltip text={streamingOptOutHelp}>
-        <button
-          type="button"
-          class="btn btn-link p-0 ml-1 text-muted"
-          aria-label={streamingOptOutHelp}
-        >
-          <FontAwesomeIcon icon="question-circle" />
-        </button>
-      </Tooltip>
+      {@render helpTip(streamingOptOutHelp)}
     </div>
   </div>
   <div class="col-md-4">
@@ -367,11 +376,7 @@
         bind:checked={tournamentEdit.manual_seed}
       />
       <label for="manual_seed" class="form-check-label">Manual Seeding</label>
-      <Tooltip text={manualSeedHelp}>
-        <button type="button" class="btn btn-link p-0 ml-1 text-muted" aria-label={manualSeedHelp}>
-          <FontAwesomeIcon icon="question-circle" />
-        </button>
-      </Tooltip>
+      {@render helpTip(manualSeedHelp)}
     </div>
   </div>
 </div>
