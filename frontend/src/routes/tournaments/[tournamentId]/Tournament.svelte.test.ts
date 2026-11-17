@@ -25,7 +25,7 @@ export const MockTournament = new Tournament({
   date: "2026-04-21",
   registration_starts: "10:00",
   tournament_starts: "11:00",
-  time_zone: "Central Time (US & Canada)",
+  time_zone: "America/Chicago",
   description: "This is a test tournament.",
   official_prize_kit_id: 1,
   official_prize_kit_name: "2026 Test Tournament Kit",
@@ -195,7 +195,7 @@ describe("Tournament", () => {
           "11:00 AM",
         );
         expect(screen.getByLabelText("time zone")).toHaveTextContent(
-          "Central Time (US & Canada)",
+          "America/Chicago",
         );
         expect(screen.getByLabelText("tournament organiser")).toHaveTextContent(
           "Alice",

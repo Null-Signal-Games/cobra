@@ -13,9 +13,12 @@ module Beta
     def create
       authorize @tournament, :update?
 
-      round.pairings.create(pairing_params)
-
-      head :ok
+      new_pairing = round.pairings.create(pairing_params)
+      if new_pairing.persisted?
+        head :ok
+      else
+        render json: { errors: new_pairing.errors.full_messages }, status: :unprocessable_content
+      end
     end
 
     def destroy

@@ -1,14 +1,16 @@
 <script lang="ts">
   import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import ProgressButton from "#lib/components/ProgressButton.svelte";
+  import Tooltip from "#lib/components/Tooltip.svelte";
   import {
     emptyTournamentOptions,
-    swissFormatDisplayString,
+    swissFormatOptions,
     type FeatureFlags,
     type Tournament,
     type TournamentOptions,
   } from "#lib/model/Tournament.ts";
   import { type Errors } from "#lib/utils/errors.ts";
+  import Svelecte from "svelecte";
 
   let {
     tournament,
@@ -36,7 +38,28 @@
 
   // svelte-ignore state_referenced_locally
   let tournamentEdit = $state($state.snapshot(tournament));
+
+  const selfRegistrationHelp =
+    "Players logged in via NRDB can register themselves for this tournament.";
+  const selfReportingHelp = "Players registered via NRDB can report their own match results.";
+  const decklistsRequiredHelp = "Require registered players to submit decklists via NRDB.";
+  const privateTournamentHelp = "This tournament will only be visible to the tournament organizer";
+  const streamingOptOutHelp =
+    "Allow players to choose whether their games should be included in video coverage " +
+    "(defaults to yes, and players are notified that in a top cut it may not be possible to " +
+    "exclude them).";
+  const manualSeedHelp =
+    'Players can be assigned a "seed" value that will be used before all other tiebreakers ' +
+    "(in ascending order; i.e. Seed 1 wins all ties).";
 </script>
+
+{#snippet helpTip(text: string)}
+  <Tooltip {text}>
+    <button type="button" class="btn btn-link p-0 ml-1 text-muted" aria-label={text}>
+      <FontAwesomeIcon icon="question-circle" />
+    </button>
+  </Tooltip>
+{/snippet}
 
 <div class="form-group">
   <label for="name"><abbr title="required">*</abbr> Tournament name</label>
@@ -47,7 +70,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-md-6 col-lg-3">
     <div class="form-group">
       <label for="date">Date</label>
       <input type="date" id="date" class="form-control" bind:value={tournamentEdit.date} />
@@ -56,23 +79,25 @@
       {/if}
     </div>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6 col-lg-3">
     <div class="form-group">
       <label for="time_zone">Time zone</label>
-      <select id="time_zone" class="form-control" bind:value={tournamentEdit.time_zone}>
-        {#each options.time_zones as time_zone (time_zone.id)}
-          <option value={time_zone.id}>{time_zone.name}</option>
-        {/each}
-      </select>
+      <Svelecte
+        name="time_zone"
+        inputId="time_zone"
+        placeholder="Search for a time zone"
+        options={options.time_zones}
+        valueField="id"
+        labelField="name"
+        clearable
+        bind:value={tournamentEdit.time_zone}
+      />
       {#if errors.time_zone}
         <div class="invalid-feedback d-block">{errors.time_zone}</div>
       {/if}
     </div>
   </div>
-</div>
-
-<div class="row">
-  <div class="col-md-6">
+  <div class="col-md-6 col-lg-3">
     <div class="form-group">
       <label for="registration_starts">Registration starts</label>
       <input
@@ -86,7 +111,7 @@
       {/if}
     </div>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6 col-lg-3">
     <div class="form-group">
       <label for="tournament_starts">Tournament starts</label>
       <input
@@ -104,15 +129,16 @@
 
 <div class="form-group">
   <label for="swiss_format">Swiss format</label>
-  <select
-    id="swiss_format"
-    class="form-control"
-    bind:value={tournamentEdit.swiss_format}
+  <Svelecte
+    name="swiss_format"
+    inputId="swiss_format"
+    options={swissFormatOptions}
+    valueField="id"
+    labelField="name"
+    searchable={false}
     disabled={!canChangeSwissFormat}
-  >
-    <option value="double_sided">{swissFormatDisplayString("double_sided")}</option>
-    <option value="single_sided">{swissFormatDisplayString("single_sided")}</option>
-  </select>
+    bind:value={tournamentEdit.swiss_format}
+  />
   {#if !canChangeSwissFormat}
     <small class="form-text text-muted">Swiss format cannot be changed once rounds exist.</small>
   {/if}
@@ -125,16 +151,15 @@
   <div class="col-md-6">
     <div class="form-group">
       <label for="tournament_type_id">Tournament Type</label>
-      <select
-        id="tournament_type_id"
-        class="form-control"
+      <Svelecte
+        name="tournament_type_id"
+        inputId="tournament_type_id"
+        options={options.tournament_types}
+        valueField="id"
+        labelField="name"
+        clearable
         bind:value={tournamentEdit.tournament_type_id}
-      >
-        <option value=""></option>
-        {#each options.tournament_types as tournament_type (tournament_type.id)}
-          <option value={tournament_type.id}>{tournament_type.name}</option>
-        {/each}
-      </select>
+      />
       {#if errors.tournament_type_id}
         <div class="invalid-feedback d-block">{errors.tournament_type_id}</div>
       {/if}
@@ -143,12 +168,15 @@
   <div class="col-md-6">
     <div class="form-group">
       <label for="card_set_id">Legal Cardpool Up To</label>
-      <select id="card_set_id" class="form-control" bind:value={tournamentEdit.card_set_id}>
-        <option value=""></option>
-        {#each options.card_sets as card_set (card_set.id)}
-          <option value={card_set.id}>{card_set.name}</option>
-        {/each}
-      </select>
+      <Svelecte
+        name="card_set_id"
+        inputId="card_set_id"
+        options={options.card_sets}
+        valueField="id"
+        labelField="name"
+        clearable
+        bind:value={tournamentEdit.card_set_id}
+      />
       {#if errors.card_set_id}
         <div class="invalid-feedback d-block">{errors.card_set_id}</div>
       {/if}
@@ -160,12 +188,15 @@
   <div class="col-md-6">
     <div class="form-group">
       <label for="format_id">Play Format</label>
-      <select id="format_id" class="form-control" bind:value={tournamentEdit.format_id}>
-        <option value=""></option>
-        {#each options.formats as format (format.id)}
-          <option value={format.id}>{format.name}</option>
-        {/each}
-      </select>
+      <Svelecte
+        name="format_id"
+        inputId="format_id"
+        options={options.formats}
+        valueField="id"
+        labelField="name"
+        clearable
+        bind:value={tournamentEdit.format_id}
+      />
       {#if errors.format_id}
         <div class="invalid-feedback d-block">{errors.format_id}</div>
       {/if}
@@ -174,16 +205,15 @@
   <div class="col-md-6">
     <div class="form-group">
       <label for="deckbuilding_restriction_id">Deckbuilding Restriction</label>
-      <select
-        id="deckbuilding_restriction_id"
-        class="form-control"
+      <Svelecte
+        name="deckbuilding_restriction_id"
+        inputId="deckbuilding_restriction_id"
+        options={options.deckbuilding_restrictions}
+        valueField="id"
+        labelField="name"
+        clearable
         bind:value={tournamentEdit.deckbuilding_restriction_id}
-      >
-        <option value=""></option>
-        {#each options.deckbuilding_restrictions as restriction (restriction.id)}
-          <option value={restriction.id}>{restriction.name}</option>
-        {/each}
-      </select>
+      />
       {#if errors.deckbuilding_restriction_id}
         <div class="invalid-feedback d-block">
           {errors.deckbuilding_restriction_id}
@@ -235,16 +265,15 @@
 
 <div class="form-group">
   <label for="official_prize_kit_id">Official Prize Kit</label>
-  <select
-    id="official_prize_kit_id"
-    class="form-control"
+  <Svelecte
+    name="official_prize_kit_id"
+    inputId="official_prize_kit_id"
+    options={options.official_prize_kits}
+    valueField="id"
+    labelField="name"
+    clearable
     bind:value={tournamentEdit.official_prize_kit_id}
-  >
-    <option value=""></option>
-    {#each options.official_prize_kits as prize_kit (prize_kit.id)}
-      <option value={prize_kit.id}>{prize_kit.name}</option>
-    {/each}
-  </select>
+  />
   {#if errors.official_prize_kit_id}
     <div class="invalid-feedback d-block">{errors.official_prize_kit_id}</div>
   {/if}
@@ -273,82 +302,84 @@
   {/if}
 </div>
 
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="self_registration"
-    class="form-check-input"
-    bind:checked={tournamentEdit.self_registration}
-  />
-  <label for="self_registration" class="form-check-label">
-    Self-Registration: Allow players to use a link to register themselves
-  </label>
-</div>
-
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="nrdb_deck_registration"
-    class="form-check-input"
-    bind:checked={tournamentEdit.nrdb_deck_registration}
-  />
-  <label for="nrdb_deck_registration" class="form-check-label">
-    Deck registration: Upload decks from NetrunnerDB
-  </label>
-</div>
-
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="private"
-    class="form-check-input"
-    bind:checked={tournamentEdit.private}
-  />
-  <label for="private" class="form-check-label">
-    Private: Only I will be able to view this tournament
-  </label>
-</div>
-
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="manual_seed"
-    class="form-check-input"
-    bind:checked={tournamentEdit.manual_seed}
-  />
-  <label for="manual_seed" class="form-check-label">
-    Use manual seeding for tiebreakers: Players can be assigned a "seed" value that will be used
-    before all other tiebreakers (in ascending order; i.e. Seed 1 wins all ties)
-  </label>
-</div>
-
-<div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="allow_streaming_opt_out"
-    class="form-check-input"
-    bind:checked={tournamentEdit.allow_streaming_opt_out}
-  />
-  <label for="allow_streaming_opt_out" class="form-check-label">
-    Streaming opt out: Allow players to choose whether their games should be included in video
-    coverage (defaults to yes, and players are notified that in a top cut it may not be possible to
-    exclude them)
-  </label>
-</div>
-
-{#if featureFlags.allow_self_reporting}
-  <div class="form-check mb-3">
-    <input
-      type="checkbox"
-      id="allow_self_reporting"
-      class="form-check-input"
-      bind:checked={tournamentEdit.allow_self_reporting}
-    />
-    <label for="allow_self_reporting" class="form-check-label">
-      Allow logged-in players to report their own match results
-    </label>
+<div class="row">
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="self_registration"
+        class="form-check-input"
+        bind:checked={tournamentEdit.self_registration}
+      />
+      <label for="self_registration" class="form-check-label"> Self-Registration </label>
+      {@render helpTip(selfRegistrationHelp)}
+    </div>
   </div>
-{/if}
+  {#if featureFlags.allow_self_reporting}
+    <div class="col-md-4">
+      <div class="form-check mb-3">
+        <input
+          type="checkbox"
+          id="allow_self_reporting"
+          class="form-check-input"
+          bind:checked={tournamentEdit.allow_self_reporting}
+        />
+        <label for="allow_self_reporting" class="form-check-label"> Self Reporting </label>
+        {@render helpTip(selfReportingHelp)}
+      </div>
+    </div>
+  {/if}
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="nrdb_deck_registration"
+        class="form-check-input"
+        bind:checked={tournamentEdit.nrdb_deck_registration}
+      />
+      <label for="nrdb_deck_registration" class="form-check-label"> NRDB Decklists Required </label>
+      {@render helpTip(decklistsRequiredHelp)}
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="private"
+        class="form-check-input"
+        bind:checked={tournamentEdit.private}
+      />
+      <label for="private" class="form-check-label"> Private Tournament </label>
+      {@render helpTip(privateTournamentHelp)}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="allow_streaming_opt_out"
+        class="form-check-input"
+        bind:checked={tournamentEdit.allow_streaming_opt_out}
+      />
+      <label for="allow_streaming_opt_out" class="form-check-label">Streaming Opt Out</label>
+      {@render helpTip(streamingOptOutHelp)}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="manual_seed"
+        class="form-check-input"
+        bind:checked={tournamentEdit.manual_seed}
+      />
+      <label for="manual_seed" class="form-check-label">Manual Seeding</label>
+      {@render helpTip(manualSeedHelp)}
+    </div>
+  </div>
+</div>
 
 <ProgressButton
   css="btn btn-primary"

@@ -38,7 +38,8 @@ class PairingsController < ApplicationController # rubocop:disable Metrics/Class
   def create
     authorize @tournament, :update?
 
-    round.pairings.create(pairing_params)
+    new_pairing = round.pairings.create(pairing_params)
+    flash[:alert] = new_pairing.errors.full_messages.to_sentence unless new_pairing.persisted?
 
     redirect_to tournament_round_path(tournament, round)
   end

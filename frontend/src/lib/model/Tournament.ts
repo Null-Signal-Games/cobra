@@ -86,6 +86,11 @@ export function swissFormatDisplayString(format: string) {
   return "Unknown";
 }
 
+export const swissFormatOptions = ["double_sided", "single_sided"].map((id) => ({
+  id,
+  name: swissFormatDisplayString(id),
+}));
+
 export function emptyTournamentOptions(): TournamentOptions {
   return {
     tournament_types: [],

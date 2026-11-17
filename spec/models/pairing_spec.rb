@@ -11,6 +11,29 @@ RSpec.describe Pairing do
     end
   end
 
+  describe 'player validation' do
+    it 'rejects pairing a player against themselves' do
+      self_pairing = build(:pairing, player1: jack, player2: jack)
+
+      expect(self_pairing).not_to be_valid
+      expect(self_pairing.errors[:base]).to include('A player cannot be paired against themselves')
+    end
+
+    it 'allows a bye as player1' do
+      expect(build(:pairing, player1: nil, player2: jill)).to be_valid
+    end
+
+    it 'allows a bye as player2' do
+      expect(build(:pairing, player1: jack, player2: nil)).to be_valid
+    end
+
+    it 'still saves an existing self-pairing when the players are unchanged' do
+      pairing.update_column(:player2_id, jack.id) # rubocop:disable Rails/SkipsModelValidations
+
+      expect(pairing.reload.update(table_number: 5)).to be(true)
+    end
+  end
+
   describe 'nil players' do
     let(:pairing) { create(:pairing, player1: nil) }
     let(:nil_player) { instance_double(NilPlayer) }

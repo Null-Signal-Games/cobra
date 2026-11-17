@@ -3,6 +3,8 @@
 
 /* --- Light-mode defaults --------------------------------------------------- */
 :root {
+  /* Native controls (date/time picker icons and popups, checkboxes) follow the theme */
+  color-scheme: light;
   --cobra-bg: #ffffff;
   --cobra-surface: #f8f9fa;
   --cobra-surface-hover: #e9ecef;
@@ -38,8 +40,24 @@
   --cobra-faction-neutral: gray;
 }
 
+/* --- Svelecte (both themes) ------------------------------------------------ */
+.svelecte-control {
+  --sv-placeholder-color: var(--cobra-text-muted);
+  --sv-disabled-bg: var(--cobra-surface-hover);
+
+  .sv-input--text {
+    color: inherit;
+  }
+
+  .in-dropdown .highlight {
+    color: var(--cobra-link);
+    font-weight: 600;
+  }
+}
+
 /* --- Dark-mode overrides --------------------------------------------------- */
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --cobra-bg: #1c1e26;
   --cobra-surface: #252836;
   --cobra-surface-hover: #2e3147;
@@ -300,59 +318,13 @@
   /* Svelecte component (Svelte ID Select dropdowns - aligned to Slim Awesomplete) */
   .svelecte-control {
     --sv-bg: var(--cobra-input-bg);
-    --sv-color: var(--cobra-text);
+    --sv-color: #f0f4f8;
     --sv-border: 1px solid var(--cobra-border);
     --sv-dropdown-bg: var(--cobra-dropdown-bg);
-    --sv-placeholder-color: var(--cobra-text-muted);
-    --sv-item-color: var(--cobra-text);
+    --sv-dropdown-border: 1px solid var(--cobra-border);
+    --sv-dropdown-active-bg: rgba(255, 255, 255, 0.1);
+    --sv-dropdown-selected-bg: #365678;
     --sv-item-btn-color: var(--cobra-text-muted);
-    --sv-item-active-bg: rgba(255, 255, 255, 0.1);
-    --sv-item-selected-bg: #365678;
-
-    .sv-control {
-      background-color: var(--cobra-input-bg) !important;
-      border-color: var(--cobra-border) !important;
-      color: var(--cobra-text) !important;
-    }
-
-    .sv-item--value {
-      color: var(--cobra-text) !important;
-    }
-
-    .sv-dropdown {
-      background-color: var(--cobra-dropdown-bg) !important;
-      border-color: var(--cobra-border) !important;
-      color: var(--cobra-text) !important;
-
-      .sv-item {
-        color: var(--cobra-text) !important;
-
-        &:hover, &.is-active {
-          background-color: rgba(255, 255, 255, 0.1) !important;
-          color: #ffffff !important;
-
-          mark, b, strong {
-            color: #ffffff !important;
-            background-color: transparent !important;
-          }
-        }
-
-        &.is-selected {
-          background-color: #365678 !important;
-          color: #ffffff !important;
-
-          mark, b, strong {
-            color: #ffffff !important;
-            background-color: transparent !important;
-          }
-        }
-      }
-
-      mark, b, strong {
-        color: #6bb4f8 !important;
-        background-color: transparent !important;
-      }
-    }
   }
 
   /* Button links */

@@ -63,7 +63,7 @@ RSpec.describe TournamentsController do
           }
         )
         expect(data['options']['time_zones']).to include(
-          { 'id' => 'UTC', 'name' => '(GMT+00:00) UTC' }
+          { 'id' => 'UTC', 'name' => 'UTC' }
         )
         expect(data['feature_flags']).to eq(
           {

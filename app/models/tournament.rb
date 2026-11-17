@@ -14,6 +14,9 @@ class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style
 
   scope :public_tournaments, -> { where(private: false) }
 
+  # IANA time zone identifiers, e.g. "America/Chicago".
+  TIME_ZONES = TZInfo::Timezone.all_identifiers.sort.freeze
+
   # This is a list of attributes that will be replaced with nil if they are blank.
   NULL_ATTRS = %w[
     additional_prizes_description
@@ -49,6 +52,7 @@ class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style
   validates :slug, uniqueness: true # rubocop:disable Rails/UniqueValidationWithoutIndex
   validates :stream_url, http_url: true, allow_blank: true
   validates :event_link, http_url: true, allow_blank: true
+  validates :time_zone, inclusion: { in: TIME_ZONES, message: 'is not a valid time zone' }, allow_blank: true
 
   before_create :default_date, unless: :date
   after_create :create_stage

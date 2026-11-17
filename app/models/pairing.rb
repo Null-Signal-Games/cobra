@@ -21,6 +21,8 @@ class Pairing < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style/Do
 
   include NoEliminationTies
 
+  validate :players_are_different, if: -> { will_save_change_to_player1_id? || will_save_change_to_player2_id? }
+
   # Normalise before validating so validations see the combined score1/score2.
   before_validation :normalise_scores_before_save
   after_update :cache_standings!, if: proc { round.completed? }
@@ -129,6 +131,12 @@ class Pairing < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style/Do
   end
 
   private
+
+  def players_are_different
+    return unless player1_id.present? && player1_id == player2_id
+
+    errors.add(:base, 'A player cannot be paired against themselves')
+  end
 
   def normalise_scores_before_save
     # Handle score presets set as corp & runner scores

@@ -126,6 +126,27 @@ RSpec.describe Tournament do
     end
   end
 
+  describe 'time_zone' do
+    it 'accepts IANA identifiers' do
+      tournament.time_zone = 'America/Chicago'
+
+      expect(tournament).to be_valid
+    end
+
+    it 'allows a blank time zone' do
+      tournament.time_zone = nil
+
+      expect(tournament).to be_valid
+    end
+
+    it 'rejects Rails zone names' do
+      tournament.time_zone = 'Central Time (US & Canada)'
+
+      expect(tournament).not_to be_valid
+      expect(tournament.errors[:time_zone]).to include('is not a valid time zone')
+    end
+  end
+
   describe '#corp_counts' do
     let!(:id_pd) { create(:id_pd) }
     let!(:id_nebula) { create(:id_nebula) }
