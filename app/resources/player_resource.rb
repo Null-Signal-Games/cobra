@@ -23,10 +23,10 @@ class PlayerResource < ApplicationResource
   attribute :first_round_bye, :boolean
   attribute :include_in_stream, :boolean
   attribute :registration_locked, :boolean
-  attribute :corp_identity_id, :integer do
+  attribute :corp_identity_id, :integer, filterable: false, sortable: false do
     @object.corp_identity_ref_id
   end
-  attribute :runner_identity_id, :integer do
+  attribute :runner_identity_id, :integer, filterable: false, sortable: false do
     @object.runner_identity_ref_id
   end
 
@@ -53,4 +53,27 @@ class PlayerResource < ApplicationResource
 
   # Enforce the tournament_id filter as required
   filter :tournament_id, :integer, required: true
+
+  # Identities need to stay hidden until the first round is paired except from the
+  # tournament organiser and the player themselves.
+  # Clearing the FKs on the loaded records hides the identities, relationships and sideloads.
+  def resolve(scope)
+    players = super
+    viewer = context.respond_to?(:current_user) ? context.current_user : nil
+    tournaments = Tournament.where(id: players.map(&:tournament_id).uniq).index_by(&:id)
+    visible = Hash.new { |cache, tournament_id| cache[tournament_id] = tournaments[tournament_id]&.show_identities? }
+
+    players.each do |player|
+      tournament = tournaments[player.tournament_id]
+      next if visible[player.tournament_id]
+      next if viewer && (tournament&.user_id == viewer.id || player.user_id == viewer.id)
+
+      player.corp_identity_ref_id = nil
+      player.runner_identity_ref_id = nil
+      # Be defensive and mark this record as read-only to prevent modification when we add editing to this API.
+      player.readonly!
+    end
+
+    players
+  end
 end
