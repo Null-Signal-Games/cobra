@@ -22,6 +22,24 @@ RSpec.describe Api::V1::Private::UsersController do
         expect(json['data']['attributes']['nrdb_id']).to eq(123)
         expect(json['data']['attributes']['nrdb_username']).to eq('test_user')
       end
+
+      it 'reports create_demo_tournaments as enabled when the flag is on for the user' do
+        Flipper.enable_actor(:demo_tournaments, user)
+
+        get :show, format: :jsonapi
+
+        json = JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody
+        expect(json['data']['attributes']['features']).to eq('create_demo_tournaments' => true)
+      end
+
+      it 'reports create_demo_tournaments as disabled when the flag is off' do
+        Flipper.disable(:demo_tournaments)
+
+        get :show, format: :jsonapi
+
+        json = JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody
+        expect(json['data']['attributes']['features']).to eq('create_demo_tournaments' => false)
+      end
     end
 
     context 'when unauthenticated' do

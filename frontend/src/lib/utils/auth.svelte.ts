@@ -1,11 +1,13 @@
 import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
 import { classicApi } from "#lib/api/classic.ts";
 import { v1Api } from "#lib/api/v1.ts";
+import type { UserFeatures } from "#lib/api/v1ApiTypes.ts";
 
 export interface AuthUser {
   id: number;
   nrdb_id: number;
   nrdb_username: string;
+  features: UserFeatures;
 }
 
 const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
@@ -21,6 +23,7 @@ async function loadUser(altFetch: typeof fetch): Promise<AuthUser | null> {
       id: Number(response.data.id),
       nrdb_id: response.data.attributes.nrdb_id,
       nrdb_username: response.data.attributes.nrdb_username,
+      features: response.data.attributes.features ?? {},
     };
   } catch {
     return null;

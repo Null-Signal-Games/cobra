@@ -5,6 +5,8 @@ import DemoTournamentCreation from "./+page.svelte";
 import { classicApi } from "#lib/api/classic.ts";
 import { navigateTo } from "#lib/utils/navigation.ts";
 import { ValidationError } from "#lib/utils/errors.ts";
+import type { AuthUser } from "#lib/utils/auth.svelte.ts";
+import type { PageProps } from "./$types";
 
 vi.mock("$app/env/public", () => ({
   CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000",
@@ -33,6 +35,18 @@ describe("DemoTournamentCreation", () => {
     csrf_token: "fake-csrf-token",
   };
 
+  const enabledUser: AuthUser = {
+    id: 1,
+    nrdb_id: 1,
+    nrdb_username: "demo_user",
+    features: { create_demo_tournaments: true },
+  };
+
+  function renderPage(user: AuthUser | null = enabledUser) {
+    const data = { user, tournamentTypes: [] } as unknown as PageProps["data"];
+    return render(DemoTournamentCreation, { props: { data, params: {} } });
+  }
+
   beforeEach(() => {
     cleanup();
     vi.clearAllMocks();
@@ -40,7 +54,7 @@ describe("DemoTournamentCreation", () => {
   });
 
   it("renders the demo tournament creation form", async () => {
-    render(DemoTournamentCreation);
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
@@ -59,7 +73,7 @@ describe("DemoTournamentCreation", () => {
   });
 
   it("loads initial tournament data on mount", async () => {
-    render(DemoTournamentCreation);
+    renderPage();
 
     await waitFor(() => {
       expect(classicApi.loadNewDemoTournament).toHaveBeenCalledOnce();
@@ -74,7 +88,7 @@ describe("DemoTournamentCreation", () => {
         }),
     );
 
-    render(DemoTournamentCreation);
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
@@ -91,7 +105,7 @@ describe("DemoTournamentCreation", () => {
 
     vi.mocked(classicApi.createDemoTournament).mockResolvedValue(mockResponse);
 
-    render(DemoTournamentCreation);
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
@@ -143,7 +157,7 @@ describe("DemoTournamentCreation", () => {
     });
     vi.mocked(classicApi.createDemoTournament).mockRejectedValue(validationError);
 
-    render(DemoTournamentCreation);
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
@@ -176,7 +190,7 @@ describe("DemoTournamentCreation", () => {
   it("handles unexpected errors", async () => {
     vi.mocked(classicApi.createDemoTournament).mockRejectedValue(new Error("Network error"));
 
-    render(DemoTournamentCreation);
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
@@ -193,5 +207,36 @@ describe("DemoTournamentCreation", () => {
         screen.getByText(/an unexpected error occurred/i),
       ).toBeInTheDocument();
     });
+  });
+
+  it("tells logged-out users to log in and does not load the form", () => {
+    renderPage(null);
+
+    expect(
+      screen.getByText(/must be logged in to create a demo tournament/i),
+    ).toBeInTheDocument();
+    expect(classicApi.loadNewDemoTournament).not.toHaveBeenCalled();
+  });
+
+  it("explains when demo tournaments are not enabled and does not load the form", () => {
+    renderPage({ ...enabledUser, features: {} });
+
+    expect(
+      screen.getByText(/demo tournaments are not enabled for your account/i),
+    ).toBeInTheDocument();
+    expect(classicApi.loadNewDemoTournament).not.toHaveBeenCalled();
+  });
+
+  it("shows an error when the form fails to load", async () => {
+    vi.mocked(classicApi.loadNewDemoTournament).mockRejectedValue(new Error("401 Unauthorized"));
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/unable to load the demo tournament form/i),
+      ).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId("loading-spinner")).not.toBeInTheDocument();
   });
 });
