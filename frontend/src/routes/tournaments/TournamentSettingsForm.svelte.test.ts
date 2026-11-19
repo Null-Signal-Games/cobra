@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, cleanup } from "@testing-library/svelte";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import userEvent from "@testing-library/user-event";
+import { tick } from "svelte";
 import TournamentSettingsForm from "./TournamentSettingsForm.svelte";
 import { Tournament, type TournamentOptions } from "#lib/model/Tournament.ts";
 
@@ -121,6 +122,39 @@ describe("TournamentSettingsForm dropdowns", () => {
     expect(mockOnSubmit).toHaveBeenCalledOnce();
     const submitted = mockOnSubmit.mock.calls[0][0] as Tournament;
     expect(submitted.time_zone).toBe("America/Chicago");
+  });
+
+  describe("browser time zone default", () => {
+    function mockBrowserTimeZone(timeZone: string) {
+      const resolved = Intl.DateTimeFormat().resolvedOptions();
+      vi.spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions").mockReturnValue({
+        ...resolved,
+        timeZone,
+      });
+    }
+
+    afterEach(() => vi.restoreAllMocks());
+
+    async function renderedTimeZone(tournament: Tournament) {
+      render(TournamentSettingsForm, { props: { tournament, options } });
+      await tick();
+      return selectedValue("time_zone");
+    }
+
+    it("defaults an unset time zone to the browser's time zone if there is a match", async () => {
+      mockBrowserTimeZone("America/Chicago");
+      expect(await renderedTimeZone(new Tournament({ name: "T" }))).toBe("America/Chicago");
+    });
+
+    it("leaves an unset time zone empty when the browser's time zone is not a match", async () => {
+      mockBrowserTimeZone("Europe/Warsaw");
+      expect(await renderedTimeZone(new Tournament({ name: "T" }))).toBeFalsy();
+    });
+
+    it("keeps an existing time zone", async () => {
+      mockBrowserTimeZone("America/Chicago");
+      expect(await renderedTimeZone(new Tournament({ name: "T", time_zone: "UTC" }))).toBe("UTC");
+    });
   });
 
   it("disables swiss_format dropdown when canChangeSwissFormat is false", () => {
