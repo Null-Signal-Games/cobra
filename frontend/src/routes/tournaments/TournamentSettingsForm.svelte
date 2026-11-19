@@ -11,6 +11,7 @@
   } from "#lib/model/Tournament.ts";
   import { type Errors } from "#lib/utils/errors.ts";
   import Svelecte from "svelecte";
+  import { onMount } from "svelte";
 
   let {
     tournament,
@@ -38,6 +39,15 @@
 
   // svelte-ignore state_referenced_locally
   let tournamentEdit = $state($state.snapshot(tournament));
+
+  // Default to the browser's time zone if there is a match.
+  onMount(() => {
+    if (tournamentEdit.time_zone) return;
+    const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (options.time_zones.some((tz) => tz.id === browserTimeZone)) {
+      tournamentEdit.time_zone = browserTimeZone;
+    }
+  });
 
   const selfRegistrationHelp =
     "Players logged in via NRDB can register themselves for this tournament.";
