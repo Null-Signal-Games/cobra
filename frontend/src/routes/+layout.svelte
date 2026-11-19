@@ -60,7 +60,7 @@
 
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark dontprint">
   <div class="container">
-    <a href={resolve("/")} class="navbar-brand">Cobra (SPA)</a>
+    <a href={resolve("/")} class="navbar-brand">Cobra</a>
     <button
       class="navbar-toggler"
       type="button"
