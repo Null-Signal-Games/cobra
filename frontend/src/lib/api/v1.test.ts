@@ -346,6 +346,47 @@ describe("V1Api", () => {
     });
   });
 
+  describe("loadPlayer", () => {
+    it("fetches a single player from the public API without sideloading identities", async () => {
+      const mockResponse = {
+        data: {
+          id: "5",
+          type: "players",
+          attributes: {
+            tournament_id: 42,
+            user_id: 10,
+            name: "Evie",
+            pronouns: "she/her",
+            active: true,
+          },
+        },
+        included: [],
+      };
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify(mockResponse), {
+          status: 200,
+          headers: { "Content-Type": "application/vnd.api+json" },
+        }),
+      );
+
+      const player = await api.loadPlayer(42, 5, mockFetch);
+
+      expect(player.id).toBe(5);
+      expect(player.name).toBe("Evie");
+      const { url, headers } = getFetchCall();
+      const parsed = new URL(url);
+      expect(parsed.pathname).toBe("/api/v1/public/tournaments/42/players/5");
+      expect(parsed.searchParams.has("include")).toBe(false);
+      expect(headers.Accept).toBe("application/vnd.api+json");
+    });
+
+    it("throws on failure", async () => {
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 404, statusText: "Not Found" }));
+
+      await expect(api.loadPlayer(42, 5, mockFetch)).rejects.toThrow();
+    });
+  });
+
   describe("loadPlayerByUserId", () => {
     it("fetches players filtered by userId and adapts player when found", async () => {
       const mockResponse = {

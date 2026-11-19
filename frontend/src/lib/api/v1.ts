@@ -3,6 +3,7 @@ import type {
   CurrentUserResponse,
   IdentitiesResponse,
   IdentityInfo,
+  PlayerResponse,
   PlayersResponse,
   TournamentResponse,
   TournamentsResponse,
@@ -167,6 +168,18 @@ export class V1Api {
     }
 
     return res.data;
+  }
+
+  async loadPlayer(
+    tournamentId: number,
+    playerId: number,
+    altFetch = fetch,
+  ): Promise<Player> {
+    const res = await this.api.getOrThrow<PlayerResponse>(
+      `/api/v1/public/tournaments/${tournamentId}/players/${playerId}`,
+      { altFetch, headers: JSON_API_HEADERS },
+    );
+    return v1Adapter.adaptPlayer(res.data, res.included);
   }
 
   async loadPlayerByUserId(
