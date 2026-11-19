@@ -244,7 +244,7 @@ describe("Tournament", () => {
 
   describe("when player is logged in", () => {
     beforeEach(() => {
-      currentUser = { id: MockPlayerBob.user_id, nrdb_id: 0, nrdb_username: MockPlayerBob.name };
+      currentUser = { id: MockPlayerBob.user_id, nrdb_id: 0, nrdb_username: MockPlayerBob.name, features: {} };
       // RegistrationCard prefills the name from the client-side store after mount.
       authStore.user = currentUser;
     });

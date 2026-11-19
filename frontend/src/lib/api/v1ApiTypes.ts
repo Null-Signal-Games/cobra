@@ -63,7 +63,12 @@ export interface UserInfo {
   attributes: {
     nrdb_id: number;
     nrdb_username: string;
+    features?: UserFeatures;
   };
+}
+
+export interface UserFeatures {
+  create_demo_tournaments?: boolean;
 }
 
 export interface CurrentUserResponse {

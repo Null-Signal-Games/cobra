@@ -1,17 +1,30 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import type { PageProps } from "./$types";
   import { classicApi } from "#lib/api/classic.ts";
   import type { DemoTournamentSettings } from "#lib/api/classicTypes.ts";
   import { type Errors, ValidationError } from "#lib/utils/errors.ts";
   import { navigateTo } from "#lib/utils/navigation.ts";
   import DemoTournamentSettingsForm from "./DemoTournamentSettingsForm.svelte";
 
+  let { data }: PageProps = $props();
+
   let tournament = $state<DemoTournamentSettings | undefined>(undefined);
   let errors = $state<Errors>({});
 
+  const canCreateDemo = $derived(data.user?.features.create_demo_tournaments === true);
+
   onMount(async () => {
-    const data = await classicApi.loadNewDemoTournament();
-    tournament = data.tournament;
+    if (!canCreateDemo) {
+      return;
+    }
+
+    try {
+      const settings = await classicApi.loadNewDemoTournament();
+      tournament = settings.tournament;
+    } catch {
+      errors = { base: ["Unable to load the demo tournament form. Please try again."] };
+    }
   });
 
   async function submitNewTournament(tournament: DemoTournamentSettings) {
@@ -42,7 +55,11 @@
       demo players with fake names, and specific rounds.
     </p>
 
-    {#if errors.base}
+    {#if !data.user}
+      <div class="alert alert-warning">You must be logged in to create a demo tournament.</div>
+    {:else if !canCreateDemo}
+      <div class="alert alert-warning">Demo tournaments are not enabled for your account.</div>
+    {:else if errors.base}
       <div class="alert alert-danger">{errors.base}</div>
     {:else if tournament}
       <DemoTournamentSettingsForm

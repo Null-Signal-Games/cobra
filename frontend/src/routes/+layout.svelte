@@ -120,10 +120,12 @@
                 <FontAwesomeIcon icon="plus" />
                 Create tournament
               </a>
-              <a href={resolve("tournaments/demo")} class="dropdown-item">
-                <FontAwesomeIcon icon="plus" />
-                Create demo tournament
-              </a>
+              {#if data.user.features.create_demo_tournaments}
+                <a href={resolve("tournaments/demo")} class="dropdown-item">
+                  <FontAwesomeIcon icon="plus" />
+                  Create demo tournament
+                </a>
+              {/if}
               <a href={resolve("tournaments/my")} class="dropdown-item">
                 <FontAwesomeIcon icon="trophy" />
                 My Tournaments

@@ -11,5 +11,14 @@ module Private
     attribute :id, :integer
     attribute :nrdb_id, :integer
     attribute :nrdb_username, :string
+
+    # Per-user feature availability for the SvelteKit frontend.
+    # This should be considered a stop-gap for now until we figure out a longer-term plan
+    # for more customizable features and feature flag use in the frontend.
+    attribute :features, :hash, readable: true, writable: false do
+      {
+        create_demo_tournaments: Flipper.enabled?(:demo_tournaments, @object)
+      }
+    end
   end
 end

@@ -27,6 +27,7 @@ describe("authStore (SvelteKit frontend)", () => {
           attributes: {
             nrdb_id: 12345,
             nrdb_username: "runner_one",
+            features: { create_demo_tournaments: true },
           },
         },
       };
@@ -41,6 +42,7 @@ describe("authStore (SvelteKit frontend)", () => {
         id: 42,
         nrdb_id: 12345,
         nrdb_username: "runner_one",
+        features: { create_demo_tournaments: true },
       });
       expect(authStore.isAuthenticated).toBe(true);
     });
@@ -80,13 +82,13 @@ describe("authStore (SvelteKit frontend)", () => {
 
       const user = await authStore.checkAuth(mockFetch);
 
-      expect(user).toEqual({ id: 7, nrdb_id: 1, nrdb_username: "corp" });
+      expect(user).toEqual({ id: 7, nrdb_id: 1, nrdb_username: "corp", features: {} });
       expect(authStore.user).toBeNull();
       expect(authStore.isAuthenticated).toBe(false);
     });
 
     it("ignores a user already in the store", async () => {
-      authStore.user = { id: 1, nrdb_id: 1, nrdb_username: "someone_else" };
+      authStore.user = { id: 1, nrdb_id: 1, nrdb_username: "someone_else", features: {} };
       const mockFetch = vi
         .fn<typeof fetch>()
         .mockResolvedValueOnce(new Response(JSON.stringify({}), { status: 401 }));
