@@ -112,3 +112,7 @@ export interface PlayerInfo {
 }
 
 export type PlayersResponse = ApiResponse<PlayerInfo, IdentityInfo>;
+export interface PlayerResponse {
+  data: PlayerInfo;
+  included?: IdentityInfo[];
+}
