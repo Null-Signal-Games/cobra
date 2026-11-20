@@ -302,7 +302,7 @@ describe("Tournament", () => {
         bobEdit.include_in_stream = true;
 
         vi.mocked(betaApi.savePlayer).mockImplementation(() =>
-          Promise.resolve(bobEdit),
+          Promise.resolve(structuredClone(bobEdit)),
         );
 
         await user.click(
