@@ -26,7 +26,7 @@
 
   let identityNames: IdentityNames | undefined = $state();
   // svelte-ignore state_referenced_locally
-  let playerEdit = $state(structuredClone($state.snapshot(player)));
+  let playerEdit = $state($state.snapshot(player));
   let playerAgreed = $state(false);
   let readOnly = $derived(playerEdit.id !== 0);
 
