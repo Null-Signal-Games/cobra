@@ -78,6 +78,14 @@ describe("TournamentCreation", () => {
     expect(screen.getByRole("button", { name: /create/i })).toBeInTheDocument();
   });
 
+  it("defaults to single-sided Swiss", () => {
+    render(TournamentCreation, { props: createProps() });
+
+    expect(document.querySelector<HTMLSelectElement>('select[name="swiss_format"]')?.value).toBe(
+      "single_sided",
+    );
+  });
+
   it("shows a loading spinner", () => {
     render(TournamentCreation, {
       props: createProps({

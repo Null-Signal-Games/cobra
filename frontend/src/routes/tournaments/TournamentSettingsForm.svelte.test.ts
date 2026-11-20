@@ -106,7 +106,11 @@ describe("TournamentSettingsForm dropdowns", () => {
   });
 
   it("shows the selected time zone and submits a newly picked one", async () => {
-    const tournament = new Tournament({ name: "Test Tournament", time_zone: "America/New_York" });
+    const tournament = new Tournament({
+      name: "Test Tournament",
+      swiss_format: "single_sided",
+      time_zone: "America/New_York",
+    });
     const mockOnSubmit = vi.fn();
 
     render(TournamentSettingsForm, {
@@ -143,17 +147,25 @@ describe("TournamentSettingsForm dropdowns", () => {
 
     it("defaults an unset time zone to the browser's time zone if there is a match", async () => {
       mockBrowserTimeZone("America/Chicago");
-      expect(await renderedTimeZone(new Tournament({ name: "T" }))).toBe("America/Chicago");
+      expect(
+        await renderedTimeZone(new Tournament({ name: "T", swiss_format: "single_sided" })),
+      ).toBe("America/Chicago");
     });
 
     it("leaves an unset time zone empty when the browser's time zone is not a match", async () => {
       mockBrowserTimeZone("Europe/Warsaw");
-      expect(await renderedTimeZone(new Tournament({ name: "T" }))).toBeFalsy();
+      expect(
+        await renderedTimeZone(new Tournament({ name: "T", swiss_format: "single_sided" })),
+      ).toBeFalsy();
     });
 
     it("keeps an existing time zone", async () => {
       mockBrowserTimeZone("America/Chicago");
-      expect(await renderedTimeZone(new Tournament({ name: "T", time_zone: "UTC" }))).toBe("UTC");
+      expect(
+        await renderedTimeZone(
+          new Tournament({ name: "T", swiss_format: "single_sided", time_zone: "UTC" }),
+        ),
+      ).toBe("UTC");
     });
   });
 
@@ -178,7 +190,11 @@ describe("TournamentSettingsForm dropdowns", () => {
   });
 
   it("does not render ABR buttons without callbacks", () => {
-    const tournament = new Tournament({ name: "Test Tournament", abr_code: "abc123" });
+    const tournament = new Tournament({
+      name: "Test Tournament",
+      swiss_format: "single_sided",
+      abr_code: "abc123",
+    });
 
     render(TournamentSettingsForm, { props: { tournament, options } });
 
@@ -188,7 +204,11 @@ describe("TournamentSettingsForm dropdowns", () => {
   });
 
   it("renders ABR buttons and calls their callbacks with the tournament", async () => {
-    const tournament = new Tournament({ name: "Test Tournament", abr_code: "abc123" });
+    const tournament = new Tournament({
+      name: "Test Tournament",
+      swiss_format: "single_sided",
+      abr_code: "abc123",
+    });
     const mockUpload = vi.fn().mockResolvedValue(true);
     const mockDownload = vi.fn().mockResolvedValue(true);
 
