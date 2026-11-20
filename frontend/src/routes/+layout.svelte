@@ -18,6 +18,7 @@
   let { children, data }: { children: Snippet; data: LayoutData; } = $props();
 
   let isNavOpen = $state(false);
+  let navHeight = $state(0);
 
   beforeNavigate(() => {
     globalMessages.infos = [];
@@ -58,7 +59,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
 </svelte:head>
 
-<nav class="navbar navbar-expand-lg fixed-top navbar-dark dontprint">
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark dontprint" bind:clientHeight={navHeight}>
   <div class="container">
     <a href={resolve("/")} class="navbar-brand">Cobra</a>
     <button
@@ -157,7 +158,7 @@
 </nav>
 
 <main class="container flex-grow-1">
-  <GlobalMessages />
+  <GlobalMessages --nav-height="{navHeight}px" />
 
   {@render children()}
 </main>
