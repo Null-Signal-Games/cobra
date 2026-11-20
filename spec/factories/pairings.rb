@@ -15,5 +15,13 @@ FactoryBot.define do
       score1 { 0 }
       score2 { 0 }
     end
+
+    trait :player1_corp do
+      side { :player1_is_corp }
+    end
+
+    trait :player1_runner do
+      side { :player1_is_runner }
+    end
   end
 end

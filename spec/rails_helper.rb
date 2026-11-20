@@ -29,6 +29,7 @@ RSpec.configure do |config|
   config.include SignIn
   config.include Report
   config.include ApiHelpers
+  config.include JsonRequestHelpers, type: :request
 
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
