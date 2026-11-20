@@ -99,6 +99,7 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
 
     @new_tournament = current_user.tournaments.new
     @new_tournament.date = Date.current
+    @new_tournament.swiss_format = :single_sided
     render json: helpers.tournament_settings_json(@new_tournament), status: :ok
   end
 
