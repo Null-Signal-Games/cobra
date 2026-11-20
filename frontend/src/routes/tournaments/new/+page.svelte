@@ -40,9 +40,8 @@
   {#if errors.base}
     <div class="alert alert-danger">{errors.base}</div>
   {:else if data.tournamentSettings.tournament}
-    <!-- New tournaments default to single-sided Swiss. -->
     <TournamentSettingsForm
-      tournament={{ ...data.tournamentSettings.tournament, swiss_format: "single_sided" }}
+      tournament={data.tournamentSettings.tournament}
       options={data.tournamentSettings.options}
       featureFlags={data.tournamentSettings.feature_flags}
       onSubmitCallback={submitNewTournament}
