@@ -29,7 +29,7 @@ RSpec.describe TournamentsController do
             'date' => '2023-05-15',
             'dropped_player_count' => 0,
             'private' => false,
-            'swiss_format' => 'double_sided',
+            'swiss_format' => 'single_sided',
             'allow_self_reporting' => false,
             'decklist_required' => false,
             'nrdb_deck_registration' => false,
