@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { authStore } from "./auth.svelte.ts";
+import { authStore, loginReturnQuery } from "./auth.svelte.ts";
 
 vi.mock("$app/env/public", () => ({ CLIENT_COBRA_API_ENDPOINT: "" }));
 
@@ -170,5 +170,21 @@ describe("authStore (SvelteKit frontend)", () => {
     );
 
     vi.unstubAllGlobals();
+  });
+});
+
+describe("loginReturnQuery", () => {
+  it("returns to the current page after login", () => {
+    const url = new URL("http://localhost/tournaments/1/standings?view=all");
+
+    expect(loginReturnQuery(url, "/tournaments/[tournamentId]/standings")).toBe(
+      "?return_to=%2Ftournaments%2F1%2Fstandings%3Fview%3Dall",
+    );
+  });
+
+  it("keeps the existing return_to when already on the login page", () => {
+    const url = new URL("http://localhost/login?return_to=%2Ftournaments%2F1");
+
+    expect(loginReturnQuery(url, "/login")).toBe("?return_to=%2Ftournaments%2F1");
   });
 });

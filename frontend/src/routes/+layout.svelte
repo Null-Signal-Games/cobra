@@ -14,6 +14,8 @@
   import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
   import type { LayoutData } from "./$types";
   import { beforeNavigate, afterNavigate } from "$app/navigation";
+  import { page } from "$app/state";
+  import { loginReturnQuery } from "#lib/utils/auth.svelte.ts";
 
   let { children, data }: { children: Snippet; data: LayoutData; } = $props();
 
@@ -40,6 +42,8 @@
     const returnUrl = typeof window !== "undefined" ? window.location.origin : "/";
     return `${serverOrigin}/oauth/logout?return_to=${encodeURIComponent(returnUrl)}`;
   }
+
+  let loginQuery = $derived(loginReturnQuery(page.url, page.route.id));
 </script>
 
 <svelte:head>
@@ -144,7 +148,7 @@
           </li>
         {:else}
           <li class="nav-item">
-            <a href={resolve("login")} id="signIn" class="nav-link text-light">
+            <a href={resolve(`login${loginQuery}`)} id="signIn" class="nav-link text-light">
               <FontAwesomeIcon icon="sign-in" />
               Sign in
             </a>
