@@ -53,12 +53,5 @@ RSpec.describe 'pairings_data score labels' do
     end
   end
 
-  describe 'Beta::RoundsController' do
-    before do
-      Flipper.enable(:beta_testing)
-      get pairings_data_beta_tournament_rounds_path(tournament)
-    end
-
-    it_behaves_like 'labels 0-0 scores'
-  end
+  # Beta::RoundsController score labels are covered in spec/requests/beta/rounds_controller_spec.rb.
 end

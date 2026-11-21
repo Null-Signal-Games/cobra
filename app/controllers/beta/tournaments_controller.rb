@@ -179,8 +179,10 @@ module Beta
 
       number = params[:number].to_i
       format = params[:elimination_type] == 'single' ? :single_elim : :double_elim
-      return redirect_to standings_tournament_players_path(@tournament) unless
-        Bracket::Factory.valid_bracket?(number, single_elim: format == :single_elim)
+      unless Bracket::Factory.valid_bracket?(number, single_elim: format == :single_elim)
+        return render json: { error: "A #{format.to_s.humanize.downcase} cut can't have #{number} players." },
+                      status: :unprocessable_content
+      end
 
       @tournament.cut_to!(format, number)
 
