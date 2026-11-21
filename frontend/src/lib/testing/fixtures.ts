@@ -14,12 +14,14 @@ import type { Round, RoundTimer } from "#lib/model/Round.ts";
 import type { Stage } from "#lib/model/Stage.ts";
 import { Tournament } from "#lib/model/Tournament.ts";
 
+export const TOURNAMENT_ORGANIZER_USER_ID = 100;
+
 export function makeTournament(overrides: Partial<Tournament> = {}): Tournament {
   return new Tournament({
     id: 1,
     name: "Test Tournament",
     slug: "TEST",
-    user_id: 1,
+    user_id: TOURNAMENT_ORGANIZER_USER_ID,
     tournament_organizer: "Tournament Organizer",
     date: "2026-01-01",
     swiss_format: "double_sided",
@@ -33,10 +35,12 @@ export function makeIdentity(overrides: Partial<Identity> = {}): Identity {
 
 export function makePlayer(overrides: Partial<Player> = {}): Player {
   const name = overrides.name ?? "Player 1";
+  const pronouns = overrides.pronouns ?? "";
   return Object.assign(new Player(), {
     id: 1,
     name,
-    name_with_pronouns: name,
+    // Same format as the server.
+    name_with_pronouns: pronouns ? `${name} (${pronouns})` : name,
     user_id: 1,
     active: true,
     ...overrides,
@@ -116,8 +120,9 @@ export function makeTournamentInfo(overrides: Partial<Tournament> = {}): Tournam
   return { id: String(tournament.id), type: "tournaments", attributes: tournament };
 }
 
+// Tournaments without an `id` are numbered by position (1, 2, 3, …) to keep them distinct.
 export function makeTournamentsResponse(
   tournaments: Partial<Tournament>[] = [],
 ): TournamentsResponse {
-  return { data: tournaments.map((t) => makeTournamentInfo(t)) };
+  return { data: tournaments.map((t, i) => makeTournamentInfo({ id: i + 1, ...t })) };
 }
