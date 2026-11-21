@@ -26,20 +26,23 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && rm -f /etc/nginx/sites-enabled/default \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Pre-install matching Bundler version and Ruby LSP
-RUN gem install "bundler:>= 4.0.9" ruby-lsp
+# Pre-install matching Bundler version and Ruby LSP. prism is installed explicitly because newer
+# rbs versions need a newer prism than Ruby's default gem. Hand the gem dir to vscode so the
+# Ruby LSP extension can regenerate its executables.
+RUN gem install "bundler:>= 4.0.9" ruby-lsp \
+    && gem install prism -v ">= 1.6" -v "< 2" \
+    && chown -R vscode:vscode /usr/local/bundle
 
 # Configure Playwright shared browsers path and copy pre-installed browsers
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 COPY --from=playwright-browsers /ms-playwright /ms-playwright
 RUN chmod -R 777 /ms-playwright
 
-# Ensure volume mount directories and RVM gem directories are writable by the vscode user
+# Ensure volume mount directories are writable by the vscode user
 RUN mkdir -p /home/vscode/.bundle /commandhistory \
-    && chown -R vscode:rvm /home/vscode/.bundle /commandhistory /usr/local/rvm \
-    && chmod -R g+w /usr/local/rvm
+    && chown -R vscode:vscode /home/vscode/.bundle /commandhistory
 
 # Configure RubyGems to install all user gems into the persistent .bundle volume
 ENV GEM_HOME="/home/vscode/.bundle"
-ENV GEM_PATH="/home/vscode/.bundle:/usr/local/rvm/gems/default:/usr/local/rvm/gems/default@global"
+ENV GEM_PATH="/home/vscode/.bundle:/usr/local/bundle:/usr/local/lib/ruby/gems/3.4.0"
 ENV PATH="/home/vscode/.bundle/bin:${PATH}"
