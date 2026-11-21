@@ -13,6 +13,7 @@ import { Player } from "#lib/model/Player.ts";
 import type { Round, RoundTimer } from "#lib/model/Round.ts";
 import type { Stage } from "#lib/model/Stage.ts";
 import { Tournament } from "#lib/model/Tournament.ts";
+import type { AuthUser } from "#lib/utils/auth.svelte.ts";
 
 export const TOURNAMENT_ORGANIZER_USER_ID = 100;
 
@@ -112,6 +113,11 @@ export function makeStage(overrides: Partial<Stage> = {}): Stage {
     rounds: [],
     ...overrides,
   };
+}
+
+// Signed-in user like from authStore.checkAuth() response.
+export function makeAuthUser(overrides: Partial<AuthUser> = {}): AuthUser {
+  return { id: 1, nrdb_id: 1, nrdb_username: "player1", features: {}, ...overrides };
 }
 
 // JSON:API wrappers for responses from /api/v1/public/tournaments.
