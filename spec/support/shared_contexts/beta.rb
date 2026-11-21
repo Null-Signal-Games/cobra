@@ -2,13 +2,16 @@
 
 # Shared setup for request specs against the Beta::* (and other JSON) endpoints.
 # The contexts below expect the including spec to define `let(:tournament)`.
+#
+# User types: "tournament organizer" (the TO), "player" (registered in the tournament),
+# "other player" (signed in, but neither the TO nor a player in it) and "signed out user".
 
 # Beta::Tournaments/Rounds/Pairings/StagesController reject requests unless this flag is on.
 RSpec.shared_context 'with beta testing enabled' do
   before { Flipper.enable(:beta_testing) }
 end
 
-RSpec.shared_context 'when signed in as the organizer' do
+RSpec.shared_context 'when signed in as the tournament organizer' do
   before { sign_in tournament.user }
 end
 
@@ -23,13 +26,14 @@ RSpec.shared_context 'when signed in as a player' do
   end
 end
 
-RSpec.shared_context 'when signed in as another user' do
-  let(:other_user) { create(:user) }
+# Signs in a user who is neither the tournament organizer nor a player in `tournament`.
+RSpec.shared_context 'when signed in as another player' do
+  let(:other_player_user) { create(:user) }
 
-  before { sign_in other_user }
+  before { sign_in other_player_user }
 end
 
-RSpec.shared_context 'when not signed in' do
+RSpec.shared_context 'when signed out' do
   before { sign_out }
 end
 
@@ -40,10 +44,10 @@ end
 #     json_delete beta_tournament_stage_path(tournament, stage), confirmation_name: tournament.name
 #   end
 #
-#   it_behaves_like 'an organizer-only endpoint'
-RSpec.shared_examples 'an organizer-only endpoint' do
-  context 'when signed in as another user' do
-    include_context 'when signed in as another user'
+#   it_behaves_like 'a tournament organizer only endpoint'
+RSpec.shared_examples 'a tournament organizer only endpoint' do
+  context 'when signed in as another player' do
+    include_context 'when signed in as another player'
 
     it 'returns unauthorized' do
       organizer_only_request
@@ -52,8 +56,8 @@ RSpec.shared_examples 'an organizer-only endpoint' do
     end
   end
 
-  context 'when not signed in' do
-    include_context 'when not signed in'
+  context 'when signed out' do
+    include_context 'when signed out'
 
     it 'returns unauthorized' do
       organizer_only_request

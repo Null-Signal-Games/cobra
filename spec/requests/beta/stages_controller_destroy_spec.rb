@@ -10,8 +10,8 @@ RSpec.describe 'Beta::StagesController #destroy' do
     json_delete beta_tournament_stage_path(tournament, stage), confirmation_name:
   end
 
-  context 'when authenticated as tournament owner' do
-    include_context 'when signed in as the organizer'
+  context 'when signed in as the tournament organizer' do
+    include_context 'when signed in as the tournament organizer'
 
     it 'destroys stage when confirmation_name matches' do
       expect { organizer_only_request }.to change(Stage, :count).by(-1)
@@ -34,10 +34,10 @@ RSpec.describe 'Beta::StagesController #destroy' do
     end
   end
 
-  it_behaves_like 'an organizer-only endpoint'
+  it_behaves_like 'a tournament organizer only endpoint'
 
-  context 'when not the organizer' do
-    include_context 'when signed in as another user'
+  context 'when signed in as another player' do
+    include_context 'when signed in as another player'
 
     it 'does not destroy the stage' do
       expect { organizer_only_request }.not_to change(Stage, :count)
