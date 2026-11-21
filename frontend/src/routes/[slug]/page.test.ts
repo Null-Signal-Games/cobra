@@ -19,7 +19,11 @@ describe("[slug] shortcode load", () => {
     vi.mocked(v1Api.loadTournamentBySlug).mockResolvedValue(makeTournamentsResponse([{ id: 42 }]));
     const fetch = vi.fn<typeof globalThis.fetch>();
 
-    await expectRedirect(load(makeLoadEvent({ params: { slug: "ABCD" }, fetch })), 302, "/tournaments/42");
+    await expectRedirect(
+      load(makeLoadEvent({ params: { slug: "ABCD" }, fetch })),
+      302,
+      "/tournaments/42",
+    );
 
     expect(v1Api.loadTournamentBySlug).toHaveBeenCalledWith("ABCD", fetch);
   });

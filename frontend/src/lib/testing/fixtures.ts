@@ -116,6 +116,8 @@ export function makeTournamentInfo(overrides: Partial<Tournament> = {}): Tournam
   return { id: String(tournament.id), type: "tournaments", attributes: tournament };
 }
 
-export function makeTournamentsResponse(tournaments: Partial<Tournament>[] = []): TournamentsResponse {
+export function makeTournamentsResponse(
+  tournaments: Partial<Tournament>[] = [],
+): TournamentsResponse {
   return { data: tournaments.map((t) => makeTournamentInfo(t)) };
 }

@@ -36,16 +36,20 @@ export function makeLoadEvent({
 }
 
 // Asserts that a load function throws a SvelteKit `redirect(status, location)`.
-// Pass the load's result (`load(event)`, which SvelteKit types as `MaybePromise<…>`), or a function
-// that calls it (`() => load(event)`) for a synchronous load that throws before returning.
-export async function expectRedirect(result: unknown, status: number, location: string): Promise<void> {
+export async function expectRedirect(
+  result: unknown,
+  status: number,
+  location: string,
+): Promise<void> {
   let thrown: unknown;
   try {
-    await (typeof result === "function" ? result() : result);
+    await (typeof result === "function" ? (result as () => unknown)() : result);
   } catch (e) {
     thrown = e;
   }
 
-  expect(isRedirect(thrown), `expected a redirect to ${location}, got ${String(thrown)}`).toBe(true);
+  expect(isRedirect(thrown), `expected a redirect to ${location}, got ${String(thrown)}`).toBe(
+    true,
+  );
   expect(thrown).toMatchObject({ status, location });
 }
