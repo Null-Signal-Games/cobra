@@ -1,6 +1,32 @@
 # frozen_string_literal: true
 
 module ApiHelpers
+  # The v1 API controllers inherit from ActionController::API, not ApplicationController,
+  # so SignIn#sign_in doesn't reach them. Use this instead.
+  def sign_in_api(user)
+    [Api::V1::Public::PublicApiController, Api::V1::Private::PrivateApiController].each do |controller|
+      allow_any_instance_of(controller) # rubocop:disable RSpec/AnyInstance
+        .to receive(:current_user)
+        .and_return(user)
+    end
+  end
+
+  # GET a v1 endpoint with JSON:API query params, e.g.
+  #   jsonapi_get '/api/v1/public/tournaments', filter: { date: '2026-11-20' }, sort: 'name'
+  def jsonapi_get(path, params = {})
+    get path, params:, headers: { 'Accept' => 'application/vnd.api+json' }
+  end
+
+  # response.parsed_body doesn't parse application/vnd.api+json.
+  def jsonapi_body
+    JSON.parse(response.body)
+  end
+
+  # IDs of the records in `data` (a list or a single record), as strings.
+  def jsonapi_ids
+    Array.wrap(jsonapi_body['data']).pluck('id')
+  end
+
   def matches_record(path, expected_id, attributes = {})
     get path
 

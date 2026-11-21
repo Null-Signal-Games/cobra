@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'Public API Players' do
-  let!(:organiser) { create(:user) }
+  let!(:tournament_organizer) { create(:user) }
   let!(:player_user) { create(:user) }
-  let!(:tournament) { create(:tournament, private: false, user: organiser) }
+  let!(:tournament) { create(:tournament, private: false, user: tournament_organizer) }
   let!(:corp_identity) { create(:id_etf) }
   let!(:runner_identity) { create(:id_az) }
   let!(:player) do
@@ -25,12 +25,6 @@ RSpec.describe 'Public API Players' do
   let(:show_path) { "/api/v1/public/tournaments/#{tournament.id}/players/#{player.id}" }
   let(:include_identities) { '?include=corp_identity,runner_identity' }
 
-  def sign_in_public_api(user)
-    allow_any_instance_of(Api::V1::Public::PublicApiController) # rubocop:disable RSpec/AnyInstance
-      .to receive(:current_user)
-      .and_return(user)
-  end
-
   def pair_first_round
     # Tournaments create their first stage on creation.
     create(:round, tournament: tournament, stage: tournament.stages.first)
@@ -39,7 +33,7 @@ RSpec.describe 'Public API Players' do
   def get_json(path)
     get path
     expect(response).to have_http_status(:ok)
-    JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody -- parsed_body does not parse vnd.api+json
+    jsonapi_body
   end
 
   def expect_identities_hidden(json)
@@ -74,24 +68,24 @@ RSpec.describe 'Public API Players' do
     end
 
     context 'before the first round is paired' do
-      it 'hides identities from anonymous users' do
+      it 'hides identities from signed out users' do
         expect_identities_hidden(get_json(index_path + include_identities))
       end
 
-      it 'hides identities from other signed-in users' do
-        sign_in_public_api(create(:user))
+      it 'hides identities from other players' do
+        sign_in_api(create(:user))
         expect_identities_hidden(get_json(index_path + include_identities))
       end
 
-      it 'shows identities to the tournament organiser' do
-        sign_in_public_api(organiser)
+      it 'shows identities to the tournament organizer' do
+        sign_in_api(tournament_organizer)
         expect_identities_visible(get_json(index_path + include_identities))
       end
 
       it "shows a player's own identities only to that player" do
         other = create(:player, tournament: tournament, name: 'Bob',
                                 corp_identity_ref: corp_identity, runner_identity_ref: runner_identity)
-        sign_in_public_api(player_user)
+        sign_in_api(player_user)
 
         json = get_json(index_path)
         by_id = json['data'].index_by { |r| r['id'] }
@@ -103,7 +97,7 @@ RSpec.describe 'Public API Players' do
     context 'after the first round is paired' do
       before { pair_first_round }
 
-      it 'shows identities to anonymous users' do
+      it 'shows identities to signed out users' do
         expect_identities_visible(get_json(index_path + include_identities))
       end
     end
@@ -124,18 +118,18 @@ RSpec.describe 'Public API Players' do
     end
 
     context 'before the first round is paired' do
-      it 'returns the player without identities to anonymous users' do
+      it 'returns the player without identities to signed out users' do
         json = matches_record(show_path + include_identities, player.id, name: 'Alice')
         expect_identities_hidden(json)
       end
 
       it 'shows identities to the player' do
-        sign_in_public_api(player_user)
+        sign_in_api(player_user)
         expect_identities_visible(get_json(show_path + include_identities))
       end
 
-      it 'shows identities to the tournament organiser' do
-        sign_in_public_api(organiser)
+      it 'shows identities to the tournament organizer' do
+        sign_in_api(tournament_organizer)
         expect_identities_visible(get_json(show_path + include_identities))
       end
     end
