@@ -71,7 +71,7 @@ jobs:
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.4
+          ruby-version: 3.4.13
           bundler-cache: true
 
       - name: Set up Rails
