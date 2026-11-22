@@ -111,3 +111,16 @@ class AuthStore {
 }
 
 export const authStore = new AuthStore();
+
+// Query string for the login page that returns the user to the given page after signing in.
+export function loginReturnQuery(
+  url: Pick<URL, "pathname" | "search">,
+  routeId: string | null,
+): string {
+  // On the login page itself, keep its existing return_to instead of pointing back at /login.
+  if (routeId === "/login") {
+    return url.search;
+  }
+
+  return `?return_to=${encodeURIComponent(url.pathname + url.search)}`;
+}
