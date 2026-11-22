@@ -23,7 +23,7 @@ describe("My tournaments page", () => {
 
   describe("when signed in as a tournament organizer", () => {
     beforeEach(() => {
-      vi.spyOn(authStore, "checkAuth").mockResolvedValue(makeAuthUser({ nrdb_username: "alice" }));
+      vi.spyOn(authStore, "checkAuth").mockResolvedValue(makeAuthUser({ nrdb_username: "jo_z" }));
     });
 
     it("lists their tournaments, marking private ones", async () => {
@@ -37,7 +37,7 @@ describe("My tournaments page", () => {
       expect(screen.getByRole("link", { name: "Secret GNK" }).parentElement).toHaveTextContent(
         "Private",
       );
-      expect(screen.getByText("alice")).toBeInTheDocument();
+      expect(screen.getByText("jo_z")).toBeInTheDocument();
     });
 
     it("says when they have no tournaments", async () => {
