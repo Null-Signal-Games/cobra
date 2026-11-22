@@ -203,6 +203,36 @@ describe("Registration", () => {
     });
   });
 
+  describe("when registration is locked", () => {
+    beforeEach(() => {
+      MockPageData.player = Object.assign(structuredClone(MockPlayerBob), {
+        registration_locked: true,
+      });
+    });
+
+    afterEach(() => {
+      MockPageData.player = MockPlayerBob;
+    });
+
+    it("hides the NetrunnerDB deck list", async () => {
+      await renderRegistration(MockPlayerBobNrdbDecks);
+
+      expect(screen.getByText(/Registration is locked/)).toBeInTheDocument();
+      expect(screen.queryByLabelText("NRDB corp decks")).not.toBeInTheDocument();
+      expect(screen.queryByLabelText("NRDB runner decks")).not.toBeInTheDocument();
+    });
+
+    it("shows the submitted decks read-only", async () => {
+      await renderRegistration(MockPlayerBobNrdbDecks, 0, 1);
+
+      expect(screen.getByLabelText("corp deck")).toHaveTextContent("Bob's BANGUN");
+      expect(screen.getByLabelText("runner deck")).toHaveTextContent("Bob's Baz");
+      // Unlocked, each deck is a selectable button in the NetrunnerDB list.
+      expect(screen.queryByRole("button", { name: /bob's bangun/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /bob's baz/i })).not.toBeInTheDocument();
+    });
+  });
+
   describe("existing decks", () => {
     it("displays existing decks correctly", async () => {
       await renderRegistration(MockPlayerBobNrdbDecks, 0, 1);

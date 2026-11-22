@@ -1,8 +1,8 @@
 // Builders for test data. Each returns a complete, valid object with sensible defaults;
 // pass overrides for the fields a test cares about:
 //
-//   const alice = makePlayer({ name: "Alice" });
-//   const pairing = makePairing({ player1: alice, player2: makePlayer({ id: 2, name: "Bob" }) });
+//   const plural = makePlayer({ name: "plural" });
+//   const pairing = makePairing({ player1: plural, player2: makePlayer({ id: 2, name: "lia" }) });
 //   const stage = makeStage({ rounds: [makeRound({ pairings: [pairing] })] });
 //
 // Existing *TestData.ts files can move to these gradually.
@@ -45,6 +45,17 @@ export function makePlayer(overrides: Partial<Player> = {}): Player {
     user_id: 1,
     active: true,
     ...overrides,
+  });
+}
+
+// A bye, as the server sends it (player_hash_json(nil)).
+export function makeBye(): Player {
+  return makePlayer({
+    id: null as unknown as number,
+    name: null as unknown as string,
+    name_with_pronouns: "(Bye)",
+    user_id: null as unknown as number,
+    include_in_stream: null as unknown as boolean,
   });
 }
 
