@@ -42,7 +42,6 @@ gem 'turbolinks', '~> 5'
 # Bundled IANA zone data, so time zones match everywhere instead of depending on the OS's tzdata.
 gem 'tzinfo-data'
 gem 'uglifier', '>= 1.3.0'
-gem 'vite_rails'
 
 group :development, :test do
   gem 'brakeman'

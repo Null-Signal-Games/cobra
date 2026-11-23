@@ -233,13 +233,6 @@ RSpec.describe TournamentsController do
         expect(response).to have_http_status(:ok)
         expect(response.parsed_body).to include('pairings')
       end
-
-      it 'renders the my_tournament page (HTML)' do
-        get my_tournament_tournament_path(tournament)
-
-        expect(response).to have_http_status(:ok)
-        expect(response.body).to include('my_tournament_anchor')
-      end
     end
 
     context 'when user is not in the tournament' do

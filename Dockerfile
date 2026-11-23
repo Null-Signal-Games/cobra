@@ -43,7 +43,7 @@ WORKDIR $RAILS_ROOT
 # Throw errors if Gemfile has been modified since Gemfile.lock
 RUN bundle config --global frozen 1
 
-COPY Gemfile Gemfile.lock package.json package-lock.json ./
+COPY Gemfile Gemfile.lock ./
 
 # Prevent bundler warnings; ensure that the bundler version executed is >= that which created Gemfile.lock
 RUN gem install bundler
@@ -52,7 +52,6 @@ RUN gem install bundler
 RUN bundle config set --local path $BUNDLE_ROOT && \
   bundle config set force_ruby_platform true && \
   bundle install --verbose
-RUN npm install
 
 COPY . $RAILS_ROOT/
 

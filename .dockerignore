@@ -11,13 +11,11 @@
 /.env
 /deploy/.env
 /deploy/rails.env
-/frontend/.env
 /.DS_STORE
 /public/packs
 /public/packs-test
 /public/assets/*
-/public/vite*
-/node_modules
+/frontend
 /yarn-error.log
 /yarn-debug.log*
 /.yarn-integrity
