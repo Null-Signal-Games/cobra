@@ -51,7 +51,7 @@ RSpec.describe 'a completed top cut with a player with no seed' do
   end
 
   it 'loads tournament standings with player names' do
-    get standings_data_tournament_players_path(tournament)
+    get standings_data_api_classic_tournament_players_path(tournament)
     aggregate_failures do
       expect(response.body).to include('Alice')
       expect(response.body).to include('Bob')

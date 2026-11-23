@@ -37,14 +37,6 @@ class TournamentPolicy < ApplicationPolicy # rubocop:disable Style/Documentation
     update?
   end
 
-  def my?
-    user
-  end
-
-  def new_demo?
-    Flipper.enabled?(:demo_tournaments, user)
-  end
-
   def new_demo_form?
     Flipper.enabled?(:demo_tournaments, user)
   end

@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 module TournamentHelper # rubocop:disable Style/Documentation
-  def short_date(tournament)
-    return unless tournament.date
-
-    tournament.date.strftime('%-d %b %Y')
-  end
-
   def tournament_json(tournament)
     {
       id: tournament.id,

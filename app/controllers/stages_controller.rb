@@ -1,24 +1,8 @@
 # frozen_string_literal: true
 
 class StagesController < ApplicationController # rubocop:disable Style/Documentation
-  include DangerZoneConfirmable
-
   before_action :set_tournament
-  before_action :set_stage, only: %i[show update destroy settings]
-  before_action :validate_confirmation_name, only: :destroy
-
-  def show
-    authorize @tournament, :update?
-  end
-
-  def create
-    authorize @tournament, :update?
-
-    stage = @tournament.stages.create(format: (@tournament.single_sided? ? :single_sided_swiss : :swiss))
-    @tournament.players.each { |p| stage.players << p }
-
-    redirect_to tournament_rounds_path(@tournament)
-  end
+  before_action :set_stage, only: %i[update settings]
 
   def update
     authorize @tournament, :update?
@@ -44,16 +28,7 @@ class StagesController < ApplicationController # rubocop:disable Style/Documenta
       return render json: { error: error }, status: :unprocessable_content
     end
 
-    render json: { url: tournament_stage_path(@tournament, @stage) }, status: :ok
-  end
-
-  def destroy
-    @stage.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to tournament_rounds_path(@tournament) }
-      format.json { head :ok }
-    end
+    render json: { url: "#{tournament_path(@tournament)}/stages/#{@stage.id}" }, status: :ok
   end
 
   def settings

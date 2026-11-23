@@ -43,7 +43,7 @@ RSpec.describe 'pairings_data score labels' do
   end
 
   describe 'RoundsController' do
-    before { get pairings_data_tournament_rounds_path(tournament) }
+    before { get pairings_data_api_classic_tournament_rounds_path(tournament) }
 
     it_behaves_like 'labels 0-0 scores'
 

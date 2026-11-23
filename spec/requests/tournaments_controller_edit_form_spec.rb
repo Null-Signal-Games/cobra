@@ -17,8 +17,8 @@ RSpec.describe TournamentsController do
     end
     let(:tournament) do
       sign_in user
-      post tournaments_path, params: tournament_params, as: :json
-      post logout_path
+      post api_classic_tournaments_path, params: tournament_params, as: :json
+      sign_out
       Tournament.last
     end
 
@@ -32,7 +32,7 @@ RSpec.describe TournamentsController do
       end
 
       it 'returns tournament data' do
-        get edit_form_tournament_path(tournament), as: :json
+        get edit_form_api_classic_tournament_path(tournament), as: :json
 
         expect(response).to be_successful
         expect(response.content_type).to include('application/json')
@@ -76,7 +76,7 @@ RSpec.describe TournamentsController do
         end
 
         it 'indicates swiss format cannot be changed' do
-          get edit_form_tournament_path(tournament), as: :json
+          get edit_form_api_classic_tournament_path(tournament), as: :json
 
           data = response.parsed_body
           expect(data['can_change_swiss_format']).to be false
@@ -91,7 +91,7 @@ RSpec.describe TournamentsController do
         restriction = create(:deckbuilding_restriction, name: 'Standard Ban List')
         prize_kit = create(:official_prize_kit, name: '2025 Q1 Game Night Kit', position: 1)
 
-        get edit_form_tournament_path(tournament), as: :json
+        get edit_form_api_classic_tournament_path(tournament), as: :json
 
         data = response.parsed_body
         expect(data['options'].except('time_zones')).to eq(
@@ -130,7 +130,7 @@ RSpec.describe TournamentsController do
       end
 
       it 'returns unauthorized status' do
-        get edit_form_tournament_path(tournament), as: :json
+        get edit_form_api_classic_tournament_path(tournament), as: :json
 
         expect(response).to have_http_status(:unauthorized)
       end
@@ -142,7 +142,7 @@ RSpec.describe TournamentsController do
       end
 
       it 'returns unauthorized status' do
-        get edit_form_tournament_path(tournament), as: :json
+        get edit_form_api_classic_tournament_path(tournament), as: :json
 
         expect(response).to have_http_status(:unauthorized)
       end

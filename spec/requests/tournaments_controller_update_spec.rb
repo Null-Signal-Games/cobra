@@ -18,7 +18,7 @@ RSpec.describe TournamentsController do
     end
     let(:tournament) do
       sign_in user
-      post tournaments_path, params: tournament_params, as: :json
+      post api_classic_tournaments_path, params: tournament_params, as: :json
       Tournament.last
     end
 
@@ -28,7 +28,7 @@ RSpec.describe TournamentsController do
 
     context 'with valid parameters' do
       it 'edits a tournament' do
-        patch tournament_path(tournament), params: { tournament: { name: 'Edited Tournament' } }, as: :json
+        patch api_classic_tournament_path(tournament), params: { tournament: { name: 'Edited Tournament' } }, as: :json
 
         tournament.reload
         expect(tournament).to have_attributes(
@@ -51,13 +51,13 @@ RSpec.describe TournamentsController do
       end
 
       it 'does not edit a tournament' do
-        patch tournament_path(tournament), params: invalid_params, as: :json
+        patch api_classic_tournament_path(tournament), params: invalid_params, as: :json
         tournament.reload
         expect(tournament).to have_attributes(name: 'Test Tournament')
       end
 
       it 'returns unprocessable entity status with errors' do
-        patch tournament_path(tournament), params: invalid_params, as: :json
+        patch api_classic_tournament_path(tournament), params: invalid_params, as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body).to eq(
@@ -74,13 +74,13 @@ RSpec.describe TournamentsController do
       end
 
       it 'returns unauthorized status' do
-        patch tournament_path(tournament), params: { tournament: { name: 'Edited Tournament' } }, as: :json
+        patch api_classic_tournament_path(tournament), params: { tournament: { name: 'Edited Tournament' } }, as: :json
 
         expect(response).to have_http_status(:unauthorized)
       end
 
       it 'does not edit a tournament' do
-        patch tournament_path(tournament), params: { tournament: { name: 'Edited Tournament' } }, as: :json
+        patch api_classic_tournament_path(tournament), params: { tournament: { name: 'Edited Tournament' } }, as: :json
         tournament.reload
         expect(tournament).to have_attributes(name: 'Test Tournament')
       end
@@ -93,7 +93,7 @@ RSpec.describe TournamentsController do
       let(:restriction) { create(:deckbuilding_restriction) }
 
       it 'edits a tournament with more attributes' do
-        patch tournament_path(tournament), params: {
+        patch api_classic_tournament_path(tournament), params: {
           tournament: {
             name: 'Extended Tournament',
             stream_url: 'https://twitch.tv',
@@ -129,7 +129,8 @@ RSpec.describe TournamentsController do
 
     context 'when changing swiss format' do
       it 'changes swiss format when no rounds exist' do
-        patch tournament_path(tournament), params: { tournament: { swiss_format: 'single_sided' } }, as: :json
+        patch api_classic_tournament_path(tournament),
+              params: { tournament: { swiss_format: 'single_sided' } }, as: :json
         tournament.reload
         expect(tournament).to be_single_sided
         expect(response).to have_http_status(:no_content)
@@ -138,7 +139,8 @@ RSpec.describe TournamentsController do
 
       it 'does not change swiss format when rounds exist' do
         tournament.pair_new_round!
-        patch tournament_path(tournament), params: { tournament: { swiss_format: 'single_sided' } }, as: :json
+        patch api_classic_tournament_path(tournament),
+              params: { tournament: { swiss_format: 'single_sided' } }, as: :json
         tournament.reload
         expect(tournament).to be_double_sided
         expect(response).to have_http_status(:unprocessable_content)

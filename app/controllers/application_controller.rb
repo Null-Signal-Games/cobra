@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base # rubocop:disable Style/Doc
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorised
   rescue_from ActiveRecord::RecordNotFound, with: :error
 
-  helper_method :current_user, :user_signed_in?, :correct_beta_path
+  helper_method :current_user, :user_signed_in?
 
   def current_user
     @current_user ||= load_current_user
@@ -32,19 +32,11 @@ class ApplicationController < ActionController::Base # rubocop:disable Style/Doc
   end
 
   def user_not_authorised
-    respond_to do |format|
-      format.html do
-        flash[:alert] = "🔒 Sorry, you can't do that"
-        redirect_to(request.referer || root_path)
-      end
-      format.json do
-        render json: { error: "🔒 Sorry, you can't do that" }, status: :unauthorized
-      end
-    end
+    render json: { error: "🔒 Sorry, you can't do that" }, status: :unauthorized
   end
 
   def error
-    redirect_to error_path
+    render json: { error: 'Not found' }, status: :not_found
   end
 
   def load_current_user
@@ -52,12 +44,5 @@ class ApplicationController < ActionController::Base # rubocop:disable Style/Doc
     return nil unless id
 
     User.find_by(id:)
-  end
-
-  # Don't send anything to the beta paths any longer.
-  def correct_beta_path(path)
-    return '/' if path.blank?
-
-    path.delete_prefix('/beta')
   end
 end

@@ -2,22 +2,6 @@
 
 class RoundsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
   before_action :set_tournament
-  before_action :set_round, only: %i[edit update destroy repair complete update_timer]
-
-  def index
-    authorize @tournament, :update?
-    @stages = @tournament.stages.includes(
-      :tournament, rounds: [:tournament, :stage, { pairings: %i[tournament stage round self_reports player1 player2] }]
-    )
-    @players = @tournament.players
-                          .includes(:corp_identity_ref, :runner_identity_ref)
-                          .index_by(&:id).merge({ nil => NilPlayer.new })
-    @warning = @tournament.current_stage&.validate_table_count
-  end
-
-  def view_pairings
-    authorize @tournament, :show?
-  end
 
   def pairings_data
     authorize @tournament, :show?
@@ -75,86 +59,7 @@ class RoundsController < ApplicationController # rubocop:disable Metrics/ClassLe
     render json: { stages: }
   end
 
-  def show
-    authorize @tournament, :update?
-    @round = Round.includes([:stage, { pairings: %i[stage tournament player1 player2 self_reports] }]).find(params[:id])
-    @players = @tournament.players
-                          .includes(:corp_identity_ref, :runner_identity_ref)
-                          .index_by(&:id).merge({ nil => NilPlayer.new })
-  end
-
-  def edit
-    authorize @tournament, :update?
-  end
-
-  def create
-    authorize @tournament, :update?
-
-    @tournament.pair_new_round!
-
-    redirect_to tournament_rounds_path(@tournament)
-  end
-
-  def update
-    authorize @tournament, :update?
-
-    @round.update(round_params)
-
-    redirect_to tournament_round_path(@tournament, @round)
-  end
-
-  def destroy
-    authorize @tournament, :update?
-
-    @round.destroy!
-
-    redirect_to tournament_rounds_path(@tournament)
-  end
-
-  def repair
-    authorize @tournament, :update?
-
-    @round.repair!
-
-    redirect_to tournament_round_path(@tournament, @round)
-  end
-
-  def complete
-    authorize @tournament, :update?
-
-    @round.update!(completed: params[:completed])
-    @round.timer.stop!
-
-    redirect_to tournament_rounds_path(@tournament)
-  end
-
-  def update_timer
-    authorize @tournament, :update?
-
-    @round.update!(length_minutes: params[:length_minutes])
-
-    operation = params[:operation]
-    case operation
-    when 'start'
-      @round.timer.start!
-    when 'stop'
-      @round.timer.stop!
-    when 'reset'
-      @round.timer.reset!
-    end
-
-    redirect_to tournament_rounds_path(@tournament)
-  end
-
   private
-
-  def set_round
-    @round = Round.find(params[:id])
-  end
-
-  def round_params
-    params.require(:round).permit(:weight)
-  end
 
   def pairings_data_stages(user_id = nil)
     players = pairings_data_players
