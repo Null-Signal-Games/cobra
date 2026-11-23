@@ -5,7 +5,7 @@ RSpec.describe OauthController do
     it 'redirects to NRDB' do
       expect_any_instance_of(ActionDispatch::Request).to receive(:host).at_least(:once).and_return('localhost') # rubocop:disable RSpec/AnyInstance
 
-      get login_path
+      get oauth_login_path
 
       expect(response).to be_redirect
       expect(response.location).to eq('https://netrunnerdb.com/oauth/v2/auth?client_id=test_id&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth%2Fcallback&response_type=code')
@@ -14,14 +14,14 @@ RSpec.describe OauthController do
 
   describe '#logout' do
     it 'clears user_id session and redirects to root_path by default' do
-      get logout_path
+      get oauth_logout_path
 
       expect(session[:user_id]).to be_nil
       expect(response).to redirect_to(root_path)
     end
 
     it 'redirects to params[:return_to] when provided' do
-      get logout_path, params: { return_to: 'http://localhost:5173/' }
+      get oauth_logout_path, params: { return_to: 'http://localhost:5173/' }
 
       expect(session[:user_id]).to be_nil
       expect(response).to redirect_to('http://localhost:5173/')
@@ -104,7 +104,7 @@ RSpec.describe OauthController do
       end
 
       it 'redirects to session return_to URL when provided' do
-        get login_path, params: { return_to: 'http://localhost:5173/tournaments/my' }
+        get oauth_login_path, params: { return_to: 'http://localhost:5173/tournaments/my' }
         get oauth_callback_path, params: { code: :some_code }
 
         expect(response).to redirect_to('http://localhost:5173/tournaments/my')

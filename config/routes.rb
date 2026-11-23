@@ -7,11 +7,7 @@ Rails.application.routes.draw do
   # Rails requires a root route to be defined, even though the served app does not use it.
   root 'rails/health#show'
 
-  get :login, to: 'oauth#auth'
-  get :logout, to: 'oauth#logout'
-
   namespace :oauth do
-    # Add aliases for login / logout to avoid collisions with the new Svelte frontend app.
     get :login, to: 'auth'
     get :logout, to: 'logout'
     get :callback
