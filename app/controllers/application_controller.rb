@@ -11,22 +11,6 @@ class ApplicationController < ActionController::Base # rubocop:disable Style/Doc
 
   helper_method :current_user, :user_signed_in?, :correct_beta_path
 
-  BETA_PATHS = [
-    %r{^/$},
-    %r{^/tournaments$},
-    %r{^/tournaments/[0-9]+$},
-    %r{^/tournaments/[0-9]+/info$},
-    %r{^/tournaments/[0-9]+/players$},
-    %r{^/tournaments/[0-9]+/registration$},
-    %r{^/tournaments/[0-9]+/rounds$},
-    %r{^/tournaments/[0-9]+/rounds/[0-9]+$},
-    %r{^/tournaments/[0-9]+/rounds/[0-9]+/pairings$},
-    %r{^/tournaments/[0-9]+/rounds/[0-9]+/pairings/match_slips$},
-    %r{^/tournaments/[0-9]+/stats$},
-    %r{^/tournaments/type/[0-9]+$},
-    %r{^/help$}
-  ].freeze
-
   def current_user
     @current_user ||= load_current_user
   end
@@ -70,16 +54,10 @@ class ApplicationController < ActionController::Base # rubocop:disable Style/Doc
     User.find_by(id:)
   end
 
+  # Don't send anything to the beta paths any longer.
   def correct_beta_path(path)
     return '/' if path.blank?
 
-    new_path = path
-    if !cookies.key?(:beta_enabled) || cookies[:beta_enabled] == 'false'
-      new_path.delete_prefix!('/beta')
-    elsif !new_path.start_with?('/beta') && BETA_PATHS.any? { |r| new_path =~ r }
-      new_path.prepend('/beta')
-    end
-
-    new_path
+    path.delete_prefix('/beta')
   end
 end

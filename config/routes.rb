@@ -69,14 +69,9 @@ Rails.application.routes.draw do
   end
 
   namespace :beta do
-    get '/', to: '/beta#index'
-    get :help
-    post :set_beta
-    resources :tournaments do
-      get 'type/:type_id', to: 'tournaments#type', on: :collection
-      resources :rounds, only: %i[index show create update destroy] do
-        resources :pairings, only: %i[index create destroy] do
-          get :match_slips, on: :collection
+    resources :tournaments, only: %i[update destroy] do
+      resources :rounds, only: %i[create update destroy] do
+        resources :pairings, only: %i[create destroy] do
           post :report, on: :member
           delete :reset_self_report, on: :member
         end
@@ -86,10 +81,8 @@ Rails.application.routes.draw do
         patch :update_timer, on: :member
         get :pairings_data, on: :collection
       end
-      resources :players, only: %i[index show create update destroy] do
+      resources :players, only: %i[show create update destroy] do
         get :players_data, on: :collection
-        get 'by_user_id/:user_id', to: 'players#by_user_id', on: :collection
-        get :registration, on: :member
         patch :lock_registration, on: :member
         patch :unlock_registration, on: :member
         patch :drop, on: :member
@@ -98,21 +91,16 @@ Rails.application.routes.draw do
         get :decks, on: :member
         get :nrdb_decks, on: :member
       end
-      get :info, on: :member
-      get :qr, on: :member
-      get :registration, on: :member
       resources :stages, only: %i[create destroy]
       patch :open_registration, on: :member
       patch :close_registration, on: :member
       patch :lock_player_registrations, on: :member
       patch :unlock_player_registrations, on: :member
       post :cut, on: :member
-      get :stats, on: :member
       get :id_and_faction_data, on: :member
       get :cut_conversion_rates, on: :member
       get :current_round_timer, on: :member
     end
-    resources :identities, only: [:index]
   end
 
   resources :tournaments do

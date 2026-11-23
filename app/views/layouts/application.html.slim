@@ -20,23 +20,11 @@ html
   body
     nav.navbar.navbar-expand-lg.fixed-top.navbar-dark.dontprint
       .container
-        - if Flipper.enabled?(:beta_testing, current_user) && cookies[:beta_enabled] == "true"
-          = link_to "Cobra (BETA)", '/beta', class: 'navbar-brand'
-        - else
-          = link_to "Cobra", root_path, class: 'navbar-brand'
+        = link_to "Cobra", root_path, class: 'navbar-brand'
         button.navbar-toggler type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
           span.navbar-toggler-icon
         #navbarNav.collapse.navbar-collapse
           ul.navbar-nav.ml-auto
-            - if Flipper.enabled?(:beta_testing, current_user)
-              - if cookies[:beta_enabled] == "true"
-                li.nav-item.nav-link.text-light = link_to beta_set_beta_path(beta_enabled: false, redirect: CGI.escape(request.path)), method: :post
-                  => fa_icon 'flask'
-                  | Switch to Classic
-              - else
-                li.nav-item.nav-link.text-light = link_to beta_set_beta_path(beta_enabled: true, redirect: CGI.escape(request.path)), method: :post
-                  => fa_icon 'flask'
-                  | Switch to Beta
             li.nav-item= link_to correct_beta_path(help_path), class: 'nav-link text-light' do
               => fa_icon 'life-ring'
               | How to
@@ -97,7 +85,7 @@ html
             = link_to timer_tournament_path(@tournament)
               = render 'rounds/round_timer', round: @tournament.rounds.includes([:round_timer_activations]).last
         ul.nav.nav-tabs.dontprint
-          - if (!Flipper.enabled?(:beta_testing, current_user) || cookies[:beta_enabled] != "true") && policy(@tournament).show?
+          - if policy(@tournament).show?
             li.nav-item= link_to info_tournament_path(@tournament), class: "nav-link #{'active' if controller_name == 'tournaments' && action_name == 'info'}" do
               => fa_icon 'info-circle'
               | Info
@@ -118,14 +106,9 @@ html
               => fa_icon 'calendar-check-o'
               | Pairings
           - elsif policy(@tournament).show?
-            - if Flipper.enabled?(:beta_testing, current_user) && cookies[:beta_enabled] == "true"
-              li.nav-item = link_to beta_tournament_rounds_path(@tournament), class: "nav-link #{'active' if controller_name == 'rounds' || controller_name == 'pairings'}" do
-                => fa_icon 'calendar-check-o'
-                | Pairings
-            - else
-              li.nav-item= link_to view_pairings_tournament_rounds_path(@tournament), class: "nav-link #{'active' if controller_name == 'rounds' || controller_name == 'pairings'}" do
-                => fa_icon 'calendar-check-o'
-                | Pairings
+            li.nav-item= link_to view_pairings_tournament_rounds_path(@tournament), class: "nav-link #{'active' if controller_name == 'rounds' || controller_name == 'pairings'}" do
+              => fa_icon 'calendar-check-o'
+              | Pairings
           - if policy(@tournament).show?
             li.nav-item= link_to standings_tournament_players_path(@tournament), class: "nav-link #{'active' if controller_name == 'players' && action_name == 'standings'}" do
               => fa_icon 'list-ol'
