@@ -36,7 +36,8 @@ module Beta
     def destroy
       authorize @tournament, :update?
 
-      @round.destroy!
+      # Preload so destroying each pairing doesn't query its self reports one by one.
+      Round.includes(pairings: :self_reports).find(@round.id).destroy!
 
       head :ok
     end
@@ -82,7 +83,7 @@ module Beta
         policy: helpers.tournament_policies_json(@tournament),
         tournament: helpers.tournament_json(@tournament),
         stages: pairings_data_stages,
-        warnings: ([@tournament.current_stage&.validate_table_count] if policy(@tournament).update?)
+        warnings: ([@tournament.current_stage&.validate_table_count].compact if policy(@tournament).update?)
       }
     end
 
@@ -110,7 +111,7 @@ module Beta
           player_count: stage.players.count
         },
         round:,
-        warnings: ([@tournament.current_stage&.validate_table_count] if policy(@tournament).update?)
+        warnings: ([@tournament.current_stage&.validate_table_count].compact if policy(@tournament).update?)
       }
     end
 

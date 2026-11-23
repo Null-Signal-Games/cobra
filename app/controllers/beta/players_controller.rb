@@ -165,7 +165,7 @@ module Beta
 
       decks = []
 
-      unless current_user.id == @player.user_id || current_user.id == @tournament.user_id
+      unless current_user && [@player.user_id, @tournament.user_id].include?(current_user.id)
         render json: decks, status: :unauthorized
         return
       end
