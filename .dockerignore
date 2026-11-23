@@ -24,5 +24,4 @@
 /docker-compose*
 /config/database*
 /config/secrets*
-!/config/database.build.yml
 /data
