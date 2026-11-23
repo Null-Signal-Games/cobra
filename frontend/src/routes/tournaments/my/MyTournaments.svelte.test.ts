@@ -22,16 +22,17 @@ describe("My tournaments page", () => {
   });
 
   describe("when signed in as a tournament organizer", () => {
-    beforeEach(() => {
-      vi.spyOn(authStore, "checkAuth").mockResolvedValue(makeAuthUser({ nrdb_username: "jo_z" }));
-    });
-
     it("lists their tournaments, marking private ones", async () => {
       vi.mocked(v1Api.loadUserTournaments).mockResolvedValue(
         makeTournamentsResponse([{ name: "Public GNK" }, { name: "Secret GNK", private: true }]),
       );
 
-      render(MyTournamentsPage);
+      render(MyTournamentsPage, {
+        props: {
+          data: { user: makeAuthUser({ nrdb_username: "jo_z" }), tournamentTypes: [] },
+          params: {}
+        }
+      });
 
       expect(await screen.findByRole("link", { name: "Public GNK" })).toBeInTheDocument();
       expect(screen.getByRole("link", { name: "Secret GNK" }).parentElement).toHaveTextContent(
@@ -43,7 +44,12 @@ describe("My tournaments page", () => {
     it("says when they have no tournaments", async () => {
       vi.mocked(v1Api.loadUserTournaments).mockResolvedValue(makeTournamentsResponse([]));
 
-      render(MyTournamentsPage);
+      render(MyTournamentsPage, {
+        props: {
+          data: { user: makeAuthUser({ nrdb_username: "jo_z" }), tournamentTypes: [] },
+          params: {}
+        }
+      });
 
       expect(
         await screen.findByText("You haven't created any tournaments yet."),
@@ -54,7 +60,12 @@ describe("My tournaments page", () => {
   it("sends a signed out user to log in", async () => {
     vi.spyOn(authStore, "checkAuth").mockResolvedValue(null);
 
-    render(MyTournamentsPage);
+    render(MyTournamentsPage, {
+      props: {
+        data: { user: null, tournamentTypes: [] },
+        params: {}
+      }
+    });
 
     await vi.waitFor(() => {
       expect(authStore.redirectToLogin).toHaveBeenCalled();

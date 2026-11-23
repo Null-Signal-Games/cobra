@@ -25,6 +25,9 @@
           {tournamentTypeName}
         </span>
       {/if}
+      {#if tournament.attributes.private}
+        <span class="badge badge-secondary ml-2">Private</span>
+      {/if}
     </h4>
 
     <h6 class="card-subtitle mb-2 text-muted">

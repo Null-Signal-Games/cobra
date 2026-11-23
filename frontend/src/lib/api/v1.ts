@@ -94,7 +94,7 @@ export class V1Api {
   }
 
   async loadUserTournaments(altFetch = fetch): Promise<TournamentsResponse> {
-    const res = await this.api.get<TournamentsResponse>("/api/v1/private/user/tournaments", {
+    const res = await this.api.get<TournamentsResponse>("/api/v1/private/user/tournaments?sort=-date,name", {
       altFetch,
       headers: JSON_API_HEADERS,
     });
@@ -198,4 +198,3 @@ export class V1Api {
 }
 
 export const v1Api = new V1Api();
-
