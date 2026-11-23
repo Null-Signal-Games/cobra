@@ -372,6 +372,15 @@ describe("ApiBase with StatusOr", () => {
       expect(globalMessages.warnings).toEqual(["Single warning"]);
     });
 
+    it("clears warnings when an empty warnings array arrives", async () => {
+      globalMessages.warnings = ["Old warning"];
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ warnings: [] }), { status: 200 }),
+      );
+      await api.get("/test");
+      expect(globalMessages.warnings).toEqual([]);
+    });
+
     it("does not overwrite warnings when neither warning nor warnings is present", async () => {
       globalMessages.warnings = ["Preserved warning"];
       mockFetch.mockResolvedValueOnce(new Response(JSON.stringify({ id: 1 }), { status: 200 }));

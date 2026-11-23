@@ -249,6 +249,56 @@ describe("EditRound", () => {
     });
   });
 
+  describe("create bye", () => {
+    beforeEach(() => {
+      vi.spyOn(MockPageData.round, "pairings", "get").mockReturnValue([]);
+      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([MockPlayerAlice]);
+    });
+
+    it("creates a bye when player 2 is left empty", async () => {
+      renderEditRound();
+      const newPairingForm = document.getElementById("new_pairing");
+      if (!newPairingForm) {
+        throw new Error("new pairing form not found");
+      }
+
+      expect(getByLabelText(newPairingForm, /^new pairing player 2$/i)).toHaveAttribute(
+        "placeholder",
+        "(Bye)",
+      );
+      await user.type(
+        getByRole(newPairingForm, "spinbutton", { name: /new pairing table number/i }),
+        "12",
+      );
+      getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
+      await user.keyboard("Alice{Enter}");
+      await user.click(getByRole(newPairingForm, "button", { name: /create/i }));
+
+      expect(betaApi.createPairing).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        expect.objectContaining({ player1_id: MockPlayerAlice.id, player2_id: null }),
+      );
+    });
+  });
+
+  describe("SOS weighting", () => {
+    it("saves the entered weighting", async () => {
+      renderEditRound();
+
+      const input = screen.getByLabelText("SOS weighting");
+      await user.clear(input);
+      await user.type(input, "0.8");
+      await user.click(screen.getByRole("button", { name: /Save/ }));
+
+      expect(betaApi.saveSOSWeighting).toHaveBeenCalledExactlyOnceWith(
+        MockRoundData.tournament.id,
+        MockRoundData.round.id,
+        0.8,
+      );
+    });
+  });
+
   describe("create pairing side", () => {
     beforeEach(() => {
       vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([

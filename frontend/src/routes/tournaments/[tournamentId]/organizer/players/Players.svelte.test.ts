@@ -284,6 +284,19 @@ describe("Players", () => {
       );
     });
 
+    it("hides the manual seed field when manual seeding is off", () => {
+      expect(screen.queryByLabelText("Manual Seed")).not.toBeInTheDocument();
+    });
+
+    it("shows a manual seed field for each player when manual seeding is on", () => {
+      cleanup();
+      renderComponent({ manual_seed: true });
+
+      const playerItems = screen.getAllByRole("listitem");
+      expect(getByLabelText(playerItems[0], "Manual Seed")).toBeInTheDocument();
+      expect(getByLabelText(playerItems[1], "Manual Seed")).toBeInTheDocument();
+    });
+
     it("locks a player", async () => {
       const playerItems = screen.getAllByRole("listitem");
 
