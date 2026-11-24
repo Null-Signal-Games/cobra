@@ -14,6 +14,7 @@
     self_reporting_enabled,
     reportScoreCallback,
     resetReportsCallback,
+    changePlayerSide,
     deleteCallback,
   }: {
     id: string;
@@ -26,6 +27,7 @@
       selfReport: boolean,
     ) => void;
     resetReportsCallback?: (pairingId: number) => void;
+    changePlayerSide?: (player: Player, side: string) => void;
     deleteCallback?: (pairingId: number) => void;
   } = $props();
 
@@ -92,6 +94,23 @@
   </div>
 {/snippet}
 
+{#snippet setSideButton(player: Player, side: string)}
+  <button
+    class="btn btn-sm {player.side === side
+      ? 'btn-secondary'
+      : 'btn-outline-secondary'} w-100"
+    onclick={() => {
+      changePlayerSide?.(player, side);
+    }}
+    aria-label={`change ${player.name} to ${side}`}
+  >
+    {#if player.side === side}
+      <FontAwesomeIcon icon="check" dataTestId="selected" />
+    {/if}
+    {side == "corp" ? "Corp" : "Runner"}
+  </button>
+{/snippet}
+
 <ModalDialog id={id} headerText="Table {pairing.table_number}">
   {#if self_reporting_enabled}
     <h5>Player Self Reports</h5>
@@ -119,6 +138,23 @@
   <h5>Manual Score Reporting</h5>
   <AdminReportOptions {stage} {pairing} {reportScoreCallback} />
   <hr />
+
+  {#if changePlayerSide}
+    <h5>Change Player Sides</h5>
+    <div class="container">
+      <div class="row mb-2 align-items-center">
+        <div class="col-6">{leftPlayer.name}:</div>
+        <div class="col-3">{@render setSideButton(leftPlayer, "corp")}</div>
+        <div class="col-3">{@render setSideButton(leftPlayer, "runner")}</div>
+      </div>
+      <div class="row mb-2 align-items-center">
+        <div class="col-6">{rightPlayer.name}:</div>
+        <div class="col-3">{@render setSideButton(rightPlayer, "corp")}</div>
+        <div class="col-3">{@render setSideButton(rightPlayer, "runner")}</div>
+      </div>
+    </div>
+    <hr />
+  {/if}
 
   <h5>Danger Zone</h5>
   <button

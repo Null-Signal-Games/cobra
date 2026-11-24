@@ -117,7 +117,6 @@
       {pairing}
       left_or_right="left"
       is_single_sided={stage.is_single_sided}
-      {changePlayerSide}
       show_ids={!stage.is_single_sided || pairing.player1.side !== null}
     />
   </div>
@@ -170,7 +169,6 @@
       {pairing}
       left_or_right="right"
       is_single_sided={stage.is_single_sided}
-      {changePlayerSide}
       show_ids={!stage.is_single_sided || pairing.player2.side !== null}
     />
   </div>
@@ -182,6 +180,7 @@
     self_reporting_enabled={tournament.allow_self_reporting}
     {reportScoreCallback}
     {resetReportsCallback}
+    {changePlayerSide}
     {deleteCallback}
   />
 </div>
