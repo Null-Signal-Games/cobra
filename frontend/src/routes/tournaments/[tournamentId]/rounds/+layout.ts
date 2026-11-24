@@ -1,11 +1,11 @@
-import type { LayoutLoad } from "./$types";
-import { betaApi } from "#lib/api/beta.ts";
+import type { LayoutLoad } from './$types';
+import { betaApi } from '#lib/api/beta.ts';
 
 export const load: LayoutLoad = async ({ params, fetch }) => {
-  const pairingsData = await betaApi.loadPairings(parseInt(params.tournamentId), fetch);
+	const pairingsData = await betaApi.loadPairings(parseInt(params.tournamentId), fetch);
 
-  return {
-    policy: pairingsData.policy,
-    stages: pairingsData.stages,
-  };
-}
+	return {
+		policy: pairingsData.policy,
+		stages: pairingsData.stages
+	};
+};

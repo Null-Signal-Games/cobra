@@ -1,22 +1,31 @@
-import { Deck } from "#lib/model/Deck.ts";
-import { sortCards } from "#lib/utils/decks.svelte.ts";
-import { betaApi } from "#lib/api/beta.ts";
-import type { PageLoad } from "./$types";
+import { Deck } from '#lib/model/Deck.ts';
+import { sortCards } from '#lib/utils/decks.svelte.ts';
+import { betaApi } from '#lib/api/beta.ts';
+import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params, fetch }) => {
-  // Load player
-  const player = await betaApi.loadPlayer(parseInt(params.tournamentId), parseInt(params.playerId), fetch);
+	// Load player
+	const player = await betaApi.loadPlayer(
+		parseInt(params.tournamentId),
+		parseInt(params.playerId),
+		fetch
+	);
 
-  // Load decks for current tournament
-  const tournamentDecks = await betaApi.loadDecks(parseInt(params.tournamentId), parseInt(params.playerId), fetch);
-  const corpDeck = tournamentDecks.find((d) => d.details.side_id === "corp") ?? new Deck("corp");
-  sortCards(corpDeck.cards);
-  const runnerDeck = tournamentDecks.find((d) => d.details.side_id === "runner") ?? new Deck("runner");
-  sortCards(runnerDeck.cards);
+	// Load decks for current tournament
+	const tournamentDecks = await betaApi.loadDecks(
+		parseInt(params.tournamentId),
+		parseInt(params.playerId),
+		fetch
+	);
+	const corpDeck = tournamentDecks.find((d) => d.details.side_id === 'corp') ?? new Deck('corp');
+	sortCards(corpDeck.cards);
+	const runnerDeck =
+		tournamentDecks.find((d) => d.details.side_id === 'runner') ?? new Deck('runner');
+	sortCards(runnerDeck.cards);
 
-  return {
-    registrationPlayer: player,
-    corpDeck: corpDeck,
-    runnerDeck: runnerDeck,
-  };
-}
+	return {
+		registrationPlayer: player,
+		corpDeck: corpDeck,
+		runnerDeck: runnerDeck
+	};
+};

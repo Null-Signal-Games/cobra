@@ -1,78 +1,78 @@
-import type { Tournament, TournamentOptions, FeatureFlags } from "#lib/model/Tournament.ts";
-import type { Errors } from "#lib/utils/errors.ts";
+import type { Tournament, TournamentOptions, FeatureFlags } from '#lib/model/Tournament.ts';
+import type { Errors } from '#lib/utils/errors.ts';
 
 export interface TournamentSettingsData {
-  tournament: Tournament;
-  options: TournamentOptions;
-  feature_flags: FeatureFlags;
-  can_change_swiss_format?: boolean;
-  csrf_token: string;
+	tournament: Tournament;
+	options: TournamentOptions;
+	feature_flags: FeatureFlags;
+	can_change_swiss_format?: boolean;
+	csrf_token: string;
 }
 
 export interface AbrUploadResponse {
-  abr_code: string;
+	abr_code: string;
 }
 
 export interface TournamentCreateResponse {
-  id: number;
-  name: string;
-  url: string;
+	id: number;
+	name: string;
+	url: string;
 }
 
 export interface TournamentCreateErrorResponse {
-  errors: Errors;
+	errors: Errors;
 }
 
 export interface DemoTournamentSettings {
-  id?: number;
-  name?: string;
-  swiss_format?: string;
-  num_players?: number;
-  num_first_round_byes?: number;
-  assign_ids?: boolean;
+	id?: number;
+	name?: string;
+	swiss_format?: string;
+	num_players?: number;
+	num_first_round_byes?: number;
+	assign_ids?: boolean;
 }
 
 export interface DemoTournamentSettingsData {
-  tournament: DemoTournamentSettings;
-  csrf_token: string;
+	tournament: DemoTournamentSettings;
+	csrf_token: string;
 }
 
 export interface TournamentDemoCreateResponse {
-  id: number;
-  name: string;
-  url: string;
+	id: number;
+	name: string;
+	url: string;
 }
 
 export interface TournamentDemoCreateErrorResponse {
-  errors: Errors;
+	errors: Errors;
 }
 
 export interface Stage {
-  id: number;
-  tournament_id: number;
-  number: number;
-  format: string | null;
-  table_ranges: TableRange[];
+	id: number;
+	tournament_id: number;
+	number: number;
+	format: string | null;
+	table_ranges: TableRange[];
 }
 
 export interface TableRange {
-  id?: number;
-  stage_id: number;
-  first_table: number;
-  last_table: number;
+	id?: number;
+	stage_id: number;
+	first_table: number;
+	last_table: number;
 }
 
 export class StageData {
-  stage: Stage;
-  warning?: string;
+	stage: Stage;
+	warning?: string;
 
-  constructor() {
-    this.stage = {
-      id: -1,
-      tournament_id: -1,
-      number: -1,
-      format: null,
-      table_ranges: [],
-    };
-  }
+	constructor() {
+		this.stage = {
+			id: -1,
+			tournament_id: -1,
+			number: -1,
+			format: null,
+			table_ranges: []
+		};
+	}
 }

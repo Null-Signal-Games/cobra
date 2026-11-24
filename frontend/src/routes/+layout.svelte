@@ -1,190 +1,202 @@
 <script lang="ts">
-  import "@fortawesome/fontawesome-free/css/all.min.css";
-  import "@fortawesome/fontawesome-free/css/v4-shims.min.css";
-  import "#lib/assets/css/application.scss";
-  import favicon from "#lib/assets/favicon.ico";
-  import { resolve } from "$app/paths";
-  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
-  import ThemeToggle from "#lib/components/ThemeToggle.svelte";
-  import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
-  import { onMount } from "svelte";
-  import type { Snippet } from "svelte";
-  import { theme } from "#lib/utils/theme.svelte.ts";
-  import GlobalMessages from "#lib/components/GlobalMessages.svelte";
-  import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
-  import type { LayoutData } from "./$types";
-  import { beforeNavigate, afterNavigate } from "$app/navigation";
-  import { page } from "$app/state";
-  import { loginReturnQuery } from "#lib/utils/auth.svelte.ts";
+	import '@fortawesome/fontawesome-free/css/all.min.css';
+	import '@fortawesome/fontawesome-free/css/v4-shims.min.css';
+	import '#lib/assets/css/application.scss';
+	import favicon from '#lib/assets/favicon.ico';
+	import { resolve } from '$app/paths';
+	import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
+	import ThemeToggle from '#lib/components/ThemeToggle.svelte';
+	import { CLIENT_COBRA_API_ENDPOINT } from '$app/env/public';
+	import { onMount } from 'svelte';
+	import type { Snippet } from 'svelte';
+	import { theme } from '#lib/utils/theme.svelte.ts';
+	import GlobalMessages from '#lib/components/GlobalMessages.svelte';
+	import { globalMessages } from '#lib/utils/GlobalMessageState.svelte.ts';
+	import type { LayoutData } from './$types';
+	import { beforeNavigate, afterNavigate } from '$app/navigation';
+	import { page } from '$app/state';
+	import { loginReturnQuery } from '#lib/utils/auth.svelte.ts';
 
-  let { children, data }: { children: Snippet; data: LayoutData; } = $props();
+	let { children, data }: { children: Snippet; data: LayoutData } = $props();
 
-  let isNavOpen = $state(false);
-  let navHeight = $state(0);
+	let isNavOpen = $state(false);
+	let navHeight = $state(0);
 
-  beforeNavigate(() => {
-    globalMessages.infos = [];
-    globalMessages.warnings = [];
-    globalMessages.errors = [];
-  });
+	beforeNavigate(() => {
+		globalMessages.infos = [];
+		globalMessages.warnings = [];
+		globalMessages.errors = [];
+	});
 
-  afterNavigate(() => {
-    isNavOpen = false;
-  });
+	afterNavigate(() => {
+		isNavOpen = false;
+	});
 
-  onMount(() => {
-    theme.init();
-  });
+	onMount(() => {
+		theme.init();
+	});
 
-  const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
+	const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || '').replace(/\/$/, '');
 
-  function getLogoutUrl() {
-    const returnUrl = typeof window !== "undefined" ? window.location.origin : "/";
-    return `${serverOrigin}/oauth/logout?return_to=${encodeURIComponent(returnUrl)}`;
-  }
+	function getLogoutUrl() {
+		const returnUrl = typeof window !== 'undefined' ? window.location.origin : '/';
+		return `${serverOrigin}/oauth/logout?return_to=${encodeURIComponent(returnUrl)}`;
+	}
 
-  let loginQuery = $derived(loginReturnQuery(page.url, page.route.id));
+	let loginQuery = $derived(loginReturnQuery(page.url, page.route.id));
 </script>
 
 <svelte:head>
-  <title>Cobra</title>
-  <link rel="icon" href={favicon} />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-    integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
-    crossorigin="anonymous"
-  />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-  />
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+	<title>Cobra</title>
+	<link rel="icon" href={favicon} />
+	<link
+		rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+		integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+		crossorigin="anonymous"
+	/>
+	<link
+		rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+	/>
+	<script
+		src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"
+	></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+		crossorigin="anonymous"
+	></script>
 </svelte:head>
 
 <nav class="navbar navbar-expand-lg fixed-top navbar-dark dontprint" bind:clientHeight={navHeight}>
-  <div class="container">
-    <a href={resolve("/")} class="navbar-brand">Cobra</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      aria-controls="navbarNav"
-      aria-expanded={isNavOpen}
-      aria-label="Toggle navigation"
-      onclick={() => {
-        isNavOpen = !isNavOpen;
-      }}
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse {isNavOpen ? 'show' : ''}" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a href={resolve("help")} class="nav-link text-light">
-            <FontAwesomeIcon icon="life-ring" />
-            How to
-          </a>
-        </li>
+	<div class="container">
+		<a href={resolve('/')} class="navbar-brand">Cobra</a>
+		<button
+			class="navbar-toggler"
+			type="button"
+			aria-controls="navbarNav"
+			aria-expanded={isNavOpen}
+			aria-label="Toggle navigation"
+			onclick={() => {
+				isNavOpen = !isNavOpen;
+			}}
+		>
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse {isNavOpen ? 'show' : ''}" id="navbarNav">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a href={resolve('help')} class="nav-link text-light">
+						<FontAwesomeIcon icon="life-ring" />
+						How to
+					</a>
+				</li>
 
-        <li class="nav-item dropdown">
-          <button
-            type="button"
-            class="nav-link dropdown-toggle text-light"
-            data-toggle="dropdown"
-          >
-            <FontAwesomeIcon icon="trophy" />
-            Tournament types
-          </button>
-          <div class="dropdown-menu dropdown-menu-right">
-            {#each data.tournamentTypes as type (type.id)}
-              <a href={resolve(`tournaments/type/${type.id}`)} class="dropdown-item">
-                {#if type.attributes.nsg_format}
-                  <FontAwesomeIcon icon="nsg" />
-                {:else}
-                  <FontAwesomeIcon icon="missing" />
-                {/if}
-                {type.attributes.name}
-              </a>
-            {/each}
-          </div>
-        </li>
+				<li class="nav-item dropdown">
+					<button
+						type="button"
+						class="nav-link dropdown-toggle text-light"
+						data-toggle="dropdown"
+					>
+						<FontAwesomeIcon icon="trophy" />
+						Tournament types
+					</button>
+					<div class="dropdown-menu dropdown-menu-right">
+						{#each data.tournamentTypes as type (type.id)}
+							<a href={resolve(`tournaments/type/${type.id}`)} class="dropdown-item">
+								{#if type.attributes.nsg_format}
+									<FontAwesomeIcon icon="nsg" />
+								{:else}
+									<FontAwesomeIcon icon="missing" />
+								{/if}
+								{type.attributes.name}
+							</a>
+						{/each}
+					</div>
+				</li>
 
-        {#if data.user}
-          <li class="nav-item dropdown">
-            <button
-              type="button"
-              class="nav-link dropdown-toggle text-light"
-              data-toggle="dropdown"
-            >
-              <FontAwesomeIcon icon="user" />
-              {data.user.nrdb_username}
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-              <a href={resolve("tournaments/new")} class="dropdown-item">
-                <FontAwesomeIcon icon="plus" />
-                Create tournament
-              </a>
-              {#if data.user.features.create_demo_tournaments}
-                <a href={resolve("tournaments/demo")} class="dropdown-item">
-                  <FontAwesomeIcon icon="plus" />
-                  Create demo tournament
-                </a>
-              {/if}
-              <a href={resolve("tournaments/my")} class="dropdown-item">
-                <FontAwesomeIcon icon="trophy" />
-                My Tournaments
-              </a>
-              <a href={resolve("profile")} class="dropdown-item">
-                <FontAwesomeIcon icon="user" />
-                Profile
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href={getLogoutUrl()} rel="external" class="dropdown-item">
-                <FontAwesomeIcon icon="sign-out" />
-                Jack Out
-              </a>
-            </div>
-          </li>
-        {:else}
-          <li class="nav-item">
-            <a href={resolve(`login${loginQuery}`)} id="signIn" class="nav-link text-light">
-              <FontAwesomeIcon icon="sign-in" />
-              Sign in
-            </a>
-          </li>
-        {/if}
+				{#if data.user}
+					<li class="nav-item dropdown">
+						<button
+							type="button"
+							class="nav-link dropdown-toggle text-light"
+							data-toggle="dropdown"
+						>
+							<FontAwesomeIcon icon="user" />
+							{data.user.nrdb_username}
+						</button>
+						<div class="dropdown-menu dropdown-menu-right">
+							<a href={resolve('tournaments/new')} class="dropdown-item">
+								<FontAwesomeIcon icon="plus" />
+								Create tournament
+							</a>
+							{#if data.user.features.create_demo_tournaments}
+								<a href={resolve('tournaments/demo')} class="dropdown-item">
+									<FontAwesomeIcon icon="plus" />
+									Create demo tournament
+								</a>
+							{/if}
+							<a href={resolve('tournaments/my')} class="dropdown-item">
+								<FontAwesomeIcon icon="trophy" />
+								My Tournaments
+							</a>
+							<a href={resolve('profile')} class="dropdown-item">
+								<FontAwesomeIcon icon="user" />
+								Profile
+							</a>
+							<div class="dropdown-divider"></div>
+							<a href={getLogoutUrl()} rel="external" class="dropdown-item">
+								<FontAwesomeIcon icon="sign-out" />
+								Jack Out
+							</a>
+						</div>
+					</li>
+				{:else}
+					<li class="nav-item">
+						<a
+							href={resolve(`login${loginQuery}`)}
+							id="signIn"
+							class="nav-link text-light"
+						>
+							<FontAwesomeIcon icon="sign-in" />
+							Sign in
+						</a>
+					</li>
+				{/if}
 
-        <ThemeToggle />
-      </ul>
-    </div>
-  </div>
+				<ThemeToggle />
+			</ul>
+		</div>
+	</div>
 </nav>
 
 <main class="container flex-grow-1">
-  <GlobalMessages --nav-height="{navHeight}px" />
+	<GlobalMessages --nav-height="{navHeight}px" />
 
-  {@render children()}
+	{@render children()}
 </main>
 
 <footer class="footer dontprint">
-  <div class="container">
-    <div class="row">
-      <div class="col-3 nav-item">
-        <a href="https://ko-fi.com/nullsignalgames">Support NSG on Ko-fi</a>
-      </div>
-      <div class="col-6 nav-item text-center">
-        🐍 Maintained by <a href="https://nullsignal.games">Null Signal Games</a>. Created by Johno.
-        🐍
-      </div>
-      <div class="col-3 nav-item">
-        <a
-          href="https://docs.google.com/forms/d/e/1FAIpQLSdP_q1BqJbct1agLHBK-TdW08vEMeb8IRS1m9XofQMS6EUZnA/viewform"
-          target="_blank"
-          rel="noopener nofollow"
-          class="text-muted ml-3">Report an issue</a
-        >
-      </div>
-    </div>
-  </div>
+	<div class="container">
+		<div class="row">
+			<div class="col-3 nav-item">
+				<a href="https://ko-fi.com/nullsignalgames">Support NSG on Ko-fi</a>
+			</div>
+			<div class="col-6 nav-item text-center">
+				🐍 Maintained by <a href="https://nullsignal.games">Null Signal Games</a>. Created
+				by Johno. 🐍
+			</div>
+			<div class="col-3 nav-item">
+				<a
+					href="https://docs.google.com/forms/d/e/1FAIpQLSdP_q1BqJbct1agLHBK-TdW08vEMeb8IRS1m9XofQMS6EUZnA/viewform"
+					target="_blank"
+					rel="noopener nofollow"
+					class="text-muted ml-3">Report an issue</a
+				>
+			</div>
+		</div>
+	</div>
 </footer>

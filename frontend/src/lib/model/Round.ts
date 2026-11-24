@@ -1,28 +1,28 @@
-import type { Pairing } from "./Pairing.ts";
-import type { Player } from "./Player.ts";
+import type { Pairing } from './Pairing.ts';
+import type { Player } from './Player.ts';
 
 export interface Round {
-  id: number;
-  number: number;
-  completed: boolean;
-  weight: number;
-  pairings: Pairing[];
-  pairings_reported: number;
-  unpaired_players?: Player[];
-  length_minutes: number;
-  timer: RoundTimer;
+	id: number;
+	number: number;
+	completed: boolean;
+	weight: number;
+	pairings: Pairing[];
+	pairings_reported: number;
+	unpaired_players?: Player[];
+	length_minutes: number;
+	timer: RoundTimer;
 }
 
 export interface RoundTimer {
-  show: boolean;
-  running: boolean;
-  paused: boolean;
-  started: boolean;
-  state: {
-    started: boolean;
-    paused: boolean;
-    finish_time?: string;
-    remaining_seconds?: number;
-    length_minutes?: number;
-  }
+	show: boolean;
+	running: boolean;
+	paused: boolean;
+	started: boolean;
+	state: {
+		started: boolean;
+		paused: boolean;
+		finish_time?: string;
+		remaining_seconds?: number;
+		length_minutes?: number;
+	};
 }

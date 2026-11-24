@@ -1,23 +1,23 @@
-import type { PageLoad } from "./$types";
-import { betaApi } from "#lib/api/beta.ts";
+import type { PageLoad } from './$types';
+import { betaApi } from '#lib/api/beta.ts';
 
 export const load: PageLoad = async ({ params, fetch, parent }) => {
-  await parent();
-  const tournamentId = parseInt(params.tournamentId, 10);
-  const roundId = parseInt(params.roundId, 10);
+	await parent();
+	const tournamentId = parseInt(params.tournamentId, 10);
+	const roundId = parseInt(params.roundId, 10);
 
-  const pairingsData = await betaApi.loadPairings(tournamentId, fetch);
-  let round = null;
-  for (const stage of pairingsData.stages) {
-    const found = stage.rounds.find((r) => r.id === roundId);
-    if (found) {
-      round = found;
-      break;
-    }
-  }
+	const pairingsData = await betaApi.loadPairings(tournamentId, fetch);
+	let round = null;
+	for (const stage of pairingsData.stages) {
+		const found = stage.rounds.find((r) => r.id === roundId);
+		if (found) {
+			round = found;
+			break;
+		}
+	}
 
-  return {
-    round,
-    policy: pairingsData.policy,
-  };
+	return {
+		round,
+		policy: pairingsData.policy
+	};
 };

@@ -1,14 +1,14 @@
 export class Identity {
-  name = "";
-  faction: string | null = null;
+	name = '';
+	faction: string | null = null;
 }
 
 export interface IdentityName {
-  label: string;
-  value: string;
+	label: string;
+	value: string;
 }
 
 export interface IdentityNames {
-  corp: IdentityName[];
-  runner: IdentityName[];
+	corp: IdentityName[];
+	runner: IdentityName[];
 }

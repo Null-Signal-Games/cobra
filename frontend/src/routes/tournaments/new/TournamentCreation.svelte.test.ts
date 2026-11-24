@@ -1,195 +1,195 @@
-import type { ComponentProps } from "svelte";
-import type { PageProps } from "./$types";
-import { Tournament } from "#lib/model/Tournament.ts";
-import { ValidationError } from "#lib/utils/errors.ts";
-import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/svelte";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import TournamentCreation from "./+page.svelte";
-import { navigateTo } from "#lib/utils/navigation.ts";
+import type { ComponentProps } from 'svelte';
+import type { PageProps } from './$types';
+import { Tournament } from '#lib/model/Tournament.ts';
+import { ValidationError } from '#lib/utils/errors.ts';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/svelte';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import TournamentCreation from './+page.svelte';
+import { navigateTo } from '#lib/utils/navigation.ts';
 
-import { classicApi } from "#lib/api/classic.ts";
+import { classicApi } from '#lib/api/classic.ts';
 
-vi.mock("$app/env/public", () => ({
-  CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000",
+vi.mock('$app/env/public', () => ({
+	CLIENT_COBRA_API_ENDPOINT: 'http://localhost:3000'
 }));
 
-vi.mock("#lib/api/classic.ts", () => ({
-  classicApi: {
-    createTournament: vi.fn(),
-  },
+vi.mock('#lib/api/classic.ts', () => ({
+	classicApi: {
+		createTournament: vi.fn()
+	}
 }));
 
-vi.mock("#lib/utils/navigation.ts", () => ({
-  navigateTo: vi.fn(),
+vi.mock('#lib/utils/navigation.ts', () => ({
+	navigateTo: vi.fn()
 }));
 
-describe("TournamentCreation", () => {
-  const mockTournamentData = {
-    tournament: new Tournament({
-      date: "2023-12-25",
-      private: false,
-      swiss_format: "double_sided",
-      allow_self_reporting: false,
-      decklist_required: false,
-      nrdb_deck_registration: false,
-    }),
-    options: {
-      tournament_types: [{ id: 1, name: "Store Championship" }],
-      formats: [{ id: 1, name: "Standard" }],
-      card_sets: [{ id: 1, name: "System Gateway" }],
-      deckbuilding_restrictions: [{ id: 1, name: "Standard Ban List" }],
-      time_zones: [{ id: "UTC", name: "UTC" }],
-      official_prize_kits: [{ id: 1, name: "2025 Q1 Game Night Kit" }],
-    },
-    feature_flags: {},
-    csrf_token: "fake-csrf-token",
-  };
+describe('TournamentCreation', () => {
+	const mockTournamentData = {
+		tournament: new Tournament({
+			date: '2023-12-25',
+			private: false,
+			swiss_format: 'double_sided',
+			allow_self_reporting: false,
+			decklist_required: false,
+			nrdb_deck_registration: false
+		}),
+		options: {
+			tournament_types: [{ id: 1, name: 'Store Championship' }],
+			formats: [{ id: 1, name: 'Standard' }],
+			card_sets: [{ id: 1, name: 'System Gateway' }],
+			deckbuilding_restrictions: [{ id: 1, name: 'Standard Ban List' }],
+			time_zones: [{ id: 'UTC', name: 'UTC' }],
+			official_prize_kits: [{ id: 1, name: '2025 Q1 Game Night Kit' }]
+		},
+		feature_flags: {},
+		csrf_token: 'fake-csrf-token'
+	};
 
-  const createProps = (
-    dataPartial: Partial<PageProps["data"]> = {},
-  ): ComponentProps<typeof TournamentCreation> => ({
-    params: {},
-    data: {
-      user: null,
-      tournamentTypes: [],
-      tournamentSettings: mockTournamentData,
-      ...dataPartial,
-    },
-  });
+	const createProps = (
+		dataPartial: Partial<PageProps['data']> = {}
+	): ComponentProps<typeof TournamentCreation> => ({
+		params: {},
+		data: {
+			user: null,
+			tournamentTypes: [],
+			tournamentSettings: mockTournamentData,
+			...dataPartial
+		}
+	});
 
-  beforeEach(() => {
-    cleanup();
-    vi.clearAllMocks();
-  });
+	beforeEach(() => {
+		cleanup();
+		vi.clearAllMocks();
+	});
 
-  it("renders the tournament creation form", async () => {
-    render(TournamentCreation, { props: createProps() });
+	it('renders the tournament creation form', async () => {
+		render(TournamentCreation, { props: createProps() });
 
-    await waitFor(() => {
-      expect(screen.getByText("Create a tournament")).toBeInTheDocument();
-    });
+		await waitFor(() => {
+			expect(screen.getByText('Create a tournament')).toBeInTheDocument();
+		});
 
-    expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /create/i })).toBeInTheDocument();
-  });
+		expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument();
+	});
 
-  it("shows a loading spinner", () => {
-    render(TournamentCreation, {
-      props: createProps({
-        tournamentSettings: {} as unknown as PageProps["data"]["tournamentSettings"],
-      }),
-    });
+	it('shows a loading spinner', () => {
+		render(TournamentCreation, {
+			props: createProps({
+				tournamentSettings: {} as unknown as PageProps['data']['tournamentSettings']
+			})
+		});
 
-    expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
-    expect(screen.queryByLabelText(/tournament name/i)).not.toBeInTheDocument();
-  });
+		expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+		expect(screen.queryByLabelText(/tournament name/i)).not.toBeInTheDocument();
+	});
 
-  it("successfully creates a tournament", async () => {
-    const mockResponse = {
-      id: 123,
-      name: "Test Tournament",
-      url: "/tournaments/123",
-    };
-    vi.mocked(classicApi.createTournament).mockResolvedValue(mockResponse);
+	it('successfully creates a tournament', async () => {
+		const mockResponse = {
+			id: 123,
+			name: 'Test Tournament',
+			url: '/tournaments/123'
+		};
+		vi.mocked(classicApi.createTournament).mockResolvedValue(mockResponse);
 
-    render(TournamentCreation, { props: createProps() });
+		render(TournamentCreation, { props: createProps() });
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
-    });
+		await waitFor(() => {
+			expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
+		});
 
-    // Fill in the form
-    const nameInput = screen.getByLabelText(/tournament name/i);
-    await fireEvent.input(nameInput, { target: { value: "Test Tournament" } });
+		// Fill in the form
+		const nameInput = screen.getByLabelText(/tournament name/i);
+		await fireEvent.input(nameInput, { target: { value: 'Test Tournament' } });
 
-    // Submit the form
-    const submitButton = screen.getByRole("button", {
-      name: /create/i,
-    });
-    await fireEvent.click(submitButton);
+		// Submit the form
+		const submitButton = screen.getByRole('button', {
+			name: /create/i
+		});
+		await fireEvent.click(submitButton);
 
-    await waitFor(() => {
-      expect(classicApi.createTournament).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: "Test Tournament",
-        }),
-      );
-    });
+		await waitFor(() => {
+			expect(classicApi.createTournament).toHaveBeenCalledWith(
+				expect.objectContaining({
+					name: 'Test Tournament'
+				})
+			);
+		});
 
-    // Check that redirect happens
-    await waitFor(() => {
-      expect(navigateTo).toHaveBeenCalledWith("/tournaments/123");
-    });
-  });
+		// Check that redirect happens
+		await waitFor(() => {
+			expect(navigateTo).toHaveBeenCalledWith('/tournaments/123');
+		});
+	});
 
-  it("handles validation errors", async () => {
-    const validationError = new ValidationError({
-      name: ["Name is required"],
-      date: ["Date must be in the future"],
-    });
-    vi.mocked(classicApi.createTournament).mockRejectedValue(validationError);
+	it('handles validation errors', async () => {
+		const validationError = new ValidationError({
+			name: ['Name is required'],
+			date: ['Date must be in the future']
+		});
+		vi.mocked(classicApi.createTournament).mockRejectedValue(validationError);
 
-    render(TournamentCreation, { props: createProps() });
+		render(TournamentCreation, { props: createProps() });
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
-    });
+		await waitFor(() => {
+			expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
+		});
 
-    // Submit the form
-    const submitButton = screen.getByRole("button", {
-      name: /create/i,
-    });
-    await fireEvent.click(submitButton);
+		// Submit the form
+		const submitButton = screen.getByRole('button', {
+			name: /create/i
+		});
+		await fireEvent.click(submitButton);
 
-    await waitFor(() => {
-      expect(screen.getByText("Name is required")).toBeInTheDocument();
-      expect(screen.getByText("Date must be in the future")).toBeInTheDocument();
-    });
-  });
+		await waitFor(() => {
+			expect(screen.getByText('Name is required')).toBeInTheDocument();
+			expect(screen.getByText('Date must be in the future')).toBeInTheDocument();
+		});
+	});
 
-  it("handles unexpected errors", async () => {
-    vi.mocked(classicApi.createTournament).mockRejectedValue(new Error("Network error"));
+	it('handles unexpected errors', async () => {
+		vi.mocked(classicApi.createTournament).mockRejectedValue(new Error('Network error'));
 
-    render(TournamentCreation, { props: createProps() });
+		render(TournamentCreation, { props: createProps() });
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
-    });
+		await waitFor(() => {
+			expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
+		});
 
-    // Submit the form
-    const submitButton = screen.getByRole("button", {
-      name: /create/i,
-    });
-    await fireEvent.click(submitButton);
+		// Submit the form
+		const submitButton = screen.getByRole('button', {
+			name: /create/i
+		});
+		await fireEvent.click(submitButton);
 
-    await waitFor(() => {
-      expect(screen.getByText(/an unexpected error occurred/i)).toBeInTheDocument();
-    });
-  });
+		await waitFor(() => {
+			expect(screen.getByText(/an unexpected error occurred/i)).toBeInTheDocument();
+		});
+	});
 
-  it("disables submit button while submitting", async () => {
-    // Make createTournament hang to test loading state
-    vi.mocked(classicApi.createTournament).mockImplementation(
-      () =>
-        new Promise(() => {
-          // This promise intentionally never resolves to test loading state
-        }),
-    );
+	it('disables submit button while submitting', async () => {
+		// Make createTournament hang to test loading state
+		vi.mocked(classicApi.createTournament).mockImplementation(
+			() =>
+				new Promise(() => {
+					// This promise intentionally never resolves to test loading state
+				})
+		);
 
-    render(TournamentCreation, { props: createProps() });
+		render(TournamentCreation, { props: createProps() });
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
-    });
+		await waitFor(() => {
+			expect(screen.getByLabelText(/tournament name/i)).toBeInTheDocument();
+		});
 
-    const submitButton = screen.getByRole("button", {
-      name: /create/i,
-    });
-    await fireEvent.click(submitButton);
+		const submitButton = screen.getByRole('button', {
+			name: /create/i
+		});
+		await fireEvent.click(submitButton);
 
-    // Button should be disabled while submitting
-    await waitFor(() => {
-      expect(submitButton).toBeDisabled();
-    });
-  });
+		// Button should be disabled while submitting
+		await waitFor(() => {
+			expect(submitButton).toBeDisabled();
+		});
+	});
 });

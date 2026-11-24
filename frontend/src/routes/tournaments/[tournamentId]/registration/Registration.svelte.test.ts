@@ -1,271 +1,234 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { cleanup, getByLabelText, getByRole, render, screen } from '@testing-library/svelte';
+import Registration from './+page.svelte';
+import { Deck, type NrdbDeck } from '#lib/model/Deck.ts';
+import { betaApi } from '#lib/api/beta.ts';
+import { convertNrdbDeck } from '#lib/utils/decks.svelte.ts';
+import type { PageProps } from './$types';
 import {
-  cleanup,
-  getByLabelText,
-  getByRole,
-  render,
-  screen,
-} from "@testing-library/svelte";
-import Registration from "./+page.svelte";
-import { Deck, type NrdbDeck } from "#lib/model/Deck.ts";
-import { betaApi } from "#lib/api/beta.ts";
-import { convertNrdbDeck } from "#lib/utils/decks.svelte.ts";
-import type { PageProps } from "./$types";
-import {
-  MockPlayerBob,
-  MockPlayerBobNrdbDecks,
-  MockPrintings,
-  MockTournament,
-} from "./RegistrationTestData.ts";
-import { Identity } from "#lib/model/Identity.ts";
+	MockPlayerBob,
+	MockPlayerBobNrdbDecks,
+	MockPrintings,
+	MockTournament
+} from './RegistrationTestData.ts';
+import { Identity } from '#lib/model/Identity.ts';
 
 vi.mock('$app/env/public', () => {
-  return {
-    CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000"
-  };
+	return {
+		CLIENT_COBRA_API_ENDPOINT: 'http://localhost:3000'
+	};
 });
 
-vi.mock("#lib/api/beta.ts", () => ({
-  betaApi: {
-    savePlayer: vi.fn(() => true),
-  },
+vi.mock('#lib/api/beta.ts', () => ({
+	betaApi: {
+		savePlayer: vi.fn(() => true)
+	}
 }));
 
-const MockPageData: PageProps["data"] = {
-  user: null,
-  tournamentTypes: [],
-  tournamentData: {
-    tournament: MockTournament,
-  },
-  timer: {
-    show: false,
-    running: false,
-    paused: false,
-    started: false,
-    state: {
-      started: false,
-      paused: false,
-      finish_time: undefined,
-      remaining_seconds: undefined,
-      length_minutes: undefined
-    }
-  },
-  player: MockPlayerBob,
-  nrdbDecks: Promise.resolve([]),
-  originalCorpDeck: new Deck("corp"),
-  originalRunnerDeck: new Deck("runner")
+const MockPageData: PageProps['data'] = {
+	user: null,
+	tournamentTypes: [],
+	tournamentData: {
+		tournament: MockTournament
+	},
+	timer: {
+		show: false,
+		running: false,
+		paused: false,
+		started: false,
+		state: {
+			started: false,
+			paused: false,
+			finish_time: undefined,
+			remaining_seconds: undefined,
+			length_minutes: undefined
+		}
+	},
+	player: MockPlayerBob,
+	nrdbDecks: Promise.resolve([]),
+	originalCorpDeck: new Deck('corp'),
+	originalRunnerDeck: new Deck('runner')
 };
 
 const user = userEvent.setup();
 
-describe("Registration", () => {
-  async function renderRegistration(
-    decks: NrdbDeck[],
-    selectedCorpDeckIndex?: number,
-    selectedRunnerDeckIndex?: number
-  ) {
-    const props = {
-      params: {
-        tournamentId: MockTournament.id.toString()
-      },
-      data: MockPageData,
-    };
+describe('Registration', () => {
+	async function renderRegistration(
+		decks: NrdbDeck[],
+		selectedCorpDeckIndex?: number,
+		selectedRunnerDeckIndex?: number
+	) {
+		const props = {
+			params: {
+				tournamentId: MockTournament.id.toString()
+			},
+			data: MockPageData
+		};
 
-    const convertedDecks = decks.map((d) => convertNrdbDeck(d, MockPrintings));
-    MockPageData.nrdbDecks = Promise.resolve(convertedDecks);
-    MockPageData.originalCorpDeck = selectedCorpDeckIndex !== undefined
-      ? convertedDecks[0]
-      : new Deck("corp");
-    MockPageData.originalRunnerDeck = selectedRunnerDeckIndex !== undefined
-      ? convertedDecks[1]
-      : new Deck("runner");
+		const convertedDecks = decks.map((d) => convertNrdbDeck(d, MockPrintings));
+		MockPageData.nrdbDecks = Promise.resolve(convertedDecks);
+		MockPageData.originalCorpDeck =
+			selectedCorpDeckIndex !== undefined ? convertedDecks[0] : new Deck('corp');
+		MockPageData.originalRunnerDeck =
+			selectedRunnerDeckIndex !== undefined ? convertedDecks[1] : new Deck('runner');
 
-    await MockPageData.nrdbDecks;
+		await MockPageData.nrdbDecks;
 
-    return render(Registration, { props: props });
-  }
+		return render(Registration, { props: props });
+	}
 
-  beforeEach(() => {
-    vi.restoreAllMocks();
+	beforeEach(() => {
+		vi.restoreAllMocks();
 
-    Object.defineProperty(window, "matchMedia", {
-      writable: true,
-      value: vi.fn().mockImplementation((query: string) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      })),
-    });
-  });
+		Object.defineProperty(window, 'matchMedia', {
+			writable: true,
+			value: vi.fn().mockImplementation((query: string) => ({
+				matches: false,
+				media: query,
+				onchange: null,
+				addEventListener: vi.fn(),
+				removeEventListener: vi.fn(),
+				dispatchEvent: vi.fn()
+			}))
+		});
+	});
 
-  afterEach(() => {
-    cleanup();
-  });
+	afterEach(() => {
+		cleanup();
+	});
 
-  describe("no existing decks", () => {
-    it("displays new player information correctly", async () => {
-      await renderRegistration([]);
+	describe('no existing decks', () => {
+		it('displays new player information correctly', async () => {
+			await renderRegistration([]);
 
-      const registrationCard = screen.getByLabelText(
-        "registration information",
-      );
-      expect(getByLabelText(registrationCard, "Name")).toHaveValue("Bob");
-      expect(getByLabelText(registrationCard, "Pronouns")).toHaveValue(
-        "he/him",
-      );
-      expect(
-        getByLabelText(registrationCard, "Video coverage allowed"),
-      ).not.toBeChecked();
+			const registrationCard = screen.getByLabelText('registration information');
+			expect(getByLabelText(registrationCard, 'Name')).toHaveValue('Bob');
+			expect(getByLabelText(registrationCard, 'Pronouns')).toHaveValue('he/him');
+			expect(getByLabelText(registrationCard, 'Video coverage allowed')).not.toBeChecked();
 
-      expect(
-        screen.queryByText("You have no decks saved in NRDB.", {
-          exact: false,
-        }),
-      ).not.toBeNull();
-      expect((await screen.findAllByText("No deck selected")).length).toEqual(2);
-    });
+			expect(
+				screen.queryByText('You have no decks saved in NRDB.', {
+					exact: false
+				})
+			).not.toBeNull();
+			expect((await screen.findAllByText('No deck selected')).length).toEqual(2);
+		});
 
-    it("allows standard player info to be edited", async () => {
-      await renderRegistration([]);
+		it('allows standard player info to be edited', async () => {
+			await renderRegistration([]);
 
-      const registrationCard = screen.getByLabelText(
-        "registration information",
-      );
-      await user.clear(getByLabelText(registrationCard, "Name"));
-      await user.type(getByLabelText(registrationCard, "Name"), "Bob Again");
-      await user.clear(getByLabelText(registrationCard, "Pronouns"));
-      await user.type(
-        getByLabelText(registrationCard, "Pronouns"),
-        "they/them",
-      );
-      await user.click(
-        getByLabelText(registrationCard, "Video coverage allowed"),
-      );
+			const registrationCard = screen.getByLabelText('registration information');
+			await user.clear(getByLabelText(registrationCard, 'Name'));
+			await user.type(getByLabelText(registrationCard, 'Name'), 'Bob Again');
+			await user.clear(getByLabelText(registrationCard, 'Pronouns'));
+			await user.type(getByLabelText(registrationCard, 'Pronouns'), 'they/them');
+			await user.click(getByLabelText(registrationCard, 'Video coverage allowed'));
 
-      await user.click(getByRole(registrationCard, "button", { name: "Save" }));
+			await user.click(getByRole(registrationCard, 'button', { name: 'Save' }));
 
-      const bobEdit = structuredClone(MockPlayerBob);
-      bobEdit.name = "Bob Again";
-      bobEdit.pronouns = "they/them";
-      bobEdit.include_in_stream = true;
-      bobEdit.corp_id = new Identity();
-      bobEdit.runner_id = new Identity();
+			const bobEdit = structuredClone(MockPlayerBob);
+			bobEdit.name = 'Bob Again';
+			bobEdit.pronouns = 'they/them';
+			bobEdit.include_in_stream = true;
+			bobEdit.corp_id = new Identity();
+			bobEdit.runner_id = new Identity();
 
-      expect(betaApi.savePlayer).toHaveBeenCalledExactlyOnceWith(
-        MockTournament.id,
-        bobEdit,
-        true,
-      );
-    });
+			expect(betaApi.savePlayer).toHaveBeenCalledExactlyOnceWith(
+				MockTournament.id,
+				bobEdit,
+				true
+			);
+		});
 
-    it("allows deck selection", async () => {
-      await renderRegistration(MockPlayerBobNrdbDecks);
+		it('allows deck selection', async () => {
+			await renderRegistration(MockPlayerBobNrdbDecks);
 
-      expect((await screen.findAllByText("No deck selected")).length).toEqual(2);
+			expect((await screen.findAllByText('No deck selected')).length).toEqual(2);
 
-      const corpDeckButton = getByRole(
-        screen.getByLabelText("NRDB corp decks"),
-        "button",
-        { name: /bob's bangun.*/i },
-      );
-      expect(corpDeckButton).not.toHaveClass("active");
-      await user.click(corpDeckButton);
-      expect(corpDeckButton).toHaveClass("active");
-      expect(screen.getByLabelText("corp deck")).toHaveTextContent(
-        "Bob's BANGUN",
-      );
-      expect(screen.getByLabelText("corp deck ID")).toHaveTextContent(
-        "BANGUN: When Disaster Strikes",
-      );
-      expect(screen.getByLabelText("corp deck list")).toHaveTextContent(
-        "3 Hedge Fund",
-      );
+			const corpDeckButton = getByRole(screen.getByLabelText('NRDB corp decks'), 'button', {
+				name: /bob's bangun.*/i
+			});
+			expect(corpDeckButton).not.toHaveClass('active');
+			await user.click(corpDeckButton);
+			expect(corpDeckButton).toHaveClass('active');
+			expect(screen.getByLabelText('corp deck')).toHaveTextContent("Bob's BANGUN");
+			expect(screen.getByLabelText('corp deck ID')).toHaveTextContent(
+				'BANGUN: When Disaster Strikes'
+			);
+			expect(screen.getByLabelText('corp deck list')).toHaveTextContent('3 Hedge Fund');
 
-      const runnerDeckButton = getByRole(
-        screen.getByLabelText("NRDB runner decks"),
-        "button",
-        { name: /bob's baz.*/i },
-      );
-      expect(runnerDeckButton).not.toHaveClass("active");
-      await user.click(runnerDeckButton);
-      expect(runnerDeckButton).toHaveClass("active");
-      expect(screen.getByLabelText("runner deck")).toHaveTextContent("Bob's Baz");
-      expect(screen.getByLabelText("runner deck ID")).toHaveTextContent(
-        "Barry “Baz” Wong: Tri-Maf Veteran",
-      );
-      expect(screen.getByLabelText("runner deck list")).toHaveTextContent(
-        "3 Sure Gamble",
-      );
-    });
-  });
+			const runnerDeckButton = getByRole(
+				screen.getByLabelText('NRDB runner decks'),
+				'button',
+				{ name: /bob's baz.*/i }
+			);
+			expect(runnerDeckButton).not.toHaveClass('active');
+			await user.click(runnerDeckButton);
+			expect(runnerDeckButton).toHaveClass('active');
+			expect(screen.getByLabelText('runner deck')).toHaveTextContent("Bob's Baz");
+			expect(screen.getByLabelText('runner deck ID')).toHaveTextContent(
+				'Barry “Baz” Wong: Tri-Maf Veteran'
+			);
+			expect(screen.getByLabelText('runner deck list')).toHaveTextContent('3 Sure Gamble');
+		});
+	});
 
-  describe("when registration is locked", () => {
-    beforeEach(() => {
-      MockPageData.player = Object.assign(structuredClone(MockPlayerBob), {
-        registration_locked: true,
-      });
-    });
+	describe('when registration is locked', () => {
+		beforeEach(() => {
+			MockPageData.player = Object.assign(structuredClone(MockPlayerBob), {
+				registration_locked: true
+			});
+		});
 
-    afterEach(() => {
-      MockPageData.player = MockPlayerBob;
-    });
+		afterEach(() => {
+			MockPageData.player = MockPlayerBob;
+		});
 
-    it("hides the NetrunnerDB deck list", async () => {
-      await renderRegistration(MockPlayerBobNrdbDecks);
+		it('hides the NetrunnerDB deck list', async () => {
+			await renderRegistration(MockPlayerBobNrdbDecks);
 
-      expect(screen.getByText(/Registration is locked/)).toBeInTheDocument();
-      expect(screen.queryByLabelText("NRDB corp decks")).not.toBeInTheDocument();
-      expect(screen.queryByLabelText("NRDB runner decks")).not.toBeInTheDocument();
-    });
+			expect(screen.getByText(/Registration is locked/)).toBeInTheDocument();
+			expect(screen.queryByLabelText('NRDB corp decks')).not.toBeInTheDocument();
+			expect(screen.queryByLabelText('NRDB runner decks')).not.toBeInTheDocument();
+		});
 
-    it("shows the submitted decks read-only", async () => {
-      await renderRegistration(MockPlayerBobNrdbDecks, 0, 1);
+		it('shows the submitted decks read-only', async () => {
+			await renderRegistration(MockPlayerBobNrdbDecks, 0, 1);
 
-      expect(screen.getByLabelText("corp deck")).toHaveTextContent("Bob's BANGUN");
-      expect(screen.getByLabelText("runner deck")).toHaveTextContent("Bob's Baz");
-      // Unlocked, each deck is a selectable button in the NetrunnerDB list.
-      expect(screen.queryByRole("button", { name: /bob's bangun/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: /bob's baz/i })).not.toBeInTheDocument();
-    });
-  });
+			expect(screen.getByLabelText('corp deck')).toHaveTextContent("Bob's BANGUN");
+			expect(screen.getByLabelText('runner deck')).toHaveTextContent("Bob's Baz");
+			// Unlocked, each deck is a selectable button in the NetrunnerDB list.
+			expect(screen.queryByRole('button', { name: /bob's bangun/i })).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /bob's baz/i })).not.toBeInTheDocument();
+		});
+	});
 
-  describe("existing decks", () => {
-    it("displays existing decks correctly", async () => {
-      await renderRegistration(MockPlayerBobNrdbDecks, 0, 1);
+	describe('existing decks', () => {
+		it('displays existing decks correctly', async () => {
+			await renderRegistration(MockPlayerBobNrdbDecks, 0, 1);
 
-      expect(
-        getByRole(screen.getByLabelText("NRDB corp decks"), "button", {
-          name: /bob's bangun.*/i,
-        }),
-      ).toHaveClass("active");
-      expect(screen.getByLabelText("corp deck")).toHaveTextContent(
-        "Bob's BANGUN",
-      );
-      expect(screen.getByLabelText("corp deck ID")).toHaveTextContent(
-        "BANGUN: When Disaster Strikes",
-      );
-      expect(screen.getByLabelText("corp deck list")).toHaveTextContent(
-        "3 Hedge Fund",
-      );
+			expect(
+				getByRole(screen.getByLabelText('NRDB corp decks'), 'button', {
+					name: /bob's bangun.*/i
+				})
+			).toHaveClass('active');
+			expect(screen.getByLabelText('corp deck')).toHaveTextContent("Bob's BANGUN");
+			expect(screen.getByLabelText('corp deck ID')).toHaveTextContent(
+				'BANGUN: When Disaster Strikes'
+			);
+			expect(screen.getByLabelText('corp deck list')).toHaveTextContent('3 Hedge Fund');
 
-      expect(
-        getByRole(screen.getByLabelText("NRDB runner decks"), "button", {
-          name: /bob's baz.*/i,
-        }),
-      ).toHaveClass("active");
-      expect(screen.getByLabelText("runner deck")).toHaveTextContent(
-        "Bob's Baz",
-      );
-      expect(screen.getByLabelText("runner deck ID")).toHaveTextContent(
-        "Barry “Baz” Wong: Tri-Maf Veteran",
-      );
-      expect(screen.getByLabelText("runner deck list")).toHaveTextContent(
-        "3 Sure Gamble",
-      );
-    });
-  });
+			expect(
+				getByRole(screen.getByLabelText('NRDB runner decks'), 'button', {
+					name: /bob's baz.*/i
+				})
+			).toHaveClass('active');
+			expect(screen.getByLabelText('runner deck')).toHaveTextContent("Bob's Baz");
+			expect(screen.getByLabelText('runner deck ID')).toHaveTextContent(
+				'Barry “Baz” Wong: Tri-Maf Veteran'
+			);
+			expect(screen.getByLabelText('runner deck list')).toHaveTextContent('3 Sure Gamble');
+		});
+	});
 });

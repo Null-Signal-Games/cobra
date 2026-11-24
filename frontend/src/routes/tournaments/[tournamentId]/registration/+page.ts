@@ -1,36 +1,38 @@
-import { Deck } from "#lib/model/Deck.ts";
-import { convertNrdbDeck, getPrintings } from "#lib/utils/decks.svelte.ts";
-import { betaApi } from "#lib/api/beta.ts";
-import type { PageLoad } from "./$types";
+import { Deck } from '#lib/model/Deck.ts';
+import { convertNrdbDeck, getPrintings } from '#lib/utils/decks.svelte.ts';
+import { betaApi } from '#lib/api/beta.ts';
+import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params, fetch, parent }) => {
-  const parentData = await parent();
+	const parentData = await parent();
 
-  // Load decks from NRDB
-  const nrdbDecks = parentData.player
-    ? betaApi.loadNrdbDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
-      .then(async (nrdbDecks) => {
-        let decks: Deck[] = [];
-        if (nrdbDecks.length > 0) {
-          const printings = await getPrintings(fetch);
-          if (printings.size > 0) {
-            decks = nrdbDecks.map((d) => convertNrdbDeck(d, printings));
-          }
-        }
-        return decks;
-      })
-    : Promise.resolve([]);
-  
-  // Load decks for current tournament
-  const tournamentDecks = parentData.player
-    ? await betaApi.loadDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
-    : [];
-  const corpDeck = tournamentDecks.find((d) => d.details.side_id === "corp") ?? new Deck("corp");
-  const runnerDeck = tournamentDecks.find((d) => d.details.side_id === "runner") ?? new Deck("runner");
+	// Load decks from NRDB
+	const nrdbDecks = parentData.player
+		? betaApi
+				.loadNrdbDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
+				.then(async (nrdbDecks) => {
+					let decks: Deck[] = [];
+					if (nrdbDecks.length > 0) {
+						const printings = await getPrintings(fetch);
+						if (printings.size > 0) {
+							decks = nrdbDecks.map((d) => convertNrdbDeck(d, printings));
+						}
+					}
+					return decks;
+				})
+		: Promise.resolve([]);
 
-  return {
-    nrdbDecks: nrdbDecks,
-    originalCorpDeck: corpDeck,
-    originalRunnerDeck: runnerDeck,
-  };
-}
+	// Load decks for current tournament
+	const tournamentDecks = parentData.player
+		? await betaApi.loadDecks(parseInt(params.tournamentId), parentData.player.id, fetch)
+		: [];
+	const corpDeck = tournamentDecks.find((d) => d.details.side_id === 'corp') ?? new Deck('corp');
+	const runnerDeck =
+		tournamentDecks.find((d) => d.details.side_id === 'runner') ?? new Deck('runner');
+
+	return {
+		nrdbDecks: nrdbDecks,
+		originalCorpDeck: corpDeck,
+		originalRunnerDeck: runnerDeck
+	};
+};

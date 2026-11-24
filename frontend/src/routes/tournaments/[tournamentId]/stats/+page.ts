@@ -1,21 +1,19 @@
-import type { PageLoad } from "./$types";
-import { betaApi } from "#lib/api/beta.ts";
+import type { PageLoad } from './$types';
+import { betaApi } from '#lib/api/beta.ts';
 
 export const load: PageLoad = async ({ params, fetch }) => {
-  const tournamentId = parseInt(params.tournamentId);
-  
-  const statsPromise = betaApi.loadStats(tournamentId, fetch);
-  const pairingsData = await betaApi.loadPairings(tournamentId, fetch);
+	const tournamentId = parseInt(params.tournamentId);
 
-  const hasCut =
-    pairingsData.stages.length > 1 &&
-    pairingsData.stages.at(-1)?.is_elimination;
+	const statsPromise = betaApi.loadStats(tournamentId, fetch);
+	const pairingsData = await betaApi.loadPairings(tournamentId, fetch);
 
-  const cutStats = hasCut ? await betaApi.loadCutStats(tournamentId, fetch) : null;
+	const hasCut = pairingsData.stages.length > 1 && pairingsData.stages.at(-1)?.is_elimination;
 
-  return {
-    stages: pairingsData.stages,
-    stats: await statsPromise,
-    cutStats,
-  };
+	const cutStats = hasCut ? await betaApi.loadCutStats(tournamentId, fetch) : null;
+
+	return {
+		stages: pairingsData.stages,
+		stats: await statsPromise,
+		cutStats
+	};
 };

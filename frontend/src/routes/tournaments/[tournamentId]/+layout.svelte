@@ -1,144 +1,145 @@
 <script lang="ts">
-  import { page } from "$app/state";
-  import type { Snippet } from "svelte";
-  import type { LayoutData } from "./$types";
-  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
-  import { resolve } from "$app/paths";
-  import RoundTimer from "./RoundTimer.svelte";
-  import { httpUrlOrNull } from "#lib/utils/url.ts";
+	import { page } from '$app/state';
+	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
+	import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
+	import { resolve } from '$app/paths';
+	import RoundTimer from './RoundTimer.svelte';
+	import { httpUrlOrNull } from '#lib/utils/url.ts';
 
-  let { children, data }: { children: Snippet; data: LayoutData } = $props();
+	let { children, data }: { children: Snippet; data: LayoutData } = $props();
 
-  let tournament = $derived(data.tournamentData.tournament);
-  let canEdit = $derived(tournament.user_id === data.user?.id);
-  let streamUrl = $derived(httpUrlOrNull(tournament.stream_url));
+	let tournament = $derived(data.tournamentData.tournament);
+	let canEdit = $derived(tournament.user_id === data.user?.id);
+	let streamUrl = $derived(httpUrlOrNull(tournament.stream_url));
 </script>
 
 <!-- Tournament header -->
 <div class="row dontprint">
-  <div class="col-md">
-    <h1>{tournament.name}</h1>
-  </div>
-  {#if streamUrl}
-    <div class="col-auto">
-      <a href={streamUrl} target="_blank" rel="external" class="stream-link">
-        <FontAwesomeIcon icon="video-camera" />
-      </a>
-    </div>
-  {/if}
-  {#if data.timer.show}
-    <div class="col col-md-auto mb-md-0 mb-2">
-      <RoundTimer timer={data.timer} />
-    </div>
-  {/if}
+	<div class="col-md">
+		<h1>{tournament.name}</h1>
+	</div>
+	{#if streamUrl}
+		<div class="col-auto">
+			<a href={streamUrl} target="_blank" rel="external" class="stream-link">
+				<FontAwesomeIcon icon="video-camera" />
+			</a>
+		</div>
+	{/if}
+	{#if data.timer.show}
+		<div class="col col-md-auto mb-md-0 mb-2">
+			<RoundTimer timer={data.timer} />
+		</div>
+	{/if}
 </div>
 
 <!-- Tabs -->
 <ul class="nav nav-tabs dontprint">
-  <li class="nav-item">
-    <a
-      href={resolve(`tournaments/${tournament.id}`)}
-      class="nav-link"
-      class:active={page.route.id === "/tournaments/[tournamentId]"}
-    >
-      <FontAwesomeIcon icon="trophy" /> Tournament
-    </a>
-  </li>
+	<li class="nav-item">
+		<a
+			href={resolve(`tournaments/${tournament.id}`)}
+			class="nav-link"
+			class:active={page.route.id === '/tournaments/[tournamentId]'}
+		>
+			<FontAwesomeIcon icon="trophy" /> Tournament
+		</a>
+	</li>
 
-  {#if data.user}
-    <li class="nav-item">
-      <a
-        href={resolve(`tournaments/${tournament.id}/me`)}
-        class="nav-link"
-        class:active={(page.route.id as string) === "/tournaments/[tournamentId]/me"}
-      >
-        <FontAwesomeIcon icon="user" /> Me
-      </a>
-    </li>
-  {/if}
-  {#if canEdit}
-    <li class="nav-item">
-      <a
-        href={resolve(`tournaments/${tournament.id}/organizer/players`)}
-        class="nav-link"
-        class:active={(page.route.id as string) === "/tournaments/[tournamentId]/organizer/players"}
-      >
-        <FontAwesomeIcon icon="users" /> Players
-      </a>
-    </li>
-  {/if}
-  <li class="nav-item">
-    <a
-      href={resolve(
-        canEdit
-          ? `tournaments/${tournament.id}/organizer/rounds`
-          : `tournaments/${tournament.id}/rounds`,
-      )}
-      class="nav-link"
-      class:active={(page.route.id as string) ===
-        (canEdit
-          ? "/tournaments/[tournamentId]/organizer/rounds"
-          : "/tournaments/[tournamentId]/rounds")}
-    >
-      <FontAwesomeIcon icon="calendar-check-o" /> Pairings
-    </a>
-  </li>
-  <li class="nav-item">
-    <a
-      href={resolve(`tournaments/${tournament.id}/standings`)}
-      class="nav-link"
-      class:active={page.route.id === "/tournaments/[tournamentId]/standings"}
-    >
-      <FontAwesomeIcon icon="list-ol" /> Standings
-    </a>
-  </li>
-  {#if tournament.has_elimination_stage }
-  <li class="nav-item">
-    <a
-      href={resolve(`tournaments/${tournament.id}/bracket`)}
-      class="nav-link"
-      class:active={(page.route.id as string) === "/tournaments/[tournamentId]/bracket"}
-    >
-      <FontAwesomeIcon icon="sitemap" /> Bracket
-    </a>
-  </li>
-  {/if}
-  <li class="nav-item">
-    <a
-      href={resolve(`tournaments/${tournament.id}/stats`)}
-      class="nav-link"
-      class:active={(page.route.id as string) === "/tournaments/[tournamentId]/stats"}
-    >
-      <FontAwesomeIcon icon="pie-chart" /> Stats
-    </a>
-  </li>
-  {#if canEdit}
-    <li class="nav-item">
-      <a
-        href={resolve(`tournaments/${tournament.id}/organizer/settings`)}
-        class="nav-link"
-        class:active={(page.route.id as string) ===
-          "/tournaments/[tournamentId]/organizer/settings"}
-      >
-        <FontAwesomeIcon icon="cog" /> Settings
-      </a>
-    </li>
-  {/if}
-  {#if canEdit}
-    <li class="nav-item">
-      <a
-        href={resolve(`tournaments/${tournament.id}/organizer/danger_zone`)}
-        class="nav-link"
-        class:active={(page.route.id as string) ===
-          "/tournaments/[tournamentId]/organizer/danger_zone"}
-      >
-        <FontAwesomeIcon icon="trash" /> Danger Zone
-      </a>
-    </li>
-  {/if}
+	{#if data.user}
+		<li class="nav-item">
+			<a
+				href={resolve(`tournaments/${tournament.id}/me`)}
+				class="nav-link"
+				class:active={(page.route.id as string) === '/tournaments/[tournamentId]/me'}
+			>
+				<FontAwesomeIcon icon="user" /> Me
+			</a>
+		</li>
+	{/if}
+	{#if canEdit}
+		<li class="nav-item">
+			<a
+				href={resolve(`tournaments/${tournament.id}/organizer/players`)}
+				class="nav-link"
+				class:active={(page.route.id as string) ===
+					'/tournaments/[tournamentId]/organizer/players'}
+			>
+				<FontAwesomeIcon icon="users" /> Players
+			</a>
+		</li>
+	{/if}
+	<li class="nav-item">
+		<a
+			href={resolve(
+				canEdit
+					? `tournaments/${tournament.id}/organizer/rounds`
+					: `tournaments/${tournament.id}/rounds`
+			)}
+			class="nav-link"
+			class:active={(page.route.id as string) ===
+				(canEdit
+					? '/tournaments/[tournamentId]/organizer/rounds'
+					: '/tournaments/[tournamentId]/rounds')}
+		>
+			<FontAwesomeIcon icon="calendar-check-o" /> Pairings
+		</a>
+	</li>
+	<li class="nav-item">
+		<a
+			href={resolve(`tournaments/${tournament.id}/standings`)}
+			class="nav-link"
+			class:active={page.route.id === '/tournaments/[tournamentId]/standings'}
+		>
+			<FontAwesomeIcon icon="list-ol" /> Standings
+		</a>
+	</li>
+	{#if tournament.has_elimination_stage}
+		<li class="nav-item">
+			<a
+				href={resolve(`tournaments/${tournament.id}/bracket`)}
+				class="nav-link"
+				class:active={(page.route.id as string) === '/tournaments/[tournamentId]/bracket'}
+			>
+				<FontAwesomeIcon icon="sitemap" /> Bracket
+			</a>
+		</li>
+	{/if}
+	<li class="nav-item">
+		<a
+			href={resolve(`tournaments/${tournament.id}/stats`)}
+			class="nav-link"
+			class:active={(page.route.id as string) === '/tournaments/[tournamentId]/stats'}
+		>
+			<FontAwesomeIcon icon="pie-chart" /> Stats
+		</a>
+	</li>
+	{#if canEdit}
+		<li class="nav-item">
+			<a
+				href={resolve(`tournaments/${tournament.id}/organizer/settings`)}
+				class="nav-link"
+				class:active={(page.route.id as string) ===
+					'/tournaments/[tournamentId]/organizer/settings'}
+			>
+				<FontAwesomeIcon icon="cog" /> Settings
+			</a>
+		</li>
+	{/if}
+	{#if canEdit}
+		<li class="nav-item">
+			<a
+				href={resolve(`tournaments/${tournament.id}/organizer/danger_zone`)}
+				class="nav-link"
+				class:active={(page.route.id as string) ===
+					'/tournaments/[tournamentId]/organizer/danger_zone'}
+			>
+				<FontAwesomeIcon icon="trash" /> Danger Zone
+			</a>
+		</li>
+	{/if}
 </ul>
 
 <!-- Content -->
 <div class="row py-3 main-content">
-  {@render children()}
+	{@render children()}
 </div>

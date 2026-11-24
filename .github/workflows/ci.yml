@@ -109,9 +109,11 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
 
-      # ESLint only; Prettier is skipped until the switch to oxfmt/oxlint.
-      - name: "Lint: ESLint"
-        run: npx eslint .
+      - name: "Lint: oxlint"
+        run: npm run lint
+
+      - name: "Format: oxfmt"
+        run: npm run fmt:check
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium

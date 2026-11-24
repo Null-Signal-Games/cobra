@@ -1,85 +1,77 @@
 <script lang="ts">
-  import Round from "./Round.svelte";
-  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
-  import type { ScoreReport } from "#lib/model/ScoreReport.ts";
-  import type { Stage } from "#lib/model/Stage.ts";
-  import type { Tournament } from "#lib/model/Tournament.ts";
-  import { resolve } from "$app/paths";
+	import Round from './Round.svelte';
+	import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
+	import type { ScoreReport } from '#lib/model/ScoreReport.ts';
+	import type { Stage } from '#lib/model/Stage.ts';
+	import type { Tournament } from '#lib/model/Tournament.ts';
+	import { resolve } from '$app/paths';
 
-  let {
-    tournament,
-    stage,
-    startExpanded,
-    deletePairingCallback,
-    changePlayerSideCallback,
-    reportScoreCallback,
-    resetReportsCallback,
-    completeRoundCallback,
-    updateTimerCallback,
-  }: {
-    tournament: Tournament;
-    stage: Stage;
-    startExpanded: boolean;
-    deletePairingCallback?: (roundId: number, pairingId: number) => void;
-    changePlayerSideCallback?: (
-      roundId: number,
-      pairingId: number,
-      side: string,
-    ) => void;
-    reportScoreCallback?: (
-      roundId: number,
-      pairingId: number,
-      report: ScoreReport,
-      selfReport: boolean,
-    ) => void;
-    resetReportsCallback?: (roundId: number, pairingId: number) => void;
-    completeRoundCallback?: (roundId: number) => void;
-    updateTimerCallback?: (
-      roundId: number,
-      length_minutes: number,
-      operation: string,
-    ) => void;
-  } = $props();
+	let {
+		tournament,
+		stage,
+		startExpanded,
+		deletePairingCallback,
+		changePlayerSideCallback,
+		reportScoreCallback,
+		resetReportsCallback,
+		completeRoundCallback,
+		updateTimerCallback
+	}: {
+		tournament: Tournament;
+		stage: Stage;
+		startExpanded: boolean;
+		deletePairingCallback?: (roundId: number, pairingId: number) => void;
+		changePlayerSideCallback?: (roundId: number, pairingId: number, side: string) => void;
+		reportScoreCallback?: (
+			roundId: number,
+			pairingId: number,
+			report: ScoreReport,
+			selfReport: boolean
+		) => void;
+		resetReportsCallback?: (roundId: number, pairingId: number) => void;
+		completeRoundCallback?: (roundId: number) => void;
+		updateTimerCallback?: (roundId: number, length_minutes: number, operation: string) => void;
+	} = $props();
 </script>
 
 <div id={`stage${stage.id}`} class="accordion mb-3" role="tablist">
-  <div class="row mb-1">
-    <div class="col-sm-6 d-flex align-items-baseline gap-2">
-      <h4>{stage.name}</h4>
-    </div>
+	<div class="row mb-1">
+		<div class="col-sm-6 d-flex align-items-baseline gap-2">
+			<h4>{stage.name}</h4>
+		</div>
 
-    <!-- Admin controls -->
-    <div class="col-sm-6 d-flex justify-content-end" aria-label="admin controls">
-      {#if !stage.is_elimination}
-        <a
-          href={resolve(`tournaments/${tournament.id}/organizer/edit_stage/${stage.id}`)}
-          class="btn btn-warning mx-1"
-          aria-label="edit stage"
-        >
-          <FontAwesomeIcon icon="pencil" />
-          Edit Stage
-        </a>
-      {/if}
-    </div>
-  </div>
+		<!-- Admin controls -->
+		<div class="col-sm-6 d-flex justify-content-end" aria-label="admin controls">
+			{#if !stage.is_elimination}
+				<a
+					href={resolve(`tournaments/${tournament.id}/organizer/edit_stage/${stage.id}`)}
+					class="btn btn-warning mx-1"
+					aria-label="edit stage"
+				>
+					<FontAwesomeIcon icon="pencil" />
+					Edit Stage
+				</a>
+			{/if}
+		</div>
+	</div>
 
-  <!-- Rounds -->
-  {#if stage.rounds.length > 0}
-    {#each stage.rounds as round, index (round.id)}
-      <Round
-        {tournament}
-        {round}
-        {stage}
-        startExpanded={startExpanded && index === stage.rounds.length - 1}
-        {deletePairingCallback}
-        {changePlayerSideCallback}
-        {reportScoreCallback}
-        {resetReportsCallback}
-        completeCallback={completeRoundCallback}
-        {updateTimerCallback}
-      />
-    {/each}
-  {:else}
-    This stage has no rounds.
-  {/if}
+	<!-- Rounds -->
+	{#if stage.rounds.length > 0}
+		{#each stage.rounds as round, index (round.id)}
+			<Round
+				{tournament}
+				{round}
+				{stage}
+				startExpanded={startExpanded && index === stage.rounds.length - 1}
+				{deletePairingCallback}
+				{changePlayerSideCallback}
+				{reportScoreCallback}
+				{resetReportsCallback}
+				completeCallback={completeRoundCallback}
+				{updateTimerCallback}
+			/>
+		{/each}
+	{:else}
+		This stage has no rounds.
+	{/if}
 </div>

@@ -5,14 +5,14 @@
  * otherwise be treated as a relative path, and schemes like "javascript:" must never be linked.
  */
 export function httpUrlOrNull(value: string | null | undefined): string | null {
-  // Browser URL parsing is a bit more lenient than the ruby validation. "http:example.com" is ~equivalent to "http://example.com/"
-  // Require a literal "http(s)://" here prefix to match the backend's validation.
-  if (!value || !/^https?:\/\//i.test(value)) return null;
+	// Browser URL parsing is a bit more lenient than the ruby validation. "http:example.com" is ~equivalent to "http://example.com/"
+	// Require a literal "http(s)://" here prefix to match the backend's validation.
+	if (!value || !/^https?:\/\//i.test(value)) return null;
 
-  try {
-    const url = new URL(value);
-    return url.hostname ? url.toString() : null;
-  } catch {
-    return null;
-  }
+	try {
+		const url = new URL(value);
+		return url.hostname ? url.toString() : null;
+	} catch {
+		return null;
+	}
 }
