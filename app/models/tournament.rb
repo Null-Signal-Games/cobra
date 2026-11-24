@@ -95,10 +95,6 @@ class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style
     self_registration? && !registration_closed?
   end
 
-  def registration_unlocked?
-    self_registration? && (!registration_closed? || unlocked_players.any?)
-  end
-
   def stage_decks_open?(stage)
     if stage.elimination?
       cut_decks_open?
@@ -190,28 +186,6 @@ class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style
     players.active.where('registration_locked IS TRUE')
   end
 
-  def registration_lock_description
-    if registration_closed?
-      if all_players_unlocked?
-        'closed, unlocked'
-      elsif any_player_unlocked?
-        'closed, part unlocked'
-      else
-        'closed'
-      end
-    elsif all_players_unlocked?
-      'open'
-    elsif any_player_unlocked?
-      'open, part locked'
-    else
-      'open, all locked'
-    end
-  end
-
-  def decks_visibility_description
-    "swiss #{swiss_decks_visibility_desc}, cut #{cut_decks_visibility_desc}"
-  end
-
   def swiss_decks_visibility_desc
     if swiss_decks_public?
       'public'
@@ -250,42 +224,6 @@ class Tournament < ApplicationRecord # rubocop:disable Metrics/ClassLength,Style
     else
       cut
     end
-  end
-
-  def self.streaming_opt_out_notice
-    'Should we include your games in video coverage of this event? ' \
-      'Note: During a top cut it may not be possible to exclude you from coverage.'
-  end
-
-  def self.registration_consent_notice
-    'Your name, pronouns and Netrunner deck identities will be publicly visible on this ' \
-      'website. If you submit decklists they will be shared with the organiser. If you enter a round with open ' \
-      'decklists, they may be shared with participants or made public.'
-  end
-
-  def side_win_percentages_data
-    sql = ActiveRecord::Base.sanitize_sql(
-      ['SELECT * FROM side_win_percentages WHERE tournament_id = ? ORDER BY stage_number ASC', id]
-    )
-    rows = ActiveRecord::Base.connection.exec_query(sql).to_a
-    results = []
-    # Normalize stage numbers to be sequential from 1 to address edge cases where
-    # there are empty stages, followed by valid stages.
-    stage_number = 0
-    rows.each do |row|
-      stage_number += 1
-      results << {
-        stage_number: stage_number,
-        num_games: row['num_games'],
-        num_valid_games: row['num_valid_games'],
-        valid_game_percentage: row['valid_game_percentage'].to_f,
-        num_corp_wins: row['num_corp_wins'],
-        corp_win_percentage: row['corp_win_percentage'].to_f,
-        num_runner_wins: row['num_runner_wins'],
-        runner_win_percentage: row['runner_win_percentage'].to_f
-      }
-    end
-    results
   end
 
   def cut_conversion_rates_data

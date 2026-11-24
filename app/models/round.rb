@@ -26,15 +26,6 @@ class Round < ApplicationRecord # rubocop:disable Style/Documentation
     pair!
   end
 
-  def collated_pairings
-    return pairings if pairings.count < 5
-
-    pairings
-      .in_groups_of((pairings.count / 4.0).ceil)
-      .transpose
-      .flatten
-  end
-
   def timer
     RoundTimer.new(self)
   end

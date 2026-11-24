@@ -1,97 +1,14 @@
 # frozen_string_literal: true
 
-class TournamentsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
-  include DangerZoneConfirmable
-
-  before_action :set_tournament, only: %i[
-    show info edit edit_form update destroy
-    upload_to_abr save_json cut qr my_tournament registration timer
-    close_registration open_registration lock_player_registrations unlock_player_registrations
-    id_and_faction_data cut_conversion_rates side_win_percentages stats bracket danger_zone
-  ]
-  before_action :validate_confirmation_name, only: :destroy
-
-  def index
-    authorize Tournament
-
-    where_clause = 'NOT private'
-    if params['type_id'].present?
-
-      @tournament_type = TournamentType.find_by id: params['type_id']
-      unless @tournament_type.nil?
-        where_clause += ActiveRecord::Base.sanitize_sql(
-          [' AND tournament_type_id = ?', params['type_id']]
-        )
-      end
-    end
-
-    @tournaments = Tournament.includes(:user, :tournament_type)
-                             .where(where_clause)
-                             .order(date: :desc)
-                             .limit(20)
-  end
-
-  def my
-    authorize Tournament
-
-    @tournaments = current_user.tournaments.includes(:tournament_type).order(date: :desc)
-  end
-
-  def stats
-    authorize @tournament, :show?
-  end
-
-  def bracket
-    authorize @tournament, :show?
-  end
+# JSON endpoints for the SvelteKit frontend (/api/classic) and the public NRTM export.
+class TournamentsController < ApplicationController # rubocop:disable Metrics/ClassLength
+  before_action :set_tournament, only: %i[show edit_form update upload_to_abr save_json]
 
   def show
     authorize @tournament
 
-    respond_to do |format|
-      format.html do
-        set_tournament_view_data
-        set_overview_notices
-      end
-      format.json do
-        headers['Access-Control-Allow-Origin'] = '*'
-        render json: NrtmJson.new(@tournament, root_url).data(tournament_shortlink_url(slug: @tournament.slug))
-      end
-    end
-  end
-
-  def info
-    authorize @tournament, :show?
-  end
-
-  def timer
-    authorize @tournament, :show?
-    @round = @tournament.rounds.last
-    @timer = @round.timer
-    render layout: 'fullscreen'
-  end
-
-  def registration
-    authorize @tournament, :register?
-
-    set_tournament_view_data
-    unless @current_user_player
-      redirect_to tournament_path(@tournament)
-      return
-    end
-
-    return unless @tournament.nrdb_deck_registration?
-    return if @current_user_player.registration_locked?
-
-    begin
-      @decks = Nrdb::Connection.new(current_user).decks
-    rescue StandardError
-      redirect_to login_path(return_to: request.path)
-    end
-  end
-
-  def new
-    authorize Tournament
+    headers['Access-Control-Allow-Origin'] = '*'
+    render json: NrtmJson.new(@tournament, root_url).data(tournament_shortlink_url(slug: @tournament.slug))
   end
 
   def new_form
@@ -103,22 +20,10 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
     render json: helpers.tournament_settings_json(@new_tournament), status: :ok
   end
 
-  def new_demo
-    authorize Tournament
-  end
-
   def new_demo_form
     authorize Tournament
 
     render json: helpers.demo_tournament_json, status: :ok
-  end
-
-  def edit
-    authorize @tournament
-  end
-
-  def danger_zone
-    authorize @tournament, :destroy?
   end
 
   def create
@@ -167,7 +72,7 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
       render json: {
         id: tournament.id,
         name: tournament.name,
-        url: tournament_rounds_path(tournament)
+        url: "#{tournament_path(tournament)}/rounds"
       }, status: :created
     else
       render json: { errors: }, status: :unprocessable_content
@@ -221,31 +126,11 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
       errors = @tournament.errors unless @tournament.update(params)
     end
 
-    respond_to do |format|
-      format.html do
-        flash[:alert] = error if error
-        redirect_back_or_to edit_tournament_path(@tournament)
-        return
-      end
-      format.json do
-        errors['base'] = error if error
-        if errors.empty?
-          head :no_content
-        else
-          render json: { errors: errors }, status: :unprocessable_content
-        end
-        return
-      end
-    end
-  end
-
-  def destroy
-    Tournament.includes(stages: %i[rounds registrations standing_rows table_ranges],
-                        players: %i[decks registrations standing_rows]).find(@tournament.id).destroy!
-
-    respond_to do |format|
-      format.html { redirect_to tournaments_path }
-      format.json { head :ok }
+    errors['base'] = error if error
+    if errors.empty?
+      head :no_content
+    else
+      render json: { errors: errors }, status: :unprocessable_content
     end
   end
 
@@ -255,16 +140,11 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
     response = AbrUpload.upload!(@tournament, root_url, tournament_shortlink_url(slug: @tournament.slug))
     @tournament.update(abr_code: response[:code]) if response[:code]
 
-    respond_to do |format|
-      format.html { redirect_to edit_tournament_path(@tournament) }
-      format.json do
-        if response[:code]
-          render json: { abr_code: @tournament.abr_code }
-        else
-          render json: { error: response[:error] || 'Upload to Always Be Running failed.' },
-                 status: :unprocessable_content
-        end
-      end
+    if response[:code]
+      render json: { abr_code: @tournament.abr_code }
+    else
+      render json: { error: response[:error] || 'Upload to Always Be Running failed.' },
+             status: :unprocessable_content
     end
   end
 
@@ -277,122 +157,6 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
               type: :json,
               disposition: :attachment,
               filename: "#{@tournament.name.underscore}.json"
-  end
-
-  def cut
-    authorize @tournament
-
-    number = params[:number].to_i
-    format = params[:elimination_type] == 'single' ? :single_elim : :double_elim
-    return redirect_to standings_tournament_players_path(@tournament) unless
-      Bracket::Factory.valid_bracket?(number, single_elim: format == :single_elim)
-
-    @tournament.cut_to!(format, number)
-
-    redirect_to tournament_rounds_path(@tournament)
-  end
-
-  def shortlink
-    tournament = Tournament.find_by!(slug: params[:slug].upcase)
-
-    authorize tournament, :show?
-
-    redirect_to tournament_path(tournament)
-  rescue ActiveRecord::RecordNotFound
-    skip_authorization
-
-    redirect_to not_found_tournaments_path(code: params[:slug])
-  end
-
-  def not_found
-    skip_authorization
-
-    @code = params[:code]
-  end
-
-  def qr
-    authorize @tournament, :show?
-  end
-
-  def my_tournament
-    authorize @tournament, :show?
-
-    respond_to do |format|
-      format.html do
-        unless current_user
-          redirect_to correct_beta_path(tournament_path(@tournament)),
-                      alert: 'Please log in to view your tournament information.'
-          return
-        end
-
-        player = @tournament.players.find_by(user_id: current_user.id)
-        unless player
-          redirect_to correct_beta_path(tournament_path(@tournament)),
-                      alert: 'You are not registered in this tournament.'
-          return
-        end
-      end
-      format.json do
-        if current_user.nil?
-          render json: { error: 'Not authorized' }, status: :unauthorized
-          return
-        end
-
-        player = @tournament.players.find_by(user_id: current_user.id)
-        unless player
-          render json: { error: 'You are not registered in this tournament.' }, status: :unauthorized
-          return
-        end
-
-        render json: SummarizedPairings.for_user_in_tournament(current_user.id, @tournament.id)
-      end
-    end
-  end
-
-  def close_registration
-    authorize @tournament, :edit?
-
-    @tournament.close_registration!
-    redirect_back_or_to(tournament_rounds_path(@tournament))
-  end
-
-  def open_registration
-    authorize @tournament, :edit?
-
-    @tournament.open_registration!
-    redirect_back_or_to(tournament_rounds_path(@tournament))
-  end
-
-  def lock_player_registrations
-    authorize @tournament, :edit?
-
-    @tournament.lock_player_registrations!
-    redirect_back_or_to(tournament_rounds_path(@tournament))
-  end
-
-  def unlock_player_registrations
-    authorize @tournament, :edit?
-
-    @tournament.unlock_player_registrations!
-    redirect_back_or_to(tournament_rounds_path(@tournament))
-  end
-
-  def cut_conversion_rates
-    authorize @tournament, :show?
-
-    render json: @tournament.cut_conversion_rates_data
-  end
-
-  def side_win_percentages
-    authorize @tournament, :show?
-
-    render json: @tournament.side_win_percentages_data
-  end
-
-  def id_and_faction_data
-    authorize @tournament, :show?
-
-    render json: @tournament.id_and_faction_data
   end
 
   private
@@ -411,46 +175,5 @@ class TournamentsController < ApplicationController # rubocop:disable Metrics/Cl
                                        :additional_prizes_description, :allow_self_reporting,
                                        # Used for demo tournaments
                                        :num_players, :num_first_round_byes)
-  end
-
-  def set_tournament_view_data
-    @players = @tournament.players.includes(%i[corp_identity_ref runner_identity_ref]).active.sort_by do |p|
-      p.name || ''
-    end
-    @dropped = @tournament.players.includes(%i[corp_identity_ref runner_identity_ref]).dropped.sort_by do |p|
-      p.name || ''
-    end
-
-    return unless current_user
-
-    @current_user_is_running_tournament = @tournament.user_id == current_user.id
-    @current_user_player = @players.find do |p|
-      p.user_id == current_user.id
-    end
-    @current_user_dropped = @dropped.any? { |p| p.user_id == current_user.id }
-  end
-
-  def set_overview_notices
-    @overview_notices = [registration_notice].compact
-  end
-
-  def registration_notice
-    return unless @tournament.nrdb_deck_registration?
-
-    if @tournament.registration_open?
-      'Registration is open' unless @current_user_player&.registration_locked?
-    elsif @current_user_player
-      if @tournament.all_players_unlocked?
-        'Registration is editable'
-      elsif !@current_user_player.registration_locked?
-        'Your registration is unlocked for editing'
-      end
-    elsif @current_user_is_running_tournament
-      if @tournament.all_players_unlocked?
-        'Registration is editable'
-      elsif @tournament.any_player_unlocked?
-        'One or more players are unlocked for editing'
-      end
-    end
   end
 end

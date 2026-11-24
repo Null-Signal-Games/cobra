@@ -1,6 +1,0 @@
-- if single_sided
-  - if policy(pairing.tournament).update?
-    = set_side_button(player, :corp, pairing)
-    = set_side_button(player, :runner, pairing)
-  - else
-    = side_label_for(pairing, player)

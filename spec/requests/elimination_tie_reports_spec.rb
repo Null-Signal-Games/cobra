@@ -14,30 +14,6 @@ RSpec.describe 'Reporting tied scores in elimination stages' do
   end
   let(:tie) { { score1: 3, score2: 3 } }
 
-  describe 'classic organiser report' do
-    before { sign_in organiser }
-
-    it 'does not save the tie and shows an alert' do
-      post report_tournament_round_pairing_path(tournament, round, pairing), params: { pairing: tie }
-
-      expect(pairing.reload.score1).to be_nil
-      expect(flash[:alert]).to eq('Elimination games cannot end in a tie')
-    end
-  end
-
-  describe 'classic self report' do
-    before { sign_in alice }
-
-    it 'rejects the tie' do
-      expect do
-        post self_report_tournament_round_pairing_path(tournament, round, pairing),
-             params: { pairing: tie }, as: :json
-      end.not_to change(SelfReport, :count)
-
-      expect(response).to have_http_status(:unprocessable_content)
-    end
-  end
-
   describe 'beta' do
     before { Flipper.enable(:beta_testing) }
 

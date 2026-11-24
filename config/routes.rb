@@ -4,13 +4,10 @@ Rails.application.routes.draw do
   # Health check endpoint used by docker.
   get 'up' => 'rails/health#show', as: :rails_health_check
 
-  root 'home#home'
-
-  get :login, to: 'oauth#auth'
-  get :logout, to: 'oauth#logout'
+  # Rails requires a root route to be defined, even though the served app does not use it.
+  root 'rails/health#show'
 
   namespace :oauth do
-    # Add aliases for login / logout to avoid collisions with the new Svelte frontend app.
     get :login, to: 'auth'
     get :logout, to: 'logout'
     get :callback
@@ -60,7 +57,7 @@ Rails.application.routes.draw do
       end
       resources :rounds, only: [] do
         get :brackets, on: :collection
-        get 'pairings_data(/:user_id)', on: :collection, action: 'pairings_data'
+        get 'pairings_data(/:user_id)', on: :collection, action: 'pairings_data', as: :pairings_data
       end
       resources :stages, only: %i[update] do
         get :settings, on: :member
@@ -69,14 +66,9 @@ Rails.application.routes.draw do
   end
 
   namespace :beta do
-    get '/', to: '/beta#index'
-    get :help
-    post :set_beta
-    resources :tournaments do
-      get 'type/:type_id', to: 'tournaments#type', on: :collection
-      resources :rounds, only: %i[index show create update destroy] do
-        resources :pairings, only: %i[index create destroy] do
-          get :match_slips, on: :collection
+    resources :tournaments, only: %i[update destroy] do
+      resources :rounds, only: %i[create update destroy] do
+        resources :pairings, only: %i[create destroy] do
           post :report, on: :member
           delete :reset_self_report, on: :member
         end
@@ -86,10 +78,8 @@ Rails.application.routes.draw do
         patch :update_timer, on: :member
         get :pairings_data, on: :collection
       end
-      resources :players, only: %i[index show create update destroy] do
+      resources :players, only: %i[show create update destroy] do
         get :players_data, on: :collection
-        get 'by_user_id/:user_id', to: 'players#by_user_id', on: :collection
-        get :registration, on: :member
         patch :lock_registration, on: :member
         patch :unlock_registration, on: :member
         patch :drop, on: :member
@@ -98,95 +88,31 @@ Rails.application.routes.draw do
         get :decks, on: :member
         get :nrdb_decks, on: :member
       end
-      get :info, on: :member
-      get :qr, on: :member
-      get :registration, on: :member
       resources :stages, only: %i[create destroy]
       patch :open_registration, on: :member
       patch :close_registration, on: :member
       patch :lock_player_registrations, on: :member
       patch :unlock_player_registrations, on: :member
       post :cut, on: :member
-      get :stats, on: :member
       get :id_and_faction_data, on: :member
       get :cut_conversion_rates, on: :member
       get :current_round_timer, on: :member
     end
-    resources :identities, only: [:index]
   end
 
-  resources :tournaments do
-    resources :players, only: %i[index new create update destroy] do
-      get :standings, on: :collection
-      get :standings_data, on: :collection
-      get :meeting, on: :collection
-      get :download_decks, on: :collection
-      get :download_streaming, on: :collection
-      patch :drop, on: :member
-      patch :reinstate, on: :member
-      patch :lock_registration, on: :member
-      patch :unlock_registration, on: :member
-      get :registration, on: :member
-      get :view_decks, on: :member
+  # Legacy URLs nginx still sends to Rails: NRTM export, ABR upload and player downloads.
+  resources :tournaments, only: %i[show] do
+    member do
+      get :save_json
+      post :upload_to_abr
     end
-    resources :rounds, only: %i[index show create edit update destroy] do
-      resources :pairings, only: %i[index create destroy] do
-        post :report, on: :member
-        delete :reset_self_report, on: :member
-        post :self_report, on: :member
-        get :match_slips, on: :collection
-        get :view_decks, on: :member
-        get :sharing, on: :collection
-        get :markdown, on: :collection
+    resources :players, only: [] do
+      collection do
+        get :download_decks
+        get :download_streaming
       end
-      patch :repair, on: :member
-      patch :complete, on: :member
-      patch :update_timer, on: :member
-      get :view_pairings, on: :collection
-      get :pairings_data, on: :collection
-      get 'pairings_data(/:user_id)', on: :collection, action: 'pairings_data'
-      get :brackets, on: :collection
     end
-    get :bracket, on: :member
-    resources :stages, only: %i[show create update destroy] do
-      get :settings, on: :member
-    end
-    get :danger_zone, on: :member
-    get :info, on: :member
-    post :upload_to_abr, on: :member
-    get :save_json, on: :member
-    get :id_and_faction_data, on: :member
-    get :cut_conversion_rates, on: :member
-    get :side_win_percentages, on: :member
-    post :cut, on: :member
-    get :qr, on: :member
-    get :my_tournament, on: :member
-    get :registration, on: :member
-    get :timer, on: :member
-    patch :open_registration, on: :member
-    patch :close_registration, on: :member
-    patch :lock_player_registrations, on: :member
-    patch :unlock_player_registrations, on: :member
-    get :shortlink, on: :collection
-    get :not_found, on: :collection
-    get :my, on: :collection
-    get :new_form, on: :collection
-    get :edit_form, on: :member
-    get :stats, on: :member
-    get :new_demo, on: :collection
-    get :new_demo_form, on: :collection
-    post :create_demo, on: :collection
-    get 'type/:type_id', to: 'tournaments#index', on: :collection, as: :tournaments_by_type
   end
-  resources :identities, only: [:index]
-
-  resources :profiles, only: [:index]
-
-  get '/error', to: 'errors#show'
-
-  get '/help', to: 'home#help'
-
+  # Served by SvelteKit; kept so Rails can build shortlink URLs.
   get ':slug', to: 'tournaments#shortlink', as: :tournament_shortlink
-
-  match '*path', to: redirect('/error'), via: :all
 end

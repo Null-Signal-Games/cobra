@@ -1,7 +1,0 @@
-production:
-  adapter: postgresql
-  encoding: unicode
-  database: cobra
-  username: cobra
-  password: cobra
-  host: do-not-resolve

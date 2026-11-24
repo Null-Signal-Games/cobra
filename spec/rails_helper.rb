@@ -6,7 +6,6 @@ abort('The Rails environment is running in production mode!') if Rails.env.produ
 require 'spec_helper'
 require 'rspec/rails'
 
-require 'capybara/rails'
 require 'database_cleaner'
 require 'factory_bot_rails'
 require 'vcr'
@@ -22,7 +21,6 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
 
-  config.include Capybara::DSL
   config.include FactoryBot::Syntax::Methods
   config.include ActiveSupport::Testing::TimeHelpers
 

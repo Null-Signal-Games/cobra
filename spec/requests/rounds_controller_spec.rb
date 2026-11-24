@@ -14,7 +14,7 @@ RSpec.describe RoundsController do
     describe 'during player meeting' do
       it 'displays without logging in' do
         sign_in nil
-        get pairings_data_tournament_rounds_path(tournament)
+        get pairings_data_api_classic_tournament_rounds_path(tournament)
 
         expect(compare_body(response))
           .to eq(
@@ -27,7 +27,7 @@ RSpec.describe RoundsController do
 
       it 'displays as player' do
         sign_in alice
-        get pairings_data_tournament_rounds_path(tournament)
+        get pairings_data_api_classic_tournament_rounds_path(tournament)
 
         expect(compare_body(response))
           .to eq(
@@ -40,7 +40,7 @@ RSpec.describe RoundsController do
 
       it 'displays as organiser' do
         sign_in organiser
-        get pairings_data_tournament_rounds_path(tournament)
+        get pairings_data_api_classic_tournament_rounds_path(tournament)
 
         expect(compare_body(response))
           .to eq(
@@ -59,7 +59,7 @@ RSpec.describe RoundsController do
 
       it 'displays without logging in' do
         sign_in nil
-        get pairings_data_tournament_rounds_path(tournament)
+        get pairings_data_api_classic_tournament_rounds_path(tournament)
         expect(compare_body(response))
           .to eq({
                    'policy' => { 'custom_table_numbering' => false, 'update' => false },
@@ -103,7 +103,7 @@ RSpec.describe RoundsController do
 
       it 'displays as organiser' do
         sign_in organiser
-        get pairings_data_tournament_rounds_path(tournament)
+        get pairings_data_api_classic_tournament_rounds_path(tournament)
         expect(compare_body(response))
           .to eq({
                    'policy' => { 'custom_table_numbering' => false, 'update' => true },
@@ -156,7 +156,7 @@ RSpec.describe RoundsController do
 
       it 'displays without logging in' do
         sign_in nil
-        get pairings_data_tournament_rounds_path(tournament)
+        get pairings_data_api_classic_tournament_rounds_path(tournament)
         expect(compare_body(response))
           .to eq({
                    'policy' => { 'custom_table_numbering' => false, 'update' => false },
@@ -225,7 +225,7 @@ RSpec.describe RoundsController do
 
       it 'displays bracket info' do
         sign_in nil
-        get brackets_tournament_rounds_path(tournament)
+        get brackets_api_classic_tournament_rounds_path(tournament)
         expect(compare_body(response))
           .to eq({
                    'stages' => [
@@ -318,7 +318,7 @@ RSpec.describe RoundsController do
 
       it 'displays without logging in' do
         sign_in nil
-        get pairings_data_tournament_rounds_path(tournament)
+        get pairings_data_api_classic_tournament_rounds_path(tournament)
         expected_tournament = default_tournament
         expected_tournament['swiss_format'] = 'single_sided'
         expect(compare_body(response))
@@ -375,7 +375,7 @@ RSpec.describe RoundsController do
 
       it 'displays player 1 score on the right (runner) side' do
         sign_in nil
-        get pairings_data_tournament_rounds_path(tournament)
+        get pairings_data_api_classic_tournament_rounds_path(tournament)
         expected_tournament = default_tournament
         expected_tournament['swiss_format'] = 'single_sided'
         expect(compare_body(response))

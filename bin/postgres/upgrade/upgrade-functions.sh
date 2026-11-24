@@ -41,7 +41,6 @@ upgrade_app() {
   docker-compose build app
   docker-compose run --rm app rake db:migrate
   docker-compose run --rm app rake ids:update
-  docker-compose run --rm app bundle exec rake assets:precompile
   docker-compose up -d
 }
 

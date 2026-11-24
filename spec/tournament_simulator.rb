@@ -594,7 +594,7 @@ RSpec.describe 'load testing' do # rubocop:disable RSpec/DescribeClass
       puts "\t\tDone generating results. Took #{time_taken} seconds"
 
       puts "\tCalculating standings"
-      visit standings_tournament_players_path(tournament)
+      tournament.current_stage.standings.to_a
       time_taken = timer
       round_results[:standings_page_load_time_seconds] = time_taken
       puts "\t\tDone. Took #{time_taken} seconds"

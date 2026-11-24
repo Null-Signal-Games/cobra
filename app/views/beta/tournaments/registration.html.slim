@@ -1,4 +1,0 @@
-#registration_anchor.col-12 data-tournament-id="#{@tournament.id}" data-player-id="#{@current_user_player&.id}" data-user-decks="#{@decks ? @decks.to_json : ""}" data-edit-mode="false"
-
-= content_for :head do
-  = vite_typescript_tag 'registration', 'data-turbolinks-track': 'reload'

@@ -6,10 +6,6 @@ module Beta
     before_action :authorize_beta_testing
     attr_reader :tournament
 
-    def index
-      authorize @tournament, :show?
-    end
-
     def create
       authorize @tournament, :update?
 
@@ -27,10 +23,6 @@ module Beta
       pairing.destroy
 
       head :ok
-    end
-
-    def match_slips
-      authorize @tournament, :edit?
     end
 
     def report
