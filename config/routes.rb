@@ -100,17 +100,11 @@ Rails.application.routes.draw do
     end
   end
 
-  # Legacy URLs nginx still sends to Rails: NRTM export, ABR upload and player downloads.
+  # Legacy URLs nginx still sends to Rails: NRTM export and ABR upload.
   resources :tournaments, only: %i[show] do
     member do
       get :save_json
       post :upload_to_abr
-    end
-    resources :players, only: [] do
-      collection do
-        get :download_decks
-        get :download_streaming
-      end
     end
   end
   # Served by SvelteKit; kept so Rails can build shortlink URLs.
