@@ -99,7 +99,7 @@ class AuthStore {
         ? targetPath
         : window.location.origin + targetPath;
 
-      window.location.href = `${serverOrigin}/oauth/login?return_to=${encodeURIComponent(fullReturnUrl)}`;
+      window.location.href = oauthLoginUrl(fullReturnUrl);
     }
   }
 
@@ -111,6 +111,11 @@ class AuthStore {
 }
 
 export const authStore = new AuthStore();
+
+// NRDB sign-in URL with a specified URL to redirect to.
+export function oauthLoginUrl(returnTo: string): string {
+  return `${serverOrigin}/oauth/login?return_to=${encodeURIComponent(returnTo)}`;
+}
 
 // Query string for the login page that returns the user to the given page after signing in.
 export function loginReturnQuery(
