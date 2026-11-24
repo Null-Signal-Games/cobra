@@ -76,8 +76,3 @@ export class StageData {
     };
   }
 }
-
-export interface SaveStageResponse {
-  url: string;
-  error?: string;
-}

@@ -11,10 +11,7 @@ class StagesController < ApplicationController # rubocop:disable Style/Documenta
 
     # Validate parameters
     error = validate_table_ranges(params[:table_ranges])
-    if error
-      flash.now[:alert] = error
-      return render json: { error: error }, status: :unprocessable_content
-    end
+    return render json: { error: error }, status: :unprocessable_content if error
 
     # Save table ranges
     ActiveRecord::Base.transaction do
@@ -23,12 +20,9 @@ class StagesController < ApplicationController # rubocop:disable Style/Documenta
     rescue ActiveRecord::ActiveRecordError => e
       error = "Unable to save stage: #{e}"
     end
-    if error
-      flash.now[:alert] = error
-      return render json: { error: error }, status: :unprocessable_content
-    end
+    return render json: { error: error }, status: :unprocessable_content if error
 
-    render json: { url: "#{tournament_path(@tournament)}/stages/#{@stage.id}" }, status: :ok
+    head :ok
   end
 
   def settings

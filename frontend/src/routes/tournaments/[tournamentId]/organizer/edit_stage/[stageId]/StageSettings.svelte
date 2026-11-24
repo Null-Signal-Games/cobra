@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import {
     StageData,
-    type SaveStageResponse,
   } from "#lib/api/classicTypes.ts";
   import { classicApi } from "#lib/api/classic.ts";
   import { ValidationError } from "#lib/utils/errors.ts";
@@ -17,7 +16,7 @@
     tournamentId: number;
     stageId: number;
     initialData?: StageData;
-    onSaveCallback?: (response: SaveStageResponse) => void;
+    onSaveCallback?: () => void;
   }
 
   interface TableRangeEditInterface {
@@ -54,10 +53,10 @@
     newTableRangeEdit?.addRange();
 
     try {
-      const response = await classicApi.saveStage(tournamentId, data.stage);
+      await classicApi.saveStage(tournamentId, data.stage);
       globalMessages.infos = ["Stage saved."];
       if (onSaveCallback) {
-        onSaveCallback(response);
+        onSaveCallback();
       } else {
         await goto(resolve(`tournaments/${tournamentId}/organizer/rounds`));
       }

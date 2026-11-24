@@ -7,7 +7,6 @@ import type {
   TournamentCreateResponse,
   TournamentDemoCreateResponse,
   TournamentSettingsData,
-  SaveStageResponse,
   Stage,
   StageData,
 } from "#lib/api/classicTypes.ts";
@@ -122,8 +121,8 @@ export class ClassicApi {
     );
   }
 
-  saveStage(tournamentId: number, stage: Stage, altFetch = fetch): Promise<SaveStageResponse> {
-    return this.api.patchOrThrow<SaveStageResponse>(
+  saveStage(tournamentId: number, stage: Stage, altFetch = fetch): Promise<void> {
+    return this.api.patchOrThrow(
       `/api/classic/tournaments/${tournamentId}/stages/${stage.id}`,
       { stage },
       { altFetch },

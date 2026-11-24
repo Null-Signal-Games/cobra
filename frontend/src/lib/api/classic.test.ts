@@ -287,12 +287,10 @@ describe("ClassicApi", () => {
         format: "Swiss",
         table_ranges: [{ id: 5, stage_id: 1, first_table: 1, last_table: 10 }],
       };
-      const mockResponse = { url: "/tournaments/10/stages/1" };
-      mockFetch.mockResolvedValueOnce(new Response(JSON.stringify(mockResponse), { status: 200 }));
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-      const result = await api.saveStage(10, stage, mockFetch);
+      await api.saveStage(10, stage, mockFetch);
 
-      expect(result).toEqual(mockResponse);
       const { url, requestOptions, body } = getFetchCall();
       expect(url).toContain("/api/classic/tournaments/10/stages/1");
       expect(requestOptions?.method).toBe("PATCH");

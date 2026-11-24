@@ -81,14 +81,9 @@ describe("StageSettings API helpers", () => {
       table_ranges: [{ id: 5, stage_id: 1, first_table: 1, last_table: 10 }],
     };
 
-    mockFetch.mockResolvedValueOnce(
-      new Response(JSON.stringify({ url: "/tournaments/10/stages/1" }), {
-        status: 200,
-      }),
-    );
+    mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }));
 
-    const result = await classicApi.saveStage(10, stage, mockFetch);
-    expect(result.url).toBe("/tournaments/10/stages/1");
+    await classicApi.saveStage(10, stage, mockFetch);
 
     const { url, requestOptions, body } = getFetchCall(mockFetch);
     expect(url).toContain("/tournaments/10/stages/1");
@@ -240,11 +235,9 @@ describe("StageSettings Page Component", () => {
     const mockData = createMockStageData();
     const onSave = vi.fn();
 
-    const fetchSpy = vi.spyOn(window, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify({ url: "/tournaments/10/stages/1" }), {
-        status: 200,
-      }),
-    );
+    const fetchSpy = vi
+      .spyOn(window, "fetch")
+      .mockResolvedValueOnce(new Response(null, { status: 200 }));
 
     render(StageSettings, {
       props: {
