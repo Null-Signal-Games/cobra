@@ -3,7 +3,6 @@
 module Beta
   class PairingsController < ApplicationController # rubocop:disable Style/Documentation
     before_action :set_tournament
-    before_action :authorize_beta_testing
     attr_reader :tournament
 
     def create

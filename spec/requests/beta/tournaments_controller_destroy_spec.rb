@@ -6,7 +6,6 @@ RSpec.describe 'Beta::TournamentsController #destroy' do
   let!(:round) { create(:round, tournament:, stage:) }
 
   before do
-    Flipper.enable(:beta_testing)
     create_list(:player, 2, tournament:)
     round.pair!
   end

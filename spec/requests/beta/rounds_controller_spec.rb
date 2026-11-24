@@ -2,8 +2,6 @@
 
 # Beta::RoundsController, as called by the SvelteKit frontend (frontend/src/lib/api/beta.ts).
 RSpec.describe 'Beta::RoundsController' do
-  include_context 'with beta testing enabled'
-
   let(:tournament) { create(:tournament, player_count: 4) }
   let(:round) { tournament.current_stage.pair_new_round! }
 

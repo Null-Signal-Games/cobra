@@ -8,7 +8,6 @@ module Beta
       update destroy open_registration close_registration lock_player_registrations
       unlock_player_registrations cut id_and_faction_data cut_conversion_rates current_round_timer
     ]
-    before_action :authorize_beta_testing
     before_action :validate_confirmation_name, only: :destroy
 
     def update

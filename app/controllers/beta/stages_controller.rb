@@ -6,7 +6,6 @@ module Beta
 
     before_action :set_tournament
     before_action :set_stage, only: %i[destroy]
-    before_action :authorize_beta_testing
     before_action :validate_confirmation_name, only: :destroy
 
     def create

@@ -15,8 +15,6 @@ RSpec.describe 'Reporting tied scores in elimination stages' do
   let(:tie) { { score1: 3, score2: 3 } }
 
   describe 'beta' do
-    before { Flipper.enable(:beta_testing) }
-
     it 'rejects an organiser tie' do
       sign_in organiser
 

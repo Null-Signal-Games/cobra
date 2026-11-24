@@ -7,7 +7,6 @@ RSpec.describe 'Beta::PairingsController #create' do
   let(:bob) { create(:player, tournament:) }
 
   before do
-    Flipper.enable(:beta_testing)
     sign_in tournament.user
   end
 
