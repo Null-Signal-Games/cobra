@@ -86,8 +86,7 @@ module Beta
 
       render json: {
         policy: {
-          update: @tournament.user == current_user,
-          custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
+          update: @tournament.user == current_user
         },
         tournament: helpers.tournament_json(@tournament),
         stage: {

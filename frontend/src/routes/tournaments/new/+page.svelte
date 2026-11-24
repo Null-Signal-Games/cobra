@@ -43,7 +43,6 @@
     <TournamentSettingsForm
       tournament={data.tournamentSettings.tournament}
       options={data.tournamentSettings.options}
-      featureFlags={data.tournamentSettings.feature_flags}
       onSubmitCallback={submitNewTournament}
       submitLabel="Create"
       submitIcon="plus"

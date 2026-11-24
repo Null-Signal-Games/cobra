@@ -58,12 +58,10 @@ export interface TournamentOptions {
 
 export class TournamentPolicies {
   update = false;
-  custom_table_numbering = false;
 }
 
-export interface FeatureFlags {
-  allow_self_reporting?: boolean;
-}
+// Update to Partial<Record<"flag_a" | "flag_b", boolean>> as new feature flags are added.
+export type FeatureFlags = Record<string, boolean>;
 
 export enum SwissDeckVisibility {
   Private = "swiss_decks_private",

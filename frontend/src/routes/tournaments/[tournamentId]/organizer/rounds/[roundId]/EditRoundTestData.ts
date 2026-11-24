@@ -108,7 +108,7 @@ export const MockRound1Timer: RoundTimer = {
 
 export const MockRoundData: RoundData = {
   tournament: new Tournament(),
-  policy: { update: true, custom_table_numbering: false },
+  policy: { update: true },
   stage: {
     id: 1,
     name: "Single Sided Swiss",

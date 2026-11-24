@@ -117,9 +117,7 @@ RSpec.describe TournamentsController do
           { 'id' => 'UTC', 'name' => 'UTC' }
         )
         expect(data['feature_flags']).to eq(
-          {
-            'allow_self_reporting' => false
-          }
+          {}
         )
       end
     end

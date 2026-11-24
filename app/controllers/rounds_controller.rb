@@ -8,8 +8,7 @@ class RoundsController < ApplicationController # rubocop:disable Metrics/ClassLe
 
     render json: {
       policy: {
-        update: @tournament.user == current_user,
-        custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
+        update: @tournament.user == current_user
       },
       tournament: helpers.tournament_json(@tournament),
       stages: pairings_data_stages(params[:user_id]&.to_i),

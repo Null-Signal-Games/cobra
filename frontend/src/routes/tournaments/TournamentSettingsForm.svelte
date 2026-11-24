@@ -5,7 +5,6 @@
   import {
     emptyTournamentOptions,
     swissFormatOptions,
-    type FeatureFlags,
     type Tournament,
     type TournamentOptions,
   } from "#lib/model/Tournament.ts";
@@ -16,7 +15,6 @@
   let {
     tournament,
     options = emptyTournamentOptions(),
-    featureFlags = {},
     canChangeSwissFormat = true,
     submitLabel = "Save",
     submitIcon = "floppy-o",
@@ -27,7 +25,6 @@
   }: {
     tournament: Tournament;
     options?: TournamentOptions;
-    featureFlags?: FeatureFlags;
     canChangeSwissFormat?: boolean;
     submitLabel?: string;
     submitIcon?: string;
@@ -325,20 +322,18 @@
       {@render helpTip(selfRegistrationHelp)}
     </div>
   </div>
-  {#if featureFlags.allow_self_reporting}
-    <div class="col-md-4">
-      <div class="form-check mb-3">
-        <input
-          type="checkbox"
-          id="allow_self_reporting"
-          class="form-check-input"
-          bind:checked={tournamentEdit.allow_self_reporting}
-        />
-        <label for="allow_self_reporting" class="form-check-label"> Self Reporting </label>
-        {@render helpTip(selfReportingHelp)}
-      </div>
+  <div class="col-md-4">
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        id="allow_self_reporting"
+        class="form-check-input"
+        bind:checked={tournamentEdit.allow_self_reporting}
+      />
+      <label for="allow_self_reporting" class="form-check-label"> Self Reporting </label>
+      {@render helpTip(selfReportingHelp)}
     </div>
-  {/if}
+  </div>
   <div class="col-md-4">
     <div class="form-check mb-3">
       <input

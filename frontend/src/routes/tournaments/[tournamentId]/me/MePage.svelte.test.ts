@@ -58,7 +58,7 @@ function createPairing(overrides: Partial<Pairing>): Pairing {
 
 function renderMePage(pairing: Pairing) {
   const pairings: PairingsData = {
-    policy: { update: false, custom_table_numbering: false },
+    policy: { update: false },
     stages: [
       {
         id: 1,

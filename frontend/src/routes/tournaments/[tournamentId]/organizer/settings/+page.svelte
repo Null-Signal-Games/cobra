@@ -69,7 +69,6 @@
       <TournamentSettingsForm
         tournament={data.tournamentSettings.tournament}
         options={data.tournamentSettings.options}
-        featureFlags={data.tournamentSettings.feature_flags}
         canChangeSwissFormat={data.tournamentSettings.can_change_swiss_format ?? true}
         submitLabel="Save"
         submitIcon="save"

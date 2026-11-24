@@ -3,14 +3,13 @@
   import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import type { ScoreReport } from "#lib/model/ScoreReport.ts";
   import type { Stage } from "#lib/model/Stage.ts";
-  import type { Tournament, TournamentPolicies } from "#lib/model/Tournament.ts";
+  import type { Tournament } from "#lib/model/Tournament.ts";
   import { resolve } from "$app/paths";
 
   let {
     tournament,
     stage,
     startExpanded,
-    tournamentPolicies,
     deletePairingCallback,
     changePlayerSideCallback,
     reportScoreCallback,
@@ -21,7 +20,6 @@
     tournament: Tournament;
     stage: Stage;
     startExpanded: boolean;
-    tournamentPolicies?: TournamentPolicies;
     deletePairingCallback?: (roundId: number, pairingId: number) => void;
     changePlayerSideCallback?: (
       roundId: number,
@@ -52,7 +50,7 @@
 
     <!-- Admin controls -->
     <div class="col-sm-6 d-flex justify-content-end" aria-label="admin controls">
-      {#if !stage.is_elimination && tournamentPolicies?.custom_table_numbering}
+      {#if !stage.is_elimination}
         <a
           href={resolve(`tournaments/${tournament.id}/organizer/edit_stage/${stage.id}`)}
           class="btn btn-warning mx-1"

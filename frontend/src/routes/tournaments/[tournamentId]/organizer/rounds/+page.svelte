@@ -308,7 +308,6 @@
           {stage}
           startExpanded={index === data.stages.length - 1}
           tournament={data.tournamentData.tournament}
-          tournamentPolicies={data.policy}
           {deletePairingCallback}
           {changePlayerSideCallback}
           {reportScoreCallback}

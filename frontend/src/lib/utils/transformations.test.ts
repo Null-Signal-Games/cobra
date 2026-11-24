@@ -78,7 +78,7 @@ describe("transformations", () => {
     it("processes a bye correctly", () => {
       const data: PairingsData = {
         // tournament: {} as never,
-        policy: { update: false, custom_table_numbering: false },
+        policy: { update: false },
         stages: [{
           id: 1, name: "Swiss", format: "swiss", is_single_sided: true, is_elimination: false, view_decks: false,
           rounds: [
@@ -112,7 +112,7 @@ describe("transformations", () => {
 
       const data: PairingsData = {
         // tournament: {} as never,
-        policy: { update: false, custom_table_numbering: false },
+        policy: { update: false },
         stages: [{
           id: 1, name: "Swiss", format: "swiss", is_single_sided: true, is_elimination: false, view_decks: false,
           rounds: [

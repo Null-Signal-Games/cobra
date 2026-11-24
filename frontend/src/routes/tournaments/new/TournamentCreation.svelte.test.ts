@@ -41,12 +41,7 @@ describe("TournamentCreation", () => {
       time_zones: [{ id: "UTC", name: "UTC" }],
       official_prize_kits: [{ id: 1, name: "2025 Q1 Game Night Kit" }],
     },
-    feature_flags: {
-      single_sided_swiss: true,
-      nrdb_deck_registration: true,
-      allow_self_reporting: true,
-      streaming_opt_out: true,
-    },
+    feature_flags: {},
     csrf_token: "fake-csrf-token",
   };
 

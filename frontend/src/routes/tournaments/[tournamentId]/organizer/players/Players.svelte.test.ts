@@ -42,8 +42,7 @@ vi.mock("$app/navigation", () => ({
           players: {
             tournament: clonedTournament,
             tournamentPolicies: {
-              update: true,
-              custom_table_numbering: false,
+              update: true
             },
             activePlayers: [mockAlice, mockBob],
             droppedPlayers: [],
@@ -216,7 +215,6 @@ describe("Players", () => {
         tournament,
         tournamentPolicies: {
           update: true,
-          custom_table_numbering: false,
         },
         activePlayers: [mockAlice, mockBob],
         droppedPlayers: [],
@@ -569,7 +567,6 @@ describe("Players", () => {
         tournament,
         tournamentPolicies: {
           update: true,
-          custom_table_numbering: false,
         },
         activePlayers: [mockAlice],
         droppedPlayers: [mockBob],

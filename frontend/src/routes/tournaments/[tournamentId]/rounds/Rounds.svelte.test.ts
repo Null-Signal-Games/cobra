@@ -37,8 +37,7 @@ vi.mock('$app/env/public', () => {
 });
 
 const MockPolicy: TournamentPolicies = {
-  update: false,
-  custom_table_numbering: false
+  update: false
 };
 
 const MockPageData: PageProps["data"] = {
