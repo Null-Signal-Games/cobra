@@ -1,13 +1,14 @@
 <script lang="ts">
-	import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
-	import SelfReportOptions from '#lib/components/SelfReportOptions.svelte';
-	import type { Stage } from '#lib/model/Stage.ts';
-	import type { Round } from '#lib/model/Round.ts';
-	import { type Pairing } from '#lib/model/Pairing.ts';
-	import type { Tournament } from '#lib/model/Tournament.ts';
-	import { readableReportScore, type ScoreReport } from '#lib/model/ScoreReport.ts';
-	import PlayerDisplay from '#lib/components/PlayerDisplay.svelte';
-	import { resolve } from '$app/paths';
+  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
+  import SelfReportOptions from "#lib/components/SelfReportOptions.svelte";
+  import type { Stage } from "#lib/model/Stage.ts";
+  import type { Round } from "#lib/model/Round.ts";
+  import { type Pairing } from "#lib/model/Pairing.ts";
+  import type { Tournament } from "#lib/model/Tournament.ts";
+  import { readableReportScore, type ScoreReport } from "#lib/model/ScoreReport.ts";
+  import PlayerDisplay from "#lib/components/PlayerDisplay.svelte";
+  import { resolve } from "$app/paths";
+  import ScoreDisplay from "#lib/components/ScoreDisplay.svelte";
 
 	let {
 		tournament,
@@ -82,14 +83,7 @@
         stage.is_single_sided,
       )}
     {:else}
-      {pairing.score_label}
-      {#if pairing.intentional_draw}
-        <span class="badge badge-pill badge-secondary score-badge">ID</span>
-      {/if}
-      {#if pairing.two_for_one}
-        <span class="badge badge-pill badge-secondary score-badge">2 for 1</span
-        >
-      {/if}
+      <ScoreDisplay {pairing} />
     {/if}
   </div>
 

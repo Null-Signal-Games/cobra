@@ -4,32 +4,38 @@
   import type { Pairing } from "#lib/model/Pairing.ts";
   import { Player } from "#lib/model/Player.ts";
   import { readableReportScore, type ScoreReport } from "#lib/model/ScoreReport.ts";
+  import type { Stage } from "#lib/model/Stage.ts";
+  import AdminReportOptions from "./AdminReportOptions.svelte";
 
   let {
     id,
     pairing,
-    is_single_sided,
+    stage,
+    self_reporting_enabled,
     reportScoreCallback,
     resetReportsCallback,
+    deleteCallback,
   }: {
     id: string;
     pairing: Pairing;
-    is_single_sided: boolean;
+    stage: Stage;
+    self_reporting_enabled: boolean;
     reportScoreCallback?: (
       pairingId: number,
       report: ScoreReport,
       selfReport: boolean,
     ) => void;
     resetReportsCallback?: (pairingId: number) => void;
+    deleteCallback?: (pairingId: number) => void;
   } = $props();
 
   let leftPlayer = $derived(
-    is_single_sided && pairing.player2.side == "corp"
+    stage.is_single_sided && pairing.player2.side == "corp"
       ? pairing.player2
       : pairing.player1,
   );
   let rightPlayer = $derived(
-    is_single_sided && pairing.player2.side == "corp"
+    stage.is_single_sided && pairing.player2.side == "corp"
       ? pairing.player1
       : pairing.player2,
   );
@@ -56,51 +62,44 @@
   );
 </script>
 
-{#snippet playerReport(player: Player, report: ScoreReport | undefined)}
-  {player.name} reported:
-  {#if report}
-    {readableReportScore(report, pairing.player1.side, is_single_sided)}
-    {#if playersReported && !selfReportsMatch}
-      <FontAwesomeIcon icon="times" />
-    {/if}
-  {:else}
-    <FontAwesomeIcon icon="hourglass" />
-  {/if}
+{#snippet playerReportRow(player: Player, report: ScoreReport | undefined)}
+  <div class="row mb-2 align-items-center">
+    <div class="col-8">
+      <button
+        type="button"
+        class="btn btn-primary"
+        data-dismiss="modal"
+        onclick={() => {
+          if (report) {
+            reportScoreCallback?.(pairing.id, report, false);
+          }
+        }}
+        disabled={!report}
+      >
+        <FontAwesomeIcon icon="check" /> Accept {player.name}
+      </button>
+    </div>
+    <div class="col-4">
+      {#if report}
+        {readableReportScore(report, pairing.player1.side, stage.is_single_sided)}
+        {#if playersReported && !selfReportsMatch}
+          <FontAwesomeIcon icon="times" />
+        {/if}
+      {:else}
+        <FontAwesomeIcon icon="hourglass" />
+      {/if}
+    </div>
+  </div>
 {/snippet}
 
-{#snippet acceptPlayerReportButton(player: Player, report: ScoreReport)}
-    <button
-      type="button"
-      class="btn btn-primary"
-      data-dismiss="modal"
-      onclick={() => {
-        reportScoreCallback?.(pairing.id, report, false);
-      }}
-      disabled={pairing.reported}
-    >
-      <FontAwesomeIcon icon="check" /> Accept {player.name}
-    </button>
-  {/snippet}
+<ModalDialog id={id} headerText="Table {pairing.table_number}">
+  {#if self_reporting_enabled}
+    <h5>Player Self Reports</h5>
+    <div class="container">
+      {@render playerReportRow(leftPlayer, leftPlayerReport)}
+      {@render playerReportRow(rightPlayer, rightPlayerReport)}
+    </div>
 
-<ModalDialog id={id} headerText="Player Self Reports">
-  <p>
-    <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-    {@render playerReport(leftPlayer, leftPlayerReport)}
-  </p>
-  <p>
-    <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-    {@render playerReport(rightPlayer, rightPlayerReport)}
-  </p>
-
-  {#snippet footer()}
-    {#if leftPlayerReport}
-      <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-      {@render acceptPlayerReportButton(leftPlayer, leftPlayerReport)}
-    {/if}
-    {#if rightPlayerReport}
-      <!-- eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -->
-      {@render acceptPlayerReportButton(rightPlayer, rightPlayerReport)}
-    {/if}
     {#if playersReported && !selfReportsMatch}
       <button
         type="button"
@@ -113,5 +112,22 @@
         <FontAwesomeIcon icon="undo" /> Reset
       </button>
     {/if}
-  {/snippet}
+
+    <hr />
+  {/if}
+
+  <h5>Manual Score Reporting</h5>
+  <AdminReportOptions {stage} {pairing} {reportScoreCallback} />
+  <hr />
+
+  <h5>Danger Zone</h5>
+  <button
+    class="btn btn-danger"
+    onclick={() => {
+      deleteCallback?.(pairing.id);
+    }}
+    aria-label="delete"
+  >
+    <FontAwesomeIcon icon="trash" /> Delete Pairing
+  </button>
 </ModalDialog>

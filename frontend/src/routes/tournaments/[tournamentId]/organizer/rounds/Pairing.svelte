@@ -1,5 +1,4 @@
 <script lang="ts">
-  import AdminReportOptions from "./AdminReportOptions.svelte";
   import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
   import type { Stage } from "#lib/model/Stage.ts";
   import type { Round } from "#lib/model/Round.ts";
@@ -12,6 +11,7 @@
   import { onMount } from "svelte";
   import { authStore, type AuthUser } from "#lib/utils/auth.svelte.ts";
   import EditPairingDialog from "./EditPairingDialog.svelte";
+  import ScoreDisplay from "#lib/components/ScoreDisplay.svelte";
 
 	let {
 		tournament,
@@ -72,105 +72,116 @@
 		? 'current_user_row'
 		: ''}"
 >
-	<!-- Table label -->
-	<div class="col-sm-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
-		{pairing.table_label}
+  <!-- Table label -->
+  <div
+    class="col-sm-2 order-0 {pairing.ui_metadata.row_highlighted
+      ? 'font-weight-bold'
+      : ''}"
+  >
+    {pairing.table_label}
+    {#if tournament.allow_streaming_opt_out}
+      {#if pairing.player1.include_in_stream && pairing.player2.include_in_stream}
+        <span title="May be included in video coverage.">
+          <FontAwesomeIcon icon="video-camera" cssClass="text-success" />
+        </span>
+      {:else if stage.is_elimination}
+        <span
+          title="One or both players request not to be included in video coverage, but were informed this may not be possible in the cut."
+        >
+          <FontAwesomeIcon icon="video-camera" cssClass="text-warning" />
+        </span>
+      {:else}
+        <span
+          title="One or both players request not to not be included in video coverage."
+        >
+          <FontAwesomeIcon icon="video-camera" cssClass="text-secondary" />
+          <FontAwesomeIcon icon="ban" cssClass="text-danger" />
+        </span>
+      {/if}
+    {/if}
+  </div>
 
-		{#if tournament.allow_streaming_opt_out}
-			{#if pairing.player1.include_in_stream && pairing.player2.include_in_stream}
-				<span title="May be included in video coverage.">
-					<FontAwesomeIcon icon="video-camera" cssClass="text-success" />
-				</span>
-			{:else if stage.is_elimination}
-				<span
-					title="One or both players request not to be included in video coverage, but were informed this may not be possible in the cut."
-				>
-					<FontAwesomeIcon icon="video-camera" cssClass="text-warning" />
-				</span>
-			{:else}
-				<span title="One or both players request not to not be included in video coverage.">
-					<FontAwesomeIcon icon="video-camera" cssClass="text-secondary" />
-					<FontAwesomeIcon icon="ban" cssClass="text-danger" />
-				</span>
-			{/if}
-		{/if}
-	</div>
+  <!-- Player 1 -->
+  {#if stage.view_decks}
+    {#if stage.is_single_sided}
+      <a
+        href={resolve(`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=${tournament.user_id === currentUser?.id ? "pairings" : "rounds"}`)}
+      >
+        <FontAwesomeIcon icon="eye" /> View decks
+      </a>
+    {/if}
+  {/if}
+  <div class="col-sm-4 col-6 order-1">
+    <PlayerDisplay
+      player={leftPlayer}
+      {pairing}
+      left_or_right="left"
+      is_single_sided={stage.is_single_sided}
+      {changePlayerSide}
+      show_ids={!stage.is_single_sided || pairing.player1.side !== null}
+    />
+  </div>
 
-	<!-- Player 1 -->
-	{#if stage.view_decks}
-		{#if stage.is_single_sided}
-			<a
-				href={resolve(
-					`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=${tournament.user_id === currentUser?.id ? 'pairings' : 'rounds'}`
-				)}
-			>
-				<FontAwesomeIcon icon="eye" /> View decks
-			</a>
-		{/if}
-	{/if}
-	<PlayerDisplay
-		player={leftPlayer}
-		{pairing}
-		left_or_right="left"
-		is_single_sided={stage.is_single_sided}
-		{changePlayerSide}
-		show_ids={!stage.is_single_sided || pairing.player1.side !== null}
-	/>
+  <!-- Edit -->
+  <div class="col-sm-2 order-last order-sm-2 centre_score">
+    <button
+      type="button"
+      class="btn btn-primary mr-2"
+      data-toggle="modal"
+      data-target="#reports{pairing.id}"
+    >
+      <FontAwesomeIcon icon="pencil" /> Edit
+    </button>
 
-	<!-- Score -->
-	<AdminReportOptions {stage} {pairing} {reportScoreCallback} />
+    <!-- Player report status badges -->
+    <div>
+     <ScoreDisplay {pairing} />
+    </div>
+    {#if pairing.self_reports}
+      <div>
+        {#if !pairing.reported}
+          {#if pairing.self_reports.length == 1}
+            <div class="badge badge-warning">
+              Partial
+            </div>
+          {:else if pairing.self_reports.length == 2
+            && !reportsMatch(pairing.self_reports[0], pairing.self_reports[1])
+          }
+            <div class="badge badge-warning">
+              Mismatch
+            </div>
+          {/if}
+        {/if}
+        {#if (pairing.self_reports.length > 0 && !isPreset(stage, pairing.self_reports[0]))
+          || (pairing.self_reports.length > 1 && !isPreset(stage, pairing.self_reports[1]))
+        }
+          <div class="badge badge-secondary">
+            Custom
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </div>
 
-	<!-- Player 2 -->
-	<PlayerDisplay
-		player={rightPlayer}
-		{pairing}
-		left_or_right="right"
-		is_single_sided={stage.is_single_sided}
-		{changePlayerSide}
-		show_ids={!stage.is_single_sided || pairing.player2.side !== null}
-	/>
-
-	<!-- Score reporting -->
-	<div class="row-sm1 mr-3">
-		<button
-			type="button"
-			class="btn btn-primary mr-2"
-			data-toggle="modal"
-			data-target="#reports{pairing.id}"
-		>
-			Reports
-		</button>
-		<button
-			class="btn btn-danger"
-			onclick={() => {
-				deleteCallback?.(pairing.id);
-			}}
-			aria-label="delete"
-		>
-			<FontAwesomeIcon icon="trash" />
-		</button>
-		<!-- Player report status badges -->
-		{#if pairing.self_reports}
-			<div>
-				{#if !pairing.reported}
-					{#if pairing.self_reports.length == 1}
-						<div class="badge badge-warning">Partial</div>
-					{:else if pairing.self_reports.length == 2 && !reportsMatch(pairing.self_reports[0], pairing.self_reports[1])}
-						<div class="badge badge-warning">Mismatch</div>
-					{/if}
-				{/if}
-				{#if (pairing.self_reports.length > 0 && !isPreset(stage, pairing.self_reports[0])) || (pairing.self_reports.length > 1 && !isPreset(stage, pairing.self_reports[1]))}
-					<div class="badge badge-secondary">Custom</div>
-				{/if}
-			</div>
-		{/if}
-	</div>
+  <!-- Player 2 -->
+  <div class="col-sm-4 col-6 order-3">
+    <PlayerDisplay
+      player={rightPlayer}
+      {pairing}
+      left_or_right="right"
+      is_single_sided={stage.is_single_sided}
+      {changePlayerSide}
+      show_ids={!stage.is_single_sided || pairing.player2.side !== null}
+    />
+  </div>
 
   <EditPairingDialog
     id="reports{pairing.id}"
     {pairing}
-    is_single_sided={stage.is_single_sided}
+    {stage}
+    self_reporting_enabled={tournament.allow_self_reporting}
     {reportScoreCallback}
     {resetReportsCallback}
+    {deleteCallback}
   />
 </div>
