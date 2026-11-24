@@ -74,7 +74,7 @@
 >
   <!-- Table label -->
   <div
-    class="col-sm-2 order-0 {pairing.ui_metadata.row_highlighted
+    class="col-sm-2 {pairing.ui_metadata.row_highlighted
       ? 'font-weight-bold'
       : ''}"
   >
@@ -111,7 +111,7 @@
       </a>
     {/if}
   {/if}
-  <div class="col-sm-4 col-6 order-1">
+  <div class="col-4 px-2">
     <PlayerDisplay
       player={leftPlayer}
       {pairing}
@@ -122,7 +122,7 @@
   </div>
 
   <!-- Edit -->
-  <div class="col-sm-2 order-last order-sm-2 centre_score">
+  <div class="col-4 col-sm-2 centre_score px-2">
     <button
       type="button"
       class="btn btn-primary mr-2"
@@ -163,7 +163,7 @@
   </div>
 
   <!-- Player 2 -->
-  <div class="col-sm-4 col-6 order-3">
+  <div class="col-4 px-2">
     <PlayerDisplay
       player={rightPlayer}
       {pairing}

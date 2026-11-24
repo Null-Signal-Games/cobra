@@ -19,9 +19,9 @@
   } = $props();
 </script>
 
-<div class="col-sm {left_or_right}_player_name">
-	<!-- Name -->
-	{player.name_with_pronouns}
+<div class="{left_or_right}_player_name">
+  <!-- Name -->
+  {player.name_with_pronouns}
 
   <!-- Side -->
   {#if is_single_sided && pairing?.player1.id && pairing.player2.id}
@@ -53,3 +53,13 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+  .left_player_name {
+    text-align: right;
+  }
+
+  .right_player_name {
+    text-align: left;
+  }
+</style>

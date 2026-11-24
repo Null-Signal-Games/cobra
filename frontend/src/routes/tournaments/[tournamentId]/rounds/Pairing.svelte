@@ -48,7 +48,7 @@
   </div>
 
   <!-- Player 1 -->
-  <div class="col-sm-4 col-6 order-1">
+  <div class="col-4 px-2">
     {#if stage.view_decks}
       {#if pairing.player1.side}
         <a
@@ -72,7 +72,7 @@
   </div>
 
   <!-- Score -->
-  <div class="col-sm-2 order-last order-sm-2 centre_score">
+  <div class="col-4 col-sm-2 centre_score px-2">
     <!-- Self-reporting -->
     {#if pairing.policy.self_report}
       <SelfReportOptions {stage} {pairing} {reportScoreCallback} />
@@ -88,7 +88,7 @@
   </div>
 
   <!-- Player 2 -->
-  <div class="col-sm-4 col-6 order-3">
+  <div class="col-4 px-2">
     <PlayerDisplay
       player={rightPlayer}
       {pairing}
