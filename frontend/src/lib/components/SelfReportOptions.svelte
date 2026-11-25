@@ -43,81 +43,81 @@
 	data-toggle="modal"
 	data-target="#reportModal-{pairing.id}"
 >
-  Report Score
+	Report Score
 </button>
 
 <ModalDialog id="reportModal-{pairing.id}" headerText="Report Score">
-  <p>Please click the button for the result to report this pairing:</p>
-  <p>
-    {left_player.name_with_pronouns} vs. {right_player.name_with_pronouns}
-  </p>
-  <div style="gap: 20px;" class="d-flex flex-row w-100 justify-content-center">
-    {#if !customReporting}
-      {#each scorePresets(stage, pairing) as report (report.label)}
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-dismiss="modal"
-          onclick={() => {
-            reportScoreCallback?.(pairing.id, report, true);
-          }}
-        >
-          {report.extra_self_report_label ?? report.label}
-        </button>
-      {/each}
-    {:else}
-      {#if left_player === pairing.player1}
-        <input
-          type="text"
-          id="name"
-          style="width: 2.5em;"
-          class="form-control"
-          bind:value={customReport.score1}
-        />
-        <p>-</p>
-        <input
-          type="text"
-          id="name"
-          style="width: 2.5em;"
-          class="form-control"
-          bind:value={customReport.score2}
-        />
-      {:else}
-        <input
-          type="text"
-          id="name"
-          style="width: 2.5em;"
-          class="form-control"
-          bind:value={customReport.score2}
-        />
-        <p>-</p>
-        <input
-          type="text"
-          id="name"
-          style="width: 2.5em;"
-          class="form-control"
-          bind:value={customReport.score1}
-        />
-      {/if}
-      <button
-        type="button"
-        class="btn btn-primary"
-        data-dismiss="modal"
-        id="option-custom"
-        onclick={() => {
-          reportScoreCallback?.(pairing.id, customReport, true);
-        }}
-      >
-        Submit
-      </button>
-    {/if}
-    <button
-      type="button"
-      class="btn btn-primary"
-      id="option-custom"
-      onclick={onCustomReportClicked}
-    >
-      {customReporting ? "Presets" : "Custom"}
-    </button>
-  </div>
+	<p>Please click the button for the result to report this pairing:</p>
+	<p>
+		{left_player.name_with_pronouns} vs. {right_player.name_with_pronouns}
+	</p>
+	<div style="gap: 20px;" class="d-flex flex-row w-100 justify-content-center">
+		{#if !customReporting}
+			{#each scorePresets(stage, pairing) as report (report.label)}
+				<button
+					type="button"
+					class="btn btn-primary"
+					data-dismiss="modal"
+					onclick={() => {
+						reportScoreCallback?.(pairing.id, report, true);
+					}}
+				>
+					{report.extra_self_report_label ?? report.label}
+				</button>
+			{/each}
+		{:else}
+			{#if left_player === pairing.player1}
+				<input
+					type="text"
+					id="name"
+					style="width: 2.5em;"
+					class="form-control"
+					bind:value={customReport.score1}
+				/>
+				<p>-</p>
+				<input
+					type="text"
+					id="name"
+					style="width: 2.5em;"
+					class="form-control"
+					bind:value={customReport.score2}
+				/>
+			{:else}
+				<input
+					type="text"
+					id="name"
+					style="width: 2.5em;"
+					class="form-control"
+					bind:value={customReport.score2}
+				/>
+				<p>-</p>
+				<input
+					type="text"
+					id="name"
+					style="width: 2.5em;"
+					class="form-control"
+					bind:value={customReport.score1}
+				/>
+			{/if}
+			<button
+				type="button"
+				class="btn btn-primary"
+				data-dismiss="modal"
+				id="option-custom"
+				onclick={() => {
+					reportScoreCallback?.(pairing.id, customReport, true);
+				}}
+			>
+				Submit
+			</button>
+		{/if}
+		<button
+			type="button"
+			class="btn btn-primary"
+			id="option-custom"
+			onclick={onCustomReportClicked}
+		>
+			{customReporting ? 'Presets' : 'Custom'}
+		</button>
+	</div>
 </ModalDialog>

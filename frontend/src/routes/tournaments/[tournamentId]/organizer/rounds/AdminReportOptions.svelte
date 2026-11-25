@@ -41,49 +41,49 @@
 </script>
 
 <div class="centre_score">
-  {#if showScorePresets}
-    <div>
-      {#each scorePresets(stage, pairing) as report (report.label)}
-        <button
-          type="button"
-          class="btn btn-primary mr-1"
-          onclick={() => {
-            reportScoreCallback?.(pairing.id, report, false);
-          }}
-        >
-          {report.label}
-        </button>
-      {/each}
-      <button
-        aria-label="show-custom"
-        type="button"
-        class="btn btn-primary"
-        onclick={toggleShowScorePresets}
-      >
-        ...
-      </button>
-    </div>
-  {:else}
-    <div class="form-row justify-content-center">
-      <div>
-        {#if leftPlayer === pairing.player1}
-          <input
-            id="pairing_score1"
-            aria-label="corp-score"
-            class="form-control"
-            style="width: 2.5em;"
-            bind:value={customReport.score1}
-          />
-        {:else}
-          <input
-            id="pairing_score2"
-            aria-label="corp-score"
-            class="form-control"
-            style="width: 2.5em;"
-            bind:value={customReport.score2}
-          />
-        {/if}
-      </div>
+	{#if showScorePresets}
+		<div>
+			{#each scorePresets(stage, pairing) as report (report.label)}
+				<button
+					type="button"
+					class="btn btn-primary mr-1"
+					onclick={() => {
+						reportScoreCallback?.(pairing.id, report, false);
+					}}
+				>
+					{report.label}
+				</button>
+			{/each}
+			<button
+				aria-label="show-custom"
+				type="button"
+				class="btn btn-primary"
+				onclick={toggleShowScorePresets}
+			>
+				...
+			</button>
+		</div>
+	{:else}
+		<div class="form-row justify-content-center">
+			<div>
+				{#if leftPlayer === pairing.player1}
+					<input
+						id="pairing_score1"
+						aria-label="corp-score"
+						class="form-control"
+						style="width: 2.5em;"
+						bind:value={customReport.score1}
+					/>
+				{:else}
+					<input
+						id="pairing_score2"
+						aria-label="corp-score"
+						class="form-control"
+						style="width: 2.5em;"
+						bind:value={customReport.score2}
+					/>
+				{/if}
+			</div>
 
 			<button
 				type="button"

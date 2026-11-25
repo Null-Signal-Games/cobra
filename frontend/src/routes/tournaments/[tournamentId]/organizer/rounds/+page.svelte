@@ -190,76 +190,83 @@
 </script>
 
 <div class="col-12">
-  {#if data.stages.length == 0}
-    <!-- Add Swiss stage button -->
-    <button
-      type="button"
-      class="btn btn-success"
-      onclick={async () => {
-        await addStage();
-      }}
-    >
-      <FontAwesomeIcon icon="plus" /> Add Swiss stage
-    </button>
-  {:else}
-    <!-- Upper controls -->
-    <div class="row">
-      <div class="col-12">
-        {#if data.stages.every((s) => s.rounds.length === 0)}
-          <a
-            href={resolve(`tournaments/${params.tournamentId}/player_meeting?back_to=pairings`)}
-            class="btn btn-primary"
-          >
-            <FontAwesomeIcon icon="list-ul" /> Player meeting
-          </a>
-        {:else}
-          <ProgressButton
-            css="btn btn-success"
-            inProgressText="Refreshing"
-            completeText="Refreshed"
-            onclick={refreshData}
-          >
-            <FontAwesomeIcon icon="rotate" /> Refresh
-          </ProgressButton>
-          <button
-            type="button"
-            class="btn btn-primary"
-            onclick={() => {
-              showReportedPairings.update((value) => !value);
-            }}
-          >
-            <FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            onclick={() => {
-              showIdentities.update((value) => !value);
-            }}
-          >
-            <FontAwesomeIcon icon="eye-slash" /> Show/hide identities
-          </button>
-          <button type="button" class="btn btn-info" data-toggle="modal" data-target="#faq">
-            <FontAwesomeIcon icon="question" /> FAQ
-          </button>
-          {#if data.policy.update}
-            <a
-              href={resolve(`tournaments/${params.tournamentId}/rounds`)}
-              class="btn btn-primary float-right"
-            >
-              <FontAwesomeIcon icon="users" /> See player pairings view
-            </a>
-          {/if}
-  
-          {#if !$showReportedPairings}
-            <div class="alert alert-info mt-3">
-              Reported scores are currently hidden on this page. This will not affect other users
-              viewing this page.
-            </div>
-          {/if}
-        {/if}
-      </div>
-    </div>
+	{#if data.stages.length == 0}
+		<!-- Add Swiss stage button -->
+		<button
+			type="button"
+			class="btn btn-success"
+			onclick={async () => {
+				await addStage();
+			}}
+		>
+			<FontAwesomeIcon icon="plus" /> Add Swiss stage
+		</button>
+	{:else}
+		<!-- Upper controls -->
+		<div class="row">
+			<div class="col-12">
+				{#if data.stages.every((s) => s.rounds.length === 0)}
+					<a
+						href={resolve(
+							`tournaments/${params.tournamentId}/player_meeting?back_to=pairings`
+						)}
+						class="btn btn-primary"
+					>
+						<FontAwesomeIcon icon="list-ul" /> Player meeting
+					</a>
+				{:else}
+					<ProgressButton
+						css="btn btn-success"
+						inProgressText="Refreshing"
+						completeText="Refreshed"
+						onclick={refreshData}
+					>
+						<FontAwesomeIcon icon="rotate" /> Refresh
+					</ProgressButton>
+					<button
+						type="button"
+						class="btn btn-primary"
+						onclick={() => {
+							showReportedPairings.update((value) => !value);
+						}}
+					>
+						<FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
+					</button>
+					<button
+						type="button"
+						class="btn btn-primary"
+						onclick={() => {
+							showIdentities.update((value) => !value);
+						}}
+					>
+						<FontAwesomeIcon icon="eye-slash" /> Show/hide identities
+					</button>
+					<button
+						type="button"
+						class="btn btn-info"
+						data-toggle="modal"
+						data-target="#faq"
+					>
+						<FontAwesomeIcon icon="question" /> FAQ
+					</button>
+					{#if data.policy.update}
+						<a
+							href={resolve(`tournaments/${params.tournamentId}/rounds`)}
+							class="btn btn-primary float-right"
+						>
+							<FontAwesomeIcon icon="users" /> See player pairings view
+						</a>
+					{/if}
+
+					{#if !$showReportedPairings}
+						<div class="alert alert-info mt-3">
+							Reported scores are currently hidden on this page. This will not affect
+							other users viewing this page.
+						</div>
+					{/if}
+				{/if}
+			</div>
+		</div>
 
 		<!-- Tournament admin controls -->
 		<div class="mt-3">
