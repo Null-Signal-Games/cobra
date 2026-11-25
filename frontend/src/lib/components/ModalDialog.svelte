@@ -16,6 +16,8 @@
 		footer?: Snippet;
 	} = $props();
 
+	let closeButton = $state<HTMLButtonElement | undefined>();
+
 	function portal(node: HTMLElement) {
 		document.body.appendChild(node);
 		return {
@@ -26,6 +28,10 @@
 			}
 		};
 	}
+
+	export function close() {
+		closeButton?.click();
+	}
 </script>
 
 <div {id} class="modal fade" role="dialog" tabindex="-1" use:portal>
@@ -33,7 +39,13 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h4>{headerText}</h4>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<button
+					bind:this={closeButton}
+					type="button"
+					class="close"
+					data-dismiss="modal"
+					aria-label="Close"
+				>
 					<FontAwesomeIcon icon="times" />
 				</button>
 			</div>

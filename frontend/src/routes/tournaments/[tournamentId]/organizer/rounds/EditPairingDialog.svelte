@@ -27,6 +27,8 @@
 		deleteCallback?: (pairingId: number) => void;
 	} = $props();
 
+	let dialog = $state<ModalDialog>();
+
 	let leftPlayer = $derived(
 		stage.is_single_sided && pairing.player2.side == 'corp' ? pairing.player2 : pairing.player1
 	);
@@ -50,11 +52,33 @@
 			leftPlayerReport?.score1_runner === rightPlayerReport?.score1_runner &&
 			leftPlayerReport?.score2_runner === rightPlayerReport?.score2_runner
 	);
+
+	async function deletePairing() {
+		if (!confirm('Are you sure? This cannot be reversed.')) {
+			return;
+		}
+
+		deleteCallback?.(pairing.id);
+		dialog?.close();
+	}
 </script>
 
 {#snippet playerReportRow(player: Player, report: ScoreReport | undefined)}
 	<div class="row mb-2 align-items-center">
-		<div class="col-8">
+		<div class="col-6">
+			{player.name}
+		</div>
+		<div class="col-3">
+			{#if report}
+				{readableReportScore(report, pairing.player1.side, stage.is_single_sided)}
+				{#if playersReported && !selfReportsMatch}
+					<FontAwesomeIcon icon="times" />
+				{/if}
+			{:else}
+				<FontAwesomeIcon icon="hourglass" />
+			{/if}
+		</div>
+		<div class="col-3">
 			<button
 				type="button"
 				class="btn btn-primary"
@@ -66,18 +90,8 @@
 				}}
 				disabled={!report || pairing.reported}
 			>
-				Accept {player.name}
+				Accept
 			</button>
-		</div>
-		<div class="col-4">
-			{#if report}
-				{readableReportScore(report, pairing.player1.side, stage.is_single_sided)}
-				{#if playersReported && !selfReportsMatch}
-					<FontAwesomeIcon icon="times" />
-				{/if}
-			{:else}
-				<FontAwesomeIcon icon="hourglass" />
-			{/if}
 		</div>
 	</div>
 {/snippet}
@@ -97,7 +111,7 @@
 	</button>
 {/snippet}
 
-<ModalDialog {id} headerText="Table {pairing.table_number}">
+<ModalDialog bind:this={dialog} {id} headerText="Table {pairing.table_number}">
 	{#if self_reporting_enabled}
 		<h5>Player Self Reports</h5>
 		<div class="container">
@@ -147,13 +161,7 @@
 	{/if}
 
 	<h5>Danger Zone</h5>
-	<button
-		class="btn btn-danger"
-		onclick={() => {
-			deleteCallback?.(pairing.id);
-		}}
-		aria-label="delete"
-	>
+	<button class="btn btn-danger" onclick={deletePairing} aria-label="delete">
 		<FontAwesomeIcon icon="trash" /> Delete Pairing
 	</button>
 </ModalDialog>

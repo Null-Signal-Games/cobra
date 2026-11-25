@@ -84,10 +84,6 @@
 	}
 
 	async function deletePairingCallback(roundId: number, pairingId: number) {
-		if (!confirm('Are you sure? This cannot be reversed.')) {
-			return;
-		}
-
 		const success = await betaApi.deletePairing(
 			data.tournamentData.tournament.id,
 			roundId,
