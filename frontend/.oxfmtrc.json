@@ -1,0 +1,14 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"tabWidth": 4,
+	"useTabs": true,
+	"singleQuote": true,
+	"trailingComma": "none",
+	"printWidth": 100,
+	"svelte": {
+		"allowShorthand": true,
+		"indentScriptAndStyle": true,
+		"sortOrder": "options-scripts-markup-styles"
+	},
+	"ignorePatterns": ["package-lock.json", "static/"]
+}

@@ -1,131 +1,131 @@
-import { CLIENT_COBRA_API_ENDPOINT } from "$app/env/public";
-import { classicApi } from "#lib/api/classic.ts";
-import { v1Api } from "#lib/api/v1.ts";
-import type { UserFeatures } from "#lib/api/v1ApiTypes.ts";
+import { CLIENT_COBRA_API_ENDPOINT } from '$app/env/public';
+import { classicApi } from '#lib/api/classic.ts';
+import { v1Api } from '#lib/api/v1.ts';
+import type { UserFeatures } from '#lib/api/v1ApiTypes.ts';
 
 export interface AuthUser {
-  id: number;
-  nrdb_id: number;
-  nrdb_username: string;
-  features: UserFeatures;
+	id: number;
+	nrdb_id: number;
+	nrdb_username: string;
+	features: UserFeatures;
 }
 
-const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || "").replace(/\/$/, "");
+const serverOrigin = (CLIENT_COBRA_API_ENDPOINT || '').replace(/\/$/, '');
 
 async function loadUser(altFetch: typeof fetch): Promise<AuthUser | null> {
-  try {
-    const response = await v1Api.loadCurrentUser(altFetch);
-    if (!response) {
-      return null;
-    }
+	try {
+		const response = await v1Api.loadCurrentUser(altFetch);
+		if (!response) {
+			return null;
+		}
 
-    return {
-      id: Number(response.data.id),
-      nrdb_id: response.data.attributes.nrdb_id,
-      nrdb_username: response.data.attributes.nrdb_username,
-      features: response.data.attributes.features ?? {},
-    };
-  } catch {
-    return null;
-  }
+		return {
+			id: Number(response.data.id),
+			nrdb_id: response.data.attributes.nrdb_id,
+			nrdb_username: response.data.attributes.nrdb_username,
+			features: response.data.attributes.features ?? {}
+		};
+	} catch {
+		return null;
+	}
 }
 
 class AuthStore {
-  user = $state<AuthUser | null>(null);
-  isLoading = $state<boolean>(true);
+	user = $state<AuthUser | null>(null);
+	isLoading = $state<boolean>(true);
 
-  // Rails ties the CSRF token to the session cookie, so one token is valid for every
-  // mutating request until the session changes.
-  private csrfToken: string | null = null;
-  private csrfTokenRequest: Promise<string> | null = null;
+	// Rails ties the CSRF token to the session cookie, so one token is valid for every
+	// mutating request until the session changes.
+	private csrfToken: string | null = null;
+	private csrfTokenRequest: Promise<string> | null = null;
 
-  get isAuthenticated(): boolean {
-    return this.user !== null;
-  }
+	get isAuthenticated(): boolean {
+		return this.user !== null;
+	}
 
-  async checkAuth(altFetch = fetch): Promise<AuthUser | null> {
-    // Never read or write this state on the server side.
-    // Server-side code should get the current user from load data (see routes/+layout.ts).
-    if (typeof window === "undefined") {
-      return loadUser(altFetch);
-    }
+	async checkAuth(altFetch = fetch): Promise<AuthUser | null> {
+		// Never read or write this state on the server side.
+		// Server-side code should get the current user from load data (see routes/+layout.ts).
+		if (typeof window === 'undefined') {
+			return loadUser(altFetch);
+		}
 
-    if (this.isAuthenticated) {
-      return this.user;
-    }
+		if (this.isAuthenticated) {
+			return this.user;
+		}
 
-    this.isLoading = true;
-    try {
-      this.user = await loadUser(altFetch);
-    } finally {
-      this.isLoading = false;
-    }
+		this.isLoading = true;
+		try {
+			this.user = await loadUser(altFetch);
+		} finally {
+			this.isLoading = false;
+		}
 
-    return this.user;
-  }
+		return this.user;
+	}
 
-  async getCsrfToken(altFetch = fetch): Promise<string> {
-    // Only cache in the browser; on the server this store is shared across requests.
-    if (typeof window === "undefined") {
-      return classicApi.loadCsrfToken(altFetch);
-    }
+	async getCsrfToken(altFetch = fetch): Promise<string> {
+		// Only cache in the browser; on the server this store is shared across requests.
+		if (typeof window === 'undefined') {
+			return classicApi.loadCsrfToken(altFetch);
+		}
 
-    if (this.csrfToken) {
-      return this.csrfToken;
-    }
+		if (this.csrfToken) {
+			return this.csrfToken;
+		}
 
-    this.csrfTokenRequest ??= classicApi
-      .loadCsrfToken(altFetch)
-      .then((token) => {
-        this.csrfToken = token;
-        return token;
-      })
-      .finally(() => {
-        this.csrfTokenRequest = null;
-      });
+		this.csrfTokenRequest ??= classicApi
+			.loadCsrfToken(altFetch)
+			.then((token) => {
+				this.csrfToken = token;
+				return token;
+			})
+			.finally(() => {
+				this.csrfTokenRequest = null;
+			});
 
-    return this.csrfTokenRequest;
-  }
+		return this.csrfTokenRequest;
+	}
 
-  clearCsrfToken() {
-    this.csrfToken = null;
-  }
+	clearCsrfToken() {
+		this.csrfToken = null;
+	}
 
-  redirectToLogin(returnTo?: string) {
-    if (typeof window !== "undefined") {
-      const defaultReturn = window.location.origin + window.location.pathname;
-      const targetPath = returnTo ?? defaultReturn;
-      const fullReturnUrl = targetPath.startsWith("http")
-        ? targetPath
-        : window.location.origin + targetPath;
+	redirectToLogin(returnTo?: string) {
+		if (typeof window !== 'undefined') {
+			const defaultReturn = window.location.origin + window.location.pathname;
+			const targetPath = returnTo ?? defaultReturn;
+			const fullReturnUrl = targetPath.startsWith('http')
+				? targetPath
+				: window.location.origin + targetPath;
 
-      window.location.href = oauthLoginUrl(fullReturnUrl);
-    }
-  }
+			window.location.href = oauthLoginUrl(fullReturnUrl);
+		}
+	}
 
-  invalidateAndLogIn(returnTo?: string) {
-    this.user = null;
-    this.clearCsrfToken();
-    this.redirectToLogin(returnTo);
-  }
+	invalidateAndLogIn(returnTo?: string) {
+		this.user = null;
+		this.clearCsrfToken();
+		this.redirectToLogin(returnTo);
+	}
 }
 
 export const authStore = new AuthStore();
 
 // NRDB sign-in URL with a specified URL to redirect to.
 export function oauthLoginUrl(returnTo: string): string {
-  return `${serverOrigin}/oauth/login?return_to=${encodeURIComponent(returnTo)}`;
+	return `${serverOrigin}/oauth/login?return_to=${encodeURIComponent(returnTo)}`;
 }
 
 // Query string for the login page that returns the user to the given page after signing in.
 export function loginReturnQuery(
-  url: Pick<URL, "pathname" | "search">,
-  routeId: string | null,
+	url: Pick<URL, 'pathname' | 'search'>,
+	routeId: string | null
 ): string {
-  // On the login page itself, keep its existing return_to instead of pointing back at /login.
-  if (routeId === "/login") {
-    return url.search;
-  }
+	// On the login page itself, keep its existing return_to instead of pointing back at /login.
+	if (routeId === '/login') {
+		return url.search;
+	}
 
-  return `?return_to=${encodeURIComponent(url.pathname + url.search)}`;
+	return `?return_to=${encodeURIComponent(url.pathname + url.search)}`;
 }

@@ -1,399 +1,421 @@
 <script lang="ts">
-  import "#lib/assets/css/pairings.sass";
-  import Stage from "./Stage.svelte";
-  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
-  import ModalDialog from "#lib/components/ModalDialog.svelte";
-  import type { ScoreReport } from "#lib/model/ScoreReport.ts";
-  import { resolve } from "$app/paths";
-  import type { PageProps } from "./$types";
-  import { showReportedPairings } from "#lib/utils/ShowReportedPairings.ts";
-  import { showIdentities } from "#lib/utils/ShowIdentities.ts";
-  import { refreshAll } from "$app/navigation";
-  import { betaApi } from "#lib/api/beta.ts";
-  import { globalMessages } from "#lib/utils/GlobalMessageState.svelte.ts";
-  import ProgressButton from "#lib/components/ProgressButton.svelte";
+	import '#lib/assets/css/pairings.sass';
+	import Stage from './Stage.svelte';
+	import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
+	import ModalDialog from '#lib/components/ModalDialog.svelte';
+	import type { ScoreReport } from '#lib/model/ScoreReport.ts';
+	import { resolve } from '$app/paths';
+	import type { PageProps } from './$types';
+	import { showReportedPairings } from '#lib/utils/ShowReportedPairings.ts';
+	import { showIdentities } from '#lib/utils/ShowIdentities.ts';
+	import { refreshAll } from '$app/navigation';
+	import { betaApi } from '#lib/api/beta.ts';
+	import { globalMessages } from '#lib/utils/GlobalMessageState.svelte.ts';
+	import ProgressButton from '#lib/components/ProgressButton.svelte';
 
-  let { data, params }: PageProps = $props();
+	let { data, params }: PageProps = $props();
 
-  async function refreshData() {
-    await refreshAll();
-    return true;
-  }
+	async function refreshData() {
+		await refreshAll();
+		return true;
+	}
 
-  async function addStage(cutSingleElim?: boolean, cutCount?: number) {
-    const success = await betaApi.createStage(data.tournamentData.tournament.id, cutSingleElim, cutCount);
-    if (!success) {
-      globalMessages.errors.push("Unable to create the stage.");
-      return;
-    }
+	async function addStage(cutSingleElim?: boolean, cutCount?: number) {
+		const success = await betaApi.createStage(
+			data.tournamentData.tournament.id,
+			cutSingleElim,
+			cutCount
+		);
+		if (!success) {
+			globalMessages.errors.push('Unable to create the stage.');
+			return;
+		}
 
-    await refreshAll();
-  }
+		await refreshAll();
+	}
 
-  async function pairNewRound() {
-    if (
-      data.tournamentData.tournament.self_registration &&
-      (!data.tournamentData.tournament.registration_closed ||
-        data.tournamentData.tournament.any_player_unlocked) &&
-      !confirm("Registration is still open or some players are unlocked. Pair new round anyway?")
-    ) {
-      return;
-    }
+	async function pairNewRound() {
+		if (
+			data.tournamentData.tournament.self_registration &&
+			(!data.tournamentData.tournament.registration_closed ||
+				data.tournamentData.tournament.any_player_unlocked) &&
+			!confirm(
+				'Registration is still open or some players are unlocked. Pair new round anyway?'
+			)
+		) {
+			return;
+		}
 
-    const success = await betaApi.pairRound(data.tournamentData.tournament.id);
-    if (!success) {
-      globalMessages.errors.push("Unable to pair a new round.");
-    }
+		const success = await betaApi.pairRound(data.tournamentData.tournament.id);
+		if (!success) {
+			globalMessages.errors.push('Unable to pair a new round.');
+		}
 
-    // Refresh even on failure so we aren't offering to pair again from stale data.
-    await refreshAll();
-  }
+		// Refresh even on failure so we aren't offering to pair again from stale data.
+		await refreshAll();
+	}
 
-  async function setRegistrationStatus(open: boolean) {
-    const success = await betaApi.setRegistrationStatus(data.tournamentData.tournament.id, open);
-    if (!success) {
-      globalMessages.errors.push(`Unable to ${open ? "open" : "close"} the tournament registration.`);
-      return;
-    }
+	async function setRegistrationStatus(open: boolean) {
+		const success = await betaApi.setRegistrationStatus(
+			data.tournamentData.tournament.id,
+			open
+		);
+		if (!success) {
+			globalMessages.errors.push(
+				`Unable to ${open ? 'open' : 'close'} the tournament registration.`
+			);
+			return;
+		}
 
-    await refreshAll();
-  }
+		await refreshAll();
+	}
 
-  async function setPlayerRegistrationStatus(open: boolean) {
-    const success = await betaApi.setPlayerRegistrationStatus(
-      data.tournamentData.tournament.id,
-      open,
-    );
-    if (!success) {
-      globalMessages.errors.push(`Unable to ${open ? "unlock" : "lock"} all players.`);
-      return;
-    }
+	async function setPlayerRegistrationStatus(open: boolean) {
+		const success = await betaApi.setPlayerRegistrationStatus(
+			data.tournamentData.tournament.id,
+			open
+		);
+		if (!success) {
+			globalMessages.errors.push(`Unable to ${open ? 'unlock' : 'lock'} all players.`);
+			return;
+		}
 
-    await refreshAll();
-  }
+		await refreshAll();
+	}
 
-  async function deletePairingCallback(roundId: number, pairingId: number) {
-    if (!confirm("Are you sure? This cannot be reversed.")) {
-      return;
-    }
+	async function deletePairingCallback(roundId: number, pairingId: number) {
+		if (!confirm('Are you sure? This cannot be reversed.')) {
+			return;
+		}
 
-    const success = await betaApi.deletePairing(data.tournamentData.tournament.id, roundId, pairingId);
-    if (!success) {
-      globalMessages.errors.push("Unable to delete the pairing.");
-      return;
-    }
+		const success = await betaApi.deletePairing(
+			data.tournamentData.tournament.id,
+			roundId,
+			pairingId
+		);
+		if (!success) {
+			globalMessages.errors.push('Unable to delete the pairing.');
+			return;
+		}
 
-    await refreshAll();
-  }
+		await refreshAll();
+	}
 
-  async function changePlayerSideCallback(roundId: number, pairingId: number, side: string) {
-    const success = await betaApi.changePlayerSide(
-      data.tournamentData.tournament.id,
-      roundId,
-      pairingId,
-      side,
-    );
+	async function changePlayerSideCallback(roundId: number, pairingId: number, side: string) {
+		const success = await betaApi.changePlayerSide(
+			data.tournamentData.tournament.id,
+			roundId,
+			pairingId,
+			side
+		);
 
-    if (!success) {
-      globalMessages.errors.push("Unable to change player sides.");
-      return;
-    }
+		if (!success) {
+			globalMessages.errors.push('Unable to change player sides.');
+			return;
+		}
 
-    await refreshAll();
-  }
+		await refreshAll();
+	}
 
-  async function reportScoreCallback(
-    roundId: number,
-    pairingId: number,
-    report: ScoreReport,
-    selfReport: boolean,
-  ) {
-    const success = await betaApi.reportScore(
-      data.tournamentData.tournament.id,
-      roundId,
-      pairingId,
-      report,
-      selfReport,
-    );
-    if (!success) {
-      globalMessages.errors.push("Unable to submit the score report.");
-      return;
-    }
+	async function reportScoreCallback(
+		roundId: number,
+		pairingId: number,
+		report: ScoreReport,
+		selfReport: boolean
+	) {
+		const success = await betaApi.reportScore(
+			data.tournamentData.tournament.id,
+			roundId,
+			pairingId,
+			report,
+			selfReport
+		);
+		if (!success) {
+			globalMessages.errors.push('Unable to submit the score report.');
+			return;
+		}
 
-    await refreshAll();
-  }
+		await refreshAll();
+	}
 
-  async function resetReportsCallback(roundId: number, pairingId: number) {
-    const success = await betaApi.resetReports(
-      parseInt(params.tournamentId),
-      roundId,
-      pairingId);
-    if (!success) {
-      globalMessages.errors.push("Unable to reset the score reports.");
-      return;
-    }
+	async function resetReportsCallback(roundId: number, pairingId: number) {
+		const success = await betaApi.resetReports(
+			parseInt(params.tournamentId),
+			roundId,
+			pairingId
+		);
+		if (!success) {
+			globalMessages.errors.push('Unable to reset the score reports.');
+			return;
+		}
 
-    await refreshAll();
-  }
+		await refreshAll();
+	}
 
-  async function completeRoundCallback(roundId: number) {
-    const success = await betaApi.completeRound(data.tournamentData.tournament.id, roundId, true);
-    if (!success) {
-      globalMessages.errors.push("Unable to complete the round.");
-      return;
-    }
+	async function completeRoundCallback(roundId: number) {
+		const success = await betaApi.completeRound(
+			data.tournamentData.tournament.id,
+			roundId,
+			true
+		);
+		if (!success) {
+			globalMessages.errors.push('Unable to complete the round.');
+			return;
+		}
 
-    await refreshAll();
-  }
+		await refreshAll();
+	}
 
-  async function updateTimerCallback(roundId: number, length_minutes: number, operation: string) {
-    if (
-      operation === "reset" &&
-      !confirm("This will clear all elapsed time in the round. Are you sure?")
-    ) {
-      return;
-    }
+	async function updateTimerCallback(roundId: number, length_minutes: number, operation: string) {
+		if (
+			operation === 'reset' &&
+			!confirm('This will clear all elapsed time in the round. Are you sure?')
+		) {
+			return;
+		}
 
-    const success = await betaApi.updateRoundTimer(
-      data.tournamentData.tournament.id,
-      roundId,
-      length_minutes,
-      operation,
-    );
-    if (!success) {
-      globalMessages.errors.push("Unable to update the round timer.");
-      return;
-    }
+		const success = await betaApi.updateRoundTimer(
+			data.tournamentData.tournament.id,
+			roundId,
+			length_minutes,
+			operation
+		);
+		if (!success) {
+			globalMessages.errors.push('Unable to update the round timer.');
+			return;
+		}
 
-    await refreshAll();
-  }
+		await refreshAll();
+	}
 </script>
 
 <div class="col-12">
-  <p></p>
+	<p></p>
 
-  {#if data.stages.length == 0}
-    <!-- Add Swiss stage button -->
-    <button
-      type="button"
-      class="btn btn-success"
-      onclick={async () => {
-        await addStage();
-      }}
-    >
-      <FontAwesomeIcon icon="plus" /> Add Swiss stage
-    </button>
-  {:else}
-    <!-- Upper controls -->
-    <div>
-      {#if data.stages.every((s) => s.rounds.length === 0)}
-        <a
-          href={resolve(`tournaments/${params.tournamentId}/player_meeting?back_to=pairings`)}
-          class="btn btn-primary"
-        >
-          <FontAwesomeIcon icon="list-ul" /> Player meeting
-        </a>
-      {:else}
-        <ProgressButton
-          css="btn btn-success"
-          inProgressText="Refreshing"
-          completeText="Refreshed"
-          onclick={refreshData}
-        >
-          <FontAwesomeIcon icon="rotate" /> Refresh
-        </ProgressButton>
-        <button
-          type="button"
-          class="btn btn-primary"
-          onclick={() => {
-            showReportedPairings.update((value) => !value);
-          }}
-        >
-          <FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          onclick={() => {
-            showIdentities.update((value) => !value);
-          }}
-        >
-          <FontAwesomeIcon icon="eye-slash" /> Show/hide identities
-        </button>
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#faq">
-          <FontAwesomeIcon icon="question" /> FAQ
-        </button>
-        {#if data.policy.update}
-          <a
-            href={resolve(`tournaments/${params.tournamentId}/rounds`)}
-            class="btn btn-primary float-right"
-          >
-            <FontAwesomeIcon icon="users" /> See player pairings view
-          </a>
-        {/if}
+	{#if data.stages.length == 0}
+		<!-- Add Swiss stage button -->
+		<button
+			type="button"
+			class="btn btn-success"
+			onclick={async () => {
+				await addStage();
+			}}
+		>
+			<FontAwesomeIcon icon="plus" /> Add Swiss stage
+		</button>
+	{:else}
+		<!-- Upper controls -->
+		<div>
+			{#if data.stages.every((s) => s.rounds.length === 0)}
+				<a
+					href={resolve(
+						`tournaments/${params.tournamentId}/player_meeting?back_to=pairings`
+					)}
+					class="btn btn-primary"
+				>
+					<FontAwesomeIcon icon="list-ul" /> Player meeting
+				</a>
+			{:else}
+				<ProgressButton
+					css="btn btn-success"
+					inProgressText="Refreshing"
+					completeText="Refreshed"
+					onclick={refreshData}
+				>
+					<FontAwesomeIcon icon="rotate" /> Refresh
+				</ProgressButton>
+				<button
+					type="button"
+					class="btn btn-primary"
+					onclick={() => {
+						showReportedPairings.update((value) => !value);
+					}}
+				>
+					<FontAwesomeIcon icon="eye-slash" /> Show/hide reported pairings
+				</button>
+				<button
+					type="button"
+					class="btn btn-primary"
+					onclick={() => {
+						showIdentities.update((value) => !value);
+					}}
+				>
+					<FontAwesomeIcon icon="eye-slash" /> Show/hide identities
+				</button>
+				<button type="button" class="btn btn-info" data-toggle="modal" data-target="#faq">
+					<FontAwesomeIcon icon="question" /> FAQ
+				</button>
+				{#if data.policy.update}
+					<a
+						href={resolve(`tournaments/${params.tournamentId}/rounds`)}
+						class="btn btn-primary float-right"
+					>
+						<FontAwesomeIcon icon="users" /> See player pairings view
+					</a>
+				{/if}
 
-        {#if !$showReportedPairings}
-          <div class="alert alert-info mt-3">
-            Reported scores are currently hidden on this page. This will not affect other users
-            viewing this page.
-          </div>
-        {/if}
-      {/if}
-    </div>
+				{#if !$showReportedPairings}
+					<div class="alert alert-info mt-3">
+						Reported scores are currently hidden on this page. This will not affect
+						other users viewing this page.
+					</div>
+				{/if}
+			{/if}
+		</div>
 
-    <!-- Tournament admin controls -->
-    <div class="mt-3">
-      {#if !data.tournamentData.tournament.registration_closed}
-        <button
-          type="button"
-          class="btn btn-info"
-          onclick={async () => {
-            await setRegistrationStatus(false);
-          }}
-        >
-          <FontAwesomeIcon icon="lock" /> Close registration
-        </button>
-      {:else if data.tournamentData.tournament.self_registration && data.stages.every((s) => s.rounds.length == 0)}
-        <button
-          type="button"
-          class="btn btn-secondary"
-          onclick={async () => {
-            await setRegistrationStatus(true);
-          }}
-        >
-          <FontAwesomeIcon icon="folder-open" /> Open registration
-        </button>
-        {#if !data.tournamentData.tournament.all_players_unlocked}
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick={async () => {
-              await setPlayerRegistrationStatus(false);
-            }}
-          >
-            <FontAwesomeIcon icon="unlock" /> Unlock all players
-          </button>
-        {/if}
-        {#if data.tournamentData.tournament.any_player_unlocked}
-          <button
-            type="button"
-            class="btn btn-info"
-            onclick={async () => {
-              await setPlayerRegistrationStatus(true);
-            }}
-          >
-            <FontAwesomeIcon icon="lock" /> Lock all players
-          </button>
-        {/if}
-      {/if}
+		<!-- Tournament admin controls -->
+		<div class="mt-3">
+			{#if !data.tournamentData.tournament.registration_closed}
+				<button
+					type="button"
+					class="btn btn-info"
+					onclick={async () => {
+						await setRegistrationStatus(false);
+					}}
+				>
+					<FontAwesomeIcon icon="lock" /> Close registration
+				</button>
+			{:else if data.tournamentData.tournament.self_registration && data.stages.every((s) => s.rounds.length == 0)}
+				<button
+					type="button"
+					class="btn btn-secondary"
+					onclick={async () => {
+						await setRegistrationStatus(true);
+					}}
+				>
+					<FontAwesomeIcon icon="folder-open" /> Open registration
+				</button>
+				{#if !data.tournamentData.tournament.all_players_unlocked}
+					<button
+						type="button"
+						class="btn btn-secondary"
+						onclick={async () => {
+							await setPlayerRegistrationStatus(false);
+						}}
+					>
+						<FontAwesomeIcon icon="unlock" /> Unlock all players
+					</button>
+				{/if}
+				{#if data.tournamentData.tournament.any_player_unlocked}
+					<button
+						type="button"
+						class="btn btn-info"
+						onclick={async () => {
+							await setPlayerRegistrationStatus(true);
+						}}
+					>
+						<FontAwesomeIcon icon="lock" /> Lock all players
+					</button>
+				{/if}
+			{/if}
 
-      {#if data.stages.every((s) => s.rounds.every((r) => r.completed))}
-        <button type="button" class="btn btn-success" onclick={pairNewRound}>
-          <FontAwesomeIcon icon="plus" /> Pair new round!
-        </button>
-      {:else}
-        <button class="btn btn-secondary disabled">
-          <FontAwesomeIcon icon="plus" /> Pair new round!
-        </button>
-        <span class="ml-2">
-          All rounds must be flagged complete before you can add a new round.
-        </span>
-      {/if}
-    </div>
+			{#if data.stages.every((s) => s.rounds.every((r) => r.completed))}
+				<button type="button" class="btn btn-success" onclick={pairNewRound}>
+					<FontAwesomeIcon icon="plus" /> Pair new round!
+				</button>
+			{:else}
+				<button class="btn btn-secondary disabled">
+					<FontAwesomeIcon icon="plus" /> Pair new round!
+				</button>
+				<span class="ml-2">
+					All rounds must be flagged complete before you can add a new round.
+				</span>
+			{/if}
+		</div>
 
-    <!-- Stages -->
-    <div class="mt-3">
-      {#each data.stages as stage, index (stage.format)}
-        <Stage
-          {stage}
-          startExpanded={index === data.stages.length - 1}
-          tournament={data.tournamentData.tournament}
-          tournamentPolicies={data.policy}
-          {deletePairingCallback}
-          {changePlayerSideCallback}
-          {reportScoreCallback}
-          {completeRoundCallback}
-          {updateTimerCallback}
-          {resetReportsCallback}
-        />
-      {/each}
-    </div>
+		<!-- Stages -->
+		<div class="mt-3">
+			{#each data.stages as stage, index (stage.format)}
+				<Stage
+					{stage}
+					startExpanded={index === data.stages.length - 1}
+					tournament={data.tournamentData.tournament}
+					{deletePairingCallback}
+					{changePlayerSideCallback}
+					{reportScoreCallback}
+					{completeRoundCallback}
+					{updateTimerCallback}
+					{resetReportsCallback}
+				/>
+			{/each}
+		</div>
 
-    <!-- Elimination stage controls -->
-    {#if data.stages.length > 0 && !data.stages[data.stages.length - 1].is_elimination && data.stages[data.stages.length - 1].rounds.some((r) => r.completed)}
-      <h4>Cut to...</h4>
-      <table>
-        <tbody>
-          <tr>
-            <td>Single Elimination</td>
-            {#each [2, 3, 4, 8, 16] as num (num)}
-              <td class="pl-2">
-                <button
-                  type="button"
-                  class="btn btn-success"
-                  style="width: 100px"
-                  onclick={async () => {
-                    await addStage(true, num);
-                  }}
-                  aria-label={`cut to single elimination top ${num}`}
-                >
-                  <FontAwesomeIcon icon="scissors" /> Top {num}
-                </button>
-              </td>
-            {/each}
-          </tr>
-          <tr>
-            <td>Double Elimination</td>
-            <td class="pl-2"></td>
-            <td class="pl-2"></td>
-            {#each [4, 8, 16] as num (num)}
-              <td class="pl-2">
-                <button
-                  type="button"
-                  class="btn btn-success"
-                  style="width: 100px"
-                  onclick={async () => {
-                    await addStage(false, num);
-                  }}
-                  aria-label={`cut to double elimination top ${num}`}
-                >
-                  <FontAwesomeIcon icon="scissors" /> Top {num}
-                </button>
-              </td>
-            {/each}
-          </tr>
-        </tbody>
-      </table>
-    {/if}
+		<!-- Elimination stage controls -->
+		{#if data.stages.length > 0 && !data.stages[data.stages.length - 1].is_elimination && data.stages[data.stages.length - 1].rounds.some((r) => r.completed)}
+			<h4>Cut to...</h4>
+			<table>
+				<tbody>
+					<tr>
+						<td>Single Elimination</td>
+						{#each [2, 3, 4, 8, 16] as num (num)}
+							<td class="pl-2">
+								<button
+									type="button"
+									class="btn btn-success"
+									style="width: 100px"
+									onclick={async () => {
+										await addStage(true, num);
+									}}
+									aria-label={`cut to single elimination top ${num}`}
+								>
+									<FontAwesomeIcon icon="scissors" /> Top {num}
+								</button>
+							</td>
+						{/each}
+					</tr>
+					<tr>
+						<td>Double Elimination</td>
+						<td class="pl-2"></td>
+						<td class="pl-2"></td>
+						{#each [4, 8, 16] as num (num)}
+							<td class="pl-2">
+								<button
+									type="button"
+									class="btn btn-success"
+									style="width: 100px"
+									onclick={async () => {
+										await addStage(false, num);
+									}}
+									aria-label={`cut to double elimination top ${num}`}
+								>
+									<FontAwesomeIcon icon="scissors" /> Top {num}
+								</button>
+							</td>
+						{/each}
+					</tr>
+				</tbody>
+			</table>
+		{/if}
 
-    <!-- FAQ dialog -->
-    <ModalDialog id="faq" headerText="FAQ">
-      <h5>How does self reporting work?</h5>
-      <ul>
-        <li>
-          For self reporting, a player needs to be logged in with the NRDB account they used to
-          register for the tournament to ensure they are reporting only their games.
-        </li>
-        <li>
-          Self reporting in Cobra works alongside the
-          <span class="font-weight-bold">two-eye principle</span>: both players have to report the
-          same result for Cobra to accept the answer and set the scores.
-        </li>
-      </ul>
-      <h5>Does self reporting replace normal reports?</h5>
-      <p>
-        No, it just allows players to report their own scores instead of handing in manually. This
-        should ease the overall reporting process.
-      </p>
-      <ul>
-        <li>
-          The TO can monitor any reports by clicking on
-          <span class="font-weight-bold">'Reports'</span>
-          which shows the scores reported.
-        </li>
-        <li>The TO can accept a single report by clicking on the provided option.</li>
-        <li>As always, the TO can report games as normal.</li>
-      </ul>
-    </ModalDialog>
-  {/if}
+		<!-- FAQ dialog -->
+		<ModalDialog id="faq" headerText="FAQ">
+			<h5>How does self reporting work?</h5>
+			<ul>
+				<li>
+					For self reporting, a player needs to be logged in with the NRDB account they
+					used to register for the tournament to ensure they are reporting only their
+					games.
+				</li>
+				<li>
+					Self reporting in Cobra works alongside the
+					<span class="font-weight-bold">two-eye principle</span>: both players have to
+					report the same result for Cobra to accept the answer and set the scores.
+				</li>
+			</ul>
+			<h5>Does self reporting replace normal reports?</h5>
+			<p>
+				No, it just allows players to report their own scores instead of handing in
+				manually. This should ease the overall reporting process.
+			</p>
+			<ul>
+				<li>
+					The TO can monitor any reports by clicking on
+					<span class="font-weight-bold">'Reports'</span>
+					which shows the scores reported.
+				</li>
+				<li>The TO can accept a single report by clicking on the provided option.</li>
+				<li>As always, the TO can report games as normal.</li>
+			</ul>
+		</ModalDialog>
+	{/if}
 </div>

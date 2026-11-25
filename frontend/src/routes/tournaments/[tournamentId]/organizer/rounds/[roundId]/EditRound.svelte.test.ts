@@ -1,826 +1,762 @@
 import {
-  cleanup,
-  getByLabelText,
-  getByRole,
-  getByText,
-  queryByTestId,
-  queryByText,
-  render,
-  screen,
-  within,
-} from "@testing-library/svelte";
-import { userEvent } from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import EditRound from "./+page.svelte";
+	cleanup,
+	getByLabelText,
+	getByRole,
+	getByText,
+	queryByTestId,
+	queryByText,
+	render,
+	screen,
+	within
+} from '@testing-library/svelte';
+import { userEvent } from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import EditRound from './+page.svelte';
 import {
-  MockPlayerAlice,
-  MockPlayerBob,
-  MockRound1Timer,
-  MockRoundData,
-  MockSelfReport1,
-  MockSelfReport2,
-  Pairing1,
-} from "./EditRoundTestData.ts";
-import { betaApi } from "#lib/api/beta.ts";
-import type { PageProps } from "./$types";
-import { Tournament } from "#lib/model/Tournament.ts";
-import { goto } from "$app/navigation";
+	MockPlayerAlice,
+	MockPlayerBob,
+	MockRound1Timer,
+	MockRoundData,
+	MockSelfReport1,
+	MockSelfReport2,
+	Pairing1
+} from './EditRoundTestData.ts';
+import { betaApi } from '#lib/api/beta.ts';
+import type { PageProps } from './$types';
+import { Tournament } from '#lib/model/Tournament.ts';
+import { goto } from '$app/navigation';
 
-export const MockPageData: PageProps["data"] = {
-  user: null,
-  tournamentTypes: [],
-  policy: { update: true, custom_table_numbering: false },
-  stage: {
-    id: 1,
-    name: "Single Sided Swiss",
-    format: "single_sided_swiss",
-    is_single_sided: true,
-    is_elimination: false,
-    view_decks: false,
-    rounds: [],
-  },
-  round: {
-    id: 1,
-    number: 1,
-    completed: false,
-    weight: 1.0,
-    pairings: [Pairing1],
-    pairings_reported: 0,
-    length_minutes: 0,
-    timer: MockRound1Timer,
-    unpaired_players: [],
-  },
-  tournamentData: {
-    tournament: new Tournament(),
-  },
-  timer: MockRound1Timer,
-  player: null,
-  stages: []
+export const MockPageData: PageProps['data'] = {
+	user: null,
+	tournamentTypes: [],
+	policy: { update: true },
+	stage: {
+		id: 1,
+		name: 'Single Sided Swiss',
+		format: 'single_sided_swiss',
+		is_single_sided: true,
+		is_elimination: false,
+		view_decks: false,
+		rounds: []
+	},
+	round: {
+		id: 1,
+		number: 1,
+		completed: false,
+		weight: 1.0,
+		pairings: [Pairing1],
+		pairings_reported: 0,
+		length_minutes: 0,
+		timer: MockRound1Timer,
+		unpaired_players: []
+	},
+	tournamentData: {
+		tournament: new Tournament()
+	},
+	timer: MockRound1Timer,
+	player: null,
+	stages: []
 };
 
-vi.mock("#lib/api/beta.ts", () => ({
-  betaApi: {
-    changePlayerSide: vi.fn(() => true),
-    completeRound: vi.fn(() => true),
-    createPairing: vi.fn(() => true),
-    deletePairing: vi.fn(() => true),
-    deleteRound: vi.fn(() => true),
-    loadRound: vi.fn(() => MockRoundData),
-    rePairRound: vi.fn(() => true),
-    reportScore: vi.fn(() => true),
-    resetReports: vi.fn(() => true),
-    saveSOSWeighting: vi.fn(() => true),
-  },
+vi.mock('#lib/api/beta.ts', () => ({
+	betaApi: {
+		changePlayerSide: vi.fn(() => true),
+		completeRound: vi.fn(() => true),
+		createPairing: vi.fn(() => true),
+		deletePairing: vi.fn(() => true),
+		deleteRound: vi.fn(() => true),
+		loadRound: vi.fn(() => MockRoundData),
+		rePairRound: vi.fn(() => true),
+		reportScore: vi.fn(() => true),
+		resetReports: vi.fn(() => true),
+		saveSOSWeighting: vi.fn(() => true)
+	}
 }));
 
 vi.mock('$app/env/public', () => {
-  return {
-    CLIENT_COBRA_API_ENDPOINT: "http://localhost:3000"
-  };
+	return {
+		CLIENT_COBRA_API_ENDPOINT: 'http://localhost:3000'
+	};
 });
 
-vi.mock("$app/navigation", () => ({
-  goto: vi.fn(() => true),
-  refreshAll: vi.fn(async () => {
-    await Promise.resolve();
-  }),
+vi.mock('$app/navigation', () => ({
+	goto: vi.fn(() => true),
+	refreshAll: vi.fn(async () => {
+		await Promise.resolve();
+	})
 }));
 
 const user = userEvent.setup();
 
-describe("EditRound", () => {
-  function renderEditRound() {
-    const props = {
-      params: {
-        tournamentId: MockRoundData.tournament.id.toString(),
-        roundId: MockRoundData.round.id.toString(),
-      },
-      data: MockPageData,
-    };
+describe('EditRound', () => {
+	function renderEditRound() {
+		const props = {
+			params: {
+				tournamentId: MockRoundData.tournament.id.toString(),
+				roundId: MockRoundData.round.id.toString()
+			},
+			data: MockPageData
+		};
 
-    return render(EditRound, { props: props });
-  }
+		return render(EditRound, { props: props });
+	}
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.restoreAllMocks();
-  });
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.restoreAllMocks();
+	});
 
-  afterEach(() => {
-    cleanup();
-  });
-
-  describe("re-pair", () => {
-    beforeEach(() => {
-      renderEditRound();
-    });
-
-    it("re-pairs the round", async () => {
-      vi.spyOn(window, "confirm").mockReturnValue(true);
-
-      await user.click(screen.getByRole("button", { name: /re-pair/i }));
-
-      expect(betaApi.rePairRound).toHaveBeenCalledOnce();
-    });
-
-    it("does not re-pair the round if cancelled", async () => {
-      vi.spyOn(window, "confirm").mockReturnValue(false);
-
-      await user.click(screen.getByRole("button", { name: /re-pair/i }));
-
-      expect(betaApi.rePairRound).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("complete", () => {
-    it("completes the round", async () => {
-      const { rerender } = renderEditRound();
-      vi.spyOn(MockPageData.round, "completed", "get").mockReturnValue(true);
-      vi.spyOn(window, "confirm").mockReturnValue(true);
-
-      await user.click(screen.getByRole("button", { name: /complete/i }));
-
-      await rerender({ data: structuredClone(MockPageData) });
-
-      expect(betaApi.completeRound).toHaveBeenCalledOnce();
-      expect(
-        screen.getByRole("button", { name: /uncomplete/i }),
-      ).toBeInTheDocument();
-    });
-
-    it("does not complete the round if cancelled", async () => {
-      renderEditRound();
-
-      vi.spyOn(window, "confirm").mockReturnValue(false);
-
-      await user.click(screen.getByRole("button", { name: /complete/i }));
-
-      expect(betaApi.completeRound).not.toHaveBeenCalled();
-      expect(
-        screen.queryByRole("button", { name: /uncomplete/i }),
-      ).not.toBeInTheDocument();
-    });
-  });
-
-  describe("delete round", () => {
-    beforeEach(() => {
-      renderEditRound();
-    });
-
-    it("deletes the round", async () => {
-      vi.spyOn(window, "confirm").mockReturnValue(true);
-
-      await user.click(screen.getByRole("button", { name: /delete round/i }));
-
-      expect(betaApi.deleteRound).toHaveBeenCalledOnce();
-      expect(goto).toHaveBeenCalledExactlyOnceWith("/tournaments/0/organizer/rounds", { refreshAll: true });
-    });
-
-    it("does not delete the round if cancelled", async () => {
-      vi.spyOn(window, "confirm").mockReturnValue(false);
-
-      await user.click(screen.getByRole("button", { name: /delete round/i }));
-
-      expect(betaApi.deleteRound).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("create pairing", () => {
-    beforeEach(() => {
-      vi.spyOn(MockPageData.round, "pairings", "get").mockReturnValue([]);
-      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([
-        MockPlayerAlice,
-        MockPlayerBob,
-      ]);
-    });
-
-    it("creates a pairing", async () => {
-      const { rerender } = renderEditRound();
-
-      expect(document.getElementsByClassName("table_1").length).toBe(0);
-
-      const newPairingForm = document.getElementById("new_pairing");
-      expect(newPairingForm).not.toBeNull();
-      if (!newPairingForm) {
-        return;
-      }
-
-      await user.type(
-        getByRole(newPairingForm, "spinbutton", {
-          name: /new pairing table number/i,
-        }),
-        "11",
-      );
-      getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
-      await user.keyboard("Alice{Enter}");
-      getByLabelText(newPairingForm, /new pairing player 1 side/i).focus();
-      await user.keyboard("{ArrowDown}");
-      await user.click(getByText(newPairingForm, "Runner"));
-      getByLabelText(newPairingForm, /^new pairing player 2$/i).focus();
-      await user.keyboard("Bob{Enter}");
-
-      // What the page shows once the pairing exists.
-      vi.spyOn(Pairing1, "table_number", "get").mockReturnValue(11);
-      vi.spyOn(MockPageData.round, "pairings", "get").mockReturnValue([
-        Pairing1,
-      ]);
-      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue(
-        [],
-      );
-      await user.click(
-        getByRole(newPairingForm, "button", { name: /create/i }),
-      );
-
-      await rerender({ data: structuredClone(MockPageData) });
-
-      expect(betaApi.createPairing).toHaveBeenCalledWith(
-        expect.any(Number),
-        expect.any(Number),
-        {
-          table_number: 11,
-          player1_id: MockPlayerAlice.id,
-          side: "player1_is_runner",
-          player2_id: MockPlayerBob.id,
-        },
-      );
-      expect(
-        document.getElementsByClassName("table_11")[0],
-      ).toBeInTheDocument();
-    });
-  });
-
-  describe("create bye", () => {
-    beforeEach(() => {
-      vi.spyOn(MockPageData.round, "pairings", "get").mockReturnValue([]);
-      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([MockPlayerAlice]);
-    });
-
-    it("creates a bye when player 2 is left empty", async () => {
-      renderEditRound();
-      const newPairingForm = document.getElementById("new_pairing");
-      if (!newPairingForm) {
-        throw new Error("new pairing form not found");
-      }
-
-      expect(getByLabelText(newPairingForm, /^new pairing player 2$/i)).toHaveAttribute(
-        "placeholder",
-        "(Bye)",
-      );
-      await user.type(
-        getByRole(newPairingForm, "spinbutton", { name: /new pairing table number/i }),
-        "12",
-      );
-      getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
-      await user.keyboard("Alice{Enter}");
-      await user.click(getByRole(newPairingForm, "button", { name: /create/i }));
-
-      expect(betaApi.createPairing).toHaveBeenCalledWith(
-        expect.any(Number),
-        expect.any(Number),
-        expect.objectContaining({ player1_id: MockPlayerAlice.id, player2_id: null }),
-      );
-    });
-  });
-
-  describe("SOS weighting", () => {
-    it("saves the entered weighting", async () => {
-      renderEditRound();
-
-      const input = screen.getByLabelText("SOS weighting");
-      await user.clear(input);
-      await user.type(input, "0.8");
-      await user.click(screen.getByRole("button", { name: /Save/ }));
-
-      expect(betaApi.saveSOSWeighting).toHaveBeenCalledExactlyOnceWith(
-        MockRoundData.tournament.id,
-        MockRoundData.round.id,
-        0.8,
-      );
-    });
-  });
-
-  describe("create pairing side", () => {
-    beforeEach(() => {
-      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([
-        MockPlayerAlice,
-        MockPlayerBob,
-      ]);
-    });
-
-    async function fillAndCreate(newPairingForm: HTMLElement) {
-      await user.type(
-        getByRole(newPairingForm, "spinbutton", { name: /new pairing table number/i }),
-        "3",
-      );
-      getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
-      await user.keyboard("Alice{Enter}");
-      getByLabelText(newPairingForm, /^new pairing player 2$/i).focus();
-      await user.keyboard("Bob{Enter}");
-      await user.click(getByRole(newPairingForm, "button", { name: /create/i }));
-    }
-
-    function getNewPairingForm() {
-      const newPairingForm = document.getElementById("new_pairing");
-      if (!newPairingForm) {
-        throw new Error("new pairing form not found");
-      }
-      return newPairingForm;
-    }
-
-    it("defaults player 1 to Corp", async () => {
-      renderEditRound();
-      const newPairingForm = getNewPairingForm();
-
-      expect(getByText(newPairingForm, "Corp")).toBeInTheDocument();
-      await fillAndCreate(newPairingForm);
-
-      expect(betaApi.createPairing).toHaveBeenCalledWith(
-        expect.any(Number),
-        expect.any(Number),
-        expect.objectContaining({ side: "player1_is_corp" }),
-      );
-    });
-
-    it("sends no side for double-sided stages", async () => {
-      vi.spyOn(MockPageData.stage, "is_single_sided", "get").mockReturnValue(false);
-      renderEditRound();
-      const newPairingForm = getNewPairingForm();
-
-      expect(queryByText(newPairingForm, "Corp")).toBeNull();
-      await fillAndCreate(newPairingForm);
-
-      expect(betaApi.createPairing).toHaveBeenCalledWith(
-        expect.any(Number),
-        expect.any(Number),
-        expect.objectContaining({ side: null }),
-      );
-    });
-  });
-
-  describe("unpaired players", () => {
-    it("shows a count and a sorted badge per player, fading dropped players", () => {
-      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([
-        Object.assign(structuredClone(MockPlayerBob), { active: false }),
-        MockPlayerAlice,
-      ]);
-
-      renderEditRound();
-
-      expect(
-        screen.getByRole("heading", { name: "Unpaired players (2)" }),
-      ).toBeInTheDocument();
-      expect(screen.getByText("Alice", { selector: ".badge" })).not.toHaveClass("dropped");
-      expect(screen.getByText(/Bob.*\(Dropped\)/, { selector: ".badge" })).toHaveClass("dropped");
-      const badgeNames = [...document.querySelectorAll(".unpaired-players .badge")].map(
-        (badge) => badge.textContent.trim(),
-      );
-      expect(badgeNames).toEqual(["Alice", "Bob\u00a0(Dropped)"]);
-    });
-  });
-
-  describe("create pairing player lists", () => {
-    beforeEach(() => {
-      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([
-        MockPlayerAlice,
-        MockPlayerBob,
-      ]);
-    });
-
-    it("does not offer the player already picked on the other side", async () => {
-      renderEditRound();
-
-      const newPairingForm = document.getElementById("new_pairing");
-      if (!newPairingForm) {
-        throw new Error("new pairing form not found");
-      }
-
-      getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
-      await user.keyboard("Alice{Enter}");
-
-      const player2Input = getByLabelText(newPairingForm, /^new pairing player 2$/i);
-      player2Input.focus();
-      await user.keyboard("Alice");
-      const player2Dropdown = player2Input
-        .closest(".svelecte")
-        ?.querySelector<HTMLElement>(".sv_dropdown");
-      if (!player2Dropdown) {
-        throw new Error("player 2 dropdown not found");
-      }
-      expect(player2Dropdown).toHaveTextContent("No matching options");
-      expect(player2Dropdown).not.toHaveTextContent("Alice");
-    });
-  });
-
-  describe("delete pairings", () => {
-    it("deletes a pairing", async () => {
-      const { rerender } = renderEditRound();
-
-      vi.spyOn(MockPageData.round, "pairings", "get").mockReturnValue([]);
-      vi.spyOn(MockPageData.round, "unpaired_players", "get").mockReturnValue([
-        MockPlayerAlice,
-        MockPlayerBob,
-      ]);
-      vi.spyOn(window, "confirm").mockReturnValue(true);
-
-      const table1Row = document.getElementsByClassName(
-        "table_1",
-      )[0] as HTMLElement;
-      await user.click(
-        within(table1Row).getByRole("button", { name: /delete/i }),
-      );
-
-      await rerender({ data: structuredClone(MockPageData) });
-
-      expect(betaApi.deletePairing).toHaveBeenCalledOnce();
-      expect(table1Row).not.toBeInTheDocument();
-    });
-
-    it("does not delete a pairing if cancelled", async () => {
-      renderEditRound();
-
-      vi.spyOn(window, "confirm").mockReturnValue(false);
-
-      const table1Row = document.getElementsByClassName(
-        "table_1",
-      )[0] as HTMLElement;
-      await user.click(
-        within(table1Row).getByRole("button", { name: /delete/i }),
-      );
-
-      expect(betaApi.deletePairing).not.toHaveBeenCalled();
-      expect(table1Row).toBeInTheDocument();
-    });
-  });
-
-  describe("player side", () => {
-    it("changes player side", async () => {
-      const { rerender } = renderEditRound();
-      vi.spyOn(MockPlayerAlice, "side", "get").mockReturnValue("runner");
-      vi.spyOn(MockPlayerBob, "side", "get").mockReturnValue("corp");
-      vi.spyOn(window, "confirm").mockReturnValue(true);
-
-      const table1Row = document.getElementsByClassName(
-        "table_1",
-      )[0] as HTMLElement;
-      const aliceRunnerButton = getByRole(table1Row, "button", {
-        name: /change alice to runner/i,
-      });
-
-      expect(aliceRunnerButton).not.toContainElement(
-        queryByTestId(aliceRunnerButton, "selected"),
-      );
-
-      await user.click(aliceRunnerButton);
-
-      await rerender({ data: structuredClone(MockPageData) });
-
-      expect(betaApi.changePlayerSide).toHaveBeenCalled();
-
-      const aliceRunnerButton2 = getByRole(table1Row, "button", {
-        name: /change alice to runner/i,
-      });
-      expect(aliceRunnerButton2).toContainElement(
-        queryByTestId(aliceRunnerButton2, "selected"),
-      );
-    });
-  });
-
-  describe.each([
-    [3, 0, "Corp Win"],
-    [3, 3, "Tie"],
-    [1, 1, "Intentional Draw"],
-    [0, 3, "Runner Win"],
-  ])("using preset score", (score1, score2, buttonText) => {
-    it(buttonText, async () => {
-      const { rerender } = renderEditRound();
-
-      vi.spyOn(Pairing1, "reported", "get").mockReturnValue(true);
-      vi.spyOn(Pairing1, "score1", "get").mockReturnValue(score1);
-      vi.spyOn(Pairing1, "score2", "get").mockReturnValue(score2);
-
-      const table1Row = document.getElementsByClassName(
-        "table_1",
-      )[0] as HTMLElement;
-      await user.click(
-        within(table1Row).getByRole("button", { name: buttonText }),
-      );
-
-      await rerender({ data: structuredClone(MockPageData) });
-
-      expect(betaApi.reportScore).toHaveBeenCalledOnce();
-      expect(
-        within(table1Row).getByRole("textbox", { name: /corp-score/i }),
-      ).toHaveValue(score1.toString());
-      expect(
-        within(table1Row).getByRole("textbox", { name: /runner-score/i }),
-      ).toHaveValue(score2.toString());
-      expect(
-        within(table1Row).getByRole("checkbox", {
-          name: /intentional draw/i,
-        }),
-      ).not.toBeChecked();
-    });
-  });
-
-  describe("using custom scores", () => {
-    it("displays the Custom badge for custom scores", () => {
-      vi.spyOn(MockSelfReport1, "score1", "get").mockReturnValue(0);
-      vi.spyOn(MockSelfReport1, "score2", "get").mockReturnValue(4);
-      vi.spyOn(MockSelfReport1, "score1_corp", "get").mockReturnValue(0);
-      vi.spyOn(MockSelfReport1, "score1_runner", "get").mockReturnValue(0);
-      vi.spyOn(MockSelfReport1, "score2_corp", "get").mockReturnValue(2);
-      vi.spyOn(MockSelfReport1, "score2_runner", "get").mockReturnValue(2);
-      vi.spyOn(MockSelfReport2, "score1", "get").mockReturnValue(0);
-      vi.spyOn(MockSelfReport2, "score2", "get").mockReturnValue(4);
-      vi.spyOn(MockSelfReport2, "score1_corp", "get").mockReturnValue(0);
-      vi.spyOn(MockSelfReport2, "score1_runner", "get").mockReturnValue(0);
-      vi.spyOn(MockSelfReport2, "score2_corp", "get").mockReturnValue(2);
-      vi.spyOn(MockSelfReport2, "score2_runner", "get").mockReturnValue(2);
-      
-      renderEditRound();
-      const table1Row = document.getElementsByClassName(
-        "table_1",
-      )[0] as HTMLElement;
-      
-      expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
-      expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
-      expect(table1Row).toContainElement(queryByText(table1Row, "Custom"));
-    });
-      
-    it("saves a custom score", async () => {
-      const { rerender } = renderEditRound();
-
-      vi.spyOn(Pairing1, "reported", "get").mockReturnValue(true);
-      vi.spyOn(Pairing1, "score1", "get").mockReturnValue(1);
-      vi.spyOn(Pairing1, "score2", "get").mockReturnValue(2);
-
-      const table1Row = document.getElementsByClassName(
-        "table_1",
-      )[0] as HTMLElement;
-      await user.click(
-        within(table1Row).getByRole("button", { name: /show-custom/i }),
-      );
-      await user.type(
-        within(table1Row).getByRole("textbox", { name: /corp-score/i }),
-        "1",
-      );
-      await user.type(
-        within(table1Row).getByRole("textbox", { name: /runner-score/i }),
-        "2",
-      );
-      await user.click(
-        within(table1Row).getByRole("button", { name: /save/i }),
-      );
-
-      await rerender({ data: structuredClone(MockPageData) });
-
-      expect(betaApi.reportScore).toHaveBeenCalledOnce();
-      expect(
-        within(table1Row).getByRole("textbox", { name: /corp-score/i }),
-      ).toHaveValue("1");
-      expect(
-        within(table1Row).getByRole("textbox", { name: /runner-score/i }),
-      ).toHaveValue("2");
-      expect(
-        within(table1Row).getByRole("checkbox", {
-          name: /intentional draw/i,
-        }),
-      ).not.toBeChecked();
-    });
-
-    it("saves an intentional draw", async () => {
-      const { rerender } = renderEditRound();
-      vi.spyOn(
-        MockRoundData.round.pairings[0],
-        "reported",
-        "get",
-      ).mockReturnValue(true);
-      vi.spyOn(
-        MockRoundData.round.pairings[0],
-        "intentional_draw",
-        "get",
-      ).mockReturnValue(true);
-
-      const table1Row = document.getElementsByClassName(
-        "table_1",
-      )[0] as HTMLElement;
-      await user.click(
-        within(table1Row).getByRole("button", { name: /show-custom/i }),
-      );
-      await user.click(
-        within(table1Row).getByRole("checkbox", {
-          name: /intentional draw/i,
-        }),
-      );
-      await user.click(
-        within(table1Row).getByRole("button", { name: /save/i }),
-      );
-
-      await rerender({ data: structuredClone(MockPageData) });
-
-      expect(betaApi.reportScore).toHaveBeenCalledOnce();
-      expect(
-        within(table1Row).getByRole("checkbox", {
-          name: /intentional draw/i,
-        }),
-      ).toBeChecked();
-    });
-  });
-
-  describe("manage self-reports", () => {
-    it("displays the Partial badge when only one player has reported", () => {
-      vi.spyOn(Pairing1, "self_reports", "get").mockReturnValue([MockSelfReport1]);
-
-      renderEditRound();
-      const table1Row = document.getElementsByClassName(
-        "table_1",
-      )[0] as HTMLElement;
-      
-      expect(table1Row).toContainElement(queryByText(table1Row, "Partial"));
-      expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
-      expect(table1Row).not.toContainElement(queryByText(table1Row, "Custom"));
-    });
-
-    describe("when self-reports agree", () => {
-      it("does not display any badges", () => {
-        renderEditRound();
-        const table1Row = document.getElementsByClassName(
-          "table_1",
-        )[0] as HTMLElement;
-
-        expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
-        expect(table1Row).not.toContainElement(queryByText(table1Row, "Mismatch"));
-        expect(table1Row).not.toContainElement(queryByText(table1Row, "Custom"));
-      });
-      
-      it("accepts a report", async () => {
-        const { rerender } = renderEditRound();
-        const table1Row = document.getElementsByClassName(
-          "table_1",
-        )[0] as HTMLElement;
-
-        const reportsButton = within(table1Row).getByRole("button", {
-          name: /reports/i,
-        });
-        expect(reportsButton).not.toContainElement(
-          queryByTestId(reportsButton, "reportConflict"),
-        );
-
-        await user.click(reportsButton);
-
-        const reportDialog = document.getElementById("reports1");
-        expect(reportDialog).not.toBeNull();
-        if (!reportDialog) {
-          return;
-        }
-        const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
-        expect(reportDialog).toContainElement(
-          getByText(reportDialog, /alice reported: 3 - 0/i),
-        );
-        expect(reportDialog).toContainElement(
-          getByText(reportDialog, /bob reported: 3 - 0/i),
-        );
-        expect(reportDialog).toContainElement(aliceAcceptButton);
-        expect(reportDialog).toContainElement(
-          queryByText(reportDialog, /accept bob/i),
-        );
-
-        vi.spyOn(Pairing1, "reported", "get").mockReturnValue(true);
-        vi.spyOn(Pairing1, "score1", "get").mockReturnValue(3);
-        vi.spyOn(Pairing1, "score2", "get").mockReturnValue(0);
-        await user.click(aliceAcceptButton);
-
-        await rerender({ data: structuredClone(MockPageData) });
-
-        expect(betaApi.reportScore).toHaveBeenCalledOnce();
-        expect(
-          within(table1Row).getByRole("textbox", { name: /corp-score/i }),
-        ).toHaveValue("3");
-        expect(
-          within(table1Row).getByRole("textbox", { name: /runner-score/i }),
-        ).toHaveValue("0");
-        expect(
-          within(table1Row).getByRole("checkbox", {
-            name: /intentional draw/i,
-          }),
-        ).not.toBeChecked();
-      });
-    });
-
-    describe("when self-reports disagree", () => {
-      beforeEach(() => {
-        vi.spyOn(MockSelfReport2, "score1", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport2, "score2", "get").mockReturnValue(3);
-        vi.spyOn(MockSelfReport2, "score1_corp", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport2, "score1_runner", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport2, "score2_corp", "get").mockReturnValue(0);
-        vi.spyOn(MockSelfReport2, "score2_runner", "get").mockReturnValue(3);
-      });
-
-      it("displays the Mismatch badge", () => {
-        renderEditRound();
-        const table1Row = document.getElementsByClassName(
-          "table_1",
-        )[0] as HTMLElement;
-
-        expect(table1Row).not.toContainElement(queryByText(table1Row, "Partial"));
-        expect(table1Row).toContainElement(queryByText(table1Row, "Mismatch"));
-        expect(table1Row).not.toContainElement(queryByText(table1Row, "Custom"));
-      });
-
-      it("accepts a report", async () => {
-        const { rerender } = renderEditRound();
-
-        const table1Row = document.getElementsByClassName(
-          "table_1",
-        )[0] as HTMLElement;
-
-        const reportsButton = within(table1Row).getByRole("button", {
-          name: /reports/i,
-        });
-
-        await user.click(reportsButton);
-
-        const reportDialog = document.getElementById("reports1");
-        expect(reportDialog).not.toBeNull();
-        if (!reportDialog) {
-          return;
-        }
-        const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
-        expect(reportDialog).toContainElement(
-          getByText(reportDialog, /alice reported: 3 - 0/i),
-        );
-        expect(reportDialog).toContainElement(
-          getByText(reportDialog, /bob reported: 0 - 3/i),
-        );
-        expect(reportDialog).toContainElement(aliceAcceptButton);
-        expect(reportDialog).toContainElement(
-          queryByText(reportDialog, /accept bob/i),
-        );
-
-        vi.spyOn(Pairing1, "reported", "get").mockReturnValue(true);
-        vi.spyOn(Pairing1, "score1", "get").mockReturnValue(3);
-        vi.spyOn(Pairing1, "score2", "get").mockReturnValue(0);
-        await user.click(aliceAcceptButton);
-
-        await rerender({ data: structuredClone(MockPageData) });
-
-        expect(betaApi.reportScore).toHaveBeenCalledOnce();
-        expect(
-          within(table1Row).getByRole("textbox", { name: /corp-score/i }),
-        ).toHaveValue("3");
-        expect(
-          within(table1Row).getByRole("textbox", { name: /runner-score/i }),
-        ).toHaveValue("0");
-        expect(
-          within(table1Row).getByRole("checkbox", {
-            name: /intentional draw/i,
-          }),
-        ).not.toBeChecked();
-      });
-
-      it("resets the reports", async () => {
-        const { rerender } = renderEditRound();
-
-        const table1Row = document.getElementsByClassName(
-          "table_1",
-        )[0] as HTMLElement;
-        const reportsButton = within(table1Row).getByRole("button", {
-          name: /reports/i,
-        });
-
-        await user.click(reportsButton);
-
-        const reportDialog = document.getElementById("reports1");
-        expect(reportDialog).not.toBeNull();
-        if (!reportDialog) {
-          return;
-        }
-
-        vi.spyOn(Pairing1, "self_reports", "get").mockReturnValue(null);
-        vi.spyOn(Pairing1, "reported", "get").mockReturnValue(false);
-        vi.spyOn(Pairing1, "score1", "get").mockReturnValue(0);
-        vi.spyOn(Pairing1, "score2", "get").mockReturnValue(0);
-        await user.click(getByText(reportDialog, /reset/i));
-        expect(betaApi.resetReports).toHaveBeenCalledOnce();
-
-        await rerender({ data: structuredClone(MockPageData) });
-
-        await user.click(reportsButton);
-
-        expect(reportDialog).not.toContainElement(
-          queryByText(reportDialog, /alice reported: 3 - 0/i),
-        );
-        expect(reportDialog).not.toContainElement(
-          queryByText(reportDialog, /bob reported: 0 - 3/i),
-        );
-        expect(reportDialog).not.toContainElement(
-          queryByText(reportDialog, /accept alice/i),
-        );
-        expect(reportDialog).not.toContainElement(
-          queryByText(reportDialog, /accept bob/i),
-        );
-      });
-    });
-  });
+	afterEach(() => {
+		cleanup();
+	});
+
+	describe('re-pair', () => {
+		beforeEach(() => {
+			renderEditRound();
+		});
+
+		it('re-pairs the round', async () => {
+			vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+			await user.click(screen.getByRole('button', { name: /re-pair/i }));
+
+			expect(betaApi.rePairRound).toHaveBeenCalledOnce();
+		});
+
+		it('does not re-pair the round if cancelled', async () => {
+			vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+			await user.click(screen.getByRole('button', { name: /re-pair/i }));
+
+			expect(betaApi.rePairRound).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('complete', () => {
+		it('completes the round', async () => {
+			const { rerender } = renderEditRound();
+			vi.spyOn(MockPageData.round, 'completed', 'get').mockReturnValue(true);
+			vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+			await user.click(screen.getByRole('button', { name: /complete/i }));
+
+			await rerender({ data: structuredClone(MockPageData) });
+
+			expect(betaApi.completeRound).toHaveBeenCalledOnce();
+			expect(screen.getByRole('button', { name: /uncomplete/i })).toBeInTheDocument();
+		});
+
+		it('does not complete the round if cancelled', async () => {
+			renderEditRound();
+
+			vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+			await user.click(screen.getByRole('button', { name: /complete/i }));
+
+			expect(betaApi.completeRound).not.toHaveBeenCalled();
+			expect(screen.queryByRole('button', { name: /uncomplete/i })).not.toBeInTheDocument();
+		});
+	});
+
+	describe('delete round', () => {
+		beforeEach(() => {
+			renderEditRound();
+		});
+
+		it('deletes the round', async () => {
+			vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+			await user.click(screen.getByRole('button', { name: /delete round/i }));
+
+			expect(betaApi.deleteRound).toHaveBeenCalledOnce();
+			expect(goto).toHaveBeenCalledExactlyOnceWith('/tournaments/0/organizer/rounds', {
+				refreshAll: true
+			});
+		});
+
+		it('does not delete the round if cancelled', async () => {
+			vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+			await user.click(screen.getByRole('button', { name: /delete round/i }));
+
+			expect(betaApi.deleteRound).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('create pairing', () => {
+		beforeEach(() => {
+			vi.spyOn(MockPageData.round, 'pairings', 'get').mockReturnValue([]);
+			vi.spyOn(MockPageData.round, 'unpaired_players', 'get').mockReturnValue([
+				MockPlayerAlice,
+				MockPlayerBob
+			]);
+		});
+
+		it('creates a pairing', async () => {
+			const { rerender } = renderEditRound();
+
+			expect(document.getElementsByClassName('table_1').length).toBe(0);
+
+			const newPairingForm = document.getElementById('new_pairing');
+			expect(newPairingForm).not.toBeNull();
+			if (!newPairingForm) {
+				return;
+			}
+
+			await user.type(
+				getByRole(newPairingForm, 'spinbutton', {
+					name: /new pairing table number/i
+				}),
+				'11'
+			);
+			getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
+			await user.keyboard('Alice{Enter}');
+			getByLabelText(newPairingForm, /new pairing player 1 side/i).focus();
+			await user.keyboard('{ArrowDown}');
+			await user.click(getByText(newPairingForm, 'Runner'));
+			getByLabelText(newPairingForm, /^new pairing player 2$/i).focus();
+			await user.keyboard('Bob{Enter}');
+
+			// What the page shows once the pairing exists.
+			vi.spyOn(Pairing1, 'table_number', 'get').mockReturnValue(11);
+			vi.spyOn(MockPageData.round, 'pairings', 'get').mockReturnValue([Pairing1]);
+			vi.spyOn(MockPageData.round, 'unpaired_players', 'get').mockReturnValue([]);
+			await user.click(getByRole(newPairingForm, 'button', { name: /create/i }));
+
+			await rerender({ data: structuredClone(MockPageData) });
+
+			expect(betaApi.createPairing).toHaveBeenCalledWith(
+				expect.any(Number),
+				expect.any(Number),
+				{
+					table_number: 11,
+					player1_id: MockPlayerAlice.id,
+					side: 'player1_is_runner',
+					player2_id: MockPlayerBob.id
+				}
+			);
+			expect(document.getElementsByClassName('table_11')[0]).toBeInTheDocument();
+		});
+	});
+
+	describe('create bye', () => {
+		beforeEach(() => {
+			vi.spyOn(MockPageData.round, 'pairings', 'get').mockReturnValue([]);
+			vi.spyOn(MockPageData.round, 'unpaired_players', 'get').mockReturnValue([
+				MockPlayerAlice
+			]);
+		});
+
+		it('creates a bye when player 2 is left empty', async () => {
+			renderEditRound();
+			const newPairingForm = document.getElementById('new_pairing');
+			if (!newPairingForm) {
+				throw new Error('new pairing form not found');
+			}
+
+			expect(getByLabelText(newPairingForm, /^new pairing player 2$/i)).toHaveAttribute(
+				'placeholder',
+				'(Bye)'
+			);
+			await user.type(
+				getByRole(newPairingForm, 'spinbutton', { name: /new pairing table number/i }),
+				'12'
+			);
+			getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
+			await user.keyboard('Alice{Enter}');
+			await user.click(getByRole(newPairingForm, 'button', { name: /create/i }));
+
+			expect(betaApi.createPairing).toHaveBeenCalledWith(
+				expect.any(Number),
+				expect.any(Number),
+				expect.objectContaining({ player1_id: MockPlayerAlice.id, player2_id: null })
+			);
+		});
+	});
+
+	describe('SOS weighting', () => {
+		it('saves the entered weighting', async () => {
+			renderEditRound();
+
+			const input = screen.getByLabelText('SOS weighting');
+			await user.clear(input);
+			await user.type(input, '0.8');
+			await user.click(screen.getByRole('button', { name: /Save/ }));
+
+			expect(betaApi.saveSOSWeighting).toHaveBeenCalledExactlyOnceWith(
+				MockRoundData.tournament.id,
+				MockRoundData.round.id,
+				0.8
+			);
+		});
+	});
+
+	describe('create pairing side', () => {
+		beforeEach(() => {
+			vi.spyOn(MockPageData.round, 'unpaired_players', 'get').mockReturnValue([
+				MockPlayerAlice,
+				MockPlayerBob
+			]);
+		});
+
+		async function fillAndCreate(newPairingForm: HTMLElement) {
+			await user.type(
+				getByRole(newPairingForm, 'spinbutton', { name: /new pairing table number/i }),
+				'3'
+			);
+			getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
+			await user.keyboard('Alice{Enter}');
+			getByLabelText(newPairingForm, /^new pairing player 2$/i).focus();
+			await user.keyboard('Bob{Enter}');
+			await user.click(getByRole(newPairingForm, 'button', { name: /create/i }));
+		}
+
+		function getNewPairingForm() {
+			const newPairingForm = document.getElementById('new_pairing');
+			if (!newPairingForm) {
+				throw new Error('new pairing form not found');
+			}
+			return newPairingForm;
+		}
+
+		it('defaults player 1 to Corp', async () => {
+			renderEditRound();
+			const newPairingForm = getNewPairingForm();
+
+			expect(getByText(newPairingForm, 'Corp')).toBeInTheDocument();
+			await fillAndCreate(newPairingForm);
+
+			expect(betaApi.createPairing).toHaveBeenCalledWith(
+				expect.any(Number),
+				expect.any(Number),
+				expect.objectContaining({ side: 'player1_is_corp' })
+			);
+		});
+
+		it('sends no side for double-sided stages', async () => {
+			vi.spyOn(MockPageData.stage, 'is_single_sided', 'get').mockReturnValue(false);
+			renderEditRound();
+			const newPairingForm = getNewPairingForm();
+
+			expect(queryByText(newPairingForm, 'Corp')).toBeNull();
+			await fillAndCreate(newPairingForm);
+
+			expect(betaApi.createPairing).toHaveBeenCalledWith(
+				expect.any(Number),
+				expect.any(Number),
+				expect.objectContaining({ side: null })
+			);
+		});
+	});
+
+	describe('unpaired players', () => {
+		it('shows a count and a sorted badge per player, fading dropped players', () => {
+			vi.spyOn(MockPageData.round, 'unpaired_players', 'get').mockReturnValue([
+				Object.assign(structuredClone(MockPlayerBob), { active: false }),
+				MockPlayerAlice
+			]);
+
+			renderEditRound();
+
+			expect(
+				screen.getByRole('heading', { name: 'Unpaired players (2)' })
+			).toBeInTheDocument();
+			expect(screen.getByText('Alice', { selector: '.badge' })).not.toHaveClass('dropped');
+			expect(screen.getByText(/Bob.*\(Dropped\)/, { selector: '.badge' })).toHaveClass(
+				'dropped'
+			);
+			const badgeNames = [...document.querySelectorAll('.unpaired-players .badge')].map(
+				(badge) => badge.textContent.trim()
+			);
+			expect(badgeNames).toEqual(['Alice', 'Bob\u00a0(Dropped)']);
+		});
+	});
+
+	describe('create pairing player lists', () => {
+		beforeEach(() => {
+			vi.spyOn(MockPageData.round, 'unpaired_players', 'get').mockReturnValue([
+				MockPlayerAlice,
+				MockPlayerBob
+			]);
+		});
+
+		it('does not offer the player already picked on the other side', async () => {
+			renderEditRound();
+
+			const newPairingForm = document.getElementById('new_pairing');
+			if (!newPairingForm) {
+				throw new Error('new pairing form not found');
+			}
+
+			getByLabelText(newPairingForm, /^new pairing player 1$/i).focus();
+			await user.keyboard('Alice{Enter}');
+
+			const player2Input = getByLabelText(newPairingForm, /^new pairing player 2$/i);
+			player2Input.focus();
+			await user.keyboard('Alice');
+			const player2Dropdown = player2Input
+				.closest('.svelecte')
+				?.querySelector<HTMLElement>('.sv_dropdown');
+			if (!player2Dropdown) {
+				throw new Error('player 2 dropdown not found');
+			}
+			expect(player2Dropdown).toHaveTextContent('No matching options');
+			expect(player2Dropdown).not.toHaveTextContent('Alice');
+		});
+	});
+
+	describe('delete pairings', () => {
+		it('deletes a pairing', async () => {
+			const { rerender } = renderEditRound();
+
+			vi.spyOn(MockPageData.round, 'pairings', 'get').mockReturnValue([]);
+			vi.spyOn(MockPageData.round, 'unpaired_players', 'get').mockReturnValue([
+				MockPlayerAlice,
+				MockPlayerBob
+			]);
+			vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+			const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+			await user.click(within(table1Row).getByRole('button', { name: /delete/i }));
+
+			await rerender({ data: structuredClone(MockPageData) });
+
+			expect(betaApi.deletePairing).toHaveBeenCalledOnce();
+			expect(table1Row).not.toBeInTheDocument();
+		});
+
+		it('does not delete a pairing if cancelled', async () => {
+			renderEditRound();
+
+			vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+			const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+			await user.click(within(table1Row).getByRole('button', { name: /delete/i }));
+
+			expect(betaApi.deletePairing).not.toHaveBeenCalled();
+			expect(table1Row).toBeInTheDocument();
+		});
+	});
+
+	describe('player side', () => {
+		it('changes player side', async () => {
+			const { rerender } = renderEditRound();
+			vi.spyOn(MockPlayerAlice, 'side', 'get').mockReturnValue('runner');
+			vi.spyOn(MockPlayerBob, 'side', 'get').mockReturnValue('corp');
+			vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+			const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+			const aliceRunnerButton = getByRole(table1Row, 'button', {
+				name: /change alice to runner/i
+			});
+
+			expect(aliceRunnerButton).not.toContainElement(
+				queryByTestId(aliceRunnerButton, 'selected')
+			);
+
+			await user.click(aliceRunnerButton);
+
+			await rerender({ data: structuredClone(MockPageData) });
+
+			expect(betaApi.changePlayerSide).toHaveBeenCalled();
+
+			const aliceRunnerButton2 = getByRole(table1Row, 'button', {
+				name: /change alice to runner/i
+			});
+			expect(aliceRunnerButton2).toContainElement(
+				queryByTestId(aliceRunnerButton2, 'selected')
+			);
+		});
+	});
+
+	describe.each([
+		[3, 0, 'Corp Win'],
+		[3, 3, 'Tie'],
+		[1, 1, 'Intentional Draw'],
+		[0, 3, 'Runner Win']
+	])('using preset score', (score1, score2, buttonText) => {
+		it(buttonText, async () => {
+			const { rerender } = renderEditRound();
+
+			vi.spyOn(Pairing1, 'reported', 'get').mockReturnValue(true);
+			vi.spyOn(Pairing1, 'score1', 'get').mockReturnValue(score1);
+			vi.spyOn(Pairing1, 'score2', 'get').mockReturnValue(score2);
+
+			const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+			await user.click(within(table1Row).getByRole('button', { name: buttonText }));
+
+			await rerender({ data: structuredClone(MockPageData) });
+
+			expect(betaApi.reportScore).toHaveBeenCalledOnce();
+			expect(within(table1Row).getByRole('textbox', { name: /corp-score/i })).toHaveValue(
+				score1.toString()
+			);
+			expect(within(table1Row).getByRole('textbox', { name: /runner-score/i })).toHaveValue(
+				score2.toString()
+			);
+			expect(
+				within(table1Row).getByRole('checkbox', {
+					name: /intentional draw/i
+				})
+			).not.toBeChecked();
+		});
+	});
+
+	describe('using custom scores', () => {
+		it('displays the Custom badge for custom scores', () => {
+			vi.spyOn(MockSelfReport1, 'score1', 'get').mockReturnValue(0);
+			vi.spyOn(MockSelfReport1, 'score2', 'get').mockReturnValue(4);
+			vi.spyOn(MockSelfReport1, 'score1_corp', 'get').mockReturnValue(0);
+			vi.spyOn(MockSelfReport1, 'score1_runner', 'get').mockReturnValue(0);
+			vi.spyOn(MockSelfReport1, 'score2_corp', 'get').mockReturnValue(2);
+			vi.spyOn(MockSelfReport1, 'score2_runner', 'get').mockReturnValue(2);
+			vi.spyOn(MockSelfReport2, 'score1', 'get').mockReturnValue(0);
+			vi.spyOn(MockSelfReport2, 'score2', 'get').mockReturnValue(4);
+			vi.spyOn(MockSelfReport2, 'score1_corp', 'get').mockReturnValue(0);
+			vi.spyOn(MockSelfReport2, 'score1_runner', 'get').mockReturnValue(0);
+			vi.spyOn(MockSelfReport2, 'score2_corp', 'get').mockReturnValue(2);
+			vi.spyOn(MockSelfReport2, 'score2_runner', 'get').mockReturnValue(2);
+
+			renderEditRound();
+			const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+
+			expect(table1Row).not.toContainElement(queryByText(table1Row, 'Partial'));
+			expect(table1Row).not.toContainElement(queryByText(table1Row, 'Mismatch'));
+			expect(table1Row).toContainElement(queryByText(table1Row, 'Custom'));
+		});
+
+		it('saves a custom score', async () => {
+			const { rerender } = renderEditRound();
+
+			vi.spyOn(Pairing1, 'reported', 'get').mockReturnValue(true);
+			vi.spyOn(Pairing1, 'score1', 'get').mockReturnValue(1);
+			vi.spyOn(Pairing1, 'score2', 'get').mockReturnValue(2);
+
+			const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+			await user.click(within(table1Row).getByRole('button', { name: /show-custom/i }));
+			await user.type(within(table1Row).getByRole('textbox', { name: /corp-score/i }), '1');
+			await user.type(within(table1Row).getByRole('textbox', { name: /runner-score/i }), '2');
+			await user.click(within(table1Row).getByRole('button', { name: /save/i }));
+
+			await rerender({ data: structuredClone(MockPageData) });
+
+			expect(betaApi.reportScore).toHaveBeenCalledOnce();
+			expect(within(table1Row).getByRole('textbox', { name: /corp-score/i })).toHaveValue(
+				'1'
+			);
+			expect(within(table1Row).getByRole('textbox', { name: /runner-score/i })).toHaveValue(
+				'2'
+			);
+			expect(
+				within(table1Row).getByRole('checkbox', {
+					name: /intentional draw/i
+				})
+			).not.toBeChecked();
+		});
+
+		it('saves an intentional draw', async () => {
+			const { rerender } = renderEditRound();
+			vi.spyOn(MockRoundData.round.pairings[0], 'reported', 'get').mockReturnValue(true);
+			vi.spyOn(MockRoundData.round.pairings[0], 'intentional_draw', 'get').mockReturnValue(
+				true
+			);
+
+			const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+			await user.click(within(table1Row).getByRole('button', { name: /show-custom/i }));
+			await user.click(
+				within(table1Row).getByRole('checkbox', {
+					name: /intentional draw/i
+				})
+			);
+			await user.click(within(table1Row).getByRole('button', { name: /save/i }));
+
+			await rerender({ data: structuredClone(MockPageData) });
+
+			expect(betaApi.reportScore).toHaveBeenCalledOnce();
+			expect(
+				within(table1Row).getByRole('checkbox', {
+					name: /intentional draw/i
+				})
+			).toBeChecked();
+		});
+	});
+
+	describe('manage self-reports', () => {
+		it('displays the Partial badge when only one player has reported', () => {
+			vi.spyOn(Pairing1, 'self_reports', 'get').mockReturnValue([MockSelfReport1]);
+
+			renderEditRound();
+			const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+
+			expect(table1Row).toContainElement(queryByText(table1Row, 'Partial'));
+			expect(table1Row).not.toContainElement(queryByText(table1Row, 'Mismatch'));
+			expect(table1Row).not.toContainElement(queryByText(table1Row, 'Custom'));
+		});
+
+		describe('when self-reports agree', () => {
+			it('does not display any badges', () => {
+				renderEditRound();
+				const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+
+				expect(table1Row).not.toContainElement(queryByText(table1Row, 'Partial'));
+				expect(table1Row).not.toContainElement(queryByText(table1Row, 'Mismatch'));
+				expect(table1Row).not.toContainElement(queryByText(table1Row, 'Custom'));
+			});
+
+			it('accepts a report', async () => {
+				const { rerender } = renderEditRound();
+				const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+
+				const reportsButton = within(table1Row).getByRole('button', {
+					name: /reports/i
+				});
+				expect(reportsButton).not.toContainElement(
+					queryByTestId(reportsButton, 'reportConflict')
+				);
+
+				await user.click(reportsButton);
+
+				const reportDialog = document.getElementById('reports1');
+				expect(reportDialog).not.toBeNull();
+				if (!reportDialog) {
+					return;
+				}
+				const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
+				expect(reportDialog).toContainElement(
+					getByText(reportDialog, /alice reported: 3 - 0/i)
+				);
+				expect(reportDialog).toContainElement(
+					getByText(reportDialog, /bob reported: 3 - 0/i)
+				);
+				expect(reportDialog).toContainElement(aliceAcceptButton);
+				expect(reportDialog).toContainElement(queryByText(reportDialog, /accept bob/i));
+
+				vi.spyOn(Pairing1, 'reported', 'get').mockReturnValue(true);
+				vi.spyOn(Pairing1, 'score1', 'get').mockReturnValue(3);
+				vi.spyOn(Pairing1, 'score2', 'get').mockReturnValue(0);
+				await user.click(aliceAcceptButton);
+
+				await rerender({ data: structuredClone(MockPageData) });
+
+				expect(betaApi.reportScore).toHaveBeenCalledOnce();
+				expect(within(table1Row).getByRole('textbox', { name: /corp-score/i })).toHaveValue(
+					'3'
+				);
+				expect(
+					within(table1Row).getByRole('textbox', { name: /runner-score/i })
+				).toHaveValue('0');
+				expect(
+					within(table1Row).getByRole('checkbox', {
+						name: /intentional draw/i
+					})
+				).not.toBeChecked();
+			});
+		});
+
+		describe('when self-reports disagree', () => {
+			beforeEach(() => {
+				vi.spyOn(MockSelfReport2, 'score1', 'get').mockReturnValue(0);
+				vi.spyOn(MockSelfReport2, 'score2', 'get').mockReturnValue(3);
+				vi.spyOn(MockSelfReport2, 'score1_corp', 'get').mockReturnValue(0);
+				vi.spyOn(MockSelfReport2, 'score1_runner', 'get').mockReturnValue(0);
+				vi.spyOn(MockSelfReport2, 'score2_corp', 'get').mockReturnValue(0);
+				vi.spyOn(MockSelfReport2, 'score2_runner', 'get').mockReturnValue(3);
+			});
+
+			it('displays the Mismatch badge', () => {
+				renderEditRound();
+				const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+
+				expect(table1Row).not.toContainElement(queryByText(table1Row, 'Partial'));
+				expect(table1Row).toContainElement(queryByText(table1Row, 'Mismatch'));
+				expect(table1Row).not.toContainElement(queryByText(table1Row, 'Custom'));
+			});
+
+			it('accepts a report', async () => {
+				const { rerender } = renderEditRound();
+
+				const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+
+				const reportsButton = within(table1Row).getByRole('button', {
+					name: /reports/i
+				});
+
+				await user.click(reportsButton);
+
+				const reportDialog = document.getElementById('reports1');
+				expect(reportDialog).not.toBeNull();
+				if (!reportDialog) {
+					return;
+				}
+				const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
+				expect(reportDialog).toContainElement(
+					getByText(reportDialog, /alice reported: 3 - 0/i)
+				);
+				expect(reportDialog).toContainElement(
+					getByText(reportDialog, /bob reported: 0 - 3/i)
+				);
+				expect(reportDialog).toContainElement(aliceAcceptButton);
+				expect(reportDialog).toContainElement(queryByText(reportDialog, /accept bob/i));
+
+				vi.spyOn(Pairing1, 'reported', 'get').mockReturnValue(true);
+				vi.spyOn(Pairing1, 'score1', 'get').mockReturnValue(3);
+				vi.spyOn(Pairing1, 'score2', 'get').mockReturnValue(0);
+				await user.click(aliceAcceptButton);
+
+				await rerender({ data: structuredClone(MockPageData) });
+
+				expect(betaApi.reportScore).toHaveBeenCalledOnce();
+				expect(within(table1Row).getByRole('textbox', { name: /corp-score/i })).toHaveValue(
+					'3'
+				);
+				expect(
+					within(table1Row).getByRole('textbox', { name: /runner-score/i })
+				).toHaveValue('0');
+				expect(
+					within(table1Row).getByRole('checkbox', {
+						name: /intentional draw/i
+					})
+				).not.toBeChecked();
+			});
+
+			it('resets the reports', async () => {
+				const { rerender } = renderEditRound();
+
+				const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+				const reportsButton = within(table1Row).getByRole('button', {
+					name: /reports/i
+				});
+
+				await user.click(reportsButton);
+
+				const reportDialog = document.getElementById('reports1');
+				expect(reportDialog).not.toBeNull();
+				if (!reportDialog) {
+					return;
+				}
+
+				vi.spyOn(Pairing1, 'self_reports', 'get').mockReturnValue(null);
+				vi.spyOn(Pairing1, 'reported', 'get').mockReturnValue(false);
+				vi.spyOn(Pairing1, 'score1', 'get').mockReturnValue(0);
+				vi.spyOn(Pairing1, 'score2', 'get').mockReturnValue(0);
+				await user.click(getByText(reportDialog, /reset/i));
+				expect(betaApi.resetReports).toHaveBeenCalledOnce();
+
+				await rerender({ data: structuredClone(MockPageData) });
+
+				await user.click(reportsButton);
+
+				expect(reportDialog).not.toContainElement(
+					queryByText(reportDialog, /alice reported: 3 - 0/i)
+				);
+				expect(reportDialog).not.toContainElement(
+					queryByText(reportDialog, /bob reported: 0 - 3/i)
+				);
+				expect(reportDialog).not.toContainElement(
+					queryByText(reportDialog, /accept alice/i)
+				);
+				expect(reportDialog).not.toContainElement(queryByText(reportDialog, /accept bob/i));
+			});
+		});
+	});
 });

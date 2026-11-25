@@ -132,7 +132,7 @@ Rails.application.configure do
 
    config.after_initialize do
       begin
-         Flipper.enable :nrdb_deck_registration
+         Flipper.enable :demo_tournaments
       rescue => e
          Rails.logger.warn "Failed setting Flipper features: #{e.class}"
       end

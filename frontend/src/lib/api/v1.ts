@@ -1,200 +1,193 @@
-import { api as defaultApi, type ApiBase } from "#lib/api/apiBase.ts";
+import { api as defaultApi, type ApiBase } from '#lib/api/apiBase.ts';
 import type {
-  CurrentUserResponse,
-  IdentitiesResponse,
-  IdentityInfo,
-  PlayerResponse,
-  PlayersResponse,
-  TournamentResponse,
-  TournamentsResponse,
-  TournamentTypeInfo,
-  TournamentTypesResponse,
-} from "#lib/api/v1ApiTypes.ts";
-import type { IdentityNames } from "#lib/model/Identity.ts";
-import { Player } from "#lib/model/Player.ts";
-import type { Tournament } from "#lib/model/Tournament.ts";
-import { v1Adapter } from "#lib/model/v1Adapter.ts";
-import { addError } from "#lib/utils/GlobalMessageState.svelte.ts";
+	CurrentUserResponse,
+	IdentitiesResponse,
+	IdentityInfo,
+	PlayerResponse,
+	PlayersResponse,
+	TournamentResponse,
+	TournamentsResponse,
+	TournamentTypeInfo,
+	TournamentTypesResponse
+} from '#lib/api/v1ApiTypes.ts';
+import type { IdentityNames } from '#lib/model/Identity.ts';
+import { Player } from '#lib/model/Player.ts';
+import type { Tournament } from '#lib/model/Tournament.ts';
+import { v1Adapter } from '#lib/model/v1Adapter.ts';
+import { addError } from '#lib/utils/GlobalMessageState.svelte.ts';
 
 const JSON_API_HEADERS = {
-  Accept: "application/vnd.api+json",
+	Accept: 'application/vnd.api+json'
 };
 
 export class V1Api {
-  constructor(private api: ApiBase = defaultApi) {}
+	constructor(private api: ApiBase = defaultApi) {}
 
-  tournamentsApiUrl(tournamentTypeId?: string): string {
-    const params = new URLSearchParams({
-      "page[size]": "10",
-      include: "tournament_type",
-      sort: "-date,name",
-    });
+	tournamentsApiUrl(tournamentTypeId?: string): string {
+		const params = new URLSearchParams({
+			'page[size]': '10',
+			include: 'tournament_type',
+			sort: '-date,name'
+		});
 
-    if (tournamentTypeId) {
-      params.set("filter[tournament_type_id]", tournamentTypeId);
-    }
+		if (tournamentTypeId) {
+			params.set('filter[tournament_type_id]', tournamentTypeId);
+		}
 
-    return `/api/v1/public/tournaments?${params.toString()}`;
-  }
+		return `/api/v1/public/tournaments?${params.toString()}`;
+	}
 
-  async loadTournaments(
-    url = this.tournamentsApiUrl(),
-    altFetch = fetch,
-  ): Promise<TournamentsResponse> {
-    const res = await this.api.get<TournamentsResponse>(url, {
-      altFetch,
-      headers: JSON_API_HEADERS,
-    });
+	async loadTournaments(
+		url = this.tournamentsApiUrl(),
+		altFetch = fetch
+	): Promise<TournamentsResponse> {
+		const res = await this.api.get<TournamentsResponse>(url, {
+			altFetch,
+			headers: JSON_API_HEADERS
+		});
 
-    if (!res.ok) {
-      addError(`Failed to load tournaments: ${res.error.message}`);
-      return { data: [] };
-    }
+		if (!res.ok) {
+			addError(`Failed to load tournaments: ${res.error.message}`);
+			return { data: [] };
+		}
 
-    return res.data;
-  }
+		return res.data;
+	}
 
-  async loadTournament(
-    tournamentId: number,
-    altFetch = fetch,
-  ): Promise<{ tournament: Tournament }> {
-    const res = await this.api.getOrThrow<TournamentResponse>(
-      `/api/v1/public/tournaments/${tournamentId}`,
-      { altFetch, headers: JSON_API_HEADERS },
-    );
-    return { tournament: v1Adapter.adaptTournament(res.data) };
-  }
+	async loadTournament(
+		tournamentId: number,
+		altFetch = fetch
+	): Promise<{ tournament: Tournament }> {
+		const res = await this.api.getOrThrow<TournamentResponse>(
+			`/api/v1/public/tournaments/${tournamentId}`,
+			{ altFetch, headers: JSON_API_HEADERS }
+		);
+		return { tournament: v1Adapter.adaptTournament(res.data) };
+	}
 
-  loadTournamentBySlug(
-    slug: string,
-    altFetch = fetch,
-  ): Promise<TournamentsResponse> {
-    const params = new URLSearchParams({
-      "filter[slug]": slug,
-    });
+	loadTournamentBySlug(slug: string, altFetch = fetch): Promise<TournamentsResponse> {
+		const params = new URLSearchParams({
+			'filter[slug]': slug
+		});
 
-    return this.loadTournaments(
-      `/api/v1/public/tournaments?${params.toString()}`,
-      altFetch,
-    );
-  }
+		return this.loadTournaments(`/api/v1/public/tournaments?${params.toString()}`, altFetch);
+	}
 
-  async loadTournamentTypes(altFetch = fetch): Promise<TournamentTypeInfo[]> {
-    const res = await this.api.get<TournamentTypesResponse>("/api/v1/public/tournament_types", {
-      altFetch,
-      headers: JSON_API_HEADERS,
-    });
+	async loadTournamentTypes(altFetch = fetch): Promise<TournamentTypeInfo[]> {
+		const res = await this.api.get<TournamentTypesResponse>('/api/v1/public/tournament_types', {
+			altFetch,
+			headers: JSON_API_HEADERS
+		});
 
-    if (!res.ok) {
-      addError(`Failed to load tournament types: ${res.error.message}`);
-      return [];
-    }
+		if (!res.ok) {
+			addError(`Failed to load tournament types: ${res.error.message}`);
+			return [];
+		}
 
-    return res.data.data;
-  }
+		return res.data.data;
+	}
 
-  async loadUserTournaments(altFetch = fetch): Promise<TournamentsResponse> {
-    const res = await this.api.get<TournamentsResponse>("/api/v1/private/user/tournaments?sort=-date,name", {
-      altFetch,
-      headers: JSON_API_HEADERS,
-    });
+	async loadUserTournaments(altFetch = fetch): Promise<TournamentsResponse> {
+		const res = await this.api.get<TournamentsResponse>(
+			'/api/v1/private/user/tournaments?sort=-date,name',
+			{
+				altFetch,
+				headers: JSON_API_HEADERS
+			}
+		);
 
-    if (!res.ok) {
-      addError(`Failed to load user tournaments: ${res.error.message}`);
-      return { data: [] };
-    }
+		if (!res.ok) {
+			addError(`Failed to load user tournaments: ${res.error.message}`);
+			return { data: [] };
+		}
 
-    return res.data;
-  }
+		return res.data;
+	}
 
-  async loadCurrentUser(altFetch = fetch): Promise<CurrentUserResponse | null> {
-    const res = await this.api.get<CurrentUserResponse>("/api/v1/private/user", {
-      altFetch,
-      headers: JSON_API_HEADERS,
-    });
+	async loadCurrentUser(altFetch = fetch): Promise<CurrentUserResponse | null> {
+		const res = await this.api.get<CurrentUserResponse>('/api/v1/private/user', {
+			altFetch,
+			headers: JSON_API_HEADERS
+		});
 
-    if (!res.ok) {
-      return null;
-    }
+		if (!res.ok) {
+			return null;
+		}
 
-    return res.data;
-  }
+		return res.data;
+	}
 
-  async loadIdentities(altFetch = fetch): Promise<IdentityInfo[]> {
-    const res = await this.api.get<IdentitiesResponse>("/api/v1/public/identities", {
-      altFetch,
-      headers: JSON_API_HEADERS,
-    });
+	async loadIdentities(altFetch = fetch): Promise<IdentityInfo[]> {
+		const res = await this.api.get<IdentitiesResponse>('/api/v1/public/identities', {
+			altFetch,
+			headers: JSON_API_HEADERS
+		});
 
-    if (!res.ok) {
-      addError(`Failed to load identities: ${res.error.message}`);
-      return [];
-    }
+		if (!res.ok) {
+			addError(`Failed to load identities: ${res.error.message}`);
+			return [];
+		}
 
-    return res.data.data;
-  }
+		return res.data.data;
+	}
 
-  async loadIdentityNames(altFetch = fetch): Promise<IdentityNames> {
-    const identities = await this.loadIdentities(altFetch);
-    return v1Adapter.adaptIdentityNames(identities);
-  }
+	async loadIdentityNames(altFetch = fetch): Promise<IdentityNames> {
+		const identities = await this.loadIdentities(altFetch);
+		return v1Adapter.adaptIdentityNames(identities);
+	}
 
-  playersApiUrl(tournamentId: number, options?: { userId?: number }): string {
-    const params = new URLSearchParams({
-      include: "corp_identity,runner_identity",
-    });
+	playersApiUrl(tournamentId: number, options?: { userId?: number }): string {
+		const params = new URLSearchParams({
+			include: 'corp_identity,runner_identity'
+		});
 
-    if (options?.userId !== undefined) {
-      params.set("filter[user_id]", String(options.userId));
-    }
+		if (options?.userId !== undefined) {
+			params.set('filter[user_id]', String(options.userId));
+		}
 
-    return `/api/v1/public/tournaments/${tournamentId}/players?${params.toString()}`;
-  }
+		return `/api/v1/public/tournaments/${tournamentId}/players?${params.toString()}`;
+	}
 
-  async loadPlayers(
-    tournamentId: number,
-    options?: { userId?: number },
-    altFetch = fetch,
-  ): Promise<PlayersResponse> {
-    const url = this.playersApiUrl(tournamentId, options);
-    const res = await this.api.get<PlayersResponse>(url, {
-      altFetch,
-      headers: JSON_API_HEADERS,
-    });
+	async loadPlayers(
+		tournamentId: number,
+		options?: { userId?: number },
+		altFetch = fetch
+	): Promise<PlayersResponse> {
+		const url = this.playersApiUrl(tournamentId, options);
+		const res = await this.api.get<PlayersResponse>(url, {
+			altFetch,
+			headers: JSON_API_HEADERS
+		});
 
-    if (!res.ok) {
-      addError(`Failed to load players: ${res.error.message}`);
-      return { data: [] };
-    }
+		if (!res.ok) {
+			addError(`Failed to load players: ${res.error.message}`);
+			return { data: [] };
+		}
 
-    return res.data;
-  }
+		return res.data;
+	}
 
-  async loadPlayer(
-    tournamentId: number,
-    playerId: number,
-    altFetch = fetch,
-  ): Promise<Player> {
-    const res = await this.api.getOrThrow<PlayerResponse>(
-      `/api/v1/public/tournaments/${tournamentId}/players/${playerId}`,
-      { altFetch, headers: JSON_API_HEADERS },
-    );
-    return v1Adapter.adaptPlayer(res.data, res.included);
-  }
+	async loadPlayer(tournamentId: number, playerId: number, altFetch = fetch): Promise<Player> {
+		const res = await this.api.getOrThrow<PlayerResponse>(
+			`/api/v1/public/tournaments/${tournamentId}/players/${playerId}`,
+			{ altFetch, headers: JSON_API_HEADERS }
+		);
+		return v1Adapter.adaptPlayer(res.data, res.included);
+	}
 
-  async loadPlayerByUserId(
-    tournamentId: number,
-    userId: number,
-    altFetch = fetch,
-  ): Promise<Player> {
-    const res = await this.loadPlayers(tournamentId, { userId }, altFetch);
-    if (res.data.length > 0) {
-      return v1Adapter.adaptPlayer(res.data[0], res.included);
-    }
-    const player = new Player();
-    player.user_id = userId;
-    return player;
-  }
+	async loadPlayerByUserId(
+		tournamentId: number,
+		userId: number,
+		altFetch = fetch
+	): Promise<Player> {
+		const res = await this.loadPlayers(tournamentId, { userId }, altFetch);
+		if (res.data.length > 0) {
+			return v1Adapter.adaptPlayer(res.data[0], res.included);
+		}
+		const player = new Player();
+		player.user_id = userId;
+		return player;
+	}
 }
 
 export const v1Api = new V1Api();

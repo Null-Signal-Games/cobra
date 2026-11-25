@@ -47,8 +47,7 @@ module TournamentHelper # rubocop:disable Style/Documentation
 
   def tournament_policies_json(tournament)
     {
-      update: tournament.user == current_user,
-      custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
+      update: tournament.user == current_user
     }
   end
 
@@ -78,9 +77,7 @@ module TournamentHelper # rubocop:disable Style/Documentation
         time_zones: time_zone_options,
         official_prize_kits: OfficialPrizeKit.order(position: :desc).map { |p| { id: p.id, name: p.name } }
       },
-      feature_flags: {
-        allow_self_reporting: Flipper.enabled?(:allow_self_reporting)
-      },
+      feature_flags: {},
       can_change_swiss_format: tournament.rounds.empty?,
       csrf_token: form_authenticity_token
     }

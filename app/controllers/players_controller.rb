@@ -1,28 +1,8 @@
 # frozen_string_literal: true
 
-# JSON endpoints for standings and player data downloads.
+# JSON standings endpoint.
 class PlayersController < ApplicationController # rubocop:disable Metrics/ClassLength
   before_action :set_tournament
-
-  def download_decks
-    authorize @tournament, :update?
-    render json: @tournament.players
-                            .sort_by(&:name)
-                            .flat_map { |p| p.decks.sort_by(&:side_id) }
-                            .map { |d| d.as_view(current_user) }
-  end
-
-  def download_streaming
-    authorize @tournament, :update?
-    render json: @tournament.players.active
-                            .sort_by(&:name)
-                            .map { |p|
-                              {
-                                name: p.name_with_pronouns,
-                                include_in_stream: p.include_in_stream?
-                              }
-                            }
-  end
 
   def standings_data # rubocop:disable Metrics/MethodLength
     authorize @tournament, :show?

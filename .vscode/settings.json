@@ -1,3 +1,18 @@
 {
-  "eslint.workingDirectories": [{ "pattern": "./frontend" }]
+  "oxc.enable.oxfmt": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": { "source.fixAll.oxc": "always" }
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": { "source.fixAll.oxc": "always" }
+  },
+  "[svelte]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": { "source.fixAll.oxc": "always" }
+  }
 }

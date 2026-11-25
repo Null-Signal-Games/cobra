@@ -1,23 +1,23 @@
-import type { PageLoad } from "./$types";
+import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params, parent }) => {
-  const { stages } = await parent();
+	const { stages } = await parent();
 
-  const roundId = parseInt(params.roundId, 10);
+	const roundId = parseInt(params.roundId, 10);
 
-  let round = null;
-  let stage = null;
-  for (const s of stages) {
-    const found = s.rounds.find((r) => r.id === roundId);
-    if (found) {
-      round = found;
-      stage = s;
-      break;
-    }
-  }
+	let round = null;
+	let stage = null;
+	for (const s of stages) {
+		const found = s.rounds.find((r) => r.id === roundId);
+		if (found) {
+			round = found;
+			stage = s;
+			break;
+		}
+	}
 
-  return {
-    round,
-    stage,
-  };
+	return {
+		round,
+		stage
+	};
 };

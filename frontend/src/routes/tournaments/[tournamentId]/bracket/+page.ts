@@ -1,10 +1,10 @@
-import type { PageLoad } from "./$types";
-import { classicApi } from "#lib/api/classic.ts";
+import type { PageLoad } from './$types';
+import { classicApi } from '#lib/api/classic.ts';
 
 export const load: PageLoad = async ({ params, fetch }) => {
-  const bracketData = await classicApi.loadBrackets(parseInt(params.tournamentId), fetch);
+	const bracketData = await classicApi.loadBrackets(parseInt(params.tournamentId), fetch);
 
-  return {
-    bracket: bracketData,
-  };
-}
+	return {
+		bracket: bracketData
+	};
+};

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Beta::StagesController #destroy' do
-  include_context 'with beta testing enabled'
-
   let(:tournament) { create(:tournament) }
   let!(:stage) { create(:stage, tournament:) }
 

@@ -13,7 +13,8 @@ CI.run do
 
   step 'Tests: System', 'bundle exec rspec'
 
-  step 'Lint: ESLint', 'cd frontend && npx eslint .'
+  step 'Lint: oxlint', 'cd frontend && npm run lint'
+  step 'Format: oxfmt', 'cd frontend && npm run fmt:check'
   step 'Lint: Svelte', 'cd frontend && npm run check'
   step 'Tests: Vitest', 'cd frontend && npm run test'
 

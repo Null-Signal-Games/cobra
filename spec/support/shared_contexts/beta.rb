@@ -6,11 +6,6 @@
 # User types: "tournament organizer" (the TO), "player" (registered in the tournament),
 # "other player" (signed in, but neither the TO nor a player in it) and "signed out user".
 
-# Beta::Tournaments/Rounds/Pairings/StagesController reject requests unless this flag is on.
-RSpec.shared_context 'with beta testing enabled' do
-  before { Flipper.enable(:beta_testing) }
-end
-
 RSpec.shared_context 'when signed in as the tournament organizer' do
   before { sign_in tournament.user }
 end

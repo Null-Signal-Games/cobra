@@ -18,7 +18,7 @@ RSpec.describe RoundsController do
 
         expect(compare_body(response))
           .to eq(
-            'policy' => { 'custom_table_numbering' => false, 'update' => false },
+            'policy' => { 'update' => false },
             'tournament' => default_tournament,
             'stages' => [swiss_stage_with_rounds([])],
             'warnings' => nil
@@ -31,7 +31,7 @@ RSpec.describe RoundsController do
 
         expect(compare_body(response))
           .to eq(
-            'policy' => { 'custom_table_numbering' => false, 'update' => false },
+            'policy' => { 'update' => false },
             'tournament' => default_tournament,
             'stages' => [swiss_stage_with_rounds([])],
             'warnings' => nil
@@ -44,7 +44,7 @@ RSpec.describe RoundsController do
 
         expect(compare_body(response))
           .to eq(
-            'policy' => { 'custom_table_numbering' => false, 'update' => true },
+            'policy' => { 'update' => true },
             'tournament' => default_tournament,
             'stages' => [swiss_stage_with_rounds([])],
             'warnings' => [nil]
@@ -62,7 +62,7 @@ RSpec.describe RoundsController do
         get pairings_data_api_classic_tournament_rounds_path(tournament)
         expect(compare_body(response))
           .to eq({
-                   'policy' => { 'custom_table_numbering' => false, 'update' => false },
+                   'policy' => { 'update' => false },
                    'tournament' => default_tournament,
                    'stages' => [swiss_stage_with_rounds(
                      [
@@ -106,7 +106,7 @@ RSpec.describe RoundsController do
         get pairings_data_api_classic_tournament_rounds_path(tournament)
         expect(compare_body(response))
           .to eq({
-                   'policy' => { 'custom_table_numbering' => false, 'update' => true },
+                   'policy' => { 'update' => true },
                    'tournament' => default_tournament,
                    'stages' => [swiss_stage_with_rounds(
                      [
@@ -159,7 +159,7 @@ RSpec.describe RoundsController do
         get pairings_data_api_classic_tournament_rounds_path(tournament)
         expect(compare_body(response))
           .to eq({
-                   'policy' => { 'custom_table_numbering' => false, 'update' => false },
+                   'policy' => { 'update' => false },
                    'tournament' => default_tournament(has_elimination_stage: true),
                    'stages' => [
                      swiss_stage_with_rounds(
@@ -323,7 +323,7 @@ RSpec.describe RoundsController do
         expected_tournament['swiss_format'] = 'single_sided'
         expect(compare_body(response))
           .to eq({
-                   'policy' => { 'custom_table_numbering' => false, 'update' => false },
+                   'policy' => { 'update' => false },
                    'tournament' => expected_tournament,
                    'stages' => [swiss_stage_with_rounds(
                      [
@@ -380,7 +380,7 @@ RSpec.describe RoundsController do
         expected_tournament['swiss_format'] = 'single_sided'
         expect(compare_body(response))
           .to eq({
-                   'policy' => { 'custom_table_numbering' => false, 'update' => false },
+                   'policy' => { 'update' => false },
                    'tournament' => expected_tournament,
                    'stages' => [swiss_stage_with_rounds(
                      [

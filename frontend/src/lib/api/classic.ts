@@ -1,134 +1,138 @@
-import { api as defaultApi, type ApiBase } from "#lib/api/apiBase.ts";
-import type { PairingsData } from "#lib/api/betaTypes.ts";
+import { api as defaultApi, type ApiBase } from '#lib/api/apiBase.ts';
+import type { PairingsData } from '#lib/api/betaTypes.ts';
 import type {
-  AbrUploadResponse,
-  DemoTournamentSettings,
-  DemoTournamentSettingsData,
-  TournamentCreateResponse,
-  TournamentDemoCreateResponse,
-  TournamentSettingsData,
-  SaveStageResponse,
-  Stage,
-  StageData,
-} from "#lib/api/classicTypes.ts";
-import type { BracketData } from "#lib/model/Bracket.ts";
-import type { StandingsData } from "#lib/model/Standings.ts";
-import type { Tournament } from "#lib/model/Tournament.ts";
-import { addError } from "#lib/utils/GlobalMessageState.svelte.ts";
+	AbrUploadResponse,
+	DemoTournamentSettings,
+	DemoTournamentSettingsData,
+	TournamentCreateResponse,
+	TournamentDemoCreateResponse,
+	TournamentSettingsData,
+	Stage,
+	StageData
+} from '#lib/api/classicTypes.ts';
+import type { BracketData } from '#lib/model/Bracket.ts';
+import type { StandingsData } from '#lib/model/Standings.ts';
+import type { Tournament } from '#lib/model/Tournament.ts';
+import { addError } from '#lib/utils/GlobalMessageState.svelte.ts';
 
 export class ClassicApi {
-  constructor(private api: ApiBase = defaultApi) {}
+	constructor(private api: ApiBase = defaultApi) {}
 
-  async loadCsrfToken(altFetch = fetch): Promise<string> {
-    const data = await this.api.getOrThrow<{ csrf_token: string }>(
-      "/api/classic/csrf_token",
-      altFetch,
-      "Failed to load CSRF token",
-    );
-    return data.csrf_token;
-  }
+	async loadCsrfToken(altFetch = fetch): Promise<string> {
+		const data = await this.api.getOrThrow<{ csrf_token: string }>(
+			'/api/classic/csrf_token',
+			altFetch,
+			'Failed to load CSRF token'
+		);
+		return data.csrf_token;
+	}
 
-  async loadPairingsForUser(
-    tournamentId: number,
-    userId: number,
-    altFetch = fetch,
-  ): Promise<PairingsData | null> {
-    const res = await this.api.get<PairingsData>(
-      `/api/classic/tournaments/${tournamentId}/rounds/pairings_data/${userId}`,
-      { altFetch },
-    );
+	async loadPairingsForUser(
+		tournamentId: number,
+		userId: number,
+		altFetch = fetch
+	): Promise<PairingsData | null> {
+		const res = await this.api.get<PairingsData>(
+			`/api/classic/tournaments/${tournamentId}/rounds/pairings_data/${userId}`,
+			{ altFetch }
+		);
 
-    if (!res.ok) {
-      addError(`Error loading pairings for user ${userId}.`);
-      return null;
-    }
+		if (!res.ok) {
+			addError(`Error loading pairings for user ${userId}.`);
+			return null;
+		}
 
-    return res.data;
-  }
+		return res.data;
+	}
 
-  loadStandings(tournamentId: number, altFetch = fetch): Promise<StandingsData> {
-    return this.api.getOrThrow<StandingsData>(
-      `/api/classic/tournaments/${tournamentId}/players/standings_data`,
-      altFetch,
-      "Failed to load standings",
-    );
-  }
+	loadStandings(tournamentId: number, altFetch = fetch): Promise<StandingsData> {
+		return this.api.getOrThrow<StandingsData>(
+			`/api/classic/tournaments/${tournamentId}/players/standings_data`,
+			altFetch,
+			'Failed to load standings'
+		);
+	}
 
-  loadBrackets(tournamentId: number, altFetch = fetch): Promise<BracketData> {
-    return this.api.getOrThrow<BracketData>(
-      `/api/classic/tournaments/${tournamentId}/rounds/brackets`,
-      altFetch,
-      "Failed to load bracket",
-    );
-  }
+	loadBrackets(tournamentId: number, altFetch = fetch): Promise<BracketData> {
+		return this.api.getOrThrow<BracketData>(
+			`/api/classic/tournaments/${tournamentId}/rounds/brackets`,
+			altFetch,
+			'Failed to load bracket'
+		);
+	}
 
-  loadNewTournament(altFetch = fetch): Promise<TournamentSettingsData> {
-    return this.api.getOrThrow<TournamentSettingsData>(
-      "/api/classic/tournaments/new_form",
-      altFetch,
-    );
-  }
+	loadNewTournament(altFetch = fetch): Promise<TournamentSettingsData> {
+		return this.api.getOrThrow<TournamentSettingsData>(
+			'/api/classic/tournaments/new_form',
+			altFetch
+		);
+	}
 
-  loadNewDemoTournament(altFetch = fetch): Promise<DemoTournamentSettingsData> {
-    return this.api.getOrThrow<DemoTournamentSettingsData>(
-      "/api/classic/tournaments/new_demo_form",
-      altFetch,
-    );
-  }
+	loadNewDemoTournament(altFetch = fetch): Promise<DemoTournamentSettingsData> {
+		return this.api.getOrThrow<DemoTournamentSettingsData>(
+			'/api/classic/tournaments/new_demo_form',
+			altFetch
+		);
+	}
 
-  loadTournamentSettings(tournamentId: number, altFetch = fetch): Promise<TournamentSettingsData> {
-    return this.api.getOrThrow<TournamentSettingsData>(
-      `/api/classic/tournaments/${tournamentId}/edit_form`,
-      altFetch,
-    );
-  }
+	loadTournamentSettings(
+		tournamentId: number,
+		altFetch = fetch
+	): Promise<TournamentSettingsData> {
+		return this.api.getOrThrow<TournamentSettingsData>(
+			`/api/classic/tournaments/${tournamentId}/edit_form`,
+			altFetch
+		);
+	}
 
-  loadStage(tournamentId: number, stageId: number, altFetch = fetch): Promise<StageData> {
-    return this.api.getOrThrow<StageData>(
-      `/api/classic/tournaments/${tournamentId}/stages/${stageId}/settings`,
-      altFetch,
-    );
-  }
+	loadStage(tournamentId: number, stageId: number, altFetch = fetch): Promise<StageData> {
+		return this.api.getOrThrow<StageData>(
+			`/api/classic/tournaments/${tournamentId}/stages/${stageId}/settings`,
+			altFetch
+		);
+	}
 
-  createTournament(tournament: Tournament): Promise<TournamentCreateResponse> {
-    return this.api.postOrThrow<TournamentCreateResponse>("/api/classic/tournaments", {
-      tournament,
-    });
-  }
+	createTournament(tournament: Tournament): Promise<TournamentCreateResponse> {
+		return this.api.postOrThrow<TournamentCreateResponse>('/api/classic/tournaments', {
+			tournament
+		});
+	}
 
-  createDemoTournament(tournament: DemoTournamentSettings): Promise<TournamentDemoCreateResponse> {
-    return this.api.postOrThrow<TournamentDemoCreateResponse>(
-      "/api/classic/tournaments/create_demo",
-      { tournament },
-    );
-  }
+	createDemoTournament(
+		tournament: DemoTournamentSettings
+	): Promise<TournamentDemoCreateResponse> {
+		return this.api.postOrThrow<TournamentDemoCreateResponse>(
+			'/api/classic/tournaments/create_demo',
+			{ tournament }
+		);
+	}
 
-  async updateTournamentSettings(tournament: Tournament): Promise<boolean> {
-    await this.api.patchOrThrow(`/api/classic/tournaments/${tournament.id}`, { tournament });
-    return true;
-  }
+	async updateTournamentSettings(tournament: Tournament): Promise<boolean> {
+		await this.api.patchOrThrow(`/api/classic/tournaments/${tournament.id}`, { tournament });
+		return true;
+	}
 
-  loadNrtmJson(tournamentId: number, altFetch = fetch): Promise<unknown> {
-    return this.api.getOrThrow<unknown>(
-      `/api/classic/tournaments/${tournamentId}/save_json`,
-      altFetch,
-      "Failed to load tournament results",
-    );
-  }
+	loadNrtmJson(tournamentId: number, altFetch = fetch): Promise<unknown> {
+		return this.api.getOrThrow<unknown>(
+			`/api/classic/tournaments/${tournamentId}/save_json`,
+			altFetch,
+			'Failed to load tournament results'
+		);
+	}
 
-  uploadToAbr(tournamentId: number): Promise<AbrUploadResponse> {
-    return this.api.postOrThrow<AbrUploadResponse>(
-      `/api/classic/tournaments/${tournamentId}/upload_to_abr`,
-    );
-  }
+	uploadToAbr(tournamentId: number): Promise<AbrUploadResponse> {
+		return this.api.postOrThrow<AbrUploadResponse>(
+			`/api/classic/tournaments/${tournamentId}/upload_to_abr`
+		);
+	}
 
-  saveStage(tournamentId: number, stage: Stage, altFetch = fetch): Promise<SaveStageResponse> {
-    return this.api.patchOrThrow<SaveStageResponse>(
-      `/api/classic/tournaments/${tournamentId}/stages/${stage.id}`,
-      { stage },
-      { altFetch },
-    );
-  }
+	saveStage(tournamentId: number, stage: Stage, altFetch = fetch): Promise<void> {
+		return this.api.patchOrThrow(
+			`/api/classic/tournaments/${tournamentId}/stages/${stage.id}`,
+			{ stage },
+			{ altFetch }
+		);
+	}
 }
 
 export const classicApi = new ClassicApi();

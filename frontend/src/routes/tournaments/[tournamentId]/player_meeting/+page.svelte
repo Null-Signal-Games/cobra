@@ -1,44 +1,44 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
-  import { page } from "$app/state";
-  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
-  import type { PageProps } from "./$types";
-  import { createPlayerMeetingPairings } from "./pairings.ts";
-  import { getBackDetails } from "#lib/utils/navigation.ts";
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
+	import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
+	import type { PageProps } from './$types';
+	import { createPlayerMeetingPairings } from './pairings.ts';
+	import { getBackDetails } from '#lib/utils/navigation.ts';
 
-  let { data, params }: PageProps = $props();
+	let { data, params }: PageProps = $props();
 
-  let pairings = $derived(createPlayerMeetingPairings(data.players));
-  let backTo = $derived(data.back_to ?? page.url.searchParams.get("back_to"));
-  let backDetails = $derived(getBackDetails(backTo, params.tournamentId));
+	let pairings = $derived(createPlayerMeetingPairings(data.players));
+	let backTo = $derived(data.back_to ?? page.url.searchParams.get('back_to'));
+	let backDetails = $derived(getBackDetails(backTo, params.tournamentId));
 </script>
 
 <div class="col-12">
-  <p class="dontprint">
-    <a href={resolve(backDetails.path)} class="btn btn-primary">
-      <FontAwesomeIcon icon="arrow-left" />
-      {backDetails.label}
-    </a>
-  </p>
+	<p class="dontprint">
+		<a href={resolve(backDetails.path)} class="btn btn-primary">
+			<FontAwesomeIcon icon="arrow-left" />
+			{backDetails.label}
+		</a>
+	</p>
 
-  <h3>Player meeting</h3>
+	<h3>Player meeting</h3>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Player 1</th>
-        <th>Player 2</th>
-      </tr>
-    </thead>
-    <tbody>
-      {#each pairings as pairing, i (i)}
-        <tr>
-          <td>{i + 1}</td>
-          <td>{pairing[0].name}</td>
-          <td>{pairing[1]?.name ?? ""}</td>
-        </tr>
-      {/each}
-    </tbody>
-  </table>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Player 1</th>
+				<th>Player 2</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each pairings as pairing, i (i)}
+				<tr>
+					<td>{i + 1}</td>
+					<td>{pairing[0].name}</td>
+					<td>{pairing[1]?.name ?? ''}</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
 </div>

@@ -1,298 +1,316 @@
 <script lang="ts">
-  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
-  import ModalDialog from "#lib/components/ModalDialog.svelte";
-  import { resolve } from "$app/paths";
-  import type { PageProps } from "./$types";
-  import { page } from "$app/state";
-  import { formatWallClockTime } from "#lib/utils/time.ts";
-  import { httpUrlOrNull } from "#lib/utils/url.ts";
-  import { swissFormatDisplayString } from "#lib/model/Tournament.ts";
-  import RegistrationCard from "./RegistrationCard.svelte";
-  import Markdown from '@magidoc/plugin-svelte-marked'
-  import { qr } from '@svelte-put/qr/svg';
+	import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
+	import ModalDialog from '#lib/components/ModalDialog.svelte';
+	import { resolve } from '$app/paths';
+	import type { PageProps } from './$types';
+	import { page } from '$app/state';
+	import { formatWallClockTime } from '#lib/utils/time.ts';
+	import { httpUrlOrNull } from '#lib/utils/url.ts';
+	import { swissFormatDisplayString } from '#lib/model/Tournament.ts';
+	import RegistrationCard from './RegistrationCard.svelte';
+	import Markdown from '@magidoc/plugin-svelte-marked';
+	import { qr } from '@svelte-put/qr/svg';
 
-  let { data }: PageProps = $props();
+	let { data }: PageProps = $props();
 
-  let userId = $derived(data.user?.id ?? 0);
-  let tournament = $derived(data.tournamentData.tournament);
-  let eventLinkUrl = $derived(httpUrlOrNull(tournament.event_link));
-  let shortcodeUrl = $derived(tournament.slug ? `${page.url.origin}/${tournament.slug}` : "");
+	let userId = $derived(data.user?.id ?? 0);
+	let tournament = $derived(data.tournamentData.tournament);
+	let eventLinkUrl = $derived(httpUrlOrNull(tournament.event_link));
+	let shortcodeUrl = $derived(tournament.slug ? `${page.url.origin}/${tournament.slug}` : '');
 
-  let notices = $derived.by(() => {
-    let notices: string[] = [];
-    if (data.player?.id !== 0 && data.player?.registration_locked) {
-      notices.push("Registration is locked. Talk to a tournament organiser to change your name or decks.");
-    }
-    if (userId === tournament.user_id && tournament.nrdb_deck_registration && tournament.any_player_unlocked) {
-      notices.push("One or more players are unlocked for editing.");
-    }
+	let notices = $derived.by(() => {
+		let notices: string[] = [];
+		if (data.player?.id !== 0 && data.player?.registration_locked) {
+			notices.push(
+				'Registration is locked. Talk to a tournament organiser to change your name or decks.'
+			);
+		}
+		if (
+			userId === tournament.user_id &&
+			tournament.nrdb_deck_registration &&
+			tournament.any_player_unlocked
+		) {
+			notices.push('One or more players are unlocked for editing.');
+		}
 
-    return notices;
-  });
+		return notices;
+	});
 
-  function printQRCode() {
-    const qrCodeDiv = document.getElementById("qrCode");
-    if (!qrCodeDiv) {
-      return;
-    }
+	function printQRCode() {
+		const qrCodeDiv = document.getElementById('qrCode');
+		if (!qrCodeDiv) {
+			return;
+		}
 
-    const printWindow = window.open();
-    if (!printWindow) {
-      return;
-    }
-    printWindow.document.body.append(qrCodeDiv.cloneNode(true));
-    printWindow.print();
-    printWindow.close();
-  }
+		const printWindow = window.open();
+		if (!printWindow) {
+			return;
+		}
+		printWindow.document.body.append(qrCodeDiv.cloneNode(true));
+		printWindow.print();
+		printWindow.close();
+	}
 </script>
 
 {#if tournament.id === 0}
-  <div class="d-flex align-items-center m-2">
-    <div class="spinner-border m-auto"></div>
-  </div>
+	<div class="d-flex align-items-center m-2">
+		<div class="spinner-border m-auto"></div>
+	</div>
 {:else}
-  <div class="container">
-    <!-- Notices -->
-    <div class="row">
-      <div class="col-md-12">
-        {#each notices as notice (notice)}
-          <div class="alert alert-info">{notice}</div>
-        {/each}
-      </div>
-    </div>
+	<div class="container">
+		<!-- Notices -->
+		<div class="row">
+			<div class="col-md-12">
+				{#each notices as notice (notice)}
+					<div class="alert alert-info">{notice}</div>
+				{/each}
+			</div>
+		</div>
 
-    <div class="row">
-      <!-- Overview -->
-      <div class="col-md-6">
-        <div class="card">
-          <!-- Shortcode -->
-          {#if tournament.slug}
-            <li class="list-group-item" aria-label="shortcode">
-              <div class="small text-secondary">Shortcode:</div>
-              {tournament.slug}
-              (<a href={resolve("/[slug]", { slug: tournament.slug })}>
-                {shortcodeUrl}
-              </a>)
-            </li>
-          {/if}
+		<div class="row">
+			<!-- Overview -->
+			<div class="col-md-6">
+				<div class="card">
+					<!-- Shortcode -->
+					{#if tournament.slug}
+						<li class="list-group-item" aria-label="shortcode">
+							<div class="small text-secondary">Shortcode:</div>
+							{tournament.slug}
+							(<a href={resolve('/[slug]', { slug: tournament.slug })}>
+								{shortcodeUrl}
+							</a>)
+						</li>
+					{/if}
 
-          <!-- Date -->
-          <li class="list-group-item">
-            <div aria-label="date">
-              <div class="small text-secondary">Date:</div>
-              {new Date(tournament.date).toLocaleString(navigator.languages, {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-                timeZone: "UTC",
-              })}
-            </div>
+					<!-- Date -->
+					<li class="list-group-item">
+						<div aria-label="date">
+							<div class="small text-secondary">Date:</div>
+							{new Date(tournament.date).toLocaleString(navigator.languages, {
+								weekday: 'long',
+								month: 'long',
+								day: 'numeric',
+								year: 'numeric',
+								timeZone: 'UTC'
+							})}
+						</div>
 
-            <div class="d-flex flex-wrap">
-              {#if tournament.registration_starts}
-                <div class="mr-4" aria-label="registration time">
-                  <div class="small text-secondary">Registration:</div>
-                  {formatWallClockTime(tournament.registration_starts)}
-                </div>
-              {/if}
+						<div class="d-flex flex-wrap">
+							{#if tournament.registration_starts}
+								<div class="mr-4" aria-label="registration time">
+									<div class="small text-secondary">Registration:</div>
+									{formatWallClockTime(tournament.registration_starts)}
+								</div>
+							{/if}
 
-              {#if tournament.tournament_starts}
-                <div class="mr-4" aria-label="first round time">
-                  <div class="small text-secondary">First Round:</div>
-                  {formatWallClockTime(tournament.tournament_starts)}
-                </div>
-              {/if}
+							{#if tournament.tournament_starts}
+								<div class="mr-4" aria-label="first round time">
+									<div class="small text-secondary">First Round:</div>
+									{formatWallClockTime(tournament.tournament_starts)}
+								</div>
+							{/if}
 
-              {#if (tournament.registration_starts ?? tournament.tournament_starts) && tournament.time_zone}
-                <div style="align-self: flex-end" aria-label="time zone">
-                  {tournament.time_zone}
-                </div>
-              {/if}
-            </div>
-          </li>
+							{#if (tournament.registration_starts ?? tournament.tournament_starts) && tournament.time_zone}
+								<div style="align-self: flex-end" aria-label="time zone">
+									{tournament.time_zone}
+								</div>
+							{/if}
+						</div>
+					</li>
 
-          <!-- Organiser -->
-          <li class="list-group-item" aria-label="tournament organiser">
-            <div class="small text-secondary">Organiser:</div>
-            {`${tournament.tournament_organizer} ${tournament.organizer_contact ? `- ${tournament.organizer_contact}` : ""}`}
-          </li>
+					<!-- Organiser -->
+					<li class="list-group-item" aria-label="tournament organiser">
+						<div class="small text-secondary">Organiser:</div>
+						{`${tournament.tournament_organizer} ${tournament.organizer_contact ? `- ${tournament.organizer_contact}` : ''}`}
+					</li>
 
-          <!-- Players -->
-          <li class="list-group-item" aria-label="player count">
-            <div class="small text-secondary">Players:</div>
-            {tournament.active_player_count}
-            {new Intl.PluralRules(navigator.languages).select(
-              tournament.active_player_count,
-            ) == "one"
-              ? "active player"
-              : "active players"}
-            ({tournament.dropped_player_count} dropped)
-          </li>
+					<!-- Players -->
+					<li class="list-group-item" aria-label="player count">
+						<div class="small text-secondary">Players:</div>
+						{tournament.active_player_count}
+						{new Intl.PluralRules(navigator.languages).select(
+							tournament.active_player_count
+						) == 'one'
+							? 'active player'
+							: 'active players'}
+						({tournament.dropped_player_count} dropped)
+					</li>
 
-          <!-- QR Code -->
-          {#if shortcodeUrl}
-            <li class="list-group-item">
-              <div class="small text-secondary">QR Code:</div>
-              <div class="row col-sm-6" aria-label="QR code">
-                <button
-                  type="button"
-                  class="btn btn-link p-0"
-                  data-toggle="modal"
-                  data-target="#qrCodeDialog"
-                >
-                  <FontAwesomeIcon icon="qrcode" />
-                  Open QR Code
-                </button>
+					<!-- QR Code -->
+					{#if shortcodeUrl}
+						<li class="list-group-item">
+							<div class="small text-secondary">QR Code:</div>
+							<div class="row col-sm-6" aria-label="QR code">
+								<button
+									type="button"
+									class="btn btn-link p-0"
+									data-toggle="modal"
+									data-target="#qrCodeDialog"
+								>
+									<FontAwesomeIcon icon="qrcode" />
+									Open QR Code
+								</button>
 
-                <ModalDialog id="qrCodeDialog" headerText="QR Code">
-                  <div class="text-center">
-                    <button
-                      type="button"
-                      class="btn btn-primary mb-3"
-                      onclick={printQRCode}
-                    >
-                      <FontAwesomeIcon icon="print" /> Print
-                    </button>
-                    <div id="qrCode">
-                      <h4 class="mb-3">
-                        {shortcodeUrl}
-                      </h4>
-                      <div class="d-inline-block bg-white p-3 rounded shadow-sm">
-                        <svg
-                          use:qr={{
-                            data: shortcodeUrl,
-                            anchorInnerFill: 'black',
-                            anchorOuterFill: 'black',
-                            moduleFill: 'black',
-                            margin: 0.25,
-                          }}
-                          class="w-100 h-100"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </ModalDialog>
-              </div>
-            </li>
-          {/if}
+								<ModalDialog id="qrCodeDialog" headerText="QR Code">
+									<div class="text-center">
+										<button
+											type="button"
+											class="btn btn-primary mb-3"
+											onclick={printQRCode}
+										>
+											<FontAwesomeIcon icon="print" /> Print
+										</button>
+										<div id="qrCode">
+											<h4 class="mb-3">
+												{shortcodeUrl}
+											</h4>
+											<div
+												class="d-inline-block bg-white p-3 rounded shadow-sm"
+											>
+												<svg
+													use:qr={{
+														data: shortcodeUrl,
+														anchorInnerFill: 'black',
+														anchorOuterFill: 'black',
+														moduleFill: 'black',
+														margin: 0.25
+													}}
+													class="w-100 h-100"
+												/>
+											</div>
+										</div>
+									</div>
+								</ModalDialog>
+							</div>
+						</li>
+					{/if}
 
-          <!-- More Information -->
-          {#if tournament.event_link}
-            <li class="list-group-item">
-              <div class="small text-secondary">More Information:</div>
-              {#if eventLinkUrl}
-                <a href={eventLinkUrl} target="_blank" rel="external">{tournament.event_link}</a>
-              {:else}
-                {tournament.event_link}
-              {/if}
-            </li>
-          {/if}
-        </div>
-      </div>
-      <!-- Registration -->
-      <div class="col-md-6" aria-label="registration information">
-        {#if data.player && data.player.id !== 0}
-          {#if data.player.active}
-            <!-- User is logged in and registered -->
-            <RegistrationCard {userId} {tournament} player={data.player} />
-          {:else}
-            <h5 class="card-title">Rejoin this Event</h5>
-            {#if userId === tournament.user_id}
-              <p /* User is the Tournament Organizer (TO) and is registered, but is currently dropped */>
-                You can reinstate yourself on the
-                <a href={resolve(`tournaments/${tournament.id}/organizer/players`)}>
-                  Players
-                </a>
-                tab.
-              </p>
-            {:else}
-              <p /* User is not the Tournament Organizer (TO) and is registered, but is currently dropped */>
-                Talk to a Tournament Organiser to rejoin the event.
-              </p>
-            {/if}
-          {/if}
-        {:else if !tournament.registration_closed && tournament.self_registration}
-          {#if data.user && data.player}
-            <RegistrationCard /* User is logged in and not registered */
-              {userId} {tournament} player={data.player} />
-          {:else}
-            <div class="card card-body alert alert-warning" /* User is not logged in and not registered */>
-              <h5 class="card-title">Register for this Event</h5>
+					<!-- More Information -->
+					{#if tournament.event_link}
+						<li class="list-group-item">
+							<div class="small text-secondary">More Information:</div>
+							{#if eventLinkUrl}
+								<a href={eventLinkUrl} target="_blank" rel="external"
+									>{tournament.event_link}</a
+								>
+							{:else}
+								{tournament.event_link}
+							{/if}
+						</li>
+					{/if}
+				</div>
+			</div>
+			<!-- Registration -->
+			<div class="col-md-6" aria-label="registration information">
+				{#if data.player && data.player.id !== 0}
+					{#if data.player.active}
+						<!-- User is logged in and registered -->
+						<RegistrationCard {userId} {tournament} player={data.player} />
+					{:else}
+						<h5 class="card-title">Rejoin this Event</h5>
+						{#if userId === tournament.user_id}
+							<p>
+								You can reinstate yourself on the
+								<a href={resolve(`tournaments/${tournament.id}/organizer/players`)}>
+									Players
+								</a>
+								tab.
+							</p>
+						{:else}
+							<p>Talk to a Tournament Organiser to rejoin the event.</p>
+						{/if}
+					{/if}
+				{:else if !tournament.registration_closed && tournament.self_registration}
+					{#if data.user && data.player}
+						<RegistrationCard
+							/* User is logged in and not registered */
+							{userId}
+							{tournament}
+							player={data.player}
+						/>
+					{:else}
+						<div
+							class="card card-body alert alert-warning" /* User is not logged in and not registered */
+						>
+							<h5 class="card-title">Register for this Event</h5>
 
-              <p class="mb-1">
-                You must be logged in to register for this tournament:
-              </p>
-              <a
-                class="alert-link"
-                href={resolve(`login?return_to=/tournaments/${tournament.id}`)}
-              >
-                <FontAwesomeIcon icon="sign-in" /> Sign in
-              </a>
+							<p class="mb-1">
+								You must be logged in to register for this tournament:
+							</p>
+							<a
+								class="alert-link"
+								href={resolve(`login?return_to=/tournaments/${tournament.id}`)}
+							>
+								<FontAwesomeIcon icon="sign-in" /> Sign in
+							</a>
 
-              <p class="mt-4 mb-1">
-                Don't have an account? Register with NetrunnerDB, then return
-                to Cobra to log in:
-              </p>
-              <a class="alert-link" href="https://netrunnerdb.com/register/">
-                <i class="icon icon-link"></i> Create NRDB Account
-              </a>
-            </div>
-          {/if}
-        {/if}
-      </div>
-    </div>
+							<p class="mt-4 mb-1">
+								Don't have an account? Register with NetrunnerDB, then return to
+								Cobra to log in:
+							</p>
+							<a class="alert-link" href="https://netrunnerdb.com/register/">
+								<i class="icon icon-link"></i> Create NRDB Account
+							</a>
+						</div>
+					{/if}
+				{/if}
+			</div>
+		</div>
 
-    <!-- Additional Details -->
-    <div class="row mt-3" aria-label="additional details">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header d-flex justify-content-between">
-            <h5 class="mb-0">Additional Details</h5>
-          </div>
-          
-          <ul class="list-group list-group-flush">
-            <!-- Description -->
-            {#if tournament.description}
-              <li class="list-group-item">
-                <h5>Description</h5>
-                <Markdown source={tournament.description} />
-              </li>
-            {/if}
+		<!-- Additional Details -->
+		<div class="row mt-3" aria-label="additional details">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header d-flex justify-content-between">
+						<h5 class="mb-0">Additional Details</h5>
+					</div>
 
-            <!-- Format and Deckbuilding -->
-            <li class="list-group-item">
-              <h5>Format and Deckbuilding</h5>
-              <div>Swiss Format: {swissFormatDisplayString(tournament.swiss_format)}</div>
-              {#if tournament.format_id}
-                <div>Game Format: {tournament.format_name}</div>
-              {/if}
-              {#if tournament.deckbuilding_restriction_id}
-                <div>Deckbuilding Restrictions: {tournament.deckbuilding_restriction_name}</div>
-              {/if}
-              {#if tournament.decklist_required}
-                <div>Decklists are required for this event.</div>
-              {/if}
-            </li>
+					<ul class="list-group list-group-flush">
+						<!-- Description -->
+						{#if tournament.description}
+							<li class="list-group-item">
+								<h5>Description</h5>
+								<Markdown source={tournament.description} />
+							</li>
+						{/if}
 
-            <!-- Prizes -->
-            {#if tournament.official_prize_kit_id ?? tournament.additional_prizes_description}
-              {#if tournament.official_prize_kit_id}
-                <li class="list-group-item">
-                  <h5>Official Prize Kit</h5>
-                  <p>{tournament.official_prize_kit_name}</p>
-                </li>
-              {/if}
-              {#if tournament.additional_prizes_description}
-                <li class="list-group-item">
-                  <h5>Additional Prizes</h5>
-                  <Markdown source={tournament.additional_prizes_description} />
-                </li>
-              {/if}
-            {/if}
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
+						<!-- Format and Deckbuilding -->
+						<li class="list-group-item">
+							<h5>Format and Deckbuilding</h5>
+							<div>
+								Swiss Format: {swissFormatDisplayString(tournament.swiss_format)}
+							</div>
+							{#if tournament.format_id}
+								<div>Game Format: {tournament.format_name}</div>
+							{/if}
+							{#if tournament.deckbuilding_restriction_id}
+								<div>
+									Deckbuilding Restrictions: {tournament.deckbuilding_restriction_name}
+								</div>
+							{/if}
+							{#if tournament.decklist_required}
+								<div>Decklists are required for this event.</div>
+							{/if}
+						</li>
+
+						<!-- Prizes -->
+						{#if tournament.official_prize_kit_id ?? tournament.additional_prizes_description}
+							{#if tournament.official_prize_kit_id}
+								<li class="list-group-item">
+									<h5>Official Prize Kit</h5>
+									<p>{tournament.official_prize_kit_name}</p>
+								</li>
+							{/if}
+							{#if tournament.additional_prizes_description}
+								<li class="list-group-item">
+									<h5>Additional Prizes</h5>
+									<Markdown source={tournament.additional_prizes_description} />
+								</li>
+							{/if}
+						{/if}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
 {/if}

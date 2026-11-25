@@ -27,10 +27,6 @@ class ApplicationController < ActionController::Base # rubocop:disable Style/Doc
 
   private
 
-  def authorize_beta_testing
-    authorize :beta, :beta_testing_enabled?
-  end
-
   def user_not_authorised
     render json: { error: "🔒 Sorry, you can't do that" }, status: :unauthorized
   end

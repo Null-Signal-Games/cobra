@@ -3,8 +3,6 @@
 # Beta::TournamentsController, as called by the SvelteKit frontend (frontend/src/lib/api/beta.ts).
 # #destroy is covered separately in tournaments_controller_destroy_spec.rb.
 RSpec.describe 'Beta::TournamentsController' do
-  include_context 'with beta testing enabled'
-
   let(:tournament) { create(:tournament, self_registration: true) }
 
   describe 'POST cut' do

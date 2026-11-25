@@ -8,7 +8,6 @@ RSpec.describe 'Beta::PlayersController #decks' do
   let(:other_player) { create(:player, tournament:, user: other_user) }
 
   before do
-    Flipper.enable(:beta_testing)
     Deck.create!(player:, user: player_user, side_id: 'corp', name: 'Player Corp')
     Deck.create!(player: other_player, user: other_user, side_id: 'corp', name: 'Other Corp')
   end

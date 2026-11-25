@@ -126,6 +126,7 @@
                 "iliazeus.vscode-ansi",
                 "manuelpuyol.erb-linter",
                 "ms-azuretools.vscode-docker",
+                "oxc.oxc-vscode",
                 "mtxr.sqltools-driver-pg",
                 "mtxr.sqltools",
                 "Shopify.ruby-lsp",

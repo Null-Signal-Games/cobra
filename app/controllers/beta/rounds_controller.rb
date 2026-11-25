@@ -4,7 +4,6 @@ module Beta
   class RoundsController < ApplicationController # rubocop:disable Metrics/ClassLength,Style/Documentation
     before_action :set_tournament
     before_action :set_round, only: %i[update destroy repair complete update_timer round_data]
-    before_action :authorize_beta_testing
 
     def create
       authorize @tournament, :update?
@@ -87,8 +86,7 @@ module Beta
 
       render json: {
         policy: {
-          update: @tournament.user == current_user,
-          custom_table_numbering: Flipper.enabled?(:custom_table_numbering, current_user)
+          update: @tournament.user == current_user
         },
         tournament: helpers.tournament_json(@tournament),
         stage: {

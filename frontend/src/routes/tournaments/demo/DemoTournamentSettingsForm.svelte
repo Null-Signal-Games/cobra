@@ -1,116 +1,109 @@
 <script lang="ts">
-  import type { DemoTournamentSettings } from "#lib/api/classicTypes.ts";
-  import type { Errors } from "#lib/utils/errors.ts";
-  import FontAwesomeIcon from "#lib/components/FontAwesomeIcon.svelte";
-  import ProgressButton from "#lib/components/ProgressButton.svelte";
-  import { swissFormatOptions } from "#lib/model/Tournament.ts";
-  import Svelecte from "svelecte";
+	import type { DemoTournamentSettings } from '#lib/api/classicTypes.ts';
+	import type { Errors } from '#lib/utils/errors.ts';
+	import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
+	import ProgressButton from '#lib/components/ProgressButton.svelte';
+	import { swissFormatOptions } from '#lib/model/Tournament.ts';
+	import Svelecte from 'svelecte';
 
-  let {
-    tournament,
-    submitLabel = "Save",
-    submitIcon = "floppy-o",
-    errors = {},
-    onSubmitCallback,
-  }: {
-    tournament: DemoTournamentSettings;
-    submitLabel?: string;
-    submitIcon?: string;
-    errors?: Errors;
-    onSubmitCallback?: (tournament: DemoTournamentSettings) => Promise<boolean>;
-  } = $props();
+	let {
+		tournament,
+		submitLabel = 'Save',
+		submitIcon = 'floppy-o',
+		errors = {},
+		onSubmitCallback
+	}: {
+		tournament: DemoTournamentSettings;
+		submitLabel?: string;
+		submitIcon?: string;
+		errors?: Errors;
+		onSubmitCallback?: (tournament: DemoTournamentSettings) => Promise<boolean>;
+	} = $props();
 
-  // svelte-ignore state_referenced_locally
-  let tournamentEdit = $state($state.snapshot(tournament));
+	// svelte-ignore state_referenced_locally
+	let tournamentEdit = $state($state.snapshot(tournament));
 </script>
 
 <div class="row">
-  <div class="col-md-9">
-    <div class="form-group">
-      <label for="name"><abbr title="required">*</abbr> Tournament name</label>
-      <input
-        type="text"
-        id="name"
-        class="form-control"
-        bind:value={tournamentEdit.name}
-      />
-      {#if errors.name}
-        <div class="invalid-feedback d-block">{errors.name}</div>
-      {/if}
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="form-group">
-      <label for="swiss_format">Swiss format</label>
-      <Svelecte
-        name="swiss_format"
-        inputId="swiss_format"
-        options={swissFormatOptions}
-        valueField="id"
-        labelField="name"
-        searchable={false}
-        bind:value={tournamentEdit.swiss_format}
-      />
-      {#if errors.swiss_format}
-        <div class="invalid-feedback d-block">{errors.swiss_format}</div>
-      {/if}
-    </div>
-  </div>
+	<div class="col-md-9">
+		<div class="form-group">
+			<label for="name"><abbr title="required">*</abbr> Tournament name</label>
+			<input type="text" id="name" class="form-control" bind:value={tournamentEdit.name} />
+			{#if errors.name}
+				<div class="invalid-feedback d-block">{errors.name}</div>
+			{/if}
+		</div>
+	</div>
+	<div class="col-md-3">
+		<div class="form-group">
+			<label for="swiss_format">Swiss format</label>
+			<Svelecte
+				name="swiss_format"
+				inputId="swiss_format"
+				options={swissFormatOptions}
+				valueField="id"
+				labelField="name"
+				searchable={false}
+				bind:value={tournamentEdit.swiss_format}
+			/>
+			{#if errors.swiss_format}
+				<div class="invalid-feedback d-block">{errors.swiss_format}</div>
+			{/if}
+		</div>
+	</div>
 </div>
 
 <div class="row">
-  <div class="col-md-6">
-    <div class="form-group">
-      <label for="num_players">Number of Players</label>
-      <input
-        type="text"
-        id="num_players"
-        class="form-control"
-        bind:value={tournamentEdit.num_players}
-      />
-      {#if errors.num_players}
-        <div class="invalid-feedback d-block">{errors.num_players}</div>
-      {/if}
-    </div>
-  </div>
-  <div class="col-md-6">
-    <div class="form-group">
-      <label for="num_first_round_byes">Number of First Round Byes</label>
-      <input
-        type="text"
-        id="num_first_round_byes"
-        class="form-control"
-        bind:value={tournamentEdit.num_first_round_byes}
-      />
-      {#if errors.num_first_round_byes}
-        <div class="invalid-feedback d-block">
-          {errors.num_first_round_byes}
-        </div>
-      {/if}
-    </div>
-  </div>
+	<div class="col-md-6">
+		<div class="form-group">
+			<label for="num_players">Number of Players</label>
+			<input
+				type="text"
+				id="num_players"
+				class="form-control"
+				bind:value={tournamentEdit.num_players}
+			/>
+			{#if errors.num_players}
+				<div class="invalid-feedback d-block">{errors.num_players}</div>
+			{/if}
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="form-group">
+			<label for="num_first_round_byes">Number of First Round Byes</label>
+			<input
+				type="text"
+				id="num_first_round_byes"
+				class="form-control"
+				bind:value={tournamentEdit.num_first_round_byes}
+			/>
+			{#if errors.num_first_round_byes}
+				<div class="invalid-feedback d-block">
+					{errors.num_first_round_byes}
+				</div>
+			{/if}
+		</div>
+	</div>
 </div>
 
 <div class="form-check mb-3">
-  <input
-    type="checkbox"
-    id="assign_ids"
-    class="form-check-input"
-    bind:checked={tournamentEdit.assign_ids}
-  />
-  <label for="assign_ids" class="form-check-label">
-    Assign random IDs for players?
-  </label>
+	<input
+		type="checkbox"
+		id="assign_ids"
+		class="form-check-input"
+		bind:checked={tournamentEdit.assign_ids}
+	/>
+	<label for="assign_ids" class="form-check-label"> Assign random IDs for players? </label>
 </div>
 
 <ProgressButton
-  css="btn btn-primary"
-  inProgressText="Saving"
-  completeText="Saved"
-  onclick={() => {
-    return onSubmitCallback ? onSubmitCallback(tournamentEdit) : false;
-  }}
+	css="btn btn-primary"
+	inProgressText="Saving"
+	completeText="Saved"
+	onclick={() => {
+		return onSubmitCallback ? onSubmitCallback(tournamentEdit) : false;
+	}}
 >
-  <FontAwesomeIcon icon={submitIcon} />
-  {submitLabel}
+	<FontAwesomeIcon icon={submitIcon} />
+	{submitLabel}
 </ProgressButton>

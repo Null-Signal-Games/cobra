@@ -1,4 +1,4 @@
-import type { PageLoad } from "../$types";
+import type { PageLoad } from '../$types';
 
 const icons = ['😢', '🤔', '🙃', '😣', '😱'];
 
@@ -6,10 +6,10 @@ const icons = ['😢', '🤔', '🙃', '😣', '😱'];
 export const ssr = false;
 
 export const load: PageLoad = ({ url }) => {
-  const code = url.searchParams.get("code") ?? "";
-  const randomIcon = icons[Math.floor(Math.random() * icons.length)];
-  return {
-    code,
-    icon: randomIcon
-  };
+	const code = url.searchParams.get('code') ?? '';
+	const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+	return {
+		code,
+		icon: randomIcon
+	};
 };
