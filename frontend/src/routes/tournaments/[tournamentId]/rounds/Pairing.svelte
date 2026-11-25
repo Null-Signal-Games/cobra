@@ -39,14 +39,11 @@
 		: ''}"
 >
 	<!-- Table label -->
-	<div class="col-sm-2 order-0 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
+	<div class="col-sm-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
 		{pairing.table_label}
-	</div>
 
-	<!-- Player 1 -->
-	<div class="col-4 px-2">
-		{#if stage.view_decks}
-			{#if pairing.player1.side}
+		{#if stage.view_decks && stage.is_single_sided}
+			<div class="d-inline d-sm-block float-right float-sm-none">
 				<a
 					href={resolve(
 						`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=rounds`
@@ -54,16 +51,12 @@
 				>
 					<FontAwesomeIcon icon="eye" /> View decks
 				</a>
-			{:else}
-				<a
-					href={resolve(
-						`tournaments/${tournament.id}/players/${pairing.player1.id}/view_decks?back_to=rounds`
-					)}
-				>
-					<FontAwesomeIcon icon="eye" /> View decks
-				</a>
-			{/if}
+			</div>
 		{/if}
+	</div>
+
+	<!-- Player 1 -->
+	<div class="col-4 px-2">
 		<PlayerDisplay
 			player={leftPlayer}
 			{pairing}
@@ -71,6 +64,17 @@
 			is_single_sided={stage.is_single_sided}
 			show_ids={!stage.is_single_sided || pairing.player1.side !== null}
 		/>
+		{#if stage.view_decks && !stage.is_single_sided}
+			<div class="float-right">
+				<a
+					href={resolve(
+						`tournaments/${tournament.id}/players/${pairing.player1.id}/view_decks?back_to=rounds`
+					)}
+				>
+					<FontAwesomeIcon icon="eye" /> View decks
+				</a>
+			</div>
+		{/if}
 	</div>
 
 	<!-- Score -->
@@ -98,7 +102,7 @@
 			is_single_sided={stage.is_single_sided}
 			show_ids={!stage.is_single_sided || pairing.player2.side !== null}
 		/>
-		{#if stage.view_decks && !pairing.player1.side && pairing.player2.id}
+		{#if stage.view_decks && !stage.is_single_sided}
 			<a
 				href={resolve(
 					`tournaments/${tournament.id}/players/${pairing.player2.id}/view_decks?back_to=rounds`
