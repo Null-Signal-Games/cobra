@@ -42,26 +42,28 @@
 
 <div class="centre_score">
 	{#if showScorePresets}
-		<div>
-			{#each scorePresets(stage, pairing) as report (report.label)}
+		<div class="form-row justify-content-center">
+			<div>
+				{#each scorePresets(stage, pairing) as report (report.label)}
+					<button
+						type="button"
+						class="btn btn-primary mr-1"
+						onclick={() => {
+							reportScoreCallback?.(pairing.id, report, false);
+						}}
+					>
+						{report.label}
+					</button>
+				{/each}
 				<button
+					aria-label="show-custom"
 					type="button"
-					class="btn btn-primary mr-1"
-					onclick={() => {
-						reportScoreCallback?.(pairing.id, report, false);
-					}}
+					class="btn btn-primary"
+					onclick={toggleShowScorePresets}
 				>
-					{report.label}
+					...
 				</button>
-			{/each}
-			<button
-				aria-label="show-custom"
-				type="button"
-				class="btn btn-primary"
-				onclick={toggleShowScorePresets}
-			>
-				...
-			</button>
+			</div>
 		</div>
 	{:else}
 		<div class="form-row justify-content-center">
