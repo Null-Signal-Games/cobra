@@ -28,7 +28,7 @@
 	}
 </script>
 
-<div {id} class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" use:portal>
+<div {id} class="modal fade" role="dialog" tabindex="-1" use:portal>
 	<div class="modal-dialog modal-dialog-centered {dialogClass}" role="document">
 		<div class="modal-content">
 			<div class="modal-header">

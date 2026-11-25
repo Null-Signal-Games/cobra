@@ -64,9 +64,9 @@
 						reportScoreCallback?.(pairing.id, report, false);
 					}
 				}}
-				disabled={!report}
+				disabled={!report || pairing.reported}
 			>
-				<FontAwesomeIcon icon="check" /> Accept {player.name}
+				Accept {player.name}
 			</button>
 		</div>
 		<div class="col-4">
@@ -103,20 +103,24 @@
 		<div class="container">
 			{@render playerReportRow(leftPlayer, leftPlayerReport)}
 			{@render playerReportRow(rightPlayer, rightPlayerReport)}
-		</div>
 
-		{#if playersReported && !selfReportsMatch}
-			<button
-				type="button"
-				class="btn btn-primary"
-				onclick={() => {
-					resetReportsCallback?.(pairing.id);
-				}}
-				title="Reset self reports of pairing"
-			>
-				<FontAwesomeIcon icon="undo" /> Reset
-			</button>
-		{/if}
+			{#if playersReported && !selfReportsMatch}
+				<div class="row mb-2 align-items-center">
+					<div class="col-8">
+						<button
+							type="button"
+							class="btn btn-primary"
+							onclick={() => {
+								resetReportsCallback?.(pairing.id);
+							}}
+							title="Reset self reports of pairing"
+						>
+							<FontAwesomeIcon icon="undo" /> Reset
+						</button>
+					</div>
+				</div>
+			{/if}
+		</div>
 
 		<hr />
 	{/if}
@@ -125,7 +129,7 @@
 	<AdminReportOptions {stage} {pairing} {reportScoreCallback} />
 	<hr />
 
-	{#if changePlayerSide}
+	{#if changePlayerSide && stage.is_single_sided && pairing.player1.id && pairing.player2.id}
 		<h5>Change Player Sides</h5>
 		<div class="container">
 			<div class="row mb-2 align-items-center">

@@ -119,7 +119,7 @@
 			type="button"
 			class="btn btn-primary mr-2"
 			data-toggle="modal"
-			data-target="#reports{pairing.id}"
+			data-target="#editPairing{pairing.id}"
 		>
 			<FontAwesomeIcon icon="pencil" /> Edit
 		</button>
@@ -156,7 +156,7 @@
 	</div>
 
 	<EditPairingDialog
-		id="reports{pairing.id}"
+		id="editPairing{pairing.id}"
 		{pairing}
 		{stage}
 		self_reporting_enabled={tournament.allow_self_reporting}
