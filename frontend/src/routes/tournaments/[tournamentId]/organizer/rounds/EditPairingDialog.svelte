@@ -89,6 +89,7 @@
 					}
 				}}
 				disabled={!report || pairing.reported}
+				aria-label={`accept ${player.name}`}
 			>
 				Accept
 			</button>

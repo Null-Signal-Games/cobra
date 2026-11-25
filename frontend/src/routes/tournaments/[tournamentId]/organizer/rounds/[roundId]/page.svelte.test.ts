@@ -3,6 +3,7 @@ import {
 	getByLabelText,
 	getByRole,
 	getByText,
+	queryByLabelText,
 	queryByTestId,
 	queryByText,
 	render,
@@ -632,12 +633,12 @@ describe('EditRound', () => {
 
 				const { table1Row, editDialog } = await openEditPairingDialog();
 
-				const aliceAcceptButton = getByText(editDialog, /accept alice/i);
+				const aliceAcceptButton = getByLabelText(editDialog, /accept alice/i);
 				expect(
-					getByText(editDialog, /accept alice/i).parentElement?.parentElement
+					getByLabelText(editDialog, /accept alice/i).parentElement?.parentElement
 				).toHaveTextContent('3 - 0');
 				expect(
-					getByText(editDialog, /accept bob/i).parentElement?.parentElement
+					getByLabelText(editDialog, /accept bob/i).parentElement?.parentElement
 				).toHaveTextContent('3 - 0');
 
 				vi.spyOn(Pairing1, 'reported', 'get').mockReturnValue(true);
@@ -649,8 +650,8 @@ describe('EditRound', () => {
 				await rerender({ data: structuredClone(MockPageData) });
 
 				expect(betaApi.reportScore).toHaveBeenCalledOnce();
-				expect(getByText(editDialog, /accept alice/i)).toBeDisabled();
-				expect(getByText(editDialog, /accept bob/i)).toBeDisabled();
+				expect(getByLabelText(editDialog, /accept alice/i)).toBeDisabled();
+				expect(getByLabelText(editDialog, /accept bob/i)).toBeDisabled();
 				expect(table1Row).toHaveTextContent('3 - 0');
 			});
 		});
@@ -679,12 +680,12 @@ describe('EditRound', () => {
 
 				const { table1Row, editDialog } = await openEditPairingDialog();
 
-				const aliceAcceptButton = getByText(editDialog, /accept alice/i);
+				const aliceAcceptButton = getByLabelText(editDialog, /accept alice/i);
 				expect(
-					getByText(editDialog, /accept alice/i).parentElement?.parentElement
+					getByLabelText(editDialog, /accept alice/i).parentElement?.parentElement
 				).toHaveTextContent('3 - 0');
 				expect(
-					getByText(editDialog, /accept bob/i).parentElement?.parentElement
+					getByLabelText(editDialog, /accept bob/i).parentElement?.parentElement
 				).toHaveTextContent('0 - 3');
 
 				vi.spyOn(Pairing1, 'reported', 'get').mockReturnValue(true);
@@ -696,8 +697,8 @@ describe('EditRound', () => {
 				await rerender({ data: structuredClone(MockPageData) });
 
 				expect(betaApi.reportScore).toHaveBeenCalledOnce();
-				expect(getByText(editDialog, /accept alice/i)).toBeDisabled();
-				expect(getByText(editDialog, /accept bob/i)).toBeDisabled();
+				expect(getByLabelText(editDialog, /accept alice/i)).toBeDisabled();
+				expect(getByLabelText(editDialog, /accept bob/i)).toBeDisabled();
 				expect(table1Row).toHaveTextContent('3 - 0');
 			});
 
@@ -719,8 +720,8 @@ describe('EditRound', () => {
 
 				expect(editDialog).not.toContainElement(queryByText(editDialog, /3 - 0/i));
 				expect(editDialog).not.toContainElement(queryByText(editDialog, /0 - 3/i));
-				expect(queryByText(editDialog, /accept alice/i)).toBeDisabled();
-				expect(queryByText(editDialog, /accept bob/i)).toBeDisabled();
+				expect(queryByLabelText(editDialog, /accept alice/i)).toBeDisabled();
+				expect(queryByLabelText(editDialog, /accept bob/i)).toBeDisabled();
 			});
 		});
 	});
