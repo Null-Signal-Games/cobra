@@ -39,11 +39,11 @@
 		: ''}"
 >
 	<!-- Table label -->
-	<div class="col-sm-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
+	<div class="col-md-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
 		{pairing.table_label}
 
 		{#if stage.view_decks && stage.is_single_sided}
-			<div class="d-inline d-sm-block float-right float-sm-none">
+			<div class="d-inline d-md-block float-right float-md-none">
 				<a
 					href={resolve(
 						`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=rounds`
@@ -56,7 +56,7 @@
 	</div>
 
 	<!-- Player 1 -->
-	<div class="col-4 px-2">
+	<div class="col-4 col-md-3 px-2">
 		<PlayerDisplay
 			player={leftPlayer}
 			{pairing}
@@ -78,7 +78,7 @@
 	</div>
 
 	<!-- Score -->
-	<div class="col-4 col-sm-2 centre_score px-2">
+	<div class="col-4 col-md-2 centre_score px-2">
 		<!-- Self-reporting -->
 		{#if pairing.policy.self_report}
 			<SelfReportOptions {stage} {pairing} {reportScoreCallback} />
@@ -94,7 +94,7 @@
 	</div>
 
 	<!-- Player 2 -->
-	<div class="col-4 px-2">
+	<div class="col-4 col-md-3 px-2">
 		<PlayerDisplay
 			player={rightPlayer}
 			{pairing}

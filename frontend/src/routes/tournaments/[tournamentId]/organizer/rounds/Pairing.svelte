@@ -69,7 +69,7 @@
 		: ''}"
 >
 	<!-- Table label -->
-	<div class="col-sm-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
+	<div class="col-md-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
 		{pairing.table_label}
 
 		{#if tournament.allow_streaming_opt_out}
@@ -92,7 +92,7 @@
 		{/if}
 
 		{#if stage.view_decks && stage.is_single_sided}
-			<div class="d-inline d-sm-block float-right float-sm-none">
+			<div class="d-inline d-md-block float-right float-md-none">
 				<a
 					href={resolve(
 						`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=pairings`
@@ -105,7 +105,7 @@
 	</div>
 
 	<!-- Player 1 -->
-	<div class="col-4 px-2">
+	<div class="col-4 col-md-3 px-2">
 		<PlayerDisplay
 			player={leftPlayer}
 			{pairing}
@@ -127,7 +127,7 @@
 	</div>
 
 	<!-- Edit -->
-	<div class="col-4 col-sm-2 centre_score px-2">
+	<div class="col-4 col-md-2 centre_score px-2">
 		<button
 			type="button"
 			class="btn btn-primary mr-2"
@@ -158,7 +158,7 @@
 	</div>
 
 	<!-- Player 2 -->
-	<div class="col-4 px-2">
+	<div class="col-4 col-md-3 px-2">
 		<PlayerDisplay
 			player={rightPlayer}
 			{pairing}
