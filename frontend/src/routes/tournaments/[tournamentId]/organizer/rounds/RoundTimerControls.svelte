@@ -19,12 +19,12 @@
 </script>
 
 <div class="form-inline mt-2 round-timer-form">
-	<div class="form-group">
+	<div class="form-group d-flex">
 		<label for="round{round.id}Length">Round timer length (minutes)</label>
 		<input
 			id="round{round.id}Length"
 			size="3"
-			class="form-control ml-2 mr-2"
+			class="form-control roundTimerInput ml-2 mr-2"
 			bind:value={roundTimerLength}
 		/>
 		{#if round.timer.running}
@@ -68,3 +68,9 @@
 		</button>
 	</div>
 </div>
+
+<style>
+	.roundTimerInput {
+		width: 4rem;
+	}
+</style>

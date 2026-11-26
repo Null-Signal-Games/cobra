@@ -8,6 +8,7 @@
 	import { readableReportScore, type ScoreReport } from '#lib/model/ScoreReport.ts';
 	import PlayerDisplay from '#lib/components/PlayerDisplay.svelte';
 	import { resolve } from '$app/paths';
+	import ScoreDisplay from '#lib/components/ScoreDisplay.svelte';
 
 	let {
 		tournament,
@@ -38,78 +39,77 @@
 		: ''}"
 >
 	<!-- Table label -->
-	<div class="col-sm-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
+	<div class="col-md-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
 		{pairing.table_label}
+
+		{#if stage.view_decks && stage.is_single_sided}
+			<div class="d-inline d-md-block float-right float-md-none">
+				<a
+					href={resolve(
+						`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=rounds`
+					)}
+				>
+					<FontAwesomeIcon icon="eye" /> View decks
+				</a>
+			</div>
+		{/if}
 	</div>
 
 	<!-- Player 1 -->
-	{#if stage.view_decks}
-		{#if pairing.player1.side}
-			<a
-				href={resolve(
-					`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=rounds`
-				)}
-			>
-				<FontAwesomeIcon icon="eye" /> View decks
-			</a>
-		{:else}
-			<a
-				href={resolve(
-					`tournaments/${tournament.id}/players/${pairing.player1.id}/view_decks?back_to=rounds`
-				)}
-			>
-				<FontAwesomeIcon icon="eye" /> View decks
-			</a>
-		{/if}
-	{/if}
-	<PlayerDisplay
-		player={leftPlayer}
-		{pairing}
-		left_or_right="left"
-		is_single_sided={stage.is_single_sided}
-		show_ids={!stage.is_single_sided || pairing.player1.side !== null}
-	/>
-
-	<!-- Score -->
-	<div class="col-sm-2 centre_score">
-		{pairing.score_label}
-		{#if pairing.intentional_draw}
-			<span class="badge badge-pill badge-secondary score-badge">ID</span>
-		{/if}
-		{#if pairing.two_for_one}
-			<span class="badge badge-pill badge-secondary score-badge">2 for 1</span>
+	<div class="col-4 col-md-3 px-2">
+		<PlayerDisplay
+			player={leftPlayer}
+			{pairing}
+			left_or_right="left"
+			is_single_sided={stage.is_single_sided}
+			show_ids={!stage.is_single_sided || pairing.player1.side !== null}
+		/>
+		{#if stage.view_decks && !stage.is_single_sided}
+			<div class="float-right">
+				<a
+					href={resolve(
+						`tournaments/${tournament.id}/players/${pairing.player1.id}/view_decks?back_to=rounds`
+					)}
+				>
+					<FontAwesomeIcon icon="eye" /> View decks
+				</a>
+			</div>
 		{/if}
 	</div>
 
-	<!-- Player 2 -->
-	<PlayerDisplay
-		player={rightPlayer}
-		{pairing}
-		left_or_right="right"
-		is_single_sided={stage.is_single_sided}
-		show_ids={!stage.is_single_sided || pairing.player2.side !== null}
-	/>
-	{#if stage.view_decks && !pairing.player1.side && pairing.player2.id}
-		<a
-			href={resolve(
-				`tournaments/${tournament.id}/players/${pairing.player2.id}/view_decks?back_to=rounds`
-			)}
-		>
-			<FontAwesomeIcon icon="eye" /> View decks
-		</a>
-	{/if}
-
-	<!-- Self-reporting -->
-	<div class="col-sm-2">
+	<!-- Score -->
+	<div class="col-4 col-md-2 centre_score px-2">
+		<!-- Self-reporting -->
 		{#if pairing.policy.self_report}
 			<SelfReportOptions {stage} {pairing} {reportScoreCallback} />
-		{/if}
-		{#if pairing.self_reports && pairing.self_reports.length !== 0}
+		{:else if pairing.self_reports && pairing.self_reports.length !== 0}
 			Report: {readableReportScore(
 				pairing.self_reports[0],
 				pairing.player1.side,
 				stage.is_single_sided
 			)}
+		{:else}
+			<ScoreDisplay {pairing} />
+		{/if}
+	</div>
+
+	<!-- Player 2 -->
+	<div class="col-4 col-md-3 px-2">
+		<PlayerDisplay
+			player={rightPlayer}
+			{pairing}
+			left_or_right="right"
+			is_single_sided={stage.is_single_sided}
+			show_ids={!stage.is_single_sided || pairing.player2.side !== null}
+		/>
+		{#if stage.view_decks && !stage.is_single_sided}
+			<a
+				href={resolve(
+					`tournaments/${tournament.id}/players/${pairing.player2.id}/view_decks?back_to=rounds`
+				)}
+			>
+				<FontAwesomeIcon icon="eye" /> View decks
+			</a>
 		{/if}
 	</div>
 </div>

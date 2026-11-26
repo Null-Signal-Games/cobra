@@ -36,42 +36,47 @@
 </script>
 
 <div class="col-12">
-	<p></p>
-
 	{#if data.stages.length > 0}
 		<!-- Upper controls -->
-		<div>
-			{#if data.stages.every((s) => s.rounds.length === 0)}
-				<a
-					href={resolve(
-						`tournaments/${params.tournamentId}/player_meeting?back_to=rounds`
-					)}
-					class="btn btn-primary"
-				>
-					<FontAwesomeIcon icon="list-ul" /> Player meeting
-				</a>
-			{:else}
-				<button
-					type="button"
-					class="btn btn-primary"
-					onclick={() => {
-						showIdentities.update((value) => !value);
-					}}
-				>
-					<FontAwesomeIcon icon="eye-slash" /> Show/hide identities
-				</button>
-				<button type="button" class="btn btn-info" data-toggle="modal" data-target="#faq">
-					<FontAwesomeIcon icon="question" /> FAQ
-				</button>
-				{#if data.policy.update}
+		<div class="row">
+			<div class="col-12">
+				{#if data.stages.every((s) => s.rounds.length === 0)}
 					<a
-						href={resolve(`tournaments/${params.tournamentId}/organizer/rounds`)}
-						class="btn btn-primary float-right"
+						href={resolve(
+							`tournaments/${params.tournamentId}/player_meeting?back_to=rounds`
+						)}
+						class="btn btn-primary"
 					>
-						<FontAwesomeIcon icon="user" /> See organizer pairings view
+						<FontAwesomeIcon icon="list-ul" /> Player meeting
 					</a>
+				{:else}
+					<button
+						type="button"
+						class="btn btn-primary"
+						onclick={() => {
+							showIdentities.update((value) => !value);
+						}}
+					>
+						<FontAwesomeIcon icon="eye-slash" /> Show/hide identities
+					</button>
+					<button
+						type="button"
+						class="btn btn-info"
+						data-toggle="modal"
+						data-target="#faq"
+					>
+						<FontAwesomeIcon icon="question" /> FAQ
+					</button>
+					{#if data.policy.update}
+						<a
+							href={resolve(`tournaments/${params.tournamentId}/organizer/rounds`)}
+							class="btn btn-primary float-right"
+						>
+							<FontAwesomeIcon icon="user" /> See organizer pairings view
+						</a>
+					{/if}
 				{/if}
-			{/if}
+			</div>
 		</div>
 
 		<!-- Stages -->

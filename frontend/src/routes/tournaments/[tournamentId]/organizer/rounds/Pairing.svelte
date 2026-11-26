@@ -1,22 +1,17 @@
 <script lang="ts">
-	import AdminReportOptions from './AdminReportOptions.svelte';
 	import FontAwesomeIcon from '#lib/components/FontAwesomeIcon.svelte';
-	import ModalDialog from '#lib/components/ModalDialog.svelte';
 	import type { Stage } from '#lib/model/Stage.ts';
 	import type { Round } from '#lib/model/Round.ts';
 	import type { Pairing } from '#lib/model/Pairing.ts';
 	import type { Tournament } from '#lib/model/Tournament.ts';
-	import {
-		isPreset,
-		readableReportScore,
-		reportsMatch,
-		type ScoreReport
-	} from '#lib/model/ScoreReport.ts';
+	import { isPreset, reportsMatch, type ScoreReport } from '#lib/model/ScoreReport.ts';
 	import PlayerDisplay from '#lib/components/PlayerDisplay.svelte';
 	import type { Player } from '#lib/model/Player.ts';
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { authStore, type AuthUser } from '#lib/utils/auth.svelte.ts';
+	import EditPairingDialog from './EditPairingDialog.svelte';
+	import ScoreDisplay from '#lib/components/ScoreDisplay.svelte';
 
 	let {
 		tournament,
@@ -44,23 +39,6 @@
 	);
 	let rightPlayer = $derived(
 		stage.is_single_sided && pairing.player2.side == 'corp' ? pairing.player1 : pairing.player2
-	);
-	let leftPlayerReport = $derived(
-		pairing.self_reports?.find((r) => r.report_player_id === leftPlayer.user_id)
-	);
-	let rightPlayerReport = $derived(
-		pairing.self_reports?.find((r) => r.report_player_id === rightPlayer.user_id)
-	);
-	let playersReported = $derived(
-		leftPlayerReport !== undefined && rightPlayerReport !== undefined
-	);
-	let selfReportsMatch = $derived(
-		leftPlayerReport?.score1 === rightPlayerReport?.score1 &&
-			leftPlayerReport?.score2 === rightPlayerReport?.score2 &&
-			leftPlayerReport?.score1_corp === rightPlayerReport?.score1_corp &&
-			leftPlayerReport?.score2_corp === rightPlayerReport?.score2_corp &&
-			leftPlayerReport?.score1_runner === rightPlayerReport?.score1_runner &&
-			leftPlayerReport?.score2_runner === rightPlayerReport?.score2_runner
 	);
 
 	function changePlayerSide(player: Player, side: string) {
@@ -91,7 +69,7 @@
 		: ''}"
 >
 	<!-- Table label -->
-	<div class="col-sm-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
+	<div class="col-md-2 {pairing.ui_metadata.row_highlighted ? 'font-weight-bold' : ''}">
 		{pairing.table_label}
 
 		{#if tournament.allow_streaming_opt_out}
@@ -112,62 +90,57 @@
 				</span>
 			{/if}
 		{/if}
+
+		{#if stage.view_decks && stage.is_single_sided}
+			<div class="d-inline d-md-block float-right float-md-none">
+				<a
+					href={resolve(
+						`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=pairings`
+					)}
+				>
+					<FontAwesomeIcon icon="eye" /> View decks
+				</a>
+			</div>
+		{/if}
 	</div>
 
 	<!-- Player 1 -->
-	{#if stage.view_decks}
-		{#if stage.is_single_sided}
-			<a
-				href={resolve(
-					`tournaments/${tournament.id}/rounds/${round.id}/pairings/${pairing.id}/view_decks?back_to=${tournament.user_id === currentUser?.id ? 'pairings' : 'rounds'}`
-				)}
-			>
-				<FontAwesomeIcon icon="eye" /> View decks
-			</a>
+	<div class="col-4 col-md-3 px-2">
+		<PlayerDisplay
+			player={leftPlayer}
+			{pairing}
+			left_or_right="left"
+			is_single_sided={stage.is_single_sided}
+			show_ids={!stage.is_single_sided || pairing.player1.side !== null}
+		/>
+		{#if stage.view_decks && !stage.is_single_sided}
+			<div class="float-right">
+				<a
+					href={resolve(
+						`tournaments/${tournament.id}/players/${pairing.player1.id}/view_decks?back_to=pairings`
+					)}
+				>
+					<FontAwesomeIcon icon="eye" /> View decks
+				</a>
+			</div>
 		{/if}
-	{/if}
-	<PlayerDisplay
-		player={leftPlayer}
-		{pairing}
-		left_or_right="left"
-		is_single_sided={stage.is_single_sided}
-		{changePlayerSide}
-		show_ids={!stage.is_single_sided || pairing.player1.side !== null}
-	/>
+	</div>
 
-	<!-- Score -->
-	<AdminReportOptions {stage} {pairing} {reportScoreCallback} />
-
-	<!-- Player 2 -->
-	<PlayerDisplay
-		player={rightPlayer}
-		{pairing}
-		left_or_right="right"
-		is_single_sided={stage.is_single_sided}
-		{changePlayerSide}
-		show_ids={!stage.is_single_sided || pairing.player2.side !== null}
-	/>
-
-	<!-- Score reporting -->
-	<div class="row-sm1 mr-3">
+	<!-- Edit -->
+	<div class="col-4 col-md-2 centre_score px-2">
 		<button
 			type="button"
 			class="btn btn-primary mr-2"
 			data-toggle="modal"
-			data-target="#reports{pairing.id}"
+			data-target="#editPairing{pairing.id}"
 		>
-			Reports
+			<FontAwesomeIcon icon="pencil" /> Edit
 		</button>
-		<button
-			class="btn btn-danger"
-			onclick={() => {
-				deleteCallback?.(pairing.id);
-			}}
-			aria-label="delete"
-		>
-			<FontAwesomeIcon icon="trash" />
-		</button>
+
 		<!-- Player report status badges -->
+		<div>
+			<ScoreDisplay {pairing} />
+		</div>
 		{#if pairing.self_reports}
 			<div>
 				{#if !pairing.reported}
@@ -184,59 +157,34 @@
 		{/if}
 	</div>
 
-	{#snippet playerReport(player: Player, report: ScoreReport | undefined)}
-		{player.name} reported:
-		{#if report}
-			{readableReportScore(report, pairing.player1.side, stage.is_single_sided)}
-			{#if playersReported && !selfReportsMatch}
-				<FontAwesomeIcon icon="times" />
-			{/if}
-		{:else}
-			<FontAwesomeIcon icon="hourglass" />
+	<!-- Player 2 -->
+	<div class="col-4 col-md-3 px-2">
+		<PlayerDisplay
+			player={rightPlayer}
+			{pairing}
+			left_or_right="right"
+			is_single_sided={stage.is_single_sided}
+			show_ids={!stage.is_single_sided || pairing.player2.side !== null}
+		/>
+		{#if stage.view_decks && !stage.is_single_sided}
+			<a
+				href={resolve(
+					`tournaments/${tournament.id}/players/${pairing.player2.id}/view_decks?back_to=pairings`
+				)}
+			>
+				<FontAwesomeIcon icon="eye" /> View decks
+			</a>
 		{/if}
-	{/snippet}
+	</div>
 
-	{#snippet acceptPlayerReportButton(player: Player, report: ScoreReport)}
-		<button
-			type="button"
-			class="btn btn-primary"
-			data-dismiss="modal"
-			onclick={() => {
-				reportScoreCallback?.(pairing.id, report, false);
-			}}
-			disabled={pairing.reported}
-		>
-			<FontAwesomeIcon icon="check" /> Accept {player.name}
-		</button>
-	{/snippet}
-
-	<ModalDialog id="reports{pairing.id}" headerText="Player Self Reports">
-		<p>
-			{@render playerReport(leftPlayer, leftPlayerReport)}
-		</p>
-		<p>
-			{@render playerReport(rightPlayer, rightPlayerReport)}
-		</p>
-
-		{#snippet footer()}
-			{#if leftPlayerReport}
-				{@render acceptPlayerReportButton(leftPlayer, leftPlayerReport)}
-			{/if}
-			{#if rightPlayerReport}
-				{@render acceptPlayerReportButton(rightPlayer, rightPlayerReport)}
-			{/if}
-			{#if playersReported && !selfReportsMatch}
-				<button
-					type="button"
-					class="btn btn-primary"
-					onclick={() => {
-						resetReportsCallback?.(pairing.id);
-					}}
-					title="Reset self reports of pairing"
-				>
-					<FontAwesomeIcon icon="undo" /> Reset
-				</button>
-			{/if}
-		{/snippet}
-	</ModalDialog>
+	<EditPairingDialog
+		id="editPairing{pairing.id}"
+		{pairing}
+		{stage}
+		self_reporting_enabled={tournament.allow_self_reporting}
+		{reportScoreCallback}
+		{resetReportsCallback}
+		{changePlayerSide}
+		{deleteCallback}
+	/>
 </div>

@@ -187,7 +187,7 @@ describe('Rounds', () => {
 					vi.spyOn(MockPairing1.policy, 'self_report', 'get').mockReturnValue(false);
 					vi.spyOn(MockPairing1, 'self_reports', 'get').mockReturnValue([scoreReport]);
 					const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
-					await user.click(getByRole(table1Row, 'button', { name: /report pairing/i }));
+					await user.click(getByRole(table1Row, 'button', { name: /report score/i }));
 
 					const reportDialog = document.getElementById(`reportModal-${MockPairing1.id}`);
 					expect(reportDialog).not.toBeNull();

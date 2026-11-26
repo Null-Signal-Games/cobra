@@ -43,10 +43,10 @@
 	data-toggle="modal"
 	data-target="#reportModal-{pairing.id}"
 >
-	Report Pairing
+	Report Score
 </button>
 
-<ModalDialog id="reportModal-{pairing.id}" headerText="Report Pairing">
+<ModalDialog id="reportModal-{pairing.id}" headerText="Report Score">
 	<p>Please click the button for the result to report this pairing:</p>
 	<p>
 		{left_player.name_with_pronouns} vs. {right_player.name_with_pronouns}

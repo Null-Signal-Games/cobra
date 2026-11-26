@@ -13,9 +13,10 @@
 
 import {
 	cleanup,
+	getByLabelText,
 	getByRole,
 	getByText,
-	queryByTestId,
+	queryByLabelText,
 	queryByText,
 	render,
 	screen,
@@ -107,6 +108,23 @@ describe('Rounds', () => {
 		};
 
 		return render(RoundsPage, { props: props });
+	}
+
+	async function openEditPairingDialog() {
+		const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+		const editButton = within(table1Row).getByRole('button', {
+			name: /edit/i
+		});
+
+		await user.click(editButton);
+
+		const editDialog = document.getElementById('editPairing1');
+		expect(editDialog).not.toBeNull();
+		if (!editDialog) {
+			throw new Error('Edit pairing dialog not found');
+		}
+
+		return { table1Row, editButton, editDialog };
 	}
 
 	beforeEach(() => {
@@ -288,8 +306,9 @@ describe('Rounds', () => {
 				]);
 				vi.spyOn(window, 'confirm').mockReturnValue(true);
 
-				const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
-				await user.click(within(table1Row).getByRole('button', { name: /delete/i }));
+				const { table1Row, editDialog } = await openEditPairingDialog();
+
+				await user.click(getByRole(editDialog, 'button', { name: /delete/i }));
 
 				await rerender({ data: structuredClone(MockPageData) });
 
@@ -302,59 +321,54 @@ describe('Rounds', () => {
 
 				vi.spyOn(window, 'confirm').mockReturnValue(false);
 
-				const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
-				await user.click(within(table1Row).getByRole('button', { name: /delete/i }));
+				const { table1Row, editDialog } = await openEditPairingDialog();
+
+				await user.click(getByRole(editDialog, 'button', { name: /delete/i }));
+
 				expect(betaApi.deletePairing).not.toHaveBeenCalled();
 				expect(table1Row).toBeInTheDocument();
 			});
 
 			describe.each([
-				[6, 0, false, false, /6-0/i, '6 - 0'],
-				[3, 3, false, false, /3-3 \(c\)/i, '3 - 3 (c)'],
-				[3, 3, false, false, /3-3 \(r\)/i, '3 - 3 (R)'],
-				[6, 0, false, false, /0-6/i, '0 - 6']
-			])('using preset score', (score1, score2, id, twoForOne, buttonText, scoreText) => {
+				[6, 0, /6-0/i, '6 - 0'],
+				[3, 3, /3-3 \(c\)/i, '3 - 3 (c)'],
+				[3, 3, /3-3 \(r\)/i, '3 - 3 (R)'],
+				[6, 0, /0-6/i, '0 - 6']
+			])('using preset score', (score1, score2, buttonText, scoreText) => {
 				it(scoreText, async () => {
 					const { rerender } = renderRounds();
 
 					vi.spyOn(MockPairing1, 'reported', 'get').mockReturnValue(true);
 					vi.spyOn(MockPairing1, 'score1', 'get').mockReturnValue(score1);
 					vi.spyOn(MockPairing1, 'score2', 'get').mockReturnValue(score2);
+					vi.spyOn(MockPairing1, 'score_label', 'get').mockReturnValue(
+						`{score1} - {score2}`
+					);
 
-					const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
-					await user.click(within(table1Row).getByRole('button', { name: buttonText }));
+					const { table1Row, editDialog } = await openEditPairingDialog();
+
+					await user.click(getByRole(editDialog, 'button', { name: buttonText }));
 
 					await rerender({ data: structuredClone(MockPageData) });
 
 					expect(betaApi.reportScore).toHaveBeenCalledOnce();
+					expect(getByRole(editDialog, 'textbox', { name: /corp-score/i })).toHaveValue(
+						score1.toString()
+					);
+					expect(getByRole(editDialog, 'textbox', { name: /runner-score/i })).toHaveValue(
+						score2.toString()
+					);
 					expect(
-						within(table1Row).getByRole('textbox', { name: /corp-score/i })
-					).toHaveValue(score1.toString());
+						getByRole(editDialog, 'checkbox', {
+							name: /intentional draw/i
+						})
+					).not.toBeChecked();
 					expect(
-						within(table1Row).getByRole('textbox', { name: /runner-score/i })
-					).toHaveValue(score2.toString());
-					if (id) {
-						expect(
-							within(table1Row).getByRole('checkbox', {
-								name: /intentional draw/i
-							})
-						).toBeChecked();
-					} else {
-						expect(
-							within(table1Row).getByRole('checkbox', {
-								name: /intentional draw/i
-							})
-						).not.toBeChecked();
-					}
-					if (twoForOne) {
-						expect(
-							within(table1Row).getByRole('checkbox', { name: /2 for 1/i })
-						).toBeChecked();
-					} else {
-						expect(
-							within(table1Row).getByRole('checkbox', { name: /2 for 1/i })
-						).not.toBeChecked();
-					}
+						getByRole(editDialog, 'checkbox', { name: /2 for 1/i })
+					).not.toBeChecked();
+					expect(table1Row).toContainElement(
+						queryByText(table1Row, `{score1} - {score2}`)
+					);
 				});
 			});
 
@@ -369,68 +383,73 @@ describe('Rounds', () => {
 					vi.spyOn(MockPairing1, 'reported', 'get').mockReturnValue(true);
 					vi.spyOn(MockPairing1, 'score1', 'get').mockReturnValue(score1);
 					vi.spyOn(MockPairing1, 'score2', 'get').mockReturnValue(score2);
+					vi.spyOn(MockPairing1, 'score_label', 'get').mockReturnValue(
+						`{score1} - {score2}`
+					);
 					vi.spyOn(MockPairing1, 'intentional_draw', 'get').mockReturnValue(id);
 					vi.spyOn(MockPairing1, 'two_for_one', 'get').mockReturnValue(twoForOne);
 
-					const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
-					await user.click(
-						within(table1Row).getByRole('button', { name: /show-custom/i })
-					);
+					const { table1Row, editDialog } = await openEditPairingDialog();
+
+					await user.click(getByRole(editDialog, 'button', { name: /show-custom/i }));
 					await user.type(
-						within(table1Row).getByRole('textbox', { name: /corp-score/i }),
+						getByRole(editDialog, 'textbox', { name: /corp-score/i }),
 						score1.toString()
 					);
 					await user.type(
-						within(table1Row).getByRole('textbox', { name: /runner-score/i }),
+						getByRole(editDialog, 'textbox', { name: /runner-score/i }),
 						score2.toString()
 					);
 					if (id) {
 						await user.click(
-							within(table1Row).getByRole('checkbox', {
+							getByRole(editDialog, 'checkbox', {
 								name: /intentional draw/i
 							})
 						);
 					}
 					if (twoForOne) {
 						await user.click(
-							within(table1Row).getByRole('checkbox', {
+							getByRole(editDialog, 'checkbox', {
 								name: /2 for 1/i
 							})
 						);
 					}
-					await user.click(within(table1Row).getByRole('button', { name: /save/i }));
+					await user.click(getByRole(editDialog, 'button', { name: /save/i }));
 
 					await rerender({ data: structuredClone(MockPageData) });
 
 					expect(betaApi.reportScore).toHaveBeenCalledOnce();
-					expect(
-						within(table1Row).getByRole('textbox', { name: /corp-score/i })
-					).toHaveValue(score1.toString());
-					expect(
-						within(table1Row).getByRole('textbox', { name: /runner-score/i })
-					).toHaveValue(score2.toString());
+					expect(getByRole(editDialog, 'textbox', { name: /corp-score/i })).toHaveValue(
+						score1.toString()
+					);
+					expect(getByRole(editDialog, 'textbox', { name: /runner-score/i })).toHaveValue(
+						score2.toString()
+					);
 					if (id) {
 						expect(
-							within(table1Row).getByRole('checkbox', {
+							getByRole(editDialog, 'checkbox', {
 								name: /intentional draw/i
 							})
 						).toBeChecked();
 					} else {
 						expect(
-							within(table1Row).getByRole('checkbox', {
+							getByRole(editDialog, 'checkbox', {
 								name: /intentional draw/i
 							})
 						).not.toBeChecked();
 					}
 					if (twoForOne) {
 						expect(
-							within(table1Row).getByRole('checkbox', { name: /2 for 1/i })
+							getByRole(editDialog, 'checkbox', { name: /2 for 1/i })
 						).toBeChecked();
 					} else {
 						expect(
-							within(table1Row).getByRole('checkbox', { name: /2 for 1/i })
+							getByRole(editDialog, 'checkbox', { name: /2 for 1/i })
 						).not.toBeChecked();
 					}
+					expect(table1Row).toContainElement(
+						queryByText(table1Row, `{score1} - {score2}`)
+					);
 				});
 			});
 
@@ -583,6 +602,14 @@ describe('Rounds', () => {
 		});
 
 		describe('manage self-reports', () => {
+			beforeEach(() => {
+				vi.spyOn(
+					MockPageData.tournamentData.tournament,
+					'allow_self_reporting',
+					'get'
+				).mockReturnValue(true);
+			});
+
 			it('displays the Partial badge when only one player has reported', () => {
 				vi.spyOn(MockPairing1, 'self_reports', 'get').mockReturnValue([MockSelfReport1]);
 
@@ -628,51 +655,29 @@ describe('Rounds', () => {
 
 				it('accepts a report', async () => {
 					const { rerender } = renderRounds();
-					const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
 
-					const reportsButton = within(table1Row).getByRole('button', {
-						name: /reports/i
-					});
-					expect(reportsButton).not.toContainElement(
-						queryByTestId(reportsButton, 'reportConflict')
-					);
+					const { table1Row, editDialog } = await openEditPairingDialog();
 
-					await user.click(reportsButton);
-
-					const reportDialog = document.getElementById('reports1');
-					expect(reportDialog).not.toBeNull();
-					if (!reportDialog) {
-						return;
-					}
-					const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
-					expect(reportDialog).toContainElement(
-						getByText(reportDialog, /alice reported: 6 - 0/i)
-					);
-					expect(reportDialog).toContainElement(
-						getByText(reportDialog, /bob reported: 6 - 0/i)
-					);
-					expect(reportDialog).toContainElement(aliceAcceptButton);
-					expect(reportDialog).toContainElement(queryByText(reportDialog, /accept bob/i));
+					const aliceAcceptButton = getByLabelText(editDialog, /accept alice/i);
+					expect(
+						getByLabelText(editDialog, /accept alice/i).parentElement?.parentElement
+					).toHaveTextContent('6 - 0');
+					expect(
+						getByLabelText(editDialog, /accept bob/i).parentElement?.parentElement
+					).toHaveTextContent('6 - 0');
 
 					vi.spyOn(MockPairing1, 'reported', 'get').mockReturnValue(true);
 					vi.spyOn(MockPairing1, 'score1', 'get').mockReturnValue(6);
 					vi.spyOn(MockPairing1, 'score2', 'get').mockReturnValue(0);
+					vi.spyOn(MockPairing1, 'score_label', 'get').mockReturnValue('6 - 0');
 					await user.click(aliceAcceptButton);
 
 					await rerender({ data: structuredClone(MockPageData) });
 
 					expect(betaApi.reportScore).toHaveBeenCalledOnce();
-					expect(
-						within(table1Row).getByRole('textbox', { name: /corp-score/i })
-					).toHaveValue('6');
-					expect(
-						within(table1Row).getByRole('textbox', { name: /runner-score/i })
-					).toHaveValue('0');
-					expect(
-						within(table1Row).getByRole('checkbox', {
-							name: /intentional draw/i
-						})
-					).not.toBeChecked();
+					expect(getByLabelText(editDialog, /accept alice/i)).toBeDisabled();
+					expect(getByLabelText(editDialog, /accept bob/i)).toBeDisabled();
+					expect(table1Row).toHaveTextContent('6 - 0');
 				});
 			});
 
@@ -698,89 +703,50 @@ describe('Rounds', () => {
 				it('accepts a report', async () => {
 					const { rerender } = renderRounds();
 
-					const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
+					const { table1Row, editDialog } = await openEditPairingDialog();
 
-					const reportsButton = within(table1Row).getByRole('button', {
-						name: /reports/i
-					});
-
-					await user.click(reportsButton);
-
-					const reportDialog = document.getElementById('reports1');
-					expect(reportDialog).not.toBeNull();
-					if (!reportDialog) {
-						return;
-					}
-					const aliceAcceptButton = getByText(reportDialog, /accept alice/i);
-					expect(reportDialog).toContainElement(
-						getByText(reportDialog, /alice reported: 6 - 0/i)
-					);
-					expect(reportDialog).toContainElement(
-						getByText(reportDialog, /bob reported: 0 - 6/i)
-					);
-					expect(reportDialog).toContainElement(aliceAcceptButton);
-					expect(reportDialog).toContainElement(queryByText(reportDialog, /accept bob/i));
+					const aliceAcceptButton = getByLabelText(editDialog, /accept alice/i);
+					expect(
+						getByLabelText(editDialog, /accept alice/i).parentElement?.parentElement
+					).toHaveTextContent('6 - 0');
+					expect(
+						getByLabelText(editDialog, /accept bob/i).parentElement?.parentElement
+					).toHaveTextContent('0 - 6');
 
 					vi.spyOn(MockPairing1, 'reported', 'get').mockReturnValue(true);
 					vi.spyOn(MockPairing1, 'score1', 'get').mockReturnValue(6);
 					vi.spyOn(MockPairing1, 'score2', 'get').mockReturnValue(0);
+					vi.spyOn(MockPairing1, 'score_label', 'get').mockReturnValue('6 - 0');
 					await user.click(aliceAcceptButton);
 
 					await rerender({ data: structuredClone(MockPageData) });
 
 					expect(betaApi.reportScore).toHaveBeenCalledOnce();
-					expect(
-						within(table1Row).getByRole('textbox', { name: /corp-score/i })
-					).toHaveValue('6');
-					expect(
-						within(table1Row).getByRole('textbox', { name: /runner-score/i })
-					).toHaveValue('0');
-					expect(
-						within(table1Row).getByRole('checkbox', {
-							name: /intentional draw/i
-						})
-					).not.toBeChecked();
+					expect(getByLabelText(editDialog, /accept alice/i)).toBeDisabled();
+					expect(getByLabelText(editDialog, /accept bob/i)).toBeDisabled();
+					expect(table1Row).toHaveTextContent('6 - 0');
 				});
 
 				it('resets the reports', async () => {
 					const { rerender } = renderRounds();
 
-					const table1Row = document.getElementsByClassName('table_1')[0] as HTMLElement;
-					const reportsButton = within(table1Row).getByRole('button', {
-						name: /reports/i
-					});
-
-					await user.click(reportsButton);
-
-					const reportDialog = document.getElementById('reports1');
-					expect(reportDialog).not.toBeNull();
-					if (!reportDialog) {
-						return;
-					}
+					const { editButton, editDialog } = await openEditPairingDialog();
 
 					vi.spyOn(MockPairing1, 'self_reports', 'get').mockReturnValue(null);
 					vi.spyOn(MockPairing1, 'reported', 'get').mockReturnValue(false);
 					vi.spyOn(MockPairing1, 'score1', 'get').mockReturnValue(0);
 					vi.spyOn(MockPairing1, 'score2', 'get').mockReturnValue(0);
-					await user.click(getByText(reportDialog, /reset/i));
+					await user.click(getByText(editDialog, /reset/i));
 					expect(betaApi.resetReports).toHaveBeenCalledOnce();
 
 					await rerender({ data: structuredClone(MockPageData) });
 
-					await user.click(reportsButton);
+					await user.click(editButton);
 
-					expect(reportDialog).not.toContainElement(
-						queryByText(reportDialog, /alice reported: 6 - 0/i)
-					);
-					expect(reportDialog).not.toContainElement(
-						queryByText(reportDialog, /bob reported: 0 - 6/i)
-					);
-					expect(reportDialog).not.toContainElement(
-						queryByText(reportDialog, /accept alice/i)
-					);
-					expect(reportDialog).not.toContainElement(
-						queryByText(reportDialog, /accept bob/i)
-					);
+					expect(editDialog).not.toContainElement(queryByText(editDialog, /3 - 0/i));
+					expect(editDialog).not.toContainElement(queryByText(editDialog, /0 - 3/i));
+					expect(queryByLabelText(editDialog, /accept alice/i)).toBeDisabled();
+					expect(queryByLabelText(editDialog, /accept bob/i)).toBeDisabled();
 				});
 			});
 		});
